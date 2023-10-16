@@ -30,9 +30,9 @@ std::string extra_args_orig;
 
 #if defined LUA_BENCH || defined LUA_BENCH2
 extern "C" {
-#include <lua5.2/lua.h>
-#include <lua5.2/lauxlib.h>
-#include <lua5.2/lualib.h>
+#include <lua5.4/lua.h>
+#include <lua5.4/lauxlib.h>
+#include <lua5.4/lualib.h>
 }
 
 lua_State *lua_state;
