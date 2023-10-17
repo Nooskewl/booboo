@@ -771,7 +771,7 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 	Program &func = prg->functions[function];
 
 	for (size_t j = 0; j < func.params.size(); j++) {
-		Token param = params[j+ignore_params];
+		Token &param = params[j+ignore_params];
 		
 		Variable var;
 
