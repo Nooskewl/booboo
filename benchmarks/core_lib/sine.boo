@@ -5,7 +5,7 @@ function draw_at r g b x radius
 	/ f 640
 	* f 3.14159
 	* f 2
-	sin f f
+	;sin f f
 	* f 90
 	+ f 180
 }

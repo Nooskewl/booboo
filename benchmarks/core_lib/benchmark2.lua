@@ -2,7 +2,7 @@ x = 0
 
 function draw_at(r, g, b, x, radius)
 	f = x / 640 * 3.14159 * 2
-	f = math.sin(f)
+	--f = math.sin(f)
 	f = f * 90 + 180
 end
 
