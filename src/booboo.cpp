@@ -773,7 +773,7 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 	for (size_t j = 0; j < func.params.size(); j++) {
 		Token &param = params[j+ignore_params];
 		
-		Variable var;
+		Variable &var = prg->variables[func.params[j]];
 
 		if (param.type == Token::NUMBER) {
 			var.type = Variable::NUMBER;
@@ -786,12 +786,8 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 			var.name = param.token;
 		}
 		else {
-			Variable &v1 = prg->variables[param.i];
-			var = v1;
-			//var.name = func.parameters[j];
+			var = prg->variables[param.i];
 		}
-		
-		prg->variables[func.params[j]] = var;
 	}
 
 	Function_Swap *bak2 = prg->s;
