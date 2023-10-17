@@ -663,6 +663,7 @@ static void compile(Program *prg, Pass pass)
 				throw Error(std::string(__FUNCTION__) + ": " + "Missing } at " + get_error_info(&func));
 			}
 
+			prg->function_name_map[func.s->name] = prg->functions.size();
 			prg->functions.push_back(func);
 					
 			std::map<std::string, int>::iterator it;
@@ -808,17 +809,16 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 
 void call_function(Program *prg, std::string function_name, std::vector<Token> &params, Variable &result, int ignore_params)
 {
-	for (size_t i = 0; i < prg->functions.size(); i++) {
-		if (prg->functions[i].s->name == function_name) {
-			call_function(prg, i, params, result, ignore_params);
-			return;
-		}
+	std::map<std::string, int>::iterator it = prg->function_name_map.find(function_name);
+	if (it == prg->function_name_map.end()) {
+		return;
 	}
+	call_function(prg, (*it).second, params, result, ignore_params);
 }
 
 void call_void_function(Program *prg, int function, std::vector<Token> &params, int ignore_params)
 {
-	Variable tmp;
+	static Variable tmp;
 	call_function(prg, function, params, tmp, ignore_params);
 }
 

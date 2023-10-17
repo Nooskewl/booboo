@@ -45,6 +45,7 @@ struct Program {
 
 	std::vector<Variable> variables;
 	std::map<std::string, int> variables_map;
+	std::map<std::string, int> function_name_map;
 	std::vector<Program> functions;
 	std::vector<int> params;
 
