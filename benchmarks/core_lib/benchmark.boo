@@ -1,4 +1,4 @@
-function draw_at r g b x radius
+function draw_at r g b x
 {
 	number f
 	= f x
@@ -16,7 +16,7 @@ function draw
 	= xx 0
 
 :loop
-	call draw_at 0 255 0 xx 8
+	call draw_at 0 255 0 xx
 	+ xx 2
 	? xx 640
 	jl loop
@@ -25,7 +25,7 @@ function draw
 	= tmp x
 	% tmp 640
 
-	call draw_at 128 255 128 tmp 32
+	call draw_at 128 255 128 tmp
 }
 
 function run
