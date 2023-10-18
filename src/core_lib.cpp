@@ -25,12 +25,12 @@ bool breaker_return(Program *prg, std::vector<Token> &v)
 {
 	Variable &v1 = prg->s->result;
 
-	if (v[0].type == Token::NUMBER) {
+	if (v[0].type == Token::SYMBOL) {
+		v1 = prg->variables[v[0].i];
+	}
+	else if (v[0].type == Token::NUMBER) {
 		v1.type = Variable::NUMBER;
 		v1.n = v[0].n;
-	}
-	else if (v[0].type == Token::SYMBOL) {
-		v1 = prg->variables[v[0].i];
 	}
 	else {
 		v1.type = Variable::STRING;
@@ -65,31 +65,7 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
-	if (v[1].type == Token::NUMBER) {
-		if (v1.type == Variable::NUMBER) {
-			v1.n = v[1].n;
-		}
-		else if (v1.type == Variable::STRING) {
-			char buf[1000];
-			snprintf(buf, 1000, "%g", v[1].n);
-			v1.s = buf;
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-		}
-	}
-	else if (v[1].type == Token::STRING) {
-		if (v1.type == Variable::STRING) {
-			v1.s = v[1].s;
-		}
-		else if (v1.type == Variable::NUMBER) {
-			v1.n = atof(v[1].s.c_str());
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-		}
-	}
-	else {
+	if (v[1].type == Token::SYMBOL) {
 		Variable &v2 = prg->variables[v[1].i];
 
 		if (v1.type == Variable::NUMBER) {
@@ -123,6 +99,33 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 		}
 	}
+	else if (v[1].type == Token::NUMBER) {
+		if (v1.type == Variable::NUMBER) {
+			v1.n = v[1].n;
+		}
+		else if (v1.type == Variable::STRING) {
+			char buf[1000];
+			snprintf(buf, 1000, "%g", v[1].n);
+			v1.s = buf;
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
+	}
+	else if (v[1].type == Token::STRING) {
+		if (v1.type == Variable::STRING) {
+			v1.s = v[1].s;
+		}
+		else if (v1.type == Variable::NUMBER) {
+			v1.n = atof(v[1].s.c_str());
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
 
 	return true;
 }
@@ -134,12 +137,10 @@ bool corefunc_add(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
-		double d = as_number_inline(prg, v[1]);
-		v1.n += d;
+		v1.n += as_number_inline(prg, v[1]);
 	}
 	else if (v1.type == Variable::STRING) {
-		std::string s = as_string_inline(prg, v[1]);
-		v1.s += s;
+		v1.s += as_string_inline(prg, v[1]);
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -153,10 +154,9 @@ bool corefunc_subtract(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
-	double d = as_number_inline(prg, v[1]);
 
 	if (v1.type == Variable::NUMBER) {
-		v1.n -= d;
+		v1.n -= as_number_inline(prg, v[1]);
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -170,10 +170,9 @@ bool corefunc_multiply(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
-	double d = as_number_inline(prg, v[1]);
 
 	if (v1.type == Variable::NUMBER) {
-		v1.n *= d;
+		v1.n *= as_number_inline(prg, v[1]);
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -187,10 +186,9 @@ bool corefunc_divide(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
-	double d = as_number_inline(prg, v[1]);
 
 	if (v1.type == Variable::NUMBER) {
-		v1.n /= d;
+		v1.n /= as_number_inline(prg, v[1]);
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -212,54 +210,79 @@ bool corefunc_compare(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	bool a_string = false;
-	bool b_string = false;
-	std::string s1;
-	std::string s2;
+	bool is_num = false;
+	double n;
 
-	if (v[0].type == Token::STRING) {
-		a_string = true;
-		s1 = v[0].s;
-	}
-	else if (v[0].type == Token::SYMBOL) {
+	if (v[0].type == Token::SYMBOL) {
 		Variable &var = as_variable_inline(prg, v[0]);
-		if (var.type == Variable::STRING) {
-			a_string = true;
-			s1 = var.s;
-		}
+		is_num = true;
+		n = var.n;
 	}
-	
-	if (v[1].type == Token::STRING) {
-		b_string = true;
-		s2 = v[1].s;
+	else if (v[0].type == Token::NUMBER) {
+		is_num = true;
+		n = v[0].n;
 	}
-	else if (v[1].type == Token::SYMBOL) {
-		Variable &var = as_variable_inline(prg, v[1]);
-		if (var.type == Variable::STRING) {
-			b_string = true;
-			s2 = var.s;
-		}
-	}
-	
-	if (a_string && b_string) {
-		prg->compare_flag = strcmp(s1.c_str(), s2.c_str());
-	}
-	else if (a_string || b_string) {
-		prg->compare_flag = 0;
-	}
-	// FIXME: if they're vectors or something then it should report an error
-	else {
-		double ad = as_number_inline(prg, v[0]);
-		double bd = as_number_inline(prg, v[1]);
 
-		if (ad < bd) {
-			prg->compare_flag = -1;
-		}
-		else if (ad == bd) {
-			prg->compare_flag = 0;
+	if (is_num) {
+		if (v[1].type == Token::NUMBER) {
+			if (n < v[1].n) {
+				prg->compare_flag = -1;
+			}
+			else if (n == v[1].n) {
+				prg->compare_flag = 0;
+			}
+			else {
+				prg->compare_flag = 1;
+			}
 		}
 		else {
-			prg->compare_flag = 1;
+			Variable &var = as_variable_inline(prg, v[1]);
+			if (n < var.n) {
+				prg->compare_flag = -1;
+			}
+			else if (n == var.n) {
+				prg->compare_flag = 0;
+			}
+			else {
+				prg->compare_flag = 1;
+			}
+		}
+	}
+	else {
+		bool a_string = false;
+		bool b_string = false;
+		std::string s1;
+		std::string s2;
+
+		if (v[0].type == Token::STRING) {
+			a_string = true;
+			s1 = v[0].s;
+		}
+		else if (v[0].type == Token::SYMBOL) {
+			Variable &var = as_variable_inline(prg, v[0]);
+			if (var.type == Variable::STRING) {
+				a_string = true;
+				s1 = var.s;
+			}
+		}
+		
+		if (v[1].type == Token::STRING) {
+			b_string = true;
+			s2 = v[1].s;
+		}
+		else if (v[1].type == Token::SYMBOL) {
+			Variable &var = as_variable_inline(prg, v[1]);
+			if (var.type == Variable::STRING) {
+				b_string = true;
+				s2 = var.s;
+			}
+		}
+		
+		if (a_string && b_string) {
+			prg->compare_flag = strcmp(s1.c_str(), s2.c_str());
+		}
+		else {
+			prg->compare_flag = 0;
 		}
 	}
 
@@ -335,8 +358,6 @@ bool corefunc_jge(Program *prg, std::vector<Token> &v)
 bool corefunc_call(Program *prg, std::vector<Token> &v)
 {
 	int function = as_function_inline(prg, v[0]);
-
-	Variable result;
 
 	call_void_function(prg, function, v, 1);
 

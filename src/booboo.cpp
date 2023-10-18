@@ -338,25 +338,23 @@ static std::string token(Program *prg, Token::Token_Type &ret_type)
 	}
 
 	std::string tok;
-	char s[2];
-	s[1] = 0;
 
-	if ((prg->s->p < prg->s->code.length()-1 && prg->s->code[prg->s->p] == '-' && isdigit(prg->s->code[prg->s->p+1])) || isdigit(prg->s->code[prg->s->p])) {
-		while (prg->s->p < prg->s->code.length() && (isdigit(prg->s->code[prg->s->p]) || prg->s->code[prg->s->p] == '.' || prg->s->code[prg->s->p] == '-')) {
-			s[0] = prg->s->code[prg->s->p];
-			tok += s;
+	if (isalpha(prg->s->code[prg->s->p]) || prg->s->code[prg->s->p] == '_') {
+		int start = prg->s->p;
+		while (prg->s->p < prg->s->code.length() && (isdigit(prg->s->code[prg->s->p]) || isalpha(prg->s->code[prg->s->p]) || prg->s->code[prg->s->p] == '_')) {
 			prg->s->p++;
 		}
-		ret_type = Token::NUMBER;
+		tok = prg->s->code.substr(start, prg->s->p-start);
+		ret_type = Token::SYMBOL;
 		return tok;
 	}
-	else if (isalpha(prg->s->code[prg->s->p]) || prg->s->code[prg->s->p] == '_') {
-		while (prg->s->p < prg->s->code.length() && (isdigit(prg->s->code[prg->s->p]) || isalpha(prg->s->code[prg->s->p]) || prg->s->code[prg->s->p] == '_')) {
-			s[0] = prg->s->code[prg->s->p];
-			tok += s;
+	else if (isdigit(prg->s->code[prg->s->p]) || (prg->s->p < prg->s->code.length()-1 && prg->s->code[prg->s->p] == '-' && isdigit(prg->s->code[prg->s->p+1]))) {
+		int start = prg->s->p;
+		while (prg->s->p < prg->s->code.length() && (isdigit(prg->s->code[prg->s->p]) || prg->s->code[prg->s->p] == '.' || prg->s->code[prg->s->p] == '-')) {
 			prg->s->p++;
 		}
-		ret_type = Token::SYMBOL;
+		tok = prg->s->code.substr(start, prg->s->p-start);
+		ret_type = Token::NUMBER;
 		return tok;
 	}
 
