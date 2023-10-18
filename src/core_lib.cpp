@@ -8,14 +8,14 @@ namespace booboo {
 
 bool breaker_reset(Program *prg, std::vector<Token> &v)
 {
-	reset_game_name = as_string(prg, v[0]);
+	reset_game_name = as_string_inline(prg, v[0]);
 
 	return false;
 }
 
 bool breaker_exit(Program *prg, std::vector<Token> &v)
 {
-	return_code = as_number(prg, v[0]);
+	return_code = as_number_inline(prg, v[0]);
 	reset_game_name = "";
 	quit = true;
 	return false;
@@ -63,7 +63,7 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v[1].type == Token::NUMBER) {
 		if (v1.type == Variable::NUMBER) {
@@ -79,11 +79,11 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 		}
 	}
 	else if (v[1].type == Token::STRING) {
-		if (v1.type == Variable::NUMBER) {
-			v1.n = atof(v[1].s.c_str());
-		}
-		else if (v1.type == Variable::STRING) {
+		if (v1.type == Variable::STRING) {
 			v1.s = v[1].s;
+		}
+		else if (v1.type == Variable::NUMBER) {
+			v1.n = atof(v[1].s.c_str());
 		}
 		else {
 			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -92,17 +92,32 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 	else {
 		Variable &v2 = prg->variables[v[1].i];
 
-		if (v1.type == Variable::NUMBER && v2.type == Variable::NUMBER) {
-			v1.n = v2.n;
+		if (v1.type == Variable::NUMBER) {
+			if (v2.type == Variable::NUMBER) {
+				v1.n = v2.n;
+			}
+			else if (v2.type == Variable::STRING) {
+				v1.n = atof(v2.s.c_str());
+			}
+			else {
+				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+			}
 		}
-		else if (v1.type == Variable::STRING && v2.type == Variable::NUMBER) {
-			v1.s = itos(v2.n);
+		else if (v1.type == Variable::STRING) {
+			if (v2.type == Variable::STRING) {
+				v1.s = v2.s;
+			}
+			else {
+				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+			}
 		}
-		else if (v1.type == Variable::STRING && v2.type == Variable::STRING) {
-			v1.s = v2.s;
-		}
-		else if (v1.type == Variable::VECTOR && v2.type == Variable::VECTOR) {
-			v1.v = v2.v;
+		else if (v1.type == Variable::VECTOR) {
+			if (v2.type == Variable::VECTOR) {
+				v1.v = v2.v;
+			}
+			else {
+				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+			}
 		}
 		else {
 			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
@@ -116,14 +131,14 @@ bool corefunc_add(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
-		double d = as_number(prg, v[1]);
+		double d = as_number_inline(prg, v[1]);
 		v1.n += d;
 	}
 	else if (v1.type == Variable::STRING) {
-		std::string s = as_string(prg, v[1]);
+		std::string s = as_string_inline(prg, v[1]);
 		v1.s += s;
 	}
 	else {
@@ -137,8 +152,8 @@ bool corefunc_subtract(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	double d = as_number(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	double d = as_number_inline(prg, v[1]);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n -= d;
@@ -154,8 +169,8 @@ bool corefunc_multiply(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	double d = as_number(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	double d = as_number_inline(prg, v[1]);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n *= d;
@@ -171,8 +186,8 @@ bool corefunc_divide(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	double d = as_number(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	double d = as_number_inline(prg, v[1]);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n /= d;
@@ -188,7 +203,7 @@ bool corefunc_goto(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	prg->s->pc = as_label(prg, v[0]);
+	prg->s->pc = as_label_inline(prg, v[0]);
 
 	return true;
 }
@@ -207,7 +222,7 @@ bool corefunc_compare(Program *prg, std::vector<Token> &v)
 		s1 = v[0].s;
 	}
 	else if (v[0].type == Token::SYMBOL) {
-		Variable &var = as_variable(prg, v[0]);
+		Variable &var = as_variable_inline(prg, v[0]);
 		if (var.type == Variable::STRING) {
 			a_string = true;
 			s1 = var.s;
@@ -219,7 +234,7 @@ bool corefunc_compare(Program *prg, std::vector<Token> &v)
 		s2 = v[1].s;
 	}
 	else if (v[1].type == Token::SYMBOL) {
-		Variable &var = as_variable(prg, v[1]);
+		Variable &var = as_variable_inline(prg, v[1]);
 		if (var.type == Variable::STRING) {
 			b_string = true;
 			s2 = var.s;
@@ -234,8 +249,8 @@ bool corefunc_compare(Program *prg, std::vector<Token> &v)
 	}
 	// FIXME: if they're vectors or something then it should report an error
 	else {
-		double ad = as_number(prg, v[0]);
-		double bd = as_number(prg, v[1]);
+		double ad = as_number_inline(prg, v[0]);
+		double bd = as_number_inline(prg, v[1]);
 
 		if (ad < bd) {
 			prg->compare_flag = -1;
@@ -256,7 +271,7 @@ bool corefunc_je(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	if (prg->compare_flag == 0) {
-		prg->s->pc = as_label(prg, v[0]);
+		prg->s->pc = as_label_inline(prg, v[0]);
 	}
 
 	return true;
@@ -267,7 +282,7 @@ bool corefunc_jne(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	if (prg->compare_flag != 0) {
-		prg->s->pc = as_label(prg, v[0]);
+		prg->s->pc = as_label_inline(prg, v[0]);
 	}
 
 	return true;
@@ -278,7 +293,7 @@ bool corefunc_jl(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	if (prg->compare_flag < 0) {
-		prg->s->pc = as_label(prg, v[0]);
+		prg->s->pc = as_label_inline(prg, v[0]);
 	}
 
 	return true;
@@ -289,7 +304,7 @@ bool corefunc_jle(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	if (prg->compare_flag <= 0) {
-		prg->s->pc = as_label(prg, v[0]);
+		prg->s->pc = as_label_inline(prg, v[0]);
 	}
 
 	return true;
@@ -300,7 +315,7 @@ bool corefunc_jg(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	if (prg->compare_flag > 0) {
-		prg->s->pc = as_label(prg, v[0]);
+		prg->s->pc = as_label_inline(prg, v[0]);
 	}
 
 	return true;
@@ -311,7 +326,7 @@ bool corefunc_jge(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	if (prg->compare_flag >= 0) {
-		prg->s->pc = as_label(prg, v[0]);
+		prg->s->pc = as_label_inline(prg, v[0]);
 	}
 
 	return true;
@@ -319,7 +334,7 @@ bool corefunc_jge(Program *prg, std::vector<Token> &v)
 
 bool corefunc_call(Program *prg, std::vector<Token> &v)
 {
-	int function = as_function(prg, v[0]);
+	int function = as_function_inline(prg, v[0]);
 
 	Variable result;
 
@@ -330,8 +345,8 @@ bool corefunc_call(Program *prg, std::vector<Token> &v)
 
 bool corefunc_call_result(Program *prg, std::vector<Token> &v)
 {
-	Variable &result = as_variable(prg, v[0]);
-	int function = as_function(prg, v[1]);
+	Variable &result = as_variable_inline(prg, v[0]);
+	int function = as_function_inline(prg, v[1]);
 
 	call_function(prg, function, v, result, 2);
 

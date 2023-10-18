@@ -1054,63 +1054,6 @@ std::vector<Variable> get_vector(Variable &v)
 	return v.v;
 }
 
-Variable &as_variable(Program *prg, Token &t)
-{
-	return prg->variables[t.i];
-}
-
-double as_number(Program *prg, Token &t)
-{
-	if (t.type == Token::NUMBER) {
-		return t.n;
-	}
-	else if (t.type == Token::SYMBOL) {
-		Variable &v = prg->variables[t.i];
-		if (v.type == Variable::NUMBER) {
-			return v.n;
-		}
-		else {
-			return atof(v.s.c_str());
-		}
-	}
-	else {
-		return atof(t.s.c_str());
-	}
-}
-
-std::string as_string(Program *prg, Token &t)
-{
-	if (t.type == Token::NUMBER) {
-		char buf[1000];
-		snprintf(buf, 1000, "%g", t.n);
-		return buf;
-	}
-	else if (t.type == Token::SYMBOL) {
-		Variable &v = prg->variables[t.i];
-		if (v.type == Variable::STRING) {
-			return v.s;
-		}
-		else {
-			char buf[1000];
-			snprintf(buf, 1000, "%g", v.n);
-			return buf;
-		}
-	}
-	else {
-		return t.s;
-	}
-}
-
-int as_label(Program *prg, Token &t)
-{
-	return prg->variables[t.i].n;
-}
-
-int as_function(Program *prg, Token &t)
-{
-	return prg->variables[t.i].n;
-}
-
 void *get_black_box(Program *prg, std::string id)
 {
 	if (prg->black_box.find(id) == prg->black_box.end()) {
@@ -1127,6 +1070,31 @@ void set_black_box(Program *prg, std::string id, void *data)
 Variable &get_variable(Program *prg, int index)
 {
 	return prg->variables[index];
+}
+
+Variable &as_variable(Program *prg, Token &t)
+{
+	return as_variable_inline(prg, t);
+}
+
+double as_number(Program *prg, Token &t)
+{
+	return as_number_inline(prg, t);
+}
+
+std::string as_string(Program *prg, Token &t)
+{
+	return as_string_inline(prg, t);
+}
+
+int as_label(Program *prg, Token &t)
+{
+	return as_label_inline(prg, t);
+}
+
+int as_function(Program *prg, Token &t)
+{
+	return as_function_inline(prg, t);
 }
 
 // Error class

@@ -62,6 +62,63 @@ std::string itos(int i);
 // This automatically gets called when you call booboo::start
 void start_lib_core();
 
+inline Variable &as_variable_inline(Program *prg, Token &t)
+{
+	return prg->variables[t.i];
+}
+
+inline double as_number_inline(Program *prg, Token &t)
+{
+	if (t.type == Token::NUMBER) {
+		return t.n;
+	}
+	else if (t.type == Token::SYMBOL) {
+		Variable &v = prg->variables[t.i];
+		if (v.type == Variable::NUMBER) {
+			return v.n;
+		}
+		else {
+			return atof(v.s.c_str());
+		}
+	}
+	else {
+		return atof(t.s.c_str());
+	}
+}
+
+inline std::string as_string_inline(Program *prg, Token &t)
+{
+	if (t.type == Token::NUMBER) {
+		char buf[1000];
+		snprintf(buf, 1000, "%g", t.n);
+		return buf;
+	}
+	else if (t.type == Token::SYMBOL) {
+		Variable &v = prg->variables[t.i];
+		if (v.type == Variable::STRING) {
+			return v.s;
+		}
+		else {
+			char buf[1000];
+			snprintf(buf, 1000, "%g", v.n);
+			return buf;
+		}
+	}
+	else {
+		return t.s;
+	}
+}
+
+inline int as_label_inline(Program *prg, Token &t)
+{
+	return prg->variables[t.i].n;
+}
+
+inline int as_function_inline(Program *prg, Token &t)
+{
+	return prg->variables[t.i].n;
+}
+
 } // End namespace booboo
 
 #endif // BOOBOO_INTERNAL_H
