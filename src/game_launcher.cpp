@@ -9,7 +9,7 @@
 #include "booboo/booboo.h"
 #include "booboo/game_lib.h"
 
-#ifdef __linux__
+#if defined __linux__ || defined __LP64__
 #include <unistd.h>
 #endif
 
