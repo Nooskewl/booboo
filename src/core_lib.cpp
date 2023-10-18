@@ -8,9 +8,7 @@ namespace booboo {
 
 bool breaker_reset(Program *prg, std::vector<Token> &v)
 {
-	std::string name = as_string(prg, v[0]);
-
-	reset_game_name = name;
+	reset_game_name = as_string(prg, v[0]);
 
 	return false;
 }
@@ -25,19 +23,19 @@ bool breaker_exit(Program *prg, std::vector<Token> &v)
 
 bool breaker_return(Program *prg, std::vector<Token> &v)
 {
+	Variable &v1 = prg->s->result;
+
 	if (v[0].type == Token::NUMBER) {
-		prg->s->result.type = Variable::NUMBER;
-		prg->s->result.n = v[0].n;
+		v1.type = Variable::NUMBER;
+		v1.n = v[0].n;
 	}
 	else if (v[0].type == Token::SYMBOL) {
-		prg->s->result = prg->variables[v[0].i];
+		v1 = prg->variables[v[0].i];
 	}
 	else {
-		prg->s->result.type = Variable::STRING;
-		prg->s->result.s = v[0].s;
+		v1.type = Variable::STRING;
+		v1.s = v[0].s;
 	}
-
-	prg->s->result.name = "result";
 
 	return false;
 }

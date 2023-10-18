@@ -1014,6 +1014,8 @@ fclose(foo);
 	prg->s->start_line = 0;
 	prg->s->pc = 0;
 
+	prg->s->result.name = "result";
+
 	return prg;
 }
 
