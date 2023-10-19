@@ -1,0 +1,56 @@
+@S0 = { kick.flac }
+@S1 = { clap.flac }
+@S2 = { hat.flac }
+@S3 = { snare.flac }
+@R0 = { 4 0 1000 192 8 }
+
+A @S0 s1 t150
+A o5c16r16c16r2.r16
+A c16r16c16r8.c16r8.c16r8.c16r16
+A c16r16c16r2.r16
+A c16r16c16r8.c16r8.c16r8.c16r16
+A c16r16c16c16r16c16c16r1.
+A r16
+A c16r16c16c16r16c16c16r1.
+A r16
+
+B @S1 s1 t150
+B r4.o5c16r16>a16r16<c16r1.
+B r8.
+B c16r16>a16r16<c16r1
+B r1
+B r1
+B r1
+B r2...
+B r4.
+
+C @S2 s1 t150
+C r1
+C r1
+C r1
+C r1
+C o6c16c16c16c16r2.
+C c16c16c16c16r4c16c16c16c16r4
+C c16c16c16c16r2.
+C c16c16c16c16r4c16c16c16c16r4
+ 
+D @S3 s1 t150
+D r1
+D r1
+D r1
+D r1
+D r2
+D o5c16r8.c16r1.
+D r8.
+D c16r8.c16r1
+D r8.
+
+E t150 @TYPE3 @R0
+E r8o5c16c16c16r16c16r2r16
+E >b8<c16r16c16c16r16c16>b16r16<c16r8.c16r8.
+E c16c16c16r16c16r2r16
+E >b8<c16r16c16c16r16c16>b16r16<c16r8.c16r16
+E c16r16c16r8.c16r2r16
+E >b4<c4>b4g+4
+E <c16r16c16r8.c16r2r16
+E >b4<c4>b4g+4

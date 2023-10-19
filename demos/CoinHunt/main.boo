@@ -1,3 +1,7 @@
+number music
+mml_load music "music/menu.mml"
+mml_play music 0.5 1
+
 number font
 font_load font "font.ttf" 96 1
 number small_font

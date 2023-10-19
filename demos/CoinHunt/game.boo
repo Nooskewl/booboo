@@ -1,3 +1,7 @@
+number music
+mml_load music "music/game.mml"
+mml_play music 0.5 1
+
 number ship_img
 image_load ship_img "misc/ship.png"
 number enemy_img

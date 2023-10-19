@@ -1,0 +1,19 @@
+@S0 = { kick.flac }
+@S1 = { hat.flac }
+@S2 = { snare.flac }
+
+A @S0 s1 t180
+A o5c8r2r8c8c8
+A r4c8r2r8
+
+B @S1 s1 t180
+B o6f16r16f16r16f16r16f16r16f16r1
+B r4..
+
+C @S2 s1 t180
+C r2o5c8r2..
+C c8r4.
+
+D t180
+D o5g16r4..d16r8.g16r8.
+D g16r8.d16r16c4r8d4
