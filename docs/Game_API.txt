@@ -18,6 +18,7 @@ few of them:
 	+height x
 	-vsync
 	+fps
+	+adapter x
 
 There is a little bit of joystick emulation on the keyboard:
 	WASD/space is X1/Y1/A
