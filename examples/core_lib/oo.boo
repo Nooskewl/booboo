@@ -1,6 +1,7 @@
 number random
 = random 12309481233
 
+; this is a really crappy random number generator since the random number generator is currently in the game library
 function genrand
 {
 	number tmp
