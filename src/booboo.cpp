@@ -549,7 +549,7 @@ static void compile(Program *prg, Pass pass)
 						prg->variables.push_back(v);
 					}
 				}
-				else if (tok == "number" || tok == "string" || tok == "vector") {
+				else if (tok == "number" || tok == "string" || tok == "vector" || tok == "pointer") {
 					std::string tok2 = token(prg, tt);
 					Statement s;
 					s.method = library_map[tok];
@@ -578,8 +578,11 @@ static void compile(Program *prg, Pass pass)
 						else if (tok == "string") {
 							v.type = Variable::STRING;
 						}
-						else {
+						else if (tok == "vector") {
 							v.type = Variable::VECTOR;
+						}
+						else {
+							v.type = Variable::POINTER;
 						}
 						if (pass == PASS1) {
 							prg->variables.push_back(v);
@@ -686,7 +689,7 @@ static void compile(Program *prg, Pass pass)
 				prg->variables.push_back(v);
 			}
 		}
-		else if (tok == "number" || tok == "string" || tok == "vector") {
+		else if (tok == "number" || tok == "string" || tok == "vector" || tok == "pointer") {
 			std::string tok2 = token(prg, tt);
 			Statement s;
 			s.method = library_map[tok];
@@ -706,8 +709,11 @@ static void compile(Program *prg, Pass pass)
 			else if (tok == "string") {
 				v.type = Variable::STRING;
 			}
-			else {
+			else if (tok == "vector") {
 				v.type = Variable::VECTOR;
+			}
+			else {
+				v.type = Variable::POINTER;
 			}
 			if (pass == PASS1) {
 				prg->variables.push_back(v);
@@ -1050,6 +1056,11 @@ std::string get_string(Variable &v)
 std::vector<Variable> get_vector(Variable &v)
 {
 	return v.v;
+}
+
+Variable *get_pointer(Variable &v)
+{
+	return v.p;
 }
 
 void *get_black_box(Program *prg, std::string id)

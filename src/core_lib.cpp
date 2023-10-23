@@ -59,6 +59,24 @@ bool corefunc_vector(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+bool corefunc_pointer(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+	return true;
+}
+
+bool corefunc_address(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = prg->variables[v[0].i];
+	Variable &v2 = as_variable_inline(prg, v[1]);
+
+	v1.p = &v2;
+
+	return true;
+}
+
 bool corefunc_set(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -383,7 +401,9 @@ void start_lib_core()
 	add_syntax("number", corefunc_number);
 	add_syntax("string", corefunc_string);
 	add_syntax("vector", corefunc_vector);
+	add_syntax("pointer", corefunc_vector);
 	
+	add_syntax("address", corefunc_address);
 	add_syntax("=", corefunc_set);
 	add_syntax("+", corefunc_add);
 	add_syntax("-", corefunc_subtract);

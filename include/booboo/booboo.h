@@ -25,7 +25,8 @@ struct Variable
 		STRING,
 		VECTOR,
 		LABEL,
-		FUNCTION
+		FUNCTION,
+		POINTER
 	} type;
 
 	std::string name;
@@ -33,6 +34,7 @@ struct Variable
 	double n;
 	std::string s;
 	std::vector<Variable> v;
+	Variable *p;
 };
 
 struct Token {

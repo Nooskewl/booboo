@@ -64,6 +64,9 @@ void start_lib_core();
 
 inline Variable &as_variable_inline(Program *prg, Token &t)
 {
+	if (prg->variables[t.i].type == Variable::POINTER) {
+		return *prg->variables[t.i].p;
+	}
 	return prg->variables[t.i];
 }
 
@@ -73,12 +76,18 @@ inline double as_number_inline(Program *prg, Token &t)
 		return t.n;
 	}
 	else if (t.type == Token::SYMBOL) {
-		Variable &v = prg->variables[t.i];
-		if (v.type == Variable::NUMBER) {
-			return v.n;
+		Variable *v;
+		if (prg->variables[t.i].type == Variable::POINTER) {
+			v = prg->variables[t.i].p;
 		}
 		else {
-			return atof(v.s.c_str());
+		      v	= &prg->variables[t.i];
+		}
+		if (v->type == Variable::NUMBER) {
+			return v->n;
+		}
+		else {
+			return atof(v->s.c_str());
 		}
 	}
 	else {
@@ -94,13 +103,19 @@ inline std::string as_string_inline(Program *prg, Token &t)
 		return buf;
 	}
 	else if (t.type == Token::SYMBOL) {
-		Variable &v = prg->variables[t.i];
-		if (v.type == Variable::STRING) {
-			return v.s;
+		Variable *v;
+		if (prg->variables[t.i].type == Variable::POINTER) {
+			v = prg->variables[t.i].p;
+		}
+		else {
+		      v	= &prg->variables[t.i];
+		}
+		if (v->type == Variable::STRING) {
+			return v->s;
 		}
 		else {
 			char buf[1000];
-			snprintf(buf, 1000, "%g", v.n);
+			snprintf(buf, 1000, "%g", v->n);
 			return buf;
 		}
 	}
@@ -111,11 +126,17 @@ inline std::string as_string_inline(Program *prg, Token &t)
 
 inline int as_label_inline(Program *prg, Token &t)
 {
+	if (prg->variables[t.i].type == Variable::POINTER) {
+		return prg->variables[t.i].p->n;
+	}
 	return prg->variables[t.i].n;
 }
 
 inline int as_function_inline(Program *prg, Token &t)
 {
+	if (prg->variables[t.i].type == Variable::POINTER) {
+		return prg->variables[t.i].p->n;
+	}
 	return prg->variables[t.i].n;
 }
 
