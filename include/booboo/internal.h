@@ -48,6 +48,8 @@ struct Program {
 	std::map<std::string, int> function_name_map;
 	std::vector<Program> functions;
 	std::vector<int> params;
+	std::map< std::string, std::map<std::string, int> > locals;
+	std::map<std::string, int> backup;
 
 	std::vector<int> line_numbers;
 

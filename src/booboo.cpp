@@ -2,6 +2,8 @@
 
 #include <sys/stat.h>
 
+#include <algorithm>
+
 #include "booboo/booboo.h"
 #include "booboo/internal.h"
 
@@ -465,6 +467,40 @@ bool process_includes(Program *prg)
 	return ret;
 }
 
+static void backup(Program *prg, std::string func_name)
+{
+	if (prg->locals.find(func_name) != prg->locals.end()) {
+		prg->backup.clear();
+		std::map<std::string, int>::iterator it;
+		for (it = prg->locals[func_name].begin(); it != prg->locals[func_name].end(); it++) {
+			std::pair<std::string, int> pair = *it;
+			if (prg->variables_map.find(pair.first) != prg->variables_map.end()) {
+				prg->backup[pair.first] = prg->variables_map[pair.first];
+			}
+			prg->variables_map[pair.first] = pair.second;
+		}
+
+	}
+}
+
+static void restore(Program *prg, std::string func_name)
+{
+	std::map<std::string, int>::iterator it;
+	for (it = prg->locals[func_name].begin(); it != prg->locals[func_name].end(); it++) {
+		std::pair<std::string, int> pair = *it;
+		std::map<std::string, int>::iterator it2;
+		it2 = prg->variables_map.find(pair.first);
+		if (it2 != prg->variables_map.end()) {
+			prg->variables_map.erase(it2);
+		}
+	}
+	for (it = prg->backup.begin(); it != prg->backup.end(); it++) {
+		std::pair<std::string, int> pair = *it;
+		prg->variables_map[pair.first] = pair.second;
+	}
+	prg->backup.clear();
+}
+
 static void compile(Program *prg, Pass pass)
 {
 	int p_bak = prg->s->p;
@@ -489,6 +525,10 @@ static void compile(Program *prg, Pass pass)
 		else if (tok == "function") {
 			std::string func_name = token(prg, tt);
 
+			if (pass == PASS2) {
+				backup(prg, func_name);
+			}
+
 			Variable v;
 			v.name = func_name;
 			v.type = Variable::FUNCTION;
@@ -506,8 +546,7 @@ static void compile(Program *prg, Pass pass)
 			func.real_file_names = prg->real_file_names;
 			bool is_param = true;
 			bool finished = false;
-			std::map<std::string, int> backup;
-			//std::vector<std::string> new_vars;
+			std::vector<std::string> new_vars;
 			while ((tok = token(prg, tt)) != "") {
 				if (tok == ";") {
 					while (prg->s->p < prg->s->code.length() && prg->s->code[prg->s->p] != '\n') {
@@ -532,21 +571,12 @@ static void compile(Program *prg, Pass pass)
 					v.name = tok2;
 					v.type = Variable::LABEL;
 					v.n = func.s->program.size();
-					if (prg->variables_map.find(tok2) != prg->variables_map.end()) {
-						if (pass == PASS1) {
-							printf("duplicate label %s\n", tok2.c_str());
-						}
-						backup[tok2] = prg->variables_map[tok2];
-					}
-					/*
-					else {
-						new_vars.push_back(tok2);
-					}
-					*/
-
-					prg->variables_map[tok2] = var_i++;
 					if (pass == PASS1) {
+						prg->locals[func.s->name][tok2] = var_i++;
 						prg->variables.push_back(v);
+					}
+					else {
+						var_i++;
 					}
 				}
 				else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map" || tok == "pointer") {
@@ -560,40 +590,45 @@ static void compile(Program *prg, Pass pass)
 						}
 						func.line_numbers.push_back(prg->s->line);
 					}
-					//if (std::find(new_vars.begin(), new_vars.end(), tok2) == new_vars.end()) {
-						if (prg->variables_map.find(tok2) != prg->variables_map.end()) {
-							backup[tok2] = prg->variables_map[tok2];
+					if (pass == PASS1) {
+						prg->locals[func.s->name][tok2] = var_i++;
+					}
+					else {
+						var_i++;
+					}
+					Variable v;
+					v.name = tok2;
+					if (tok == "number") {
+						v.type = Variable::NUMBER;
+					}
+					else if (tok == "string") {
+						v.type = Variable::STRING;
+					}
+					else if (tok == "vector") {
+						v.type = Variable::VECTOR;
+					}
+					else if (tok == "map") {
+						v.type = Variable::MAP;
+					}
+					else {
+						v.type = Variable::POINTER;
+					}
+					std::map<std::string, int>::iterator it;
+					it = prg->variables_map.find(tok2);
+					if (it != prg->variables_map.end()) {
+						Variable &var = prg->variables[(*it).second];
+						if (var.type != v.type) {
+							throw Error("Type for " + tok2 + " changed at " + get_error_info(&func));
 						}
-						/*
-						else {
-							new_vars.push_back(tok2);
-						}
-						*/
-						prg->variables_map[tok2] = var_i++;
-						Variable v;
-						v.name = tok2;
-						if (tok == "number") {
-							v.type = Variable::NUMBER;
-						}
-						else if (tok == "string") {
-							v.type = Variable::STRING;
-						}
-						else if (tok == "vector") {
-							v.type = Variable::VECTOR;
-						}
-						else if (tok == "map") {
-							v.type = Variable::MAP;
-						}
-						else {
-							v.type = Variable::POINTER;
-						}
-						if (pass == PASS1) {
-							prg->variables.push_back(v);
-						}
-					//}
+					}
+					if (pass == PASS1) {
+						prg->variables.push_back(v);
+					}
 					Token t;
 					t.type = Token::SYMBOL;
-					t.i = prg->variables_map[tok2];
+					if (pass == PASS2) {
+						t.i = prg->variables_map[tok2];
+					}
 					t.s = tok2;
 					t.token = tok2;
 					func.s->program[func.s->program.size()-1].data.push_back(t);
@@ -610,16 +645,10 @@ static void compile(Program *prg, Pass pass)
 					}
 				}
 				else if (is_param) {
-					if (prg->variables_map.find(tok) != prg->variables_map.end()) {
-						backup[tok] = prg->variables_map[tok];
-					}
-					/*
-					else {
-						new_vars.push_back(tok);
-					}
-					*/
 					int param_i = var_i++;
-					prg->variables_map[tok] = param_i;
+					if (pass == PASS1) {
+						prg->locals[func.s->name][tok] = param_i;
+					}
 					Variable v;
 					v.name = tok;
 					if (pass == PASS1) {
@@ -669,10 +698,13 @@ static void compile(Program *prg, Pass pass)
 
 			prg->function_name_map[func.s->name] = prg->functions.size();
 			prg->functions.push_back(func);
-					
+
 			std::map<std::string, int>::iterator it;
-			for (it = backup.begin(); it != backup.end(); it++) {
-				prg->variables_map[(*it).first] = (*it).second;
+
+			if (pass == PASS2) {
+				restore(prg, func_name);
+			}
+			else if (pass == PASS1) {
 			}
 		}
 		else if (tok == ":") {
@@ -781,6 +813,8 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 {
 	Program &func = prg->functions[function];
 
+	backup(prg, func.s->name);
+
 	for (size_t j = 0; j < func.params.size(); j++) {
 		Token &param = params[j+ignore_params];
 		
@@ -809,6 +843,8 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 
 	while (interpret(prg)) {
 	}
+
+	restore(prg, func.s->name);
 
 	std::string bak = result.name;
 	result = prg->s->result;
@@ -964,6 +1000,7 @@ fclose(foo);
 
 	compile(prg, PASS2);
 
+#ifdef NO_DUPLICATE_LABELS
 	for (int i = 0; i < int(prg->variables.size())-1; i++) {
 		if (prg->variables[i].type != Variable::LABEL) {
 			continue;
@@ -977,6 +1014,7 @@ fclose(foo);
 			}
 		}
 	}
+#endif
 	
 #ifdef DEBUG_LINE_NUMBERS
 foo = fopen("debug_line_numbers.txt", "a");

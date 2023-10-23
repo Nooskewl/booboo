@@ -79,6 +79,8 @@ number NUM_COINS
 = NUM_COINS 7
 number NUM_ENEMIES
 = NUM_ENEMIES 32
+number num_stars
+= num_stars 1024
 
 call start_game
 
@@ -116,8 +118,6 @@ function start_stars
 {
 	vector_clear stars
 
-	number num_stars
-	= num_stars 1024
 	number i
 	= i 0
 :add_another_star
@@ -147,6 +147,7 @@ function start_coins
 
 	vector_clear coins
 
+	number i
 	= i 0
 :another_coin
 	number sz
@@ -195,6 +196,7 @@ function start_enemies
 
 	vector_clear enemies
 
+	number i
 	= i 0
 :add_another_enemy
 	number sz
@@ -312,6 +314,7 @@ function get_quadrants
 {
 	vector v
 
+	number i
 	= i 0
 	number x
 	number y
@@ -671,14 +674,14 @@ function draw
 
 	= i 0
 :draw_next_coin
-	vector tmp
-	vector_get coins tmp i
+	vector tmpv
+	vector_get coins tmpv i
 	number coin_x
 	number coin_y
 	number coin_exists
-	vector_get tmp coin_x 0
-	vector_get tmp coin_y 1
-	vector_get tmp coin_exists 2
+	vector_get tmpv coin_x 0
+	vector_get tmpv coin_y 1
+	vector_get tmpv coin_exists 2
 	? coin_exists 0
 	je skip_coin
 	- coin_x ox
@@ -1351,12 +1354,12 @@ function run
 
 	= i 0
 :update_next_explosion
-	vector ex
-	vector_get explosions ex i
+	vector exv
+	vector_get explosions exv i
 	number r
 	number max_r
-	vector_get ex r 2
-	vector_get ex max_r 3
+	vector_get exv r 2
+	vector_get exv max_r 3
 	+ r 5
 	? r max_r
 	jle its_fine
@@ -1365,8 +1368,8 @@ function run
 	- ne 1
 	goto finished_explosion_update
 :its_fine
-	vector_set ex 2 r
-	vector_set explosions i ex
+	vector_set exv 2 r
+	vector_set explosions i exv
 :finished_explosion_update
 	+ i 1
 	? i ne

@@ -124,6 +124,14 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 					throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 				}
 			}
+			else if (v1.type == Variable::MAP) {
+				if (v2.type == Variable::MAP) {
+					v1.m = v2.m;
+				}
+				else {
+					throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+				}
+			}
 			else {
 				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 			}
