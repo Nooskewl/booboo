@@ -467,12 +467,12 @@ bool process_includes(Program *prg)
 	return ret;
 }
 
-static void backup(Program *prg, std::string func_name)
+static void backup(Program *prg, int func)
 {
-	if (prg->locals.find(func_name) != prg->locals.end()) {
+	if (func < prg->locals.size()) {
 		prg->backup.clear();
 		std::map<std::string, int>::iterator it;
-		for (it = prg->locals[func_name].begin(); it != prg->locals[func_name].end(); it++) {
+		for (it = prg->locals[func].begin(); it != prg->locals[func].end(); it++) {
 			std::pair<std::string, int> pair = *it;
 			if (prg->variables_map.find(pair.first) != prg->variables_map.end()) {
 				prg->backup[pair.first] = prg->variables_map[pair.first];
@@ -483,10 +483,10 @@ static void backup(Program *prg, std::string func_name)
 	}
 }
 
-static void restore(Program *prg, std::string func_name)
+static void restore(Program *prg, int func)
 {
 	std::map<std::string, int>::iterator it;
-	for (it = prg->locals[func_name].begin(); it != prg->locals[func_name].end(); it++) {
+	for (it = prg->locals[func].begin(); it != prg->locals[func].end(); it++) {
 		std::pair<std::string, int> pair = *it;
 		std::map<std::string, int>::iterator it2;
 		it2 = prg->variables_map.find(pair.first);
@@ -525,14 +525,17 @@ static void compile(Program *prg, Pass pass)
 		else if (tok == "function") {
 			std::string func_name = token(prg, tt);
 
+			int func_index = func_i;
 			if (pass == PASS2) {
-				backup(prg, func_name);
+				backup(prg, func_index);
 			}
 
 			Variable v;
 			v.name = func_name;
 			v.type = Variable::FUNCTION;
 			v.n = func_i++;
+			std::map<std::string, int> tmp;
+			prg->locals.push_back(tmp);
 			prg->variables_map[func_name] = var_i++;
 			if (pass == PASS1) {
 				prg->variables.push_back(v);
@@ -572,7 +575,7 @@ static void compile(Program *prg, Pass pass)
 					v.type = Variable::LABEL;
 					v.n = func.s->program.size();
 					if (pass == PASS1) {
-						prg->locals[func.s->name][tok2] = var_i++;
+						prg->locals[func_index][tok2] = var_i++;
 						prg->variables.push_back(v);
 					}
 					else {
@@ -591,7 +594,7 @@ static void compile(Program *prg, Pass pass)
 						func.line_numbers.push_back(prg->s->line);
 					}
 					if (pass == PASS1) {
-						prg->locals[func.s->name][tok2] = var_i++;
+						prg->locals[func_index][tok2] = var_i++;
 					}
 					else {
 						var_i++;
@@ -647,7 +650,7 @@ static void compile(Program *prg, Pass pass)
 				else if (is_param) {
 					int param_i = var_i++;
 					if (pass == PASS1) {
-						prg->locals[func.s->name][tok] = param_i;
+						prg->locals[func_index][tok] = param_i;
 					}
 					Variable v;
 					v.name = tok;
@@ -702,7 +705,7 @@ static void compile(Program *prg, Pass pass)
 			std::map<std::string, int>::iterator it;
 
 			if (pass == PASS2) {
-				restore(prg, func_name);
+				restore(prg, func_index);
 			}
 			else if (pass == PASS1) {
 			}
@@ -813,7 +816,7 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 {
 	Program &func = prg->functions[function];
 
-	backup(prg, func.s->name);
+	backup(prg, function);
 
 	for (size_t j = 0; j < func.params.size(); j++) {
 		Token &param = params[j+ignore_params];
@@ -844,7 +847,7 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 	while (interpret(prg)) {
 	}
 
-	restore(prg, func.s->name);
+	restore(prg, function);
 
 	std::string bak = result.name;
 	result = prg->s->result;
