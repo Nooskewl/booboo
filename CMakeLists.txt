@@ -24,7 +24,6 @@ set(TGUI6_LIB tgui6)
 set(LIB_SOURCES
 	src/booboo.cpp
 	src/core_lib.cpp
-	src/basics_lib.cpp
 )
 
 set(GAME_LAUNCHER_SOURCES

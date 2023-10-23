@@ -549,7 +549,7 @@ static void compile(Program *prg, Pass pass)
 						prg->variables.push_back(v);
 					}
 				}
-				else if (tok == "number" || tok == "string" || tok == "vector" || tok == "pointer") {
+				else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map" || tok == "pointer") {
 					std::string tok2 = token(prg, tt);
 					Statement s;
 					s.method = library_map[tok];
@@ -580,6 +580,9 @@ static void compile(Program *prg, Pass pass)
 						}
 						else if (tok == "vector") {
 							v.type = Variable::VECTOR;
+						}
+						else if (tok == "map") {
+							v.type = Variable::MAP;
 						}
 						else {
 							v.type = Variable::POINTER;
@@ -689,7 +692,7 @@ static void compile(Program *prg, Pass pass)
 				prg->variables.push_back(v);
 			}
 		}
-		else if (tok == "number" || tok == "string" || tok == "vector" || tok == "pointer") {
+		else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map" || tok == "pointer") {
 			std::string tok2 = token(prg, tt);
 			Statement s;
 			s.method = library_map[tok];
@@ -711,6 +714,9 @@ static void compile(Program *prg, Pass pass)
 			}
 			else if (tok == "vector") {
 				v.type = Variable::VECTOR;
+			}
+			else if (tok == "map") {
+				v.type = Variable::MAP;
 			}
 			else {
 				v.type = Variable::POINTER;

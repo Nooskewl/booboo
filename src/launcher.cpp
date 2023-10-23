@@ -76,7 +76,6 @@ int main(int argc, char **argv)
 	try {
 
 	booboo::start();
-	booboo::start_lib_basics();
 
 again:
 	booboo::quit = false;

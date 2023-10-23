@@ -24,6 +24,7 @@ struct Variable
 		NUMBER = 0,
 		STRING,
 		VECTOR,
+		MAP,
 		LABEL,
 		FUNCTION,
 		POINTER
@@ -34,6 +35,7 @@ struct Variable
 	double n;
 	std::string s;
 	std::vector<Variable> v;
+	std::map<std::string, Variable> m;
 	Variable *p;
 };
 
@@ -97,9 +99,6 @@ double as_number(Program *prg, Token &t);
 std::string as_string(Program *prg, Token &t);
 int as_label(Program *prg, Token &t);
 int as_function(Program *prg, Token &t);
-
-// This one adds basic syntax like arithmetic and vector manipulation
-void start_lib_basics();
 
 // The black box allows you to store anything you want
 void *get_black_box(Program *prg, std::string id);

@@ -22,10 +22,12 @@ call p
 call p
 
 vector v
-vector_add v b
-vector_add v a
-vector_add v a
-vector_add v a
+address p b
+vector_add v p
+address p a
+vector_add v p
+vector_add v p
+vector_add v p
 
 number sz
 vector_size v sz
@@ -42,7 +44,7 @@ string foobar
 = foobar "foobar\n"
 address p foobar
 = p "baz\n"
-print foobar
+print "%\n" foobar
 
 number test
 = test 0
