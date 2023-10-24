@@ -549,7 +549,6 @@ static void compile(Program *prg, Pass pass)
 			func.real_file_names = prg->real_file_names;
 			bool is_param = true;
 			bool finished = false;
-			std::vector<std::string> new_vars;
 			while ((tok = token(prg, tt)) != "") {
 				if (tok == ";") {
 					while (prg->s->p < prg->s->code.length() && prg->s->code[prg->s->p] != '\n') {
