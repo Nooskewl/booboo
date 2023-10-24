@@ -822,7 +822,7 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 {
 	Program &func = prg->functions[function];
 
-	backup(prg, function);
+	//backup(prg, function);
 
 	for (size_t j = 0; j < func.params.size(); j++) {
 		Token &param = params[j+ignore_params];
@@ -853,7 +853,7 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 	while (interpret(prg)) {
 	}
 
-	restore(prg, function);
+	//restore(prg, function);
 
 	std::string bak = result.name;
 	result = prg->s->result;
