@@ -2,6 +2,9 @@ string reset_game_name
 = reset_game_name "robots.boo"
 include "slideshow_start.inc"
 
+number x
+= x 0
+
 function draw_at r g b x radius
 {
 	number f
@@ -44,6 +47,3 @@ function run
 	+ x 5
 	include "slideshow_logic.inc"
 }
-
-number x
-= x 0
