@@ -3,11 +3,6 @@
 
 namespace booboo {
 
-struct Label {
-	std::string name;
-	int pc;
-};
-
 struct Statement {
 	int method;
 	std::vector<Token> data;

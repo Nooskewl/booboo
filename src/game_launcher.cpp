@@ -881,11 +881,6 @@ again:
 		}
 		printf("\n");
 	}
-	std::map<std::string, booboo::Label>::iterator it2;
-	for (it2 = prg->labels.begin(); it2 != prg->labels.end(); it2++) {
-		std::string label = (*it2).first;
-		printf("label %s %d\n", label.c_str(), (*it2).second.pc);
-	}
 	std::map<std::string, booboo::Program>::iterator it;
 	for (it = prg->functions.begin(); it != prg->functions.end(); it++) {
 		booboo::Program prg = (*it).second;
