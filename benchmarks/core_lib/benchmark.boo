@@ -1,3 +1,15 @@
+number x
+= x 0
+
+number i
+= i 0
+:next_loop
+call draw
+call run
++ i 1
+? i 100000
+jl next_loop
+
 function draw_at x
 {
 	number f
@@ -32,15 +44,3 @@ function run
 {
 	+ x 5
 }
-
-number x
-= x 0
-
-number i
-= i 0
-:next_loop
-call draw
-call run
-+ i 1
-? i 100000
-jl next_loop
