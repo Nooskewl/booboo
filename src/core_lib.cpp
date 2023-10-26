@@ -84,7 +84,7 @@ bool corefunc_address(Program *prg, std::vector<Token> &v)
 	}
 
 	Variable &v1 = prg->variables[v[0].i];
-	Variable &v2 = prg->variables[v[1].i];
+	Variable &v2 = as_variable_inline(prg, v[1]);
 
 	v1.p = &v2;
 
@@ -98,11 +98,11 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 	if (v[0].type == Token::SYMBOL && v[1].type == Token::SYMBOL && prg->variables[v[0].i].type == Variable::POINTER && prg->variables[v[1].i].type == Variable::POINTER) {
 		prg->variables[v[0].i].p = prg->variables[v[1].i].p;
 	}
-	else {
+	else if (v[0].type == Token::SYMBOL) {
 		Variable &v1 = as_variable_inline(prg, v[0]);
 
 		if (v[1].type == Token::SYMBOL) {
-			Variable &v2 = prg->variables[v[1].i];
+			Variable &v2 = as_variable_inline(prg, v[1]);
 
 			if (v1.type == Variable::NUMBER) {
 				if (v2.type == Variable::NUMBER) {
@@ -118,6 +118,11 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 			else if (v1.type == Variable::STRING) {
 				if (v2.type == Variable::STRING) {
 					v1.s = v2.s;
+				}
+				else if (v2.type == Variable::NUMBER) {
+					char buf[1000];
+					snprintf(buf, 1000, "%g", v2.n);
+					v1.s = buf;
 				}
 				else {
 					throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
@@ -153,7 +158,7 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 				v1.s = buf;
 			}
 			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 			}
 		}
 		else if (v[1].type == Token::STRING) {
@@ -164,12 +169,15 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 				v1.n = atof(v[1].s.c_str());
 			}
 			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 			}
 		}
 		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 		}
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 	}
 
 	return true;
