@@ -231,8 +231,10 @@ bool corefunc_compare(Program *prg, std::vector<Token> &v)
 
 	if (v[0].type == Token::SYMBOL) {
 		Variable &var = as_variable_inline(prg, v[0]);
-		is_num = true;
-		n = var.n;
+		if (var.type == Variable::NUMBER) {
+			is_num = true;
+			n = var.n;
+		}
 	}
 	else if (v[0].type == Token::NUMBER) {
 		is_num = true;
@@ -240,28 +242,15 @@ bool corefunc_compare(Program *prg, std::vector<Token> &v)
 	}
 
 	if (is_num) {
-		if (v[1].type == Token::NUMBER) {
-			if (n < v[1].n) {
-				prg->compare_flag = -1;
-			}
-			else if (n == v[1].n) {
-				prg->compare_flag = 0;
-			}
-			else {
-				prg->compare_flag = 1;
-			}
+		double n2 = as_number_inline(prg, v[1]);
+		if (n < n2) {
+			prg->compare_flag = -1;
+		}
+		else if (n == n2) {
+			prg->compare_flag = 0;
 		}
 		else {
-			Variable &var = as_variable_inline(prg, v[1]);
-			if (n < var.n) {
-				prg->compare_flag = -1;
-			}
-			else if (n == var.n) {
-				prg->compare_flag = 0;
-			}
-			else {
-				prg->compare_flag = 1;
-			}
+			prg->compare_flag = 1;
 		}
 	}
 	else {
@@ -298,7 +287,7 @@ bool corefunc_compare(Program *prg, std::vector<Token> &v)
 			prg->compare_flag = strcmp(s1.c_str(), s2.c_str());
 		}
 		else {
-			prg->compare_flag = 0;
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 		}
 	}
 
@@ -393,7 +382,11 @@ bool corefunc_call_result(Program *prg, std::vector<Token> &v)
 bool corefunc_int(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+	}
 
 	v1.n = (int)v1.n;
 
@@ -404,7 +397,7 @@ bool corefunc_neg(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = -v1.n;
@@ -420,7 +413,7 @@ bool corefunc_intmod(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 	int d = as_number(prg, v[1]);
 	
 	if (v1.type == Variable::NUMBER) {
@@ -437,7 +430,7 @@ bool corefunc_fmod(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 	double d = as_number(prg, v[1]);
 
 	if (v1.type == Variable::NUMBER) {
@@ -492,7 +485,7 @@ bool corefunc_print(Program *prg, std::vector<Token> &v)
 			val = param;
 		}
 		else {
-			Variable &v1 = as_variable(prg, v[_tok-1]);
+			Variable &v1 = as_variable_inline(prg, v[_tok-1]);
 			if (v1.type == Variable::NUMBER) {
 				char buf[1000];
 				snprintf(buf, 1000, "%g", v1.n);
@@ -525,7 +518,7 @@ bool corefunc_print(Program *prg, std::vector<Token> &v)
 
 bool stringfunc_format(Program *prg, std::vector<Token> &v)
 {
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 	std::string fmt = as_string(prg, v[1]);
 	int _tok = 2;
 	
@@ -566,7 +559,7 @@ bool stringfunc_format(Program *prg, std::vector<Token> &v)
 			val = param;
 		}
 		else {
-			Variable &v1 = as_variable(prg, v[_tok-1]);
+			Variable &v1 = as_variable_inline(prg, v[_tok-1]);
 			if (v1.type == Variable::NUMBER) {
 				char buf[1000];
 				snprintf(buf, 1000, "%g", v1.n);
@@ -600,7 +593,7 @@ bool stringfunc_format(Program *prg, std::vector<Token> &v)
 
 bool stringfunc_char_at(Program *prg, std::vector<Token> &v)
 {
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 	std::string s = as_string(prg, v[1]);
 	int index = as_number(prg, v[2]);
 
@@ -618,7 +611,7 @@ bool stringfunc_char_at(Program *prg, std::vector<Token> &v)
 
 bool stringfunc_length(Program *prg, std::vector<Token> &v)
 {
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 	std::string s = as_string(prg, v[1]);
 
 	if (v1.type == Variable::NUMBER) {
@@ -633,7 +626,7 @@ bool stringfunc_length(Program *prg, std::vector<Token> &v)
 
 bool stringfunc_from_number(Program *prg, std::vector<Token> &v)
 {
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 	int n = as_number(prg, v[1]);
 
 	static char buf[2] = { 0, 0 };
@@ -654,7 +647,7 @@ bool mathfunc_sin(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = sin(as_number(prg, v[1]));
@@ -670,7 +663,7 @@ bool mathfunc_cos(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = cos(as_number(prg, v[1]));
@@ -686,7 +679,7 @@ bool mathfunc_atan2(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = atan2(as_number(prg, v[1]), as_number(prg, v[2]));
@@ -702,7 +695,7 @@ bool mathfunc_abs(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = fabs(as_number(prg, v[1]));
@@ -718,7 +711,7 @@ bool mathfunc_pow(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = pow(as_number(prg, v[1]), as_number(prg, v[2]));
@@ -734,7 +727,7 @@ bool mathfunc_sqrt(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = sqrt(as_number(prg, v[1]));
@@ -750,7 +743,7 @@ static bool vectorfunc_add(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable_inline(prg, v[0]);
 
 	Variable var;
 
@@ -764,7 +757,7 @@ static bool vectorfunc_add(Program *prg, std::vector<Token> &v)
 			var = prg->variables[v[1].i];
 		}
 		else {
-			var = as_variable(prg, v[1]);
+			var = as_variable_inline(prg, v[1]);
 		}
 	}
 	else {
@@ -782,8 +775,8 @@ static bool vectorfunc_size(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &id = as_variable(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
+	Variable &id = as_variable_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = id.v.size();
@@ -799,7 +792,7 @@ static bool vectorfunc_set(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable_inline(prg, v[0]);
 	double index = as_number(prg, v[1]);
 	
 	if (index < 0 || index >= id.v.size()) {
@@ -818,7 +811,7 @@ static bool vectorfunc_set(Program *prg, std::vector<Token> &v)
 			var = prg->variables[v[2].i];
 		}
 		else {
-			var = as_variable(prg, v[2]);
+			var = as_variable_inline(prg, v[2]);
 		}
 	}
 	else {
@@ -836,7 +829,7 @@ static bool vectorfunc_insert(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable_inline(prg, v[0]);
 	double index = as_number(prg, v[1]);
 
 	if (index < 0 || index > id.v.size()) {
@@ -855,7 +848,7 @@ static bool vectorfunc_insert(Program *prg, std::vector<Token> &v)
 			var = prg->variables[v[2].i];
 		}
 		else {
-			var = as_variable(prg, v[2]);
+			var = as_variable_inline(prg, v[2]);
 		}
 	}
 	else {
@@ -873,7 +866,7 @@ static bool vectorfunc_get(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable_inline(prg, v[0]);
 	double index = as_number(prg, v[2]);
 
 	if (index < 0 || index >= id.v.size()) {
@@ -885,7 +878,7 @@ static bool vectorfunc_get(Program *prg, std::vector<Token> &v)
 		v1.p = id.v[index].p;
 	}
 	else {
-		Variable &v1 = as_variable(prg, v[1]);
+		Variable &v1 = as_variable_inline(prg, v[1]);
 		std::string bak = v1.name;
 		v1 = id.v[index];
 		v1.name = bak;
@@ -898,7 +891,7 @@ static bool vectorfunc_erase(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable_inline(prg, v[0]);
 	double index = as_number(prg, v[1]);
 
 	if (index < 0 || index >= id.v.size()) {
@@ -914,7 +907,7 @@ static bool vectorfunc_clear(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable_inline(prg, v[0]);
 
 	id.v.clear();
 
@@ -925,7 +918,7 @@ static bool mapfunc_set(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable_inline(prg, v[0]);
 	std::string key = as_string(prg, v[1]);
 
 	Variable var;
@@ -940,7 +933,7 @@ static bool mapfunc_set(Program *prg, std::vector<Token> &v)
 			var = prg->variables[v[2].i];
 		}
 		else {
-			var = as_variable(prg, v[2]);
+			var = as_variable_inline(prg, v[2]);
 		}
 	}
 	else {
@@ -958,7 +951,7 @@ static bool mapfunc_get(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable_inline(prg, v[0]);
 	std::string key = as_string(prg, v[2]);
 
 	std::map<std::string, Variable>::iterator it = id.m.find(key);
@@ -972,7 +965,7 @@ static bool mapfunc_get(Program *prg, std::vector<Token> &v)
 		v1.p = id.m[key].p;
 	}
 	else {
-		Variable &v1 = as_variable(prg, v[1]);
+		Variable &v1 = as_variable_inline(prg, v[1]);
 		std::string bak = v1.name;
 		v1 = id.m[key];
 		v1.name = bak;
@@ -985,7 +978,7 @@ static bool mapfunc_clear(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable_inline(prg, v[0]);
 
 	id.m.clear();
 
@@ -996,7 +989,7 @@ static bool mapfunc_erase(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable_inline(prg, v[0]);
 	std::string key = as_string(prg, v[1]);
 
 	std::map<std::string, Variable>::iterator it = id.m.find(key);
