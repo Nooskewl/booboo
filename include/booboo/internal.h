@@ -61,6 +61,9 @@ void start_lib_core();
 
 inline Variable &as_variable_inline(Program *prg, Token &t)
 {
+	if (t.type != Token::SYMBOL) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
 	if (prg->variables[t.i].type == Variable::POINTER) {
 		return *prg->variables[t.i].p;
 	}
@@ -83,12 +86,18 @@ inline double as_number_inline(Program *prg, Token &t)
 		if (v->type == Variable::NUMBER) {
 			return v->n;
 		}
-		else {
+		else if (v->type == Variable::STRING) {
 			return atof(v->s.c_str());
 		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
+	}
+	else if (t.type == Token::STRING) {
+		return atof(t.s.c_str());
 	}
 	else {
-		return atof(t.s.c_str());
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 }
 
@@ -110,19 +119,28 @@ inline std::string as_string_inline(Program *prg, Token &t)
 		if (v->type == Variable::STRING) {
 			return v->s;
 		}
-		else {
+		else if (v->type == Variable::NUMBER) {
 			char buf[1000];
 			snprintf(buf, 1000, "%g", v->n);
 			return buf;
 		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
+	}
+	else if (t.type == Token::STRING) {
+		return t.s;
 	}
 	else {
-		return t.s;
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 }
 
 inline int as_label_inline(Program *prg, Token &t)
 {
+	if (t.type != Token::SYMBOL) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
 	if (prg->variables[t.i].type == Variable::POINTER) {
 		return prg->variables[t.i].p->n;
 	}
@@ -131,6 +149,9 @@ inline int as_label_inline(Program *prg, Token &t)
 
 inline int as_function_inline(Program *prg, Token &t)
 {
+	if (t.type != Token::SYMBOL) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
 	if (prg->variables[t.i].type == Variable::POINTER) {
 		return prg->variables[t.i].p->n;
 	}

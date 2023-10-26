@@ -101,79 +101,29 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 	else if (v[0].type == Token::SYMBOL) {
 		Variable &v1 = as_variable_inline(prg, v[0]);
 
-		if (v[1].type == Token::SYMBOL) {
+		if (v1.type == Variable::NUMBER) {
+			v1.n = as_number_inline(prg, v[1]);
+		}
+		else if (v1.type == Variable::STRING) {
+			v1.s = as_string_inline(prg, v[1]);
+		}
+		else if (v1.type == Variable::VECTOR) {
 			Variable &v2 = as_variable_inline(prg, v[1]);
-
-			if (v1.type == Variable::NUMBER) {
-				if (v2.type == Variable::NUMBER) {
-					v1.n = v2.n;
-				}
-				else if (v2.type == Variable::STRING) {
-					v1.n = atof(v2.s.c_str());
-				}
-				else {
-					throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-				}
-			}
-			else if (v1.type == Variable::STRING) {
-				if (v2.type == Variable::STRING) {
-					v1.s = v2.s;
-				}
-				else if (v2.type == Variable::NUMBER) {
-					char buf[1000];
-					snprintf(buf, 1000, "%g", v2.n);
-					v1.s = buf;
-				}
-				else {
-					throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-				}
-			}
-			else if (v1.type == Variable::VECTOR) {
-				if (v2.type == Variable::VECTOR) {
-					v1.v = v2.v;
-				}
-				else {
-					throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-				}
-			}
-			else if (v1.type == Variable::MAP) {
-				if (v2.type == Variable::MAP) {
-					v1.m = v2.m;
-				}
-				else {
-					throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-				}
+			if (v2.type == Variable::VECTOR) {
+				v1.v = v2.v;
 			}
 			else {
 				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 			}
 		}
-		else if (v[1].type == Token::NUMBER) {
-			if (v1.type == Variable::NUMBER) {
-				v1.n = v[1].n;
-			}
-			else if (v1.type == Variable::STRING) {
-				char buf[1000];
-				snprintf(buf, 1000, "%g", v[1].n);
-				v1.s = buf;
+		else if (v1.type == Variable::MAP) {
+			Variable &v2 = as_variable_inline(prg, v[1]);
+			if (v2.type == Variable::MAP) {
+				v1.m = v2.m;
 			}
 			else {
 				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 			}
-		}
-		else if (v[1].type == Token::STRING) {
-			if (v1.type == Variable::STRING) {
-				v1.s = v[1].s;
-			}
-			else if (v1.type == Variable::NUMBER) {
-				v1.n = atof(v[1].s.c_str());
-			}
-			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-			}
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 		}
 	}
 	else {
@@ -187,81 +137,30 @@ bool corefunc_add(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	if (v[0].type != Token::SYMBOL) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
-
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
-	if (v[1].type == Token::SYMBOL) {
+	if (v1.type == Variable::NUMBER) {
+		v1.n += as_number_inline(prg, v[1]);
+	}
+	else if (v1.type == Variable::STRING) {
+		v1.s += as_string_inline(prg, v[1]);
+	}
+	else if (v1.type == Variable::VECTOR) {
 		Variable &v2 = as_variable_inline(prg, v[1]);
-
-		if (v2.type == Variable::NUMBER) {
-			if (v1.type == Variable::NUMBER) {
-				v1.n += v2.n;
-			}
-			else if (v1.type == Variable::STRING) {
-				char buf[1000];
-				snprintf(buf, 1000, "%g", v2.n);
-				v1.s += buf;
-			}
-			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-			}
-		}
-		else if (v2.type == Variable::STRING) {
-			if (v1.type == Variable::STRING) {
-				v1.s += v2.s;
-			}
-			else if (v1.type == Variable::NUMBER) {
-				v1.n += atof(v2.s.c_str());
-			}
-			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-			}
-		}
-		else if (v2.type == Variable::VECTOR) {
-			if (v1.type == Variable::VECTOR) {
-				v1.v.insert(v1.v.end(), v2.v.begin(), v2.v.end());
-			}
-			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-			}
-		}
-		else if (v2.type == Variable::MAP) {
-			if (v1.type == Variable::MAP) {
-				v1.m.insert(v2.m.begin(), v2.m.end());
-			}
-			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-			}
+		if (v2.type != Variable::VECTOR) {
+			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 		}
 		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+			v1.v.insert(v1.v.end(), v2.v.begin(), v2.v.end());
 		}
 	}
-	else if (v[1].type == Token::NUMBER) {
-		if (v1.type == Variable::NUMBER) {			
-			v1.n += v[1].n;
-		}
-		else if (v1.type == Variable::STRING) {
-			char buf[1000];
-			snprintf(buf, 1000, "%g", v[1].n);
-			v1.s += buf;
-		}
-		else {
+	else if (v1.type == Variable::MAP) {
+		Variable &v2 = as_variable_inline(prg, v[1]);
+		if (v2.type != Variable::MAP) {
 			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 		}
-	}
-	else if (v[1].type == Token::STRING) {
-		if (v1.type == Variable::NUMBER) {			
-			v1.n += atof(v[1].s.c_str());
-		}
-		else if (v1.type == Variable::STRING) {
-			v1.s += v[1].s;
-		}
 		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+			v1.m.insert(v2.m.begin(), v2.m.end());
 		}
 	}
 	else {
@@ -274,38 +173,14 @@ bool corefunc_add(Program *prg, std::vector<Token> &v)
 bool corefunc_subtract(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
-
-	if (v[0].type != Token::SYMBOL) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
-
+	
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
-		if (v[1].type == Token::SYMBOL) {
-			Variable &v2 = as_variable_inline(prg, v[1]);
-			if (v2.type == Variable::NUMBER) {
-				v1.n -= v2.n;
-			}
-			else if (v2.type == Variable::STRING) {
-				v1.n -= atof(v2.s.c_str());
-			}
-			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-			}
-		}
-		else if (v[1].type == Token::NUMBER) {
-			v1.n -= v[1].n;
-		}
-		else if (v[1].type == Token::STRING) {
-			v1.n -= atof(v[1].s.c_str());
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-		}
+		v1.n -= as_number_inline(prg, v[1]);
 	}
 	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
 	return true;
