@@ -84,7 +84,7 @@ bool corefunc_address(Program *prg, std::vector<Token> &v)
 	}
 
 	Variable &v1 = prg->variables[v[0].i];
-	Variable &v2 = as_variable_inline(prg, v[1]);
+	Variable &v2 = prg->variables[v[1].i];
 
 	v1.p = &v2;
 
@@ -95,35 +95,30 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	if (v[0].type == Token::SYMBOL && v[1].type == Token::SYMBOL && prg->variables[v[0].i].type == Variable::POINTER && prg->variables[v[1].i].type == Variable::POINTER) {
-		prg->variables[v[0].i].p = prg->variables[v[1].i].p;
-	}
-	else if (v[0].type == Token::SYMBOL) {
-		Variable &v1 = as_variable_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
-		if (v1.type == Variable::NUMBER) {
-			v1.n = as_number_inline(prg, v[1]);
+	if (v1.type == Variable::NUMBER) {
+		v1.n = as_number_inline(prg, v[1]);
+	}
+	else if (v1.type == Variable::STRING) {
+		v1.s = as_string_inline(prg, v[1]);
+	}
+	else if (v1.type == Variable::VECTOR) {
+		Variable &v2 = as_variable_inline(prg, v[1]);
+		if (v2.type == Variable::VECTOR) {
+			v1.v = v2.v;
 		}
-		else if (v1.type == Variable::STRING) {
-			v1.s = as_string_inline(prg, v[1]);
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 		}
-		else if (v1.type == Variable::VECTOR) {
-			Variable &v2 = as_variable_inline(prg, v[1]);
-			if (v2.type == Variable::VECTOR) {
-				v1.v = v2.v;
-			}
-			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-			}
+	}
+	else if (v1.type == Variable::MAP) {
+		Variable &v2 = as_variable_inline(prg, v[1]);
+		if (v2.type == Variable::MAP) {
+			v1.m = v2.m;
 		}
-		else if (v1.type == Variable::MAP) {
-			Variable &v2 = as_variable_inline(prg, v[1]);
-			if (v2.type == Variable::MAP) {
-				v1.m = v2.m;
-			}
-			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-			}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 		}
 	}
 	else {

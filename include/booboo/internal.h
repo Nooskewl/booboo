@@ -142,7 +142,13 @@ inline int as_label_inline(Program *prg, Token &t)
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 	if (prg->variables[t.i].type == Variable::POINTER) {
+		if (prg->variables[t.i].p->type != Variable::LABEL) {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
 		return prg->variables[t.i].p->n;
+	}
+	if (prg->variables[t.i].type != Variable::LABEL) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 	return prg->variables[t.i].n;
 }
@@ -153,9 +159,48 @@ inline int as_function_inline(Program *prg, Token &t)
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 	if (prg->variables[t.i].type == Variable::POINTER) {
+		if (prg->variables[t.i].p->type != Variable::FUNCTION) {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
 		return prg->variables[t.i].p->n;
 	}
+	if (prg->variables[t.i].type != Variable::FUNCTION) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
 	return prg->variables[t.i].n;
+}
+
+inline Variable &as_pointer_inline(Program *prg, Token &t)
+{
+	if (t.type != Token::SYMBOL) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+	if (prg->variables[t.i].type != Variable::POINTER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+	return prg->variables[t.i];
+}
+
+inline std::vector<Variable> &as_vector_inline(Program *prg, Token &t)
+{
+	if (t.type != Token::SYMBOL) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+	if (prg->variables[t.i].type != Variable::VECTOR) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+	return prg->variables[t.i].v;
+}
+
+inline std::map<std::string, Variable> &as_map_inline(Program *prg, Token &t)
+{
+	if (t.type != Token::SYMBOL) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+	if (prg->variables[t.i].type != Variable::MAP) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+	return prg->variables[t.i].m;
 }
 
 } // End namespace booboo
