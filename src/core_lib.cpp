@@ -275,13 +275,37 @@ bool corefunc_subtract(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
+	if (v[0].type != Token::SYMBOL) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+	}
+
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
-		v1.n -= as_number_inline(prg, v[1]);
+		if (v[1].type == Token::SYMBOL) {
+			Variable &v2 = as_variable_inline(prg, v[1]);
+			if (v2.type == Variable::NUMBER) {
+				v1.n -= v2.n;
+			}
+			else if (v2.type == Variable::STRING) {
+				v1.n -= atof(v2.s.c_str());
+			}
+			else {
+				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+			}
+		}
+		else if (v[1].type == Token::NUMBER) {
+			v1.n -= v[1].n;
+		}
+		else if (v[1].type == Token::STRING) {
+			v1.n -= atof(v[1].s.c_str());
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+		}
 	}
 	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 	}
 
 	return true;
