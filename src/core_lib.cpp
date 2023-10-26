@@ -79,8 +79,12 @@ bool corefunc_address(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
+	if (v[0].type != Token::SYMBOL || v[1].type != Token::SYMBOL) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+	}
+
 	Variable &v1 = prg->variables[v[0].i];
-	Variable &v2 = as_variable_inline(prg, v[1]);
+	Variable &v2 = prg->variables[v[1].i];
 
 	v1.p = &v2;
 
