@@ -209,6 +209,9 @@ static bool miscfunc_inspect(Program *prg, std::vector<Token> &v)
 		else if (var.type == Variable::VECTOR) {
 			snprintf(buf, 1000, "-vector-");
 		}
+		else if (var.type == Variable::MAP) {
+			snprintf(buf, 1000, "-map-");
+		}
 		else if (var.type == Variable::POINTER) {
 			snprintf(buf, 1000, "-pointer-");
 		}

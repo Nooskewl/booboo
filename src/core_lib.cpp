@@ -497,6 +497,12 @@ bool corefunc_print(Program *prg, std::vector<Token> &v)
 			else if (v1.type == Variable::VECTOR) {
 				val = "-vector-";
 			}
+			else if (v1.type == Variable::MAP) {
+				val = "-map-";
+			}
+			else if (v1.type == Variable::POINTER) {
+				val = "-pointer-";
+			}
 			else {
 				val = "-unknown-";
 			}
