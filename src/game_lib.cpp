@@ -53,44 +53,44 @@ static std::string remove_quotes(std::string s)
 
 static MML_Info *mml_info(Program *prg)
 {
-	MML_Info *info = (MML_Info *)booboo::get_black_box(prg, "mml");
+	MML_Info *info = (MML_Info *)booboo::get_black_box(prg, "com.b1stable.booboo.mml");
 	if (info == nullptr) {
 		info = new MML_Info;
 		info->mml_id = 0;
-		booboo::set_black_box(prg, "mml", info);
+		booboo::set_black_box(prg, "com.b1stable.booboo.mml", info);
 	}
 	return info;
 }
 
 static Image_Info *image_info(Program *prg)
 {
-	Image_Info *info = (Image_Info *)booboo::get_black_box(prg, "image");
+	Image_Info *info = (Image_Info *)booboo::get_black_box(prg, "com.b1stable.booboo.image");
 	if (info == nullptr) {
 		info = new Image_Info;
 		info->image_id = 0;
-		booboo::set_black_box(prg, "image", info);
+		booboo::set_black_box(prg, "com.b1stable.booboo.image", info);
 	}
 	return info;
 }
 
 static Font_Info *font_info(Program *prg)
 {
-	Font_Info *info = (Font_Info *)booboo::get_black_box(prg, "font");
+	Font_Info *info = (Font_Info *)booboo::get_black_box(prg, "com.b1stable.booboo.font");
 	if (info == nullptr) {
 		info = new Font_Info;
 		info->font_id = 0;
-		booboo::set_black_box(prg, "font", info);
+		booboo::set_black_box(prg, "com.b1stable.booboo.font", info);
 	}
 	return info;
 }
 
 static CFG_Info *cfg_info(Program *prg)
 {
-	CFG_Info *info = (CFG_Info *)booboo::get_black_box(prg, "cfg");
+	CFG_Info *info = (CFG_Info *)booboo::get_black_box(prg, "com.b1stable.booboo.cfg");
 	if (info == nullptr) {
 		info = new CFG_Info;
 		info->cfg_id = 0;
-		booboo::set_black_box(prg, "cfg", info);
+		booboo::set_black_box(prg, "com.b1stable.booboo.cfg", info);
 	}
 	return info;
 }
@@ -1469,8 +1469,8 @@ void game_lib_destroy_program(Program *prg)
 	delete font_i;
 	delete cfg_i;
 
-	booboo::set_black_box(prg, "mml", nullptr);
-	booboo::set_black_box(prg, "image", nullptr);
-	booboo::set_black_box(prg, "font", nullptr);
-	booboo::set_black_box(prg, "cfg", nullptr);
+	booboo::set_black_box(prg, "com.b1stable.booboo.mml", nullptr);
+	booboo::set_black_box(prg, "com.b1stable.booboo.image", nullptr);
+	booboo::set_black_box(prg, "com.b1stable.booboo.font", nullptr);
+	booboo::set_black_box(prg, "com.b1stable.booboo.cfg", nullptr);
 }
