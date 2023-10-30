@@ -1,5 +1,6 @@
 #include <cmath>
 #include <cstring>
+#include <iostream>
 
 #include "booboo/booboo.h"
 #include "booboo/internal.h"
@@ -585,6 +586,26 @@ bool corefunc_print(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+bool corefunc_input(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &var = as_variable_inline(prg, v[0]);
+
+	if (var.type != Variable::STRING) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	if (std::cin.eof()) {
+		var.s = "";
+	}
+	else {
+		std::cin >> var.s;
+	}
+
+	return true;
+}
+
 bool stringfunc_format(Program *prg, std::vector<Token> &v)
 {
 	Variable &v1 = as_variable_inline(prg, v[0]);
@@ -639,6 +660,18 @@ bool stringfunc_format(Program *prg, std::vector<Token> &v)
 			}
 			else if (v1.type == Variable::VECTOR) {
 				val = "-vector-";
+			}
+			else if (v1.type == Variable::MAP) {
+				val = "-map-";
+			}
+			else if (v1.type == Variable::POINTER) {
+				val = "-pointer-";
+			}
+			else if (v1.type == Variable::FUNCTION) {
+				val = "-function-";
+			}
+			else if (v1.type == Variable::LABEL) {
+				val = "-label-";
 			}
 			else {
 				val = "-unknown-";
@@ -1109,6 +1142,7 @@ void start_lib_core()
 
 	add_syntax("typeof", corefunc_typeof);
 	add_syntax("print", corefunc_print);
+	add_syntax("input", corefunc_input);
 
 	add_syntax("string_format", stringfunc_format);
 	add_syntax("string_char_at", stringfunc_char_at);
