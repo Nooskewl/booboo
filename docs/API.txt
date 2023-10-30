@@ -230,3 +230,7 @@ typeof
 print
 	print a string (like string_format)
 	e.g. print "Hello, I'm % and I like % and %" name like1 like2
+
+input
+	Read a word from stdin
+	e.g. input str
