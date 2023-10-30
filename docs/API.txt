@@ -223,6 +223,10 @@ map_clear
 
 -- Other ---------------------------------------------------------------------
 
+typeof
+	Returns a string respresentation of the type of the second parameter
+	e.g. typeof type_string my_var
+
 print
 	print a string (like string_format)
 	e.g. print "Hello, I'm % and I like % and %" name like1 like2

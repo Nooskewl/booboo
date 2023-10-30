@@ -443,6 +443,57 @@ bool corefunc_fmod(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+bool corefunc_typeof(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	std::string res;
+
+	if (v[1].type != Token::SYMBOL) {
+		if (v[1].type == Token::NUMBER) {
+			res = "number";
+		}
+		else if (v[1].type == Token::STRING) {
+			res = "string";
+		}
+		else {
+			res = "unknown";
+		}
+	}
+	else {
+		Variable &v1 = prg->variables[v[1].i];
+
+		if (v1.type == Variable::NUMBER) {
+			res = "number";
+		}
+		else if (v1.type == Variable::STRING) {
+			res = "string";
+		}
+		else if (v1.type == Variable::VECTOR) {
+			res = "vector";
+		}
+		else if (v1.type == Variable::MAP) {
+			res = "map";
+		}
+		else if (v1.type == Variable::POINTER) {
+			res = "pointer";
+		}
+		else {
+			res = "unknown";
+		}
+	}
+
+	Variable &v2 = as_variable_inline(prg, v[0]);
+
+	if (v2.type != Variable::STRING) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v2.s = res;
+
+	return true;
+}
+
 bool corefunc_print(Program *prg, std::vector<Token> &v)
 {
 	std::string fmt = as_string(prg, v[0]);
@@ -1044,7 +1095,9 @@ void start_lib_core()
 	add_syntax("%", corefunc_intmod);
 	add_syntax("fmod", corefunc_fmod);
 
+	add_syntax("typeof", corefunc_typeof);
 	add_syntax("print", corefunc_print);
+
 	add_syntax("string_format", stringfunc_format);
 	add_syntax("string_char_at", stringfunc_char_at);
 	add_syntax("string_length", stringfunc_length);
