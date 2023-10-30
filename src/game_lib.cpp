@@ -215,6 +215,12 @@ static bool miscfunc_inspect(Program *prg, std::vector<Token> &v)
 		else if (var.type == Variable::POINTER) {
 			snprintf(buf, 1000, "-pointer-");
 		}
+		else if (var.type == Variable::FUNCTION) {
+			snprintf(buf, 1000, "-function-");
+		}
+		else if (var.type == Variable::LABEL) {
+			snprintf(buf, 1000, "-label-");
+		}
 	}
 	else {
 		strcpy(buf, "Unknown");

@@ -478,6 +478,12 @@ bool corefunc_typeof(Program *prg, std::vector<Token> &v)
 		else if (v1.type == Variable::POINTER) {
 			res = "pointer";
 		}
+		else if (v1.type == Variable::FUNCTION) {
+			res = "function";
+		}
+		else if (v1.type == Variable::LABEL) {
+			res = "label";
+		}
 		else {
 			res = "unknown";
 		}
@@ -553,6 +559,12 @@ bool corefunc_print(Program *prg, std::vector<Token> &v)
 			}
 			else if (v1.type == Variable::POINTER) {
 				val = "-pointer-";
+			}
+			else if (v1.type == Variable::FUNCTION) {
+				val = "-function-";
+			}
+			else if (v1.type == Variable::LABEL) {
+				val = "-label-";
 			}
 			else {
 				val = "-unknown-";
