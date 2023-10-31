@@ -1,5 +1,3 @@
-//#define DEBUG_LINE_NUMBERS
-
 #include <sys/stat.h>
 
 #include "booboo/booboo.h"
@@ -442,10 +440,6 @@ bool process_includes(Program *prg)
 				prg->real_file_names.insert(prg->real_file_names.begin()+start_line+(i-1+total_added), fn);
 			}
 
-			//for (int i = start_line+nlines; i < prg->real_line_numbers.size(); i++) {
-				//prg->real_line_numbers[i] += nlines-1;
-			//}
-
 			start = prg->s->p;
 
 			total_added += nlines;
@@ -822,8 +816,6 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 {
 	Program &func = prg->functions[function];
 
-	//backup(prg, function);
-
 	for (size_t j = 0; j < func.params.size(); j++) {
 		Token &param = params[j+ignore_params];
 		
@@ -852,8 +844,6 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 
 	while (interpret(prg)) {
 	}
-
-	//restore(prg, function);
 
 	std::string bak = result.name;
 	result = prg->s->result;
@@ -989,16 +979,6 @@ Program *create_program(std::string code)
 	
 	while(process_includes(prg));
 
-#ifdef DEBUG_LINE_NUMBERS
-FILE *foo = fopen("debug_line_numbers.txt", "w");
-fprintf(foo, "%s", prg->s->code.c_str());
-fprintf(foo, "---\n");
-for (size_t i = 0; i < prg->real_line_numbers.size(); i++) {
-	fprintf(foo, "%d\n", prg->real_line_numbers[i]);
-}
-fclose(foo);
-#endif
-		
 	compile(prg, PASS1);
 
 	prg->s->p = 0;
@@ -1008,63 +988,6 @@ fclose(foo);
 	prg->functions.clear();
 
 	compile(prg, PASS2);
-
-#ifdef NO_DUPLICATE_LABELS
-	for (int i = 0; i < int(prg->variables.size())-1; i++) {
-		if (prg->variables[i].type != Variable::LABEL) {
-			continue;
-		}
-		for (size_t j = i+1; j < prg->variables.size(); j++) {
-			if (prg->variables[j].type != Variable::LABEL) {
-				continue;
-			}
-			if (prg->variables[i].name == prg->variables[j].name) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Duplicate labels \"" + prg->variables[i].name + "\"");
-			}
-		}
-	}
-#endif
-	
-#ifdef DEBUG_LINE_NUMBERS
-foo = fopen("debug_line_numbers.txt", "a");
-fprintf(foo, "---\n");
-for (size_t i = 0; i < prg->line_numbers.size(); i++) {
-	if (i >= prg->s->program.size()) {
-		fprintf(foo, "-- line_numbers bigger than program --\n");
-		break;
-	}
-	Statement &s = prg->s->program[i];
-	std::map<std::string, int>::iterator it;
-	std::string op = "UNKNOWN";
-	for (it = library_map.begin(); it != library_map.end(); it++) {
-		if ((*it).second == s.method) {
-			op = (*it).first;
-			break;
-		}
-	}
-	fprintf(foo, "%d (%s)\n", prg->line_numbers[i], op.c_str());
-}
-for (size_t i = 0; i < prg->functions.size(); i++) {
-	fprintf(foo, "--- %s ---\n", prg->functions[i].name.c_str());
-	for (size_t j = 0; j < prg->functions[i].line_numbers.size(); j++) {
-		if (j >= prg->functions[i].program.size()) {
-			fprintf(foo, "-- line_numbers bigger than program --\n");
-			break;
-		}
-		Statement &s = prg->functions[i].program[j];
-		std::map<std::string, int>::iterator it;
-		std::string op = "UNKNOWN";
-		for (it = library_map.begin(); it != library_map.end(); it++) {
-			if ((*it).second == s.method) {
-				op = (*it).first;
-				break;
-			}
-		}
-		fprintf(foo, "%d (%s)\n", prg->functions[i].line_numbers[j], op.c_str());
-	}
-}
-fclose(foo);
-#endif
 
 	prg->s->p = 0;
 	prg->s->line = 1;
