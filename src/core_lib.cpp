@@ -892,28 +892,31 @@ static bool vectorfunc_size(Program *prg, std::vector<Token> &v)
 
 static bool vectorfunc_set(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
-
 	Variable &id = as_variable_inline(prg, v[0]);
-	double index = as_number(prg, v[1]);
-	
-	if (index < 0 || index >= id.v.size()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
+	int val_index = v.size() - 1;
+	std::vector<int> indices;
+
+	if (v.size() < 3) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
+	}
+
+	for (int i = 1; i < val_index; i++) {
+		indices.push_back(as_number_inline(prg, v[i]));
 	}
 
 	Variable var;
 
-	if (v[2].type == Token::NUMBER) {
+	if (v[val_index].type == Token::NUMBER) {
 		var.type = Variable::NUMBER;
 		var.name = "-constant-";
-		var.n = v[2].n;
+		var.n = v[val_index].n;
 	}
-	else if (v[2].type == Token::SYMBOL) {
-		if (prg->variables[v[2].i].type == Variable::POINTER) {
-			var = prg->variables[v[2].i];
+	else if (v[val_index].type == Token::SYMBOL) {
+		if (prg->variables[v[val_index].i].type == Variable::POINTER) {
+			var = prg->variables[v[val_index].i];
 		}
 		else {
-			var = as_variable_inline(prg, v[2]);
+			var = as_variable_inline(prg, v[val_index]);
 		}
 	}
 	else {
@@ -922,7 +925,29 @@ static bool vectorfunc_set(Program *prg, std::vector<Token> &v)
 		var.s = v[2].s;
 	}
 
-	id.v[index] = var;
+	std::vector<Variable> *p = nullptr;
+
+	for (size_t i = 0; i < indices.size()-1; i++) {
+		int index = indices[i];
+		if (p == nullptr) {
+			if (index < 0 || index >= (int)id.v.size()) {
+				throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
+			}
+			p = &id.v[index].v;
+		}
+		else {
+			if (index < 0 || index >= (int)(*p).size()) {
+				throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
+			}
+			p = &(*p)[index].v;
+		}
+	}
+			
+	if (p == nullptr) {
+		p = &id.v;
+	}
+
+	(*p)[indices[indices.size()-1]] = var;
 
 	return true;
 }
@@ -966,24 +991,54 @@ static bool vectorfunc_insert(Program *prg, std::vector<Token> &v)
 
 static bool vectorfunc_get(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
-
 	Variable &id = as_variable_inline(prg, v[0]);
-	double index = as_number(prg, v[2]);
+	std::vector<int> indices;
 
-	if (index < 0 || index >= id.v.size()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
+	if (v.size() < 3) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
 	}
 
-	if (prg->variables[v[1].i].type == Variable::POINTER) {
-		Variable &v1 = prg->variables[v[1].i];
-		v1.p = id.v[index].p;
+	for (size_t i = 2; i < v.size(); i++) {
+		int index = as_number(prg, v[i]);
+		indices.push_back(index);
 	}
-	else {
-		Variable &v1 = as_variable_inline(prg, v[1]);
-		std::string bak = v1.name;
-		v1 = id.v[index];
-		v1.name = bak;
+
+	std::vector<Variable> *p = nullptr;
+
+	for (size_t i = 0; i < indices.size(); i++) {
+		int index = indices[i];
+		if (i == indices.size()-1) {
+			if (p == nullptr) {
+				p = &id.v;
+			}
+			if (index < 0 || index >= (int)(*p).size()) {
+				throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
+			}
+			if (prg->variables[v[1].i].type == Variable::POINTER) {
+				Variable &v1 = prg->variables[v[1].i];
+				v1.p = (*p)[index].p;
+			}
+			else {
+				Variable &v1 = as_variable_inline(prg, v[1]);
+				std::string bak = v1.name;
+				v1 = (*p)[index];
+				v1.name = bak;
+			}
+		}
+		else {
+			if (p == nullptr) {
+				if (index < 0 || index >= (int)id.v.size()) {
+					throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
+				}
+				p = &id.v[index].v;
+			}
+			else {
+				if (index < 0 || index >= (int)(*p).size()) {
+					throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
+				}
+				p = &(*p)[index].v;
+			}
+		}
 	}
 
 	return true;
@@ -991,6 +1046,7 @@ static bool vectorfunc_get(Program *prg, std::vector<Token> &v)
 
 static bool vectorfunc_erase(Program *prg, std::vector<Token> &v)
 {
+
 	COUNT_ARGS(2)
 
 	Variable &id = as_variable_inline(prg, v[0]);
