@@ -1,7 +1,12 @@
 //#define LUA_BENCH
 //#define LUA_BENCH2
+//#define LUA_BENCH3
 //#define CPP_BENCH
 //#define CPP_BENCH2
+
+#if defined LUA_BENCH || defined LUA_BENCH2 || defined LUA_BENCH3
+#define LUA_BENCH_ANY
+#endif
 
 #include <shim4/shim4.h>
 
@@ -27,7 +32,7 @@ char **orig_argv;
 std::string extra_args;
 std::string extra_args_orig;
 
-#if defined LUA_BENCH || defined LUA_BENCH2
+#if defined LUA_BENCH_ANY
 extern "C" {
 #include <lua5.4/lua.h>
 #include <lua5.4/lauxlib.h>
@@ -181,6 +186,52 @@ static int c_filled_circle(lua_State *stack)
 	return 0;
 }
 
+static int c_filled_rectangle(lua_State *stack)
+{
+	int r = lua_tonumber(stack, 1);
+	int g = lua_tonumber(stack, 2);
+	int b = lua_tonumber(stack, 3);
+	int a = lua_tonumber(stack, 4);
+	int r2 = lua_tonumber(stack, 5);
+	int g2 = lua_tonumber(stack, 6);
+	int b2 = lua_tonumber(stack, 7);
+	int a2 = lua_tonumber(stack, 8);
+	int r3 = lua_tonumber(stack, 9);
+	int g3 = lua_tonumber(stack, 10);
+	int b3 = lua_tonumber(stack, 11);
+	int a3 = lua_tonumber(stack, 12);
+	int r4 = lua_tonumber(stack, 13);
+	int g4 = lua_tonumber(stack, 14);
+	int b4 = lua_tonumber(stack, 15);
+	int a4 = lua_tonumber(stack, 16);
+	float x = lua_tonumber(stack, 17);
+	float y = lua_tonumber(stack, 18);
+	float w = lua_tonumber(stack, 19);
+	float h = lua_tonumber(stack, 20);
+
+	SDL_Color c[4];
+	c[0].r = r;
+	c[0].g = g;
+	c[0].b = b;
+	c[0].a = a;
+	c[1].r = r2;
+	c[1].g = g2;
+	c[1].b = b2;
+	c[1].a = a2;
+	c[2].r = r3;
+	c[2].g = g3;
+	c[2].b = b3;
+	c[2].a = a3;
+	c[3].r = r4;
+	c[3].g = g4;
+	c[3].b = b4;
+	c[3].a = a4;
+
+	gfx::draw_filled_rectangle(c, util::Point<float>(x, y), util::Size<float>(w, h));
+
+	return 0;
+}
+
 static int c_clear(lua_State *stack)
 {
 	int r = lua_tonumber(stack, 1);
@@ -296,6 +347,7 @@ void init_lua()
 	REGISTER_FUNCTION(start_primitives);
 	REGISTER_FUNCTION(end_primitives);
 	REGISTER_FUNCTION(filled_circle);
+	REGISTER_FUNCTION(filled_rectangle);
 	REGISTER_FUNCTION(load_image);
 	REGISTER_FUNCTION(image_size);
 	REGISTER_FUNCTION(image_draw);
@@ -306,9 +358,11 @@ void init_lua()
 	#undef REGISTER_FUNCION
 
 #ifdef LUA_BENCH
-	std::string program = util::load_text_from_filesystem("benchmark.lua");
+	std::string program = util::load_text_from_filesystem("robots.lua");
+#elif defined LUA_BENCH2
+	std::string program = util::load_text_from_filesystem("sine.lua");
 #else
-	std::string program = util::load_text_from_filesystem("benchmark2.lua");
+	std::string program = util::load_text_from_filesystem("plasma.lua");
 #endif
 	luaL_loadstring(lua_state, program.c_str());
 	if (lua_pcall(lua_state, 0, 0, 0) != 0) {
@@ -435,7 +489,7 @@ void draw_all()
 
 	gfx::set_cull_mode(gfx::NO_FACE);
 	
-#if defined LUA_BENCH || defined LUA_BENCH2
+#if defined LUA_BENCH_ANY
 	call_lua(lua_state, "draw", "");
 #elif defined CPP_BENCH2
 	SDL_Colour c;
@@ -574,7 +628,7 @@ static void loop()
 			TGUI_Event *event = shim::handle_event(&sdl_event);
 			handle_event(event);
 
-#if defined LUA_BENCH2
+#if defined LUA_BENCH_ANY
 			call_lua(lua_state, "run", "");
 #else
 			std::vector<booboo::Token> tmp;
@@ -863,7 +917,7 @@ again:
 	while (booboo::interpret(prg)) {
 	}
 
-#if defined LUA_BENCH || defined LUA_BENCH2
+#if defined LUA_BENCH_ANY
 	init_lua();
 #elif defined CPP_BENCH
 	grass = new gfx::Image("misc/grass.tga");
