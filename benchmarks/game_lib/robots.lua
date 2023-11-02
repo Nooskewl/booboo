@@ -19,3 +19,6 @@ function draw()
 		image_draw(robot, 255, 255, 255, 255, x*20, y*20, 0, 0)
 	end
 end
+
+function run()
+end
