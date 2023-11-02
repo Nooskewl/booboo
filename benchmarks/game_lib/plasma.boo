@@ -268,6 +268,9 @@ function find_closest r g b
 	* rr rr
 	* gg gg
 	* bb bb
+	* rr 0.2126
+	* gg 0.7152
+	* bb 0.0722
 	+ rr gg
 	+ rr bb
 	sqrt rr rr

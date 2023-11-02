@@ -93,7 +93,11 @@ function find_closest(r, g, b)
 		rr = math.abs(palette[i][0] - r)
 		gg = math.abs(palette[i][1] - g)
 		bb = math.abs(palette[i][2] - b)
-		rr = math.sqrt(rr*rr + gg*gg + bb*bb)
+		rr = (rr * rr) * 0.2126
+		gg = (gg * gg) * 0.7152
+		bb = (bb * bb) * 0.0722
+		rr = rr + gg + bb
+		rr = math.sqrt(rr)
 		if (rr < smallest_diff) then
 			smallest_diff = rr
 			best_i = i
