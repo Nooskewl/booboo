@@ -166,7 +166,6 @@ function divide frame w h
 	number xx2
 	number yy2
 	= yy y
-	+ yy 0.5
 	/ yy 2
 	int yy
 	- yy 1
@@ -174,7 +173,6 @@ function divide frame w h
 	+ yy2 3
 :next_pixel_y
 	= xx x
-	+ xx 0.5
 	/ xx 2
 	int xx
 	- xx 1

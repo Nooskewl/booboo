@@ -61,9 +61,9 @@ function divide(frame, w, h)
 			g = 0
 			b = 0
 			valid = 0
-			yy=math.floor((y + 0.5) / 2) - 1
+			yy=math.floor(y / 2) - 1
 			for yy2=yy,yy+2 do
-				xx = math.floor((x + 0.5) / 2) - 1
+				xx = math.floor(x / 2) - 1
 				for xx2=xx,xx+2 do
 					if (xx2 >= 0 and xx2 < w and yy2 >= 0 and yy2 < h) then
 						valid = valid + 1
@@ -104,6 +104,12 @@ function find_closest(r, g, b)
 	return best_i
 end
 
+frame = divide(frame, W, H)
+W = W * 2
+H = H * 2
+frame = divide(frame, W, H)
+W = W * 2
+H = H * 2
 frame = divide(frame, W, H)
 W = W * 2
 H = H * 2
