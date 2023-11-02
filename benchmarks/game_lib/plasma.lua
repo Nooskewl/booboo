@@ -61,10 +61,10 @@ function divide(frame, w, h)
 			g = 0
 			b = 0
 			valid = 0
-			yy=math.floor(y / 2) - 1
-			for yy2=yy,yy+2 do
-				xx = math.floor(x / 2) - 1
-				for xx2=xx,xx+2 do
+			for yy=y-1,y+1 do
+				for xx=x-1,x+1 do
+					xx2 = math.floor(xx/2)
+					yy2 = math.floor(yy/2)
 					if (xx2 >= 0 and xx2 < w and yy2 >= 0 and yy2 < h) then
 						valid = valid + 1
 						row = frame[yy2]
@@ -93,8 +93,7 @@ function find_closest(r, g, b)
 		rr = math.abs(palette[i][0] - r)
 		gg = math.abs(palette[i][1] - g)
 		bb = math.abs(palette[i][2] - b)
-		rr = math.max(rr, gg)
-		rr = math.max(rr, bb)
+		rr = math.sqrt(rr*rr + gg*gg + bb*bb)
 		if (rr < smallest_diff) then
 			smallest_diff = rr
 			best_i = i
@@ -113,9 +112,12 @@ H = H * 2
 frame = divide(frame, W, H)
 W = W * 2
 H = H * 2
-frame = divide(frame, W, H)
-W = W * 2
-H = H * 2
+--frame = divide(frame, W, H)
+--W = W * 2
+--H = H * 2
+--frame = divide(frame, W, H)
+--W = W * 2
+--H = H * 2
 
 ticks = 0
 
@@ -137,8 +139,9 @@ function draw()
 	end
 
 	end_primitives()
+	
+	ticks = ticks + 1
 end
 
 function run()
-	ticks = ticks + 1
 end

@@ -118,6 +118,15 @@ call_result frame divide frame W H
 call_result frame divide frame W H
 * W 2
 * H 2
+;call_result frame divide frame W H
+;* W 2
+;* H 2
+;call_result frame divide frame W H
+;* W 2
+;* H 2
+;call_result frame divide frame W H
+;* W 2
+;* H 2
 
 number ticks
 = ticks 0
@@ -166,32 +175,36 @@ function divide frame w h
 	number xx2
 	number yy2
 	= yy y
-	/ yy 2
-	int yy
 	- yy 1
 	= yy2 yy
 	+ yy2 3
 :next_pixel_y
 	= xx x
-	/ xx 2
-	int xx
 	- xx 1
 	= xx2 xx
 	+ xx2 3
+	number tmpy
+	= tmpy yy
+	/ tmpy 2
+	int tmpy
 :next_pixel_x
-	? xx 0
-	jl skip_it
-	? xx w
-	jge skip_it
-	? yy 0
-	jl skip_it
-	? yy h
-	jge skip_it
 	+ valid 1
+	number tmpx
+	= tmpx xx
+	/ tmpx 2
+	int tmpx
+	? tmpx 0
+	jl skip_it
+	? tmpx w
+	jge skip_it
+	? tmpy 0
+	jl skip_it
+	? tmpy h
+	jge skip_it
 	vector row
-	vector_get frame row yy
+	vector_get frame row tmpy
 	number pal_index
-	vector_get row pal_index xx
+	vector_get row pal_index tmpx
 	number rr
 	number gg
 	number bb
@@ -255,12 +268,15 @@ function find_closest r g b
 	abs rr rr
 	abs gg gg
 	abs bb bb
-	number m
-	call_result m max rr gg
-	call_result m max m bb
-	? m smallest_diff
+	* rr rr
+	* gg gg
+	* bb bb
+	+ rr gg
+	+ rr bb
+	sqrt rr rr
+	? rr smallest_diff
 	jge not_better
-	= smallest_diff m
+	= smallest_diff rr
 	= best_i i
 :not_better
 	+ i 1
