@@ -1,3 +1,6 @@
+number x
+= x 0
+
 function draw_at r g b x radius
 {
 	number f
@@ -39,6 +42,3 @@ function run
 {
 	+ x 5
 }
-
-number x
-= x 0
