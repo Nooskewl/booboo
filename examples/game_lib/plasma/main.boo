@@ -198,18 +198,14 @@ function divide frame w h
 	jl skip_it
 	? tmpy h
 	jge skip_it
-	vector row
-	vector_get frame row tmpy
 	number pal_index
-	vector_get row pal_index tmpx
+	vector_get frame pal_index tmpy tmpx
 	number rr
 	number gg
 	number bb
-	vector colour
-	vector_get palette colour pal_index
-	vector_get colour rr 0
-	vector_get colour gg 1
-	vector_get colour bb 2
+	vector_get palette rr pal_index 0
+	vector_get palette gg pal_index 1
+	vector_get palette bb pal_index 2
 	+ r rr
 	+ g gg
 	+ b bb
@@ -228,10 +224,7 @@ function divide frame w h
 	int b
 	number best_fit
 	call_result best_fit find_closest r g b
-	vector row
-	vector_get v row y
-	vector_set row x best_fit
-	vector_set v y row
+	vector_set v y x best_fit
 	+ x 1
 	? x new_w
 	jl next_x
@@ -251,14 +244,12 @@ function find_closest r g b
 	number i
 	= i 0
 :next_loop
-	vector colour
-	vector_get palette colour i
 	number rr
 	number gg
 	number bb
-	vector_get colour rr 0
-	vector_get colour gg 1
-	vector_get colour bb 2
+	vector_get palette rr i 0
+	vector_get palette gg i 1
+	vector_get palette bb i 2
 	- rr r
 	- gg g
 	- bb b
@@ -320,20 +311,16 @@ function draw
 	number x
 	= x 0
 :next_x
-	vector row
-	vector_get frame row y
 	number pal_index
-	vector_get row pal_index x
+	vector_get frame pal_index y x
 	+ pal_index ticks
 	% pal_index 256
-	vector colour
-	vector_get palette colour pal_index
 	number r
 	number g
 	number b
-	vector_get colour r 0
-	vector_get colour g 1
-	vector_get colour b 2
+	vector_get palette r pal_index 0
+	vector_get palette g pal_index 1
+	vector_get palette b pal_index 2
 	number xx
 	number yy
 	= yy y
