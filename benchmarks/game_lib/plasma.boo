@@ -124,9 +124,6 @@ call_result frame divide frame W H
 ;call_result frame divide frame W H
 ;* W 2
 ;* H 2
-;call_result frame divide frame W H
-;* W 2
-;* H 2
 
 number ticks
 = ticks 0
