@@ -136,9 +136,8 @@ function draw()
 	end
 
 	end_primitives()
-	
-	ticks = ticks + 1
 end
 
 function run()
+	ticks = ticks + 1
 end
