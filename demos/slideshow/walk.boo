@@ -79,9 +79,11 @@ function run
 	include "poll_joystick.inc"
 
 	number abs_x
-	abs abs_x joy_x2
+	= abs_x joy_x2
+	abs abs_x
 	number abs_y
-	abs abs_y joy_y2
+	= abs_y joy_y2
+	abs abs_y
 
 	? abs_x 0.1
 	jge is_moving

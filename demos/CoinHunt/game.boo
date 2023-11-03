@@ -500,19 +500,19 @@ function draw_time_playing
 	number seconds
 	= seconds killed_all_ticks
 	/ seconds 60
-	int seconds
+	floor seconds
 
 	number hundredths
 	= hundredths killed_all_ticks
 	/ hundredths 60
 	- hundredths seconds
 	* hundredths 100
-	int hundredths
+	floor hundredths
 
 	number minutes
 	= minutes seconds
 	/ minutes 60
-	int minutes
+	floor minutes
 	number tmp
 	= tmp minutes
 	* tmp 60
@@ -540,19 +540,19 @@ function draw_time_playing
 	number seconds
 	= seconds got_coins_ticks
 	/ seconds 60
-	int seconds
+	floor seconds
 
 	number hundredths
 	= hundredths got_coins_ticks
 	/ hundredths 60
 	- hundredths seconds
 	* hundredths 100
-	int hundredths
+	floor hundredths
 
 	number minutes
 	= minutes seconds
 	/ minutes 60
-	int minutes
+	floor minutes
 	number tmp
 	= tmp minutes
 	* tmp 60
@@ -837,19 +837,19 @@ function draw
 	number seconds
 	= seconds total_time
 	/ seconds 60
-	int seconds
+	floor seconds
 
 	number hundredths
 	= hundredths total_time
 	/ hundredths 60
 	- hundredths seconds
 	* hundredths 100
-	int hundredths
+	floor hundredths
 
 	number minutes
 	= minutes seconds
 	/ minutes 60
-	int minutes
+	floor minutes
 	number tmp
 	= tmp minutes
 	* tmp 60
@@ -902,7 +902,7 @@ function write_config score
 	cfg_set_string cfg "name3" "ILL"
 	cfg_set_string cfg "name4" "ILL"
 :dont_set_defaults
-	int score
+	floor score
 	cfg_set_number cfg "last_score" score
 	number success
 	cfg_save cfg success "com.illnorth.coinhunt"
@@ -1213,7 +1213,7 @@ function run
 	number diff
 	= diff ex
 	- diff dest_x
-	abs diff diff
+	abs diff
 	? diff 2
 	jl set_next_dest
 	goto done_move
@@ -1229,7 +1229,7 @@ function run
 	number diff
 	= diff ey
 	- diff dest_y
-	abs diff diff
+	abs diff
 	? diff 2
 	jl set_next_dest
 	goto done_move

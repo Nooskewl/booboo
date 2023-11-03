@@ -199,7 +199,7 @@ function draw
 	string text
 	number score_int
 	= score_int score
-	int score_int
+	floor score_int
 	string_format text "%" score_int
 	number text_w
 	font_width font text_w text

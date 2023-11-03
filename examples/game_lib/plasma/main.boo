@@ -16,12 +16,12 @@ number inv
 - inv p
 = p inv
 * p 255
-int p
+floor p
 vector_add v p
 = p i
 / p 85
 * p 255
-int p
+floor p
 vector_add v p
 vector_add v 0
 vector_add palette v
@@ -42,12 +42,12 @@ number inv
 - inv p
 = p inv
 * p 255
-int p
+floor p
 vector_add v p
 = p i
 / p 85
 * p 255
-int p
+floor p
 vector_add v p
 vector_add palette v
 + i 1
@@ -62,7 +62,7 @@ number p
 = p i
 / p 86
 * p 255
-int p
+floor p
 vector_add v p
 vector_add v 0
 = p i
@@ -72,7 +72,7 @@ number inv
 - inv p
 = p inv
 * p 255
-int p
+floor p
 vector_add v p
 vector_add palette v
 + i 1
@@ -82,13 +82,13 @@ jl next_colour3
 number W
 = W 640
 / W TSZ
-int W
+floor W
 + W 1
 
 number H
 = H 360
 / H TSZ
-int H
+floor H
 + H 1
 
 ; generate the initial randomly-coloured TSZxTSZ blocks
@@ -183,13 +183,13 @@ function divide frame w h
 	number tmpy
 	= tmpy yy
 	/ tmpy 2
-	int tmpy
+	floor tmpy
 :next_pixel_x
 	+ valid 1
 	number tmpx
 	= tmpx xx
 	/ tmpx 2
-	int tmpx
+	floor tmpx
 	? tmpx 0
 	jl skip_it
 	? tmpx w
@@ -219,9 +219,9 @@ function divide frame w h
 	/ r valid
 	/ g valid
 	/ b valid
-	int r
-	int g
-	int b
+	floor r
+	floor g
+	floor b
 	number best_fit
 	call_result best_fit find_closest r g b
 	vector_set v y x best_fit
@@ -253,9 +253,9 @@ function find_closest r g b
 	- rr r
 	- gg g
 	- bb b
-	abs rr rr
-	abs gg gg
-	abs bb bb
+	abs rr
+	abs gg
+	abs bb
 	* rr rr
 	* gg gg
 	* bb bb

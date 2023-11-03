@@ -34,10 +34,10 @@ vector_size v sz
 
 number i
 = i 0
-:next_loop
+:next_loop2
 string key
 vector_get v key i
 print "m2[%] exists\n" key
 + i 1
 ? i sz
-jl next_loop
+jl next_loop2

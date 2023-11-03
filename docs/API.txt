@@ -12,6 +12,10 @@ vector
 	define a vector
 	e.g. vector x
 
+map
+	define a map
+	e.g. map m
+
 reset
 	load a different BooBoo script
 	e.g. reset "next_slide.boo"
@@ -47,6 +51,14 @@ function
 address
 	store an address in a pointer
 	e.g. address p var_or_function
+
+typeof
+	Returns a string respresentation of the type of the second parameter
+	e.g. typeof type_string my_var
+
+	typeof has the ability to index into vectors and maps. Simply add numbers
+	for vectors and strings for maps after the final parameter. You cannot
+	mix vectors and maps this way.
 
 -- Flow Control --------------------------------------------------------------
 
@@ -155,7 +167,7 @@ atan2
 
 abs
 	absolute value
-	e.g. abs dest value
+	e.g. abs value
 
 pow
 	exponentiation
@@ -165,9 +177,9 @@ sqrt
 	square root
 	e.g. sqrt x
 
-int
+floor
 	Drop the fractional part of a number
-	e.g. int x
+	e.g. floor x
 
 neg
 	Invert the sign of a number
@@ -238,14 +250,6 @@ map_keys
 	Get the names of the keys from a map into a vector of strings e.g. map_keys m v
 
 -- Other ---------------------------------------------------------------------
-
-typeof
-	Returns a string respresentation of the type of the second parameter
-	e.g. typeof type_string my_var
-
-	typeof has the ability to index into vectors and maps. Simply add numbers
-	for vectors and strings for maps after the final parameter. You cannot
-	mix vectors and maps this way.
 
 print
 	print a string (like string_format)

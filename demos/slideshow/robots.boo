@@ -275,7 +275,7 @@ function move_robots
 	number y
 	= y index
 	/ y width
-	int y
+	floor y
 
 	number value
 	vector_get board value index

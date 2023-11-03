@@ -50,7 +50,7 @@ number i
 number r
 call_result r genrand
 fmod r 3
-int r
+floor r
 pointer p
 vector_get v p r
 map_set m "draw" p

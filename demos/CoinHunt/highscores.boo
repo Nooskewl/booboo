@@ -130,19 +130,19 @@ string text2
 number seconds
 = seconds sc
 / seconds 60
-int seconds
+floor seconds
 
 number hundredths
 = hundredths sc
 / hundredths 60
 - hundredths seconds
 * hundredths 100
-int hundredths
+floor hundredths
 
 number minutes
 = minutes seconds
 / minutes 60
-int minutes
+floor minutes
 number tmp
 = tmp minutes
 * tmp 60
@@ -223,19 +223,19 @@ string text2
 number seconds
 = seconds sc
 / seconds 60
-int seconds
+floor seconds
 
 number hundredths
 = hundredths sc
 / hundredths 60
 - hundredths seconds
 * hundredths 100
-int hundredths
+floor hundredths
 
 number minutes
 = minutes seconds
 / minutes 60
-int minutes
+floor minutes
 number tmp
 = tmp minutes
 * tmp 60

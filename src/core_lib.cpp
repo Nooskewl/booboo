@@ -380,70 +380,6 @@ bool corefunc_call_result(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_int(Program *prg, std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-	Variable &v1 = as_variable_inline(prg, v[0]);
-
-	if (v1.type != Variable::NUMBER) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
-
-	v1.n = (int)v1.n;
-
-	return true;
-}
-
-bool corefunc_neg(Program *prg, std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-
-	Variable &v1 = as_variable_inline(prg, v[0]);
-
-	if (v1.type == Variable::NUMBER) {
-		v1.n = -v1.n;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
-
-	return true;
-}
-
-bool corefunc_intmod(Program *prg, std::vector<Token> &v)
-{
-	COUNT_ARGS(2)
-
-	Variable &v1 = as_variable_inline(prg, v[0]);
-	int d = as_number(prg, v[1]);
-	
-	if (v1.type == Variable::NUMBER) {
-		v1.n = int(v1.n) % int(d);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
-
-	return true;
-}
-
-bool corefunc_fmod(Program *prg, std::vector<Token> &v)
-{
-	COUNT_ARGS(2)
-
-	Variable &v1 = as_variable_inline(prg, v[0]);
-	double d = as_number(prg, v[1]);
-
-	if (v1.type == Variable::NUMBER) {
-		v1.n = fmod(v1.n, d);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
-
-	return true;
-}
-
 static std::string typeof_var(Variable &v1)
 {
 	std::string res;
@@ -843,12 +779,12 @@ bool mathfunc_atan2(Program *prg, std::vector<Token> &v)
 
 bool mathfunc_abs(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
-		v1.n = fabs(as_number(prg, v[1]));
+		v1.n = fabs(v1.n);
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
@@ -884,6 +820,70 @@ bool mathfunc_sqrt(Program *prg, std::vector<Token> &v)
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
+bool mathfunc_floor(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+	}
+
+	v1.n = (int)v1.n;
+
+	return true;
+}
+
+bool mathfunc_neg(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	if (v1.type == Variable::NUMBER) {
+		v1.n = -v1.n;
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
+bool mathfunc_intmod(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	int d = as_number(prg, v[1]);
+	
+	if (v1.type == Variable::NUMBER) {
+		v1.n = int(v1.n) % int(d);
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
+bool mathfunc_fmod(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	double d = as_number(prg, v[1]);
+
+	if (v1.type == Variable::NUMBER) {
+		v1.n = fmod(v1.n, d);
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
 	return true;
@@ -1283,11 +1283,6 @@ void start_lib_core()
 	add_syntax("call", corefunc_call);
 	add_syntax("call_result", corefunc_call_result);
 	
-	add_syntax("int", corefunc_int);
-	add_syntax("neg", corefunc_neg);
-	add_syntax("%", corefunc_intmod);
-	add_syntax("fmod", corefunc_fmod);
-
 	add_syntax("typeof", corefunc_typeof);
 	add_syntax("print", corefunc_print);
 	add_syntax("input", corefunc_input);
@@ -1303,6 +1298,10 @@ void start_lib_core()
 	add_syntax("abs", mathfunc_abs);
 	add_syntax("pow", mathfunc_pow);
 	add_syntax("sqrt", mathfunc_sqrt);
+	add_syntax("floor", mathfunc_floor);
+	add_syntax("neg", mathfunc_neg);
+	add_syntax("%", mathfunc_intmod);
+	add_syntax("fmod", mathfunc_fmod);
 
 	add_syntax("vector_add", vectorfunc_add);
 	add_syntax("vector_size", vectorfunc_size);

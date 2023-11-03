@@ -17,7 +17,7 @@ function write_config
 	cfg_set_string cfg "name3" "ILL"
 	cfg_set_string cfg "name4" "ILL"
 :dont_set_defaults
-	int score
+	floor score
 	cfg_set_number cfg "last_score" score
 	number success
 	cfg_save cfg success "com.illnorth.rainrunner"
