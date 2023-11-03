@@ -13,3 +13,5 @@ a standalone app (with your main.boo,) you are allowed to do that.
 
 Your data/ directory can be compressed into data.cpa with compress_dir
 from shim4. Just enter data/ and run it, and it will create ../data.cpa.
+The shaders you'll find in the examples' data/ directories are part of
+shim4 and are all or partly required to make everything work.
