@@ -1209,6 +1209,33 @@ static bool mapfunc_erase(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool mapfunc_keys(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	std::map<std::string, Variable> &m = as_map_inline(prg, v[0]);
+	Variable &vec_var = as_variable_inline(prg, v[1]);
+
+	if (vec_var.type != Variable::VECTOR) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected a vector at " + get_error_info(prg));
+	}
+
+	vec_var.v.clear();
+
+	std::map<std::string, Variable>::iterator it;
+
+	for (it = m.begin(); it != m.end(); it++) {
+		std::pair<std::string, Variable> p = *it;
+		Variable var;
+		var.type = Variable::STRING;
+		var.name = "-constant-";
+		var.s = p.first;
+		vec_var.v.push_back(var);
+	}
+
+	return true;
+}
+
 void start_lib_core()
 {
 	add_syntax("reset", breaker_reset);
@@ -1272,6 +1299,7 @@ void start_lib_core()
 	add_syntax("map_get", mapfunc_get);
 	add_syntax("map_clear", mapfunc_clear);
 	add_syntax("map_erase", mapfunc_erase);
+	add_syntax("map_keys", mapfunc_keys);
 }
 
 } // end namespace booboo
