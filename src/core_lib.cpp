@@ -76,6 +76,12 @@ bool corefunc_pointer(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+bool corefunc_label(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+	return true;
+}
+
 bool corefunc_address(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -1263,7 +1269,8 @@ void start_lib_core()
 	add_syntax("string", corefunc_string);
 	add_syntax("vector", corefunc_vector);
 	add_syntax("map", corefunc_map);
-	add_syntax("pointer", corefunc_vector);
+	add_syntax("pointer", corefunc_pointer);
+	add_syntax("label", corefunc_label);
 	
 	add_syntax("address", corefunc_address);
 	add_syntax("=", corefunc_set);

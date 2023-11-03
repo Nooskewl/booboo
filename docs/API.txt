@@ -1,20 +1,28 @@
 -- Core Functions ------------------------------------------------------------
 
 number
-	define a number
+	declare a number
 	e.g. number x
 
 string
-	define a string
+	declare a string
 	e.g. string s
 
 vector
-	define a vector
+	declare a vector
 	e.g. vector x
 
 map
-	define a map
+	declare a map
 	e.g. map m
+
+pointer
+	declare a pointer
+	e.g. pointer p
+
+label
+	declare a label-holding variable. You can goto these etc.
+	e.g. label l
 
 reset
 	load a different BooBoo script
