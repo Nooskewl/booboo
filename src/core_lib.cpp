@@ -444,9 +444,42 @@ bool corefunc_fmod(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static std::string typeof_var(Variable &v1)
+{
+	std::string res;
+	if (v1.type == Variable::NUMBER) {
+		res = "number";
+	}
+	else if (v1.type == Variable::STRING) {
+		res = "string";
+	}
+	else if (v1.type == Variable::VECTOR) {
+		res = "vector";
+	}
+	else if (v1.type == Variable::MAP) {
+		res = "map";
+	}
+	else if (v1.type == Variable::POINTER) {
+		res = "pointer";
+	}
+	else if (v1.type == Variable::FUNCTION) {
+		res = "function";
+	}
+	else if (v1.type == Variable::LABEL) {
+		res = "label";
+	}
+	else {
+		res = "unknown";
+	}
+
+	return res;
+}
+
 bool corefunc_typeof(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	if (v.size() < 2) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
+	}
 
 	std::string res;
 
@@ -464,29 +497,44 @@ bool corefunc_typeof(Program *prg, std::vector<Token> &v)
 	else {
 		Variable &v1 = prg->variables[v[1].i];
 
-		if (v1.type == Variable::NUMBER) {
-			res = "number";
-		}
-		else if (v1.type == Variable::STRING) {
-			res = "string";
-		}
-		else if (v1.type == Variable::VECTOR) {
-			res = "vector";
+		if (v1.type == Variable::VECTOR) {
+			if (v.size() > 2) {
+				std::vector<Variable> *p;
+				p = &v1.v;
+				int index = 0;
+				for (size_t i = 2; i < v.size(); i++) {
+					index = as_number_inline(prg, v[i]);
+					if (i < v.size()-1) {
+						p = &(*p)[index].v;
+					}
+				}
+				Variable &v2 = (*p)[index];
+				res = typeof_var(v2);
+			}
+			else {
+				res = "vector";
+			}
 		}
 		else if (v1.type == Variable::MAP) {
-			res = "map";
-		}
-		else if (v1.type == Variable::POINTER) {
-			res = "pointer";
-		}
-		else if (v1.type == Variable::FUNCTION) {
-			res = "function";
-		}
-		else if (v1.type == Variable::LABEL) {
-			res = "label";
+			if (v.size() > 2) {
+				std::map<std::string, Variable> *p;
+				p = &v1.m;
+				std::string key = "";
+				for (size_t i = 2; i < v.size(); i++) {
+					key = as_string_inline(prg, v[i]);
+					if (i < v.size()-1) {
+						p = &(*p)[key].m;
+					}
+				}
+				Variable &v2 = (*p)[key];
+				res = typeof_var(v2);
+			}
+			else {
+				res = "map";
+			}
 		}
 		else {
-			res = "unknown";
+			res = typeof_var(v1);
 		}
 	}
 
