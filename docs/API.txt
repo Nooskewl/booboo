@@ -216,9 +216,15 @@ map_set
 	set a key in a map
 	e.g. map_set m "key" value
 
+	map_set can dig down into linked maps the same way as you can
+	with vector_set
+
 map_get
 	get a value from a map
 	e.g. map_get m output "key"
+
+	map_get can dig down into linked maps the same way as you can
+	with vector_get
 
 map_erase
 	erase a key/value pair from a map
@@ -229,8 +235,7 @@ map_clear
 	e.g. map_clear m
 
 map_keys
-	Get the names of the keys from a map into a vector of strings
-	e.g. map_keys m v
+	Get the names of the keys from a map into a vector of strings e.g. map_keys m v
 
 -- Other ---------------------------------------------------------------------
 

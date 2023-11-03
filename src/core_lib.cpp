@@ -1122,58 +1122,75 @@ static bool vectorfunc_clear(Program *prg, std::vector<Token> &v)
 
 static bool mapfunc_set(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	if (v.size() < 3) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
+	}
 
 	Variable &id = as_variable_inline(prg, v[0]);
-	std::string key = as_string(prg, v[1]);
 
 	Variable var;
+	int val_index = v.size()-1;
 
-	if (v[2].type == Token::NUMBER) {
+	if (v[val_index].type == Token::NUMBER) {
 		var.type = Variable::NUMBER;
 		var.name = "-constant-";
-		var.n = v[2].n;
+		var.n = v[val_index].n;
 	}
-	else if (v[2].type == Token::SYMBOL) {
-		if (prg->variables[v[2].i].type == Variable::POINTER) {
-			var = prg->variables[v[2].i];
+	else if (v[val_index].type == Token::SYMBOL) {
+		if (prg->variables[v[val_index].i].type == Variable::POINTER) {
+			var = prg->variables[v[val_index].i];
 		}
 		else {
-			var = as_variable_inline(prg, v[2]);
+			var = as_variable_inline(prg, v[val_index]);
 		}
 	}
 	else {
 		var.type = Variable::STRING;
 		var.name = "-constant-";
-		var.s = v[2].s;
+		var.s = v[val_index].s;
 	}
 
-	id.m[key] = var;
+	std::map<std::string, Variable> *p = &id.m;
+	std::string key;
+
+	for (size_t i = 1; i < (size_t)val_index; i++) {
+		key = as_string_inline(prg, v[i]);
+		if ((int)i < val_index-1) {
+			p = &(*p)[key].m;
+		}
+	}
+
+	(*p)[key] = var;
 
 	return true;
 }
 
 static bool mapfunc_get(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	if (v.size() < 3) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
+	}
 
 	Variable &id = as_variable_inline(prg, v[0]);
-	std::string key = as_string(prg, v[2]);
 
-	std::map<std::string, Variable>::iterator it = id.m.find(key);
+	std::map<std::string, Variable> *p = &id.m;
+	std::string key;
 
-	if (it == id.m.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid map key at " + get_error_info(prg));
+	for (size_t i = 2; i < v.size(); i++) {
+		key = as_string_inline(prg, v[i]);
+		if (i < v.size()-1) {
+			p = &(*p)[key].m;
+		}
 	}
 
 	if (prg->variables[v[1].i].type == Variable::POINTER) {
 		Variable &v1 = prg->variables[v[1].i];
-		v1.p = id.m[key].p;
+		v1.p = (*p)[key].p;
 	}
 	else {
 		Variable &v1 = as_variable_inline(prg, v[1]);
 		std::string bak = v1.name;
-		v1 = id.m[key];
+		v1 = (*p)[key];
 		v1.name = bak;
 	}
 
