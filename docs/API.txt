@@ -24,6 +24,9 @@ label
 	declare a label-holding variable. You can goto these etc.
 	e.g. label l
 
+	If you try to jump to a label in a different scope, then you'll get undefined
+	behaviour.
+
 reset
 	load a different BooBoo script
 	e.g. reset "next_slide.boo"
