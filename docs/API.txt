@@ -186,6 +186,10 @@ vector_size
 vector_set
 	set an element in a vector
 	e.g. vector_set vec index value
+	
+	Note: you can use multiple indices if you know you have a multidimensional vector.
+	BooBoo will dig down into as many vectors as you specify indices for (followed by
+	the value you're setting it to)
 
 vector_insert
 	insert a value in any position in a vector
@@ -194,6 +198,9 @@ vector_insert
 vector_get
 	get the value at index in vector
 	e.g. vector_get v output index
+
+	Note: you can use multiple indices if you know you have a multidimensional vector.
+	For example vector_get v colour y x to index into a 2D array of palette indices
 
 vector_erase
 	remove from a vector
@@ -221,11 +228,19 @@ map_clear
 	clear a map
 	e.g. map_clear m
 
+map_keys
+	Get the names of the keys from a map into a vector of strings
+	e.g. map_keys m v
+
 -- Other ---------------------------------------------------------------------
 
 typeof
 	Returns a string respresentation of the type of the second parameter
 	e.g. typeof type_string my_var
+
+	typeof has the ability to index into vectors and maps. Simply add numbers
+	for vectors and strings for maps after the final parameter. You cannot
+	mix vectors and maps this way.
 
 print
 	print a string (like string_format)
