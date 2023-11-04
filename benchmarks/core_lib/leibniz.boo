@@ -9,13 +9,13 @@ number rounds
 number x
 = x 1
 number pi
-= pi 1.0
+= pi 1
 
 number i
 = i 3
 :next_loop
 neg x
-+ pi (* x (/ 1 i))
++ pi (/ x i)
 + i 2
 ? i rounds
 jl next_loop
