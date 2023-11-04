@@ -64,6 +64,10 @@ typeof
 	for vectors and strings for maps after the final parameter. You cannot
 	mix vectors and maps this way.
 
+()
+	evaluates to a number and can be used anywhere you use a number
+	e.g. (+ x (* y (* z 2))) in C would be x+(y*(z*2))
+
 -- Flow Control --------------------------------------------------------------
 
 goto

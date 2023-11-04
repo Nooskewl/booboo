@@ -105,6 +105,7 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
+		Variable &tmp = prg->variables[v[1].i];
 		v1.n = as_number_inline(prg, v[1]);
 	}
 	else if (v1.type == Variable::STRING) {

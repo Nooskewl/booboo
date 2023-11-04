@@ -8,6 +8,8 @@ namespace booboo {
 std::map<std::string, int> library_map;
 std::vector<library_func> library;
 std::map<char, token_func> token_map;
+std::map<std::string, int> expression_map;
+std::vector<expression_func> expression_handlers;
 
 std::string reset_game_name;
 std::string main_program_name;
@@ -327,6 +329,34 @@ static std::string tokenfunc_modulus(booboo::Program *prg)
 	return "%";
 }
 
+static std::string tokenfunc_expression(booboo::Program *prg)
+{
+	std::string e;
+	int open = 0;
+
+	while (prg->s->p < prg->s->code.length()) {
+		char buf[2];
+		buf[0] = prg->s->code[prg->s->p];
+		buf[1] = 0;
+		e += buf;
+		prg->s->p++;
+		if (buf[0] == '(') {
+			open++;
+		}
+		else if (buf[0] == ')') {
+			open--;
+			if (open == 0) {
+				break;
+			}
+		}
+		else if (buf[0] == '\n') {
+			prg->s->line++;
+		}
+	}
+
+	return e;
+}
+
 static std::string token(Program *prg, Token::Token_Type &ret_type)
 {
 	skip_whitespace(prg);
@@ -356,7 +386,14 @@ static std::string token(Program *prg, Token::Token_Type &ret_type)
 		return tok;
 	}
 
-	ret_type = Token::STRING;
+	char c = prg->s->code[prg->s->p];
+
+	if (c == '(') {
+		ret_type = Token::SYMBOL;
+	}
+	else {
+		ret_type = Token::STRING;
+	}
 
 	std::map<char, token_func>::iterator it = token_map.find(prg->s->code[prg->s->p]);
 	if (it != token_map.end()) {
@@ -491,6 +528,146 @@ static void restore(Program *prg, int func)
 	}
 }
 
+static Variable::Expression parse_expression(Program *prg, std::string expr, int &var_i, int &expression_i, Pass pass)
+{
+	int p = 0;
+
+	while (isspace(expr[p]) && p < (int)expr.length()) {
+		p++;
+	}
+	if (p >= (int)expr.length()-1) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid expression at " + get_error_info(prg));
+	}
+	p++; // skip (
+	std::string name;
+	while (!isspace(expr[p]) && p < (int)expr.length()) {
+		char buf[2];
+		buf[0] = expr[p];
+		buf[1] = 0;
+		name += buf;
+		p++;
+	}
+	if (expression_map.find(name) == expression_map.end()) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Unknown expression function at " + get_error_info(prg));
+	}
+
+	Variable::Expression e;
+	e.i = expression_map[name];
+
+	bool done = false;
+
+	while (!done) {
+		while (isspace(expr[p]) && p < (int)expr.length()) {
+			p++;
+		}
+		if (p >= (int)expr.length()) {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid expression at " + get_error_info(prg));
+		}
+		char c = expr[p];
+		Token tok;
+		if (c == '(') {
+			tok.type = Token::SYMBOL;
+			int open = 0;
+			std::string new_expr;
+			while (p < (int)expr.length()) {
+				char buf[2];
+				buf[0] = expr[p];
+				buf[1] = 0;
+				new_expr += buf;
+				p++;
+				if (buf[0] == '(') {
+					open++;
+				}
+				else if (buf[0] == ')') {
+					open--;
+				}
+				if (open == 0) {
+					break;
+				}
+			}
+			tok.i = var_i++;
+			tok.token = new_expr;
+
+			Variable v1;
+			v1.name = "__expr" + itos(expression_i++);
+			v1.type = Variable::EXPRESSION;
+
+			prg->variables.push_back(v1);
+			prg->variables_map[v1.name] = tok.i;
+
+			prg->variables[tok.i].e = parse_expression(prg, new_expr, var_i, expression_i, pass);
+
+			//prg->s->program[prg->s->program.size()-1].data.push_back(tok);
+		}
+		else if (c == ')') {
+			done = true;
+			break;
+		}
+		else if (isdigit(c) || c == '-' || c == '.') {
+			tok.type = Token::NUMBER;
+			std::string str;
+			while (p < (int)expr.length() && (isdigit(expr[p]) || expr[p] == '.' || expr[p] == '-')) {
+				char buf[2];
+				buf[0] = expr[p];
+				buf[1] = 0;
+				str += buf;
+				p++;
+			}
+			tok.token = str;
+			tok.n = atof(str.c_str());
+		}
+		else if (c == '"') {
+			tok.type = Token::STRING;
+			std::string str = "\"";
+			p++;
+			int prev = -1;
+			while (p < (int)expr.length()) {
+				char buf[2];
+				buf[0] = expr[p];
+				buf[1] = 0;
+				str += buf;
+				if (buf[0] == '"' && prev != '\\') {
+					break;
+				}
+				prev = buf[0];
+				p++;
+			}
+			str = remove_quotes(unescape_string(str));
+			tok.token = str;
+			tok.s = str;
+		}
+		else if (isalpha(c) || c == '_') {
+			tok.type = Token::SYMBOL;
+			std::string sym;
+			while (p < (int)expr.length()) {
+				if (!(isalpha(expr[p]) || expr[p] == '_' || isdigit(expr[p]))) {
+					break;
+				}
+				char buf[2];
+				buf[0] = expr[p];
+				buf[1] = 0;
+				sym += buf;
+				p++;
+			}
+			tok.token = sym;
+
+			if (pass == PASS2) {
+				if (prg->variables_map.find(sym) == prg->variables_map.end()) {
+					throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(prg));
+				}
+				tok.i = prg->variables_map[sym];
+			}
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg));
+		}
+
+		e.v.push_back(tok);
+	}
+
+	return e;
+}
+
 static void compile(Program *prg, Pass pass)
 {
 	int p_bak = prg->s->p;
@@ -501,6 +678,7 @@ static void compile(Program *prg, Pass pass)
 
 	int var_i = 0;
 	int func_i = 0;
+	int expression_i = 0;
 
 	while ((tok = token(prg, tt)) != "") {
 		if (tok == ";") {
@@ -624,6 +802,38 @@ static void compile(Program *prg, Pass pass)
 					}
 					t.s = tok2;
 					t.token = tok2;
+					func.s->program[func.s->program.size()-1].data.push_back(t);
+				}
+				else if (tok[0] == '(') {
+					Variable v;
+					v.name = "__expr" + itos(expression_i++);
+					v.type = Variable::EXPRESSION;
+
+					int var_index = var_i;
+					var_i++;
+
+					if (pass == PASS1) {
+						prg->locals[func_index][v.name] = var_index;
+					}
+					else {
+						prg->variables_map[v.name] = prg->locals[func_index][v.name];
+					}
+
+					if (pass == PASS1) {
+						prg->variables.push_back(v);
+					}
+					//else if (pass == PASS2) {
+						prg->variables[var_index].e = parse_expression(&func, tok, var_i, expression_i, pass);
+					//}
+
+					Token t;
+					t.token = tok;
+					t.type = Token::SYMBOL;
+					t.s = v.name;
+					if (pass == PASS2) {
+						t.i = prg->variables_map[v.name];
+					}
+
 					func.s->program[func.s->program.size()-1].data.push_back(t);
 				}
 				else if (library_map.find(tok) != library_map.end()) {
@@ -764,6 +974,32 @@ static void compile(Program *prg, Pass pass)
 			}
 			t.s = tok2;
 			t.token = tok2;
+			prg->s->program[prg->s->program.size()-1].data.push_back(t);
+		}
+		else if (tok[0] == '(') {
+			Variable v;
+			v.name = "__expr" + itos(expression_i++);
+			v.type = Variable::EXPRESSION;
+
+			int var_index = var_i;
+			var_i++;
+
+			if (pass == PASS1) {
+				prg->variables.push_back(v);
+			}
+			else if (pass == PASS2) {
+				prg->variables_map[v.name] = var_index;
+			}
+				prg->variables[var_index].e = parse_expression(prg, tok, var_i, expression_i, pass);
+
+			Token t;
+			t.token = tok;
+			t.type = Token::SYMBOL;
+			t.s = v.name;
+			if (pass == PASS2) {
+				t.i = prg->variables_map[v.name];
+			}
+
 			prg->s->program[prg->s->program.size()-1].data.push_back(t);
 		}
 		else if (library_map.find(tok) != library_map.end()) {
@@ -914,31 +1150,114 @@ void add_instruction(std::string name, library_func processing)
 	library.push_back(processing);
 }
 
-void add_token(char token, token_func func)
+void add_token_handler(char token, token_func func)
 {
 	token_map[token] = func;
 }
 
+void add_expression_handler(std::string name, expression_func func)
+{
+	expression_map[name] = expression_handlers.size();
+	expression_handlers.push_back(func);
+}
+
 static void init_token_map()
 {
-	add_token(':', tokenfunc_label);
-	add_token('"', tokenfunc_string);
-	add_token('{', tokenfunc_openbrace);
-	add_token('}', tokenfunc_closebrace);
-	add_token(';', tokenfunc_comment);
-	
-	add_token('+', tokenfunc_add);
-	add_token('-', tokenfunc_subtract);
-	add_token('=', tokenfunc_equals);
-	add_token('?', tokenfunc_compare);
-	add_token('*', tokenfunc_multiply);
-	add_token('/', tokenfunc_divide);
-	add_token('%', tokenfunc_modulus);
+	add_token_handler(':', tokenfunc_label);
+	add_token_handler('"', tokenfunc_string);
+	add_token_handler('{', tokenfunc_openbrace);
+	add_token_handler('}', tokenfunc_closebrace);
+	add_token_handler(';', tokenfunc_comment);
+	add_token_handler('+', tokenfunc_add);
+	add_token_handler('-', tokenfunc_subtract);
+	add_token_handler('=', tokenfunc_equals);
+	add_token_handler('?', tokenfunc_compare);
+	add_token_handler('*', tokenfunc_multiply);
+	add_token_handler('/', tokenfunc_divide);
+	add_token_handler('%', tokenfunc_modulus);
+	add_token_handler('(', tokenfunc_expression);
+}
+
+double exprfunc_add(Program *prg, std::vector<Token> &v)
+{
+	if (v.size() < 2) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
+	}
+
+	double n = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n += as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_subtract(Program *prg, std::vector<Token> &v)
+{
+	if (v.size() < 2) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
+	}
+
+	double n = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n -= as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_multiply(Program *prg, std::vector<Token> &v)
+{
+	if (v.size() < 2) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
+	}
+
+	double n = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n *= as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_divide(Program *prg, std::vector<Token> &v)
+{
+	if (v.size() < 2) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
+	}
+
+	double n = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n /= as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_modulus(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	return (int)as_number_inline(prg, v[0]) % (int)as_number_inline(prg, v[1]);
+}
+
+static void init_expression_handlers()
+{
+	add_expression_handler("+", exprfunc_add);
+	add_expression_handler("-", exprfunc_subtract);
+	add_expression_handler("*", exprfunc_multiply);
+	add_expression_handler("/", exprfunc_divide);
+	add_expression_handler("%", exprfunc_modulus);
 }
 
 void start()
 {
 	init_token_map();
+	init_expression_handlers();
 	
 	start_lib_core();
 	
@@ -953,6 +1272,8 @@ void end()
 Program *create_program(std::string code)
 {
 	Program *prg = new Program;
+
+	prg->tmps = 0;
 
 	prg->s = new Function_Swap;
 
@@ -1103,6 +1424,11 @@ std::string itos(int i)
 	char buf[20];
 	snprintf(buf, 20, "%d", i);
 	return std::string(buf);
+}
+
+double evaluate_expression(Program *prg, Variable::Expression &e)
+{
+	return expression_handlers[e.i](prg, e.v);
 }
 
 } // end namespace booboo

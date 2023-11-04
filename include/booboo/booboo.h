@@ -18,27 +18,6 @@ public:
 	std::string error_message;
 };
 
-struct Variable
-{
-	enum Variable_Type {
-		NUMBER = 0,
-		STRING,
-		VECTOR,
-		MAP,
-		LABEL,
-		FUNCTION,
-		POINTER
-	} type;
-
-	std::string name;
-
-	double n;
-	std::string s;
-	std::vector<Variable> v;
-	std::map<std::string, Variable> m;
-	Variable *p;
-};
-
 struct Token {
 	enum Token_Type {
 		STRING = 0,
@@ -55,8 +34,38 @@ struct Token {
 	std::string token;
 };
 
+struct Variable
+{
+	enum Variable_Type {
+		NUMBER = 0,
+		STRING,
+		VECTOR,
+		MAP,
+		LABEL,
+		FUNCTION,
+		POINTER,
+		EXPRESSION
+	} type;
+
+	struct Expression
+	{
+		int i;
+		std::vector<Token> v;
+	};
+
+	std::string name;
+
+	double n;
+	std::string s;
+	std::vector<Variable> v;
+	std::map<std::string, Variable> m;
+	Variable *p;
+	Expression e;
+};
+
 typedef bool (*library_func)(Program *prg, std::vector<Token> &v);
 typedef std::string (*token_func)(Program *);
+typedef double (*expression_func)(Program *prg, std::vector<Token> &v);
 
 // Call these before/after using BooBoo
 void start();
@@ -85,7 +94,9 @@ std::vector<Variable> get_vector(Variable &v);
 // Add a library function
 void add_instruction(std::string name, library_func func);
 // Add a token handler
-void add_token(char token, token_func func);
+void add_token_handler(char token, token_func func);
+// Handler for things within an expression (parenthesis)
+void add_expression_handler(std::string name, expression_func func);
 
 // For error handling
 int get_line_num(Program *prg);

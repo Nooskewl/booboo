@@ -38,6 +38,8 @@ struct Program {
 	int compare_flag;
 	Pass complete_pass;
 
+	int tmps;
+
 	std::vector<Variable> variables;
 	std::map<std::string, int> variables_map;
 	std::map<std::string, int> function_name_map;
@@ -55,6 +57,8 @@ struct Program {
 };
 
 std::string itos(int i);
+
+double evaluate_expression(Program *prg, Variable::Expression &e);
 
 // This automatically gets called when you call booboo::start
 void start_lib_core();
@@ -88,6 +92,9 @@ inline double as_number_inline(Program *prg, Token &t)
 		}
 		else if (v->type == Variable::STRING) {
 			return atof(v->s.c_str());
+		}
+		else if (v->type == Variable::EXPRESSION) {
+			return evaluate_expression(prg, v->e);
 		}
 		else {
 			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
