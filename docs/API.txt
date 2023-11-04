@@ -72,6 +72,7 @@ typeof
 []
 	Vector/map indexing operator
 	e.g. = x [v [m "key"]] in C++ would be x = v[m["key"]]
+	Can be used anywhere a variable is expected
 
 -- Flow Control --------------------------------------------------------------
 
