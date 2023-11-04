@@ -69,6 +69,10 @@ typeof
 	e.g. (+ x (* y (* z w 2))) in C would be x+(y*(z*w*2))
 	Supported operators are: + - * / %
 
+[]
+	Vector/map indexing operator
+	e.g. = x [v [m "key"]] in C++ would be x = v[m["key"]]
+
 -- Flow Control --------------------------------------------------------------
 
 goto

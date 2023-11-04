@@ -574,6 +574,37 @@ bool corefunc_print(Program *prg, std::vector<Token> &v)
 			else if (v1.type == Variable::LABEL) {
 				val = "-label-";
 			}
+			else if (v1.type == Variable::EXPRESSION) {
+				char buf[1000];
+				snprintf(buf, 1000, "%g", evaluate_expression(prg, v1.e));
+				val = buf;
+			}
+			else if (v1.type == Variable::FISH) {
+				Variable &var = go_fish(prg, v1.f);
+				if (var.type == Variable::NUMBER) {
+					char buf[1000];
+					snprintf(buf, 1000, "%g", var.n);
+					val = buf;
+				}
+				else if (var.type == Variable::STRING) {
+					val = var.s;
+				}
+				else if (var.type == Variable::VECTOR) {
+					val = "-vector-";
+				}
+				else if (var.type == Variable::MAP) {
+					val = "-map-";
+				}
+				else if (var.type == Variable::POINTER) {
+					val = "-pointer-";
+				}
+				else if (var.type == Variable::FUNCTION) {
+					val = "-function-";
+				}
+				else if (var.type == Variable::LABEL) {
+					val = "-label-";
+				}
+			}
 			else {
 				val = "-unknown-";
 			}

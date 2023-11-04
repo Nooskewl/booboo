@@ -171,24 +171,18 @@ function divide frame w h
 	number yy
 	number xx2
 	number yy2
-	= yy y
-	- yy 1
-	= yy2 yy
-	+ yy2 3
+	= yy (- y 1)
+	= yy2 (+ yy 3)
 :next_pixel_y
-	= xx x
-	- xx 1
-	= xx2 xx
-	+ xx2 3
+	= xx (- x 1)
+	= xx2 (+ xx 3)
 	number tmpy
-	= tmpy yy
-	/ tmpy 2
+	= tmpy (/ yy 2)
 	floor tmpy
 :next_pixel_x
 	+ valid 1
 	number tmpx
-	= tmpx xx
-	/ tmpx 2
+	= tmpx (/ xx 2)
 	floor tmpx
 	? tmpx 0
 	jl skip_it
@@ -323,10 +317,8 @@ function draw
 	vector_get palette b pal_index 2
 	number xx
 	number yy
-	= yy y
-	* yy ysz
-	= xx x
-	* xx xsz
+	= yy (* y ysz)
+	= xx (* x xsz)
 	filled_rectangle r g b 255 r g b 255 r g b 255 r g b 255 xx yy xsz ysz
 	+ x 1
 	? x w

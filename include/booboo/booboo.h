@@ -44,12 +44,19 @@ struct Variable
 		LABEL,
 		FUNCTION,
 		POINTER,
-		EXPRESSION
+		EXPRESSION,
+		FISH
 	} type;
 
 	struct Expression
 	{
 		int i;
+		std::vector<Token> v;
+	};
+
+	struct Fish
+	{
+		int c_i;
 		std::vector<Token> v;
 	};
 
@@ -61,6 +68,7 @@ struct Variable
 	std::map<std::string, Variable> m;
 	Variable *p;
 	Expression e;
+	Fish f;
 };
 
 typedef bool (*library_func)(Program *prg, std::vector<Token> &v);

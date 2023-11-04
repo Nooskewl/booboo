@@ -357,6 +357,34 @@ static std::string tokenfunc_expression(booboo::Program *prg)
 	return e;
 }
 
+static std::string tokenfunc_fish(booboo::Program *prg)
+{
+	std::string e;
+	int open = 0;
+
+	while (prg->s->p < prg->s->code.length()) {
+		char buf[2];
+		buf[0] = prg->s->code[prg->s->p];
+		buf[1] = 0;
+		e += buf;
+		prg->s->p++;
+		if (buf[0] == '[') {
+			open++;
+		}
+		else if (buf[0] == ']') {
+			open--;
+			if (open == 0) {
+				break;
+			}
+		}
+		else if (buf[0] == '\n') {
+			prg->s->line++;
+		}
+	}
+
+	return e;
+}
+
 static std::string token(Program *prg, Token::Token_Type &ret_type)
 {
 	skip_whitespace(prg);
@@ -388,7 +416,7 @@ static std::string token(Program *prg, Token::Token_Type &ret_type)
 
 	char c = prg->s->code[prg->s->p];
 
-	if (c == '(') {
+	if (c == '(' || c == '[') {
 		ret_type = Token::SYMBOL;
 	}
 	else {
@@ -528,7 +556,9 @@ static void restore(Program *prg, int func)
 	}
 }
 
-static Variable::Expression parse_expression(Program *prg, std::string expr, int &var_i, int &expression_i, Pass pass)
+static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, int &var_i, int &expression_i, int &fish_i, Pass pass);
+
+static Variable::Expression parse_expression(Program *prg, Program *func, std::string expr, int &var_i, int &expression_i, int &fish_i, Pass pass)
 {
 	int p = 0;
 
@@ -536,7 +566,7 @@ static Variable::Expression parse_expression(Program *prg, std::string expr, int
 		p++;
 	}
 	if (p >= (int)expr.length()-1) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid expression at " + get_error_info(prg));
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid expression at " + get_error_info(func));
 	}
 	p++; // skip (
 	std::string name;
@@ -548,7 +578,7 @@ static Variable::Expression parse_expression(Program *prg, std::string expr, int
 		p++;
 	}
 	if (expression_map.find(name) == expression_map.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Unknown expression function at " + get_error_info(prg));
+		throw Error(std::string(__FUNCTION__) + ": " + "Unknown expression function at " + get_error_info(func));
 	}
 
 	Variable::Expression e;
@@ -561,7 +591,7 @@ static Variable::Expression parse_expression(Program *prg, std::string expr, int
 			p++;
 		}
 		if (p >= (int)expr.length()) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid expression at " + get_error_info(prg));
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid expression at " + get_error_info(func));
 		}
 		char c = expr[p];
 		Token tok;
@@ -593,13 +623,235 @@ static Variable::Expression parse_expression(Program *prg, std::string expr, int
 			v1.type = Variable::EXPRESSION;
 
 			prg->variables.push_back(v1);
-			prg->variables_map[v1.name] = tok.i;
+			if (pass == PASS2) {
+				prg->variables_map[v1.name] = tok.i;
+			}
 
-			prg->variables[tok.i].e = parse_expression(prg, new_expr, var_i, expression_i, pass);
+			prg->variables[tok.i].e = parse_expression(prg, func, new_expr, var_i, expression_i, fish_i, pass);
 
-			//prg->s->program[prg->s->program.size()-1].data.push_back(tok);
+			//func->s->program[func->s->program.size()-1].data.push_back(tok);
 		}
 		else if (c == ')') {
+			done = true;
+			break;
+		}
+		else if (c == '[') {
+			tok.type = Token::SYMBOL;
+			int open = 0;
+			std::string new_expr;
+			while (p < (int)expr.length()) {
+				char buf[2];
+				buf[0] = expr[p];
+				buf[1] = 0;
+				new_expr += buf;
+				p++;
+				if (buf[0] == '[') {
+					open++;
+				}
+				else if (buf[0] == ']') {
+					open--;
+				}
+				if (open == 0) {
+					break;
+				}
+			}
+			tok.i = var_i++;
+			tok.token = new_expr;
+
+			Variable v1;
+			v1.name = "__fish" + itos(fish_i++);
+			v1.type = Variable::FISH;
+
+			prg->variables.push_back(v1);
+			if (pass == PASS2) {
+				prg->variables_map[v1.name] = tok.i;
+			}
+
+			prg->variables[tok.i].f = parse_fish(prg, func, new_expr, var_i, expression_i, fish_i, pass);
+
+			//func->s->program[func->s->program.size()-1].data.push_back(tok);
+		}
+		else if (isdigit(c) || c == '-' || c == '.') {
+			tok.type = Token::NUMBER;
+			std::string str;
+			while (p < (int)expr.length() && (isdigit(expr[p]) || expr[p] == '.' || expr[p] == '-')) {
+				char buf[2];
+				buf[0] = expr[p];
+				buf[1] = 0;
+				str += buf;
+				p++;
+			}
+			tok.token = str;
+			tok.n = atof(str.c_str());
+		}
+		else if (c == '"') {
+			tok.type = Token::STRING;
+			std::string str = "\"";
+			p++;
+			int prev = -1;
+			while (p < (int)expr.length()) {
+				char buf[2];
+				buf[0] = expr[p];
+				buf[1] = 0;
+				str += buf;
+				if (buf[0] == '"' && prev != '\\') {
+					p++;
+					break;
+				}
+				prev = buf[0];
+				p++;
+			}
+			str = remove_quotes(unescape_string(str));
+			tok.token = str;
+			tok.s = str;
+		}
+		else if (isalpha(c) || c == '_') {
+			tok.type = Token::SYMBOL;
+			std::string sym;
+			while (p < (int)expr.length()) {
+				if (!(isalpha(expr[p]) || expr[p] == '_' || isdigit(expr[p]))) {
+					break;
+				}
+				char buf[2];
+				buf[0] = expr[p];
+				buf[1] = 0;
+				sym += buf;
+				p++;
+			}
+			tok.token = sym;
+
+			if (pass == PASS2) {
+				if (prg->variables_map.find(sym) == prg->variables_map.end()) {
+					throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(func));
+				}
+				tok.i = prg->variables_map[sym];
+			}
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(func));
+		}
+
+		e.v.push_back(tok);
+	}
+
+	return e;
+}
+
+static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, int &var_i, int &expression_i, int &fish_i, Pass pass)
+{
+	if (pass == PASS1) {
+		Variable::Fish f;
+		return f;
+	}
+
+	int p = 0;
+
+	while (isspace(expr[p]) && p < (int)expr.length()) {
+		p++;
+	}
+	if (p >= (int)expr.length()-1) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid fish at " + get_error_info(func));
+	}
+	p++; // skip [
+	std::string name;
+	while (!isspace(expr[p]) && p < (int)expr.length()) {
+		char buf[2];
+		buf[0] = expr[p];
+		buf[1] = 0;
+		name += buf;
+		p++;
+	}
+	if (prg->variables_map.find(name) == prg->variables_map.end()) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Unknown variable at " + get_error_info(func));
+	}
+
+	Variable::Fish e;
+	e.c_i = prg->variables_map[name];
+
+	bool done = false;
+
+	while (!done) {
+		while (isspace(expr[p]) && p < (int)expr.length()) {
+			p++;
+		}
+		if (p >= (int)expr.length()) {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid fish at " + get_error_info(func));
+		}
+		char c = expr[p];
+		Token tok;
+		if (c == '(') {
+			tok.type = Token::SYMBOL;
+			int open = 0;
+			std::string new_expr;
+			while (p < (int)expr.length()) {
+				char buf[2];
+				buf[0] = expr[p];
+				buf[1] = 0;
+				new_expr += buf;
+				p++;
+				if (buf[0] == '(') {
+					open++;
+				}
+				else if (buf[0] == ')') {
+					open--;
+				}
+				if (open == 0) {
+					break;
+				}
+			}
+			tok.i = var_i++;
+			tok.token = new_expr;
+
+			Variable v1;
+			v1.name = "__expr" + itos(expression_i++);
+			v1.type = Variable::EXPRESSION;
+
+			prg->variables.push_back(v1);
+			if (pass == PASS2) {
+				prg->variables_map[v1.name] = tok.i;
+			}
+
+			prg->variables[tok.i].e = parse_expression(prg, func, new_expr, var_i, expression_i, fish_i, pass);
+
+			//func->s->program[func->s->program.size()-1].data.push_back(tok);
+		}
+		else if (c == '[') {
+			tok.type = Token::SYMBOL;
+			int open = 0;
+			std::string new_expr;
+			while (p < (int)expr.length()) {
+				char buf[2];
+				buf[0] = expr[p];
+				buf[1] = 0;
+				new_expr += buf;
+				p++;
+				if (buf[0] == '[') {
+					open++;
+				}
+				else if (buf[0] == ']') {
+					open--;
+				}
+				if (open == 0) {
+					break;
+				}
+			}
+			tok.i = var_i++;
+			tok.token = new_expr;
+
+			Variable v1;
+			v1.name = "__fish" + itos(fish_i++);
+			v1.type = Variable::FISH;
+
+			prg->variables.push_back(v1);
+			if (pass == PASS2) {
+				prg->variables_map[v1.name] = tok.i;
+			}
+
+			prg->variables[tok.i].f = parse_fish(prg, func, new_expr, var_i, expression_i, fish_i, pass);
+
+			//func->s->program[func->s->program.size()-1].data.push_back(tok);
+		}
+		else if (c == ']') {
 			done = true;
 			break;
 		}
@@ -627,6 +879,7 @@ static Variable::Expression parse_expression(Program *prg, std::string expr, int
 				buf[1] = 0;
 				str += buf;
 				if (buf[0] == '"' && prev != '\\') {
+					p++;
 					break;
 				}
 				prev = buf[0];
@@ -653,13 +906,13 @@ static Variable::Expression parse_expression(Program *prg, std::string expr, int
 
 			if (pass == PASS2) {
 				if (prg->variables_map.find(sym) == prg->variables_map.end()) {
-					throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(prg));
+					throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(func));
 				}
 				tok.i = prg->variables_map[sym];
 			}
 		}
 		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg));
+			throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(func));
 		}
 
 		e.v.push_back(tok);
@@ -679,6 +932,7 @@ static void compile(Program *prg, Pass pass)
 	int var_i = 0;
 	int func_i = 0;
 	int expression_i = 0;
+	int fish_i = 0;
 
 	while ((tok = token(prg, tt)) != "") {
 		if (tok == ";") {
@@ -822,9 +1076,37 @@ static void compile(Program *prg, Pass pass)
 					if (pass == PASS1) {
 						prg->variables.push_back(v);
 					}
-					//else if (pass == PASS2) {
-						prg->variables[var_index].e = parse_expression(&func, tok, var_i, expression_i, pass);
-					//}
+					prg->variables[var_index].e = parse_expression(prg, &func, tok, var_i, expression_i, fish_i, pass);
+
+					Token t;
+					t.token = tok;
+					t.type = Token::SYMBOL;
+					t.s = v.name;
+					if (pass == PASS2) {
+						t.i = prg->variables_map[v.name];
+					}
+
+					func.s->program[func.s->program.size()-1].data.push_back(t);
+				}
+				else if (tok[0] == '[') {
+					Variable v;
+					v.name = "__fish" + itos(fish_i++);
+					v.type = Variable::FISH;
+
+					int var_index = var_i;
+					var_i++;
+
+					if (pass == PASS1) {
+						prg->locals[func_index][v.name] = var_index;
+					}
+					else {
+						prg->variables_map[v.name] = prg->locals[func_index][v.name];
+					}
+
+					if (pass == PASS1) {
+						prg->variables.push_back(v);
+					}
+					prg->variables[var_index].f = parse_fish(prg, &func, tok, var_i, expression_i, fish_i, pass);
 
 					Token t;
 					t.token = tok;
@@ -990,7 +1272,33 @@ static void compile(Program *prg, Pass pass)
 			else if (pass == PASS2) {
 				prg->variables_map[v.name] = var_index;
 			}
-				prg->variables[var_index].e = parse_expression(prg, tok, var_i, expression_i, pass);
+				prg->variables[var_index].e = parse_expression(prg, prg, tok, var_i, expression_i, fish_i, pass);
+
+			Token t;
+			t.token = tok;
+			t.type = Token::SYMBOL;
+			t.s = v.name;
+			if (pass == PASS2) {
+				t.i = prg->variables_map[v.name];
+			}
+
+			prg->s->program[prg->s->program.size()-1].data.push_back(t);
+		}
+		else if (tok[0] == '[') {
+			Variable v;
+			v.name = "__fish" + itos(fish_i++);
+			v.type = Variable::FISH;
+
+			int var_index = var_i;
+			var_i++;
+
+			if (pass == PASS1) {
+				prg->variables.push_back(v);
+			}
+			else if (pass == PASS2) {
+				prg->variables_map[v.name] = var_index;
+			}
+				prg->variables[var_index].f = parse_fish(prg, prg, tok, var_i, expression_i, fish_i, pass);
 
 			Token t;
 			t.token = tok;
@@ -1176,6 +1484,7 @@ static void init_token_map()
 	add_token_handler('/', tokenfunc_divide);
 	add_token_handler('%', tokenfunc_modulus);
 	add_token_handler('(', tokenfunc_expression);
+	add_token_handler('[', tokenfunc_fish);
 }
 
 double exprfunc_add(Program *prg, std::vector<Token> &v)
@@ -1429,6 +1738,38 @@ std::string itos(int i)
 double evaluate_expression(Program *prg, Variable::Expression &e)
 {
 	return expression_handlers[e.i](prg, e.v);
+}
+
+Variable &go_fish(Program *prg, Variable::Fish &f)
+{
+	Variable *v = &prg->variables[f.c_i];
+
+	int index;
+	std::string key;
+
+	for (size_t i = 0; i < f.v.size(); i++) {
+		if (v->type == Variable::VECTOR) {
+			index = as_number_inline(prg, f.v[i]);
+		}
+		else {
+			key = as_string_inline(prg, f.v[i]);
+		}
+		if (i < f.v.size()-1) {
+			if (v->type == Variable::VECTOR) {
+				v = &v->v[index];
+			}
+			else {
+				v = &v->m[key];
+			}
+		}
+	}
+
+	if (v->type == Variable::VECTOR) {
+		return v->v[index];
+	}
+	else {
+		return v->m[key];
+	}
 }
 
 } // end namespace booboo
