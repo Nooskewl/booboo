@@ -315,11 +315,7 @@ function draw
 	vector_get palette r pal_index 0
 	vector_get palette g pal_index 1
 	vector_get palette b pal_index 2
-	number xx
-	number yy
-	= yy (* y ysz)
-	= xx (* x xsz)
-	filled_rectangle r g b 255 r g b 255 r g b 255 r g b 255 xx yy xsz ysz
+	filled_rectangle r g b 255 r g b 255 r g b 255 r g b 255 (* x xsz) (* y ysz) xsz ysz
 	+ x 1
 	? x w
 	jl next_x
