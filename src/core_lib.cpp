@@ -137,36 +137,40 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 
 bool corefunc_add(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	if (v.size() < 2) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
+	}
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
-	if (v1.type == Variable::NUMBER) {
-		v1.n += as_number_inline(prg, v[1]);
-	}
-	else if (v1.type == Variable::STRING) {
-		v1.s += as_string_inline(prg, v[1]);
-	}
-	else if (v1.type == Variable::VECTOR) {
-		Variable &v2 = as_variable_inline(prg, v[1]);
-		if (v2.type != Variable::VECTOR) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+	for (size_t i = 1; i < v.size(); i++) {
+		if (v1.type == Variable::NUMBER) {
+			v1.n += as_number_inline(prg, v[i]);
+		}
+		else if (v1.type == Variable::STRING) {
+			v1.s += as_string_inline(prg, v[i]);
+		}
+		else if (v1.type == Variable::VECTOR) {
+			Variable &v2 = as_variable_inline(prg, v[i]);
+			if (v2.type != Variable::VECTOR) {
+				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+			}
+			else {
+				v1.v.insert(v1.v.end(), v2.v.begin(), v2.v.end());
+			}
+		}
+		else if (v1.type == Variable::MAP) {
+			Variable &v2 = as_variable_inline(prg, v[i]);
+			if (v2.type != Variable::MAP) {
+				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+			}
+			else {
+				v1.m.insert(v2.m.begin(), v2.m.end());
+			}
 		}
 		else {
-			v1.v.insert(v1.v.end(), v2.v.begin(), v2.v.end());
-		}
-	}
-	else if (v1.type == Variable::MAP) {
-		Variable &v2 = as_variable_inline(prg, v[1]);
-		if (v2.type != Variable::MAP) {
 			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 		}
-		else {
-			v1.m.insert(v2.m.begin(), v2.m.end());
-		}
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 	}
 
 	return true;
@@ -174,15 +178,19 @@ bool corefunc_add(Program *prg, std::vector<Token> &v)
 
 bool corefunc_subtract(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
-	
+	if (v.size() < 2) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
+	}
+
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
-	if (v1.type == Variable::NUMBER) {
-		v1.n -= as_number_inline(prg, v[1]);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	for (size_t i = 1; i < v.size(); i++) {
+		if (v1.type == Variable::NUMBER) {
+			v1.n -= as_number_inline(prg, v[i]);
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
 	}
 
 	return true;
@@ -190,15 +198,19 @@ bool corefunc_subtract(Program *prg, std::vector<Token> &v)
 
 bool corefunc_multiply(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	if (v.size() < 2) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
+	}
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
-	if (v1.type == Variable::NUMBER) {
-		v1.n *= as_number_inline(prg, v[1]);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	for (size_t i = 1; i < v.size(); i++) {
+		if (v1.type == Variable::NUMBER) {
+			v1.n *= as_number_inline(prg, v[i]);
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
 	}
 
 	return true;
@@ -206,15 +218,19 @@ bool corefunc_multiply(Program *prg, std::vector<Token> &v)
 
 bool corefunc_divide(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	if (v.size() < 2) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
+	}
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
-	if (v1.type == Variable::NUMBER) {
-		v1.n /= as_number_inline(prg, v[1]);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	for (size_t i = 1; i < v.size(); i++) {
+		if (v1.type == Variable::NUMBER) {
+			v1.n /= as_number_inline(prg, v[i]);
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
 	}
 
 	return true;
