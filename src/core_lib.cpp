@@ -1,6 +1,7 @@
 #include <cmath>
 #include <cstring>
 #include <iostream>
+#include <fstream>
 
 #include "booboo/booboo.h"
 #include "booboo/internal.h"
@@ -509,7 +510,7 @@ bool corefunc_typeof(Program *prg, std::vector<Token> &v)
 
 bool corefunc_print(Program *prg, std::vector<Token> &v)
 {
-	std::string fmt = as_string(prg, v[0]);
+	std::string fmt = as_string_inline(prg, v[0]);
 	int _tok = 1;
 	
 	int prev = 0;
@@ -646,7 +647,7 @@ bool corefunc_input(Program *prg, std::vector<Token> &v)
 bool stringfunc_format(Program *prg, std::vector<Token> &v)
 {
 	Variable &v1 = as_variable_inline(prg, v[0]);
-	std::string fmt = as_string(prg, v[1]);
+	std::string fmt = as_string_inline(prg, v[1]);
 	int _tok = 2;
 	
 	int prev = 0;
@@ -733,8 +734,8 @@ bool stringfunc_format(Program *prg, std::vector<Token> &v)
 bool stringfunc_char_at(Program *prg, std::vector<Token> &v)
 {
 	Variable &v1 = as_variable_inline(prg, v[0]);
-	std::string s = as_string(prg, v[1]);
-	int index = as_number(prg, v[2]);
+	std::string s = as_string_inline(prg, v[1]);
+	int index = as_number_inline(prg, v[2]);
 
 	int value = s[index];
 
@@ -751,7 +752,7 @@ bool stringfunc_char_at(Program *prg, std::vector<Token> &v)
 bool stringfunc_length(Program *prg, std::vector<Token> &v)
 {
 	Variable &v1 = as_variable_inline(prg, v[0]);
-	std::string s = as_string(prg, v[1]);
+	std::string s = as_string_inline(prg, v[1]);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = s.length();
@@ -766,7 +767,7 @@ bool stringfunc_length(Program *prg, std::vector<Token> &v)
 bool stringfunc_from_number(Program *prg, std::vector<Token> &v)
 {
 	Variable &v1 = as_variable_inline(prg, v[0]);
-	int n = as_number(prg, v[1]);
+	int n = as_number_inline(prg, v[1]);
 
 	static char buf[2] = { 0, 0 };
 	
@@ -821,7 +822,7 @@ bool mathfunc_atan2(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
-		v1.n = atan2(v1.n, as_number(prg, v[1]));
+		v1.n = atan2(v1.n, as_number_inline(prg, v[1]));
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
@@ -853,7 +854,7 @@ bool mathfunc_pow(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
-		v1.n = pow(v1.n, as_number(prg, v[1]));
+		v1.n = pow(v1.n, as_number_inline(prg, v[1]));
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
@@ -913,7 +914,7 @@ bool mathfunc_intmod(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
-	int d = as_number(prg, v[1]);
+	int d = as_number_inline(prg, v[1]);
 	
 	if (v1.type == Variable::NUMBER) {
 		v1.n = int(v1.n) % int(d);
@@ -930,7 +931,7 @@ bool mathfunc_fmod(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
-	double d = as_number(prg, v[1]);
+	double d = as_number_inline(prg, v[1]);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = fmod(v1.n, d);
@@ -1058,7 +1059,7 @@ static bool vectorfunc_insert(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(3)
 
 	Variable &id = as_variable_inline(prg, v[0]);
-	double index = as_number(prg, v[1]);
+	double index = as_number_inline(prg, v[1]);
 
 	if (index < 0 || index > id.v.size()) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
@@ -1100,7 +1101,7 @@ static bool vectorfunc_get(Program *prg, std::vector<Token> &v)
 	}
 
 	for (size_t i = 2; i < v.size(); i++) {
-		int index = as_number(prg, v[i]);
+		int index = as_number_inline(prg, v[i]);
 		indices.push_back(index);
 	}
 
@@ -1151,7 +1152,7 @@ static bool vectorfunc_erase(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	Variable &id = as_variable_inline(prg, v[0]);
-	double index = as_number(prg, v[1]);
+	double index = as_number_inline(prg, v[1]);
 
 	if (index < 0 || index >= id.v.size()) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
@@ -1266,7 +1267,7 @@ static bool mapfunc_erase(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	Variable &id = as_variable_inline(prg, v[0]);
-	std::string key = as_string(prg, v[1]);
+	std::string key = as_string_inline(prg, v[1]);
 
 	std::map<std::string, Variable>::iterator it = id.m.find(key);
 
@@ -1302,6 +1303,88 @@ static bool mapfunc_keys(Program *prg, std::vector<Token> &v)
 		var.s = p.first;
 		vec_var.v.push_back(var);
 	}
+
+	return true;
+}
+
+static bool filefunc_open(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string filename = as_string_inline(prg, v[1]);
+	std::string mode = as_string_inline(prg, v[2]);
+	
+	File_Info *info = file_info(prg);
+
+	if (v1.type == Variable::NUMBER) {
+		v1.n = info->file_id;
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	std::fstream *f = new std::fstream;
+
+	if (mode == "r") {
+		f->open(filename, std::fstream::in);
+	}
+	else if (mode == "w") {
+		f->open(filename, std::fstream::out);
+	}
+	else if (mode == "a") {
+		f->open(filename, std::fstream::out | std::fstream::app);
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid file open mode at " + get_error_info(prg));
+	}
+
+	info->files[info->file_id++] = f;
+
+	return true;
+}
+
+static bool filefunc_close(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number_inline(prg, v[0]);
+	
+	File_Info *info = file_info(prg);
+
+	info->files[id]->close();
+
+	return true;
+}
+
+static bool filefunc_read(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number_inline(prg, v[0]);
+	Variable &var = as_variable_inline(prg, v[1]);
+
+	if (var.type != Variable::STRING) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected string at " + get_error_info(prg));
+	}
+
+	File_Info *info = file_info(prg);
+
+	(*info->files[id]) >> var.s;
+
+	return true;
+}
+
+static bool filefunc_write(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number_inline(prg, v[0]);
+	std::string val = as_string_inline(prg, v[1]);
+
+	File_Info *info = file_info(prg);
+
+	(*info->files[id]) << val;
 
 	return true;
 }
@@ -1369,6 +1452,11 @@ void start_lib_core()
 	add_instruction("map_clear", mapfunc_clear);
 	add_instruction("map_erase", mapfunc_erase);
 	add_instruction("map_keys", mapfunc_keys);
+
+	add_instruction("file_open", filefunc_open);
+	add_instruction("file_close", filefunc_close);
+	add_instruction("file_read", filefunc_read);
+	add_instruction("file_write", filefunc_write);
 }
 
 } // end namespace booboo

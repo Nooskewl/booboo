@@ -56,6 +56,13 @@ struct Program {
 	std::map<std::string, void *> black_box;
 };
 
+struct File_Info {
+	int file_id;
+	std::map<int, std::fstream *> files;
+};
+
+File_Info *file_info(Program *prg);
+
 std::string itos(int i);
 
 double evaluate_expression(Program *prg, Variable::Expression &e);

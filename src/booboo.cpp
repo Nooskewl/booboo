@@ -1,5 +1,7 @@
 #include <sys/stat.h>
 
+#include <fstream>
+
 #include "booboo/booboo.h"
 #include "booboo/internal.h"
 
@@ -171,6 +173,17 @@ static std::string remove_quotes(std::string s)
 }
 
 // And this all makes BooBoo work
+
+File_Info *file_info(Program *prg)
+{
+	File_Info *info = (File_Info *)booboo::get_black_box(prg, "com.b1stable.booboo.files");
+	if (info == nullptr) {
+		info = new File_Info;
+		info->file_id = 0;
+		booboo::set_black_box(prg, "com.b1stable.booboo.files", info);
+	}
+	return info;
+}
 
 std::string get_file_name(Program *prg)
 {
@@ -1445,6 +1458,14 @@ void destroy_program(Program *prg)
 	prg->variables.clear();
 	prg->functions.clear();
 
+	File_Info *file_i = file_info(prg);
+	for (size_t i = 0; i < file_i->files.size(); i++) {
+		file_i->files[i]->close();
+		delete file_i->files[i];
+	}
+	delete file_i;
+
+	booboo::set_black_box(prg, "com.b1stable.booboo.files", nullptr);
 	for (size_t i = 0; i < prg->functions.size(); i++) {
 		delete prg->functions[i].s;
 	}
