@@ -914,7 +914,7 @@ void destroy_program(Program *prg)
 	delete prg;
 }
 
-void add_syntax(std::string name, library_func processing)
+void add_instruction(std::string name, library_func processing)
 {
 	library_map[name] = library.size();
 	library.push_back(processing);

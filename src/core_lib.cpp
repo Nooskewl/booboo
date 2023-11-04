@@ -1277,68 +1277,68 @@ static bool mapfunc_keys(Program *prg, std::vector<Token> &v)
 
 void start_lib_core()
 {
-	add_syntax("reset", breaker_reset);
-	add_syntax("exit", breaker_exit);
-	add_syntax("return", breaker_return);
+	add_instruction("reset", breaker_reset);
+	add_instruction("exit", breaker_exit);
+	add_instruction("return", breaker_return);
 
-	add_syntax("number", corefunc_number);
-	add_syntax("string", corefunc_string);
-	add_syntax("vector", corefunc_vector);
-	add_syntax("map", corefunc_map);
-	add_syntax("pointer", corefunc_pointer);
-	add_syntax("label", corefunc_label);
+	add_instruction("number", corefunc_number);
+	add_instruction("string", corefunc_string);
+	add_instruction("vector", corefunc_vector);
+	add_instruction("map", corefunc_map);
+	add_instruction("pointer", corefunc_pointer);
+	add_instruction("label", corefunc_label);
 	
-	add_syntax("address", corefunc_address);
-	add_syntax("=", corefunc_set);
-	add_syntax("+", corefunc_add);
-	add_syntax("-", corefunc_subtract);
-	add_syntax("*", corefunc_multiply);
-	add_syntax("/", corefunc_divide);
+	add_instruction("address", corefunc_address);
+	add_instruction("=", corefunc_set);
+	add_instruction("+", corefunc_add);
+	add_instruction("-", corefunc_subtract);
+	add_instruction("*", corefunc_multiply);
+	add_instruction("/", corefunc_divide);
 	
-	add_syntax("goto", corefunc_goto);
-	add_syntax("?", corefunc_compare);
-	add_syntax("je", corefunc_je);
-	add_syntax("jne", corefunc_jne);
-	add_syntax("jl", corefunc_jl);
-	add_syntax("jle", corefunc_jle);
-	add_syntax("jg", corefunc_jg);
-	add_syntax("jge", corefunc_jge);
-	add_syntax("call", corefunc_call);
-	add_syntax("call_result", corefunc_call_result);
+	add_instruction("goto", corefunc_goto);
+	add_instruction("?", corefunc_compare);
+	add_instruction("je", corefunc_je);
+	add_instruction("jne", corefunc_jne);
+	add_instruction("jl", corefunc_jl);
+	add_instruction("jle", corefunc_jle);
+	add_instruction("jg", corefunc_jg);
+	add_instruction("jge", corefunc_jge);
+	add_instruction("call", corefunc_call);
+	add_instruction("call_result", corefunc_call_result);
 	
-	add_syntax("typeof", corefunc_typeof);
-	add_syntax("print", corefunc_print);
-	add_syntax("input", corefunc_input);
+	add_instruction("typeof", corefunc_typeof);
+	add_instruction("print", corefunc_print);
+	add_instruction("input", corefunc_input);
 
-	add_syntax("string_format", stringfunc_format);
-	add_syntax("string_char_at", stringfunc_char_at);
-	add_syntax("string_length", stringfunc_length);
-	add_syntax("string_from_number", stringfunc_from_number);
+	add_instruction("string_format", stringfunc_format);
+	add_instruction("string_char_at", stringfunc_char_at);
+	add_instruction("string_length", stringfunc_length);
+	add_instruction("string_from_number", stringfunc_from_number);
 
-	add_syntax("sin", mathfunc_sin);
-	add_syntax("cos", mathfunc_cos);
-	add_syntax("atan2", mathfunc_atan2);
-	add_syntax("abs", mathfunc_abs);
-	add_syntax("pow", mathfunc_pow);
-	add_syntax("sqrt", mathfunc_sqrt);
-	add_syntax("floor", mathfunc_floor);
-	add_syntax("neg", mathfunc_neg);
-	add_syntax("%", mathfunc_intmod);
-	add_syntax("fmod", mathfunc_fmod);
+	add_instruction("sin", mathfunc_sin);
+	add_instruction("cos", mathfunc_cos);
+	add_instruction("atan2", mathfunc_atan2);
+	add_instruction("abs", mathfunc_abs);
+	add_instruction("pow", mathfunc_pow);
+	add_instruction("sqrt", mathfunc_sqrt);
+	add_instruction("floor", mathfunc_floor);
+	add_instruction("neg", mathfunc_neg);
+	add_instruction("%", mathfunc_intmod);
+	add_instruction("fmod", mathfunc_fmod);
 
-	add_syntax("vector_add", vectorfunc_add);
-	add_syntax("vector_size", vectorfunc_size);
-	add_syntax("vector_set", vectorfunc_set);
-	add_syntax("vector_insert", vectorfunc_insert);
-	add_syntax("vector_get", vectorfunc_get);
-	add_syntax("vector_erase", vectorfunc_erase);
-	add_syntax("vector_clear", vectorfunc_clear);
+	add_instruction("vector_add", vectorfunc_add);
+	add_instruction("vector_size", vectorfunc_size);
+	add_instruction("vector_set", vectorfunc_set);
+	add_instruction("vector_insert", vectorfunc_insert);
+	add_instruction("vector_get", vectorfunc_get);
+	add_instruction("vector_erase", vectorfunc_erase);
+	add_instruction("vector_clear", vectorfunc_clear);
 
-	add_syntax("map_set", mapfunc_set);
-	add_syntax("map_get", mapfunc_get);
-	add_syntax("map_clear", mapfunc_clear);
-	add_syntax("map_erase", mapfunc_erase);
-	add_syntax("map_keys", mapfunc_keys);
+	add_instruction("map_set", mapfunc_set);
+	add_instruction("map_get", mapfunc_get);
+	add_instruction("map_clear", mapfunc_clear);
+	add_instruction("map_erase", mapfunc_erase);
+	add_instruction("map_keys", mapfunc_keys);
 }
 
 } // end namespace booboo

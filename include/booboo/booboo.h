@@ -55,9 +55,7 @@ struct Token {
 	std::string token;
 };
 
-// These are for adding syntax
 typedef bool (*library_func)(Program *prg, std::vector<Token> &v);
-
 typedef std::string (*token_func)(Program *);
 
 // Call these before/after using BooBoo
@@ -85,7 +83,8 @@ std::string get_string(Variable &v);
 std::vector<Variable> get_vector(Variable &v);
 
 // Add a library function
-void add_syntax(std::string name, library_func func);
+void add_instruction(std::string name, library_func func);
+// Add a token handler
 void add_token(char token, token_func func);
 
 // For error handling
