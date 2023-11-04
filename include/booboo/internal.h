@@ -72,6 +72,9 @@ inline Variable &as_variable_inline(Program *prg, Token &t)
 	if (prg->variables[t.i].type == Variable::POINTER) {
 		return *prg->variables[t.i].p;
 	}
+	if (prg->variables[t.i].type == Variable::FISH) {
+		return go_fish(prg, prg->variables[t.i].f);
+	}
 	return prg->variables[t.i];
 }
 

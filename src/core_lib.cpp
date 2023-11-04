@@ -128,33 +128,6 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 		}
 	}
-	else if (v1.type == Variable::FISH) {
-		Variable &var = go_fish(prg, v1.f);
-		if (var.type == Variable::NUMBER) {
-			var.n = as_number_inline(prg, v[1]);
-		}
-		else if (var.type == Variable::STRING) {
-			var.s = as_string_inline(prg, v[1]);
-		}
-		else if (var.type == Variable::VECTOR) {
-			Variable &v2 = as_variable_inline(prg, v[1]);
-			if (v2.type == Variable::VECTOR) {
-				var.v = v2.v;
-			}
-			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-			}
-		}
-		else if (var.type == Variable::MAP) {
-			Variable &v2 = as_variable_inline(prg, v[1]);
-			if (v2.type == Variable::MAP) {
-				var.m = v2.m;
-			}
-			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-			}
-		}
-	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 	}
