@@ -1,4 +1,4 @@
-label l
+pointer l
 string value
 print "Print 2? (y/n)\n"
 input value
@@ -9,11 +9,14 @@ goto l
 
 function set_label value
 {
+	pointer p
 	? value "y"
 	je two
-	return label1
+	address p label1
+	return p
 :two
-	return label2
+	address p label2
+	return p
 }
 
 :label1

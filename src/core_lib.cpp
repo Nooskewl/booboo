@@ -394,7 +394,7 @@ bool corefunc_call(Program *prg, std::vector<Token> &v)
 
 bool corefunc_call_result(Program *prg, std::vector<Token> &v)
 {
-	Variable &result = as_variable_inline(prg, v[0]);
+	Variable &result = prg->variables[v[0].i];
 	int function = as_function_inline(prg, v[1]);
 
 	call_function(prg, function, v, result, 2);
@@ -1286,7 +1286,6 @@ void start_lib_core()
 	add_instruction("vector", corefunc_vector);
 	add_instruction("map", corefunc_map);
 	add_instruction("pointer", corefunc_pointer);
-	add_instruction("label", corefunc_label);
 	
 	add_instruction("address", corefunc_address);
 	add_instruction("=", corefunc_set);
