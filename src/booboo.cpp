@@ -615,7 +615,6 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 					break;
 				}
 			}
-			printf("e: expr='%s'\n", new_expr.c_str());
 			tok.i = var_i++;
 			tok.token = new_expr;
 
@@ -660,7 +659,6 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			}
 			tok.i = var_i++;
 			tok.token = new_expr;
-			printf("e: fish='%s'\n", new_expr.c_str());
 
 			Variable v1;
 			v1.name = "__fish" + itos(fish_i++);
@@ -770,7 +768,6 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 
 	Variable::Fish e;
 	e.c_i = prg->variables_map[name];
-	printf("set c_i to %d\n", e.c_i);
 
 	bool done = false;
 
@@ -803,7 +800,6 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 					break;
 				}
 			}
-			printf("f: expr='%s'\n", new_expr.c_str());
 			tok.i = var_i++;
 			tok.token = new_expr;
 
@@ -844,7 +840,6 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			}
 			tok.i = var_i++;
 			tok.token = new_expr;
-			printf("f: fish='%s'\n", new_expr.c_str());
 
 			Variable v1;
 			v1.name = "__fish" + itos(fish_i++);
@@ -1084,7 +1079,6 @@ static void compile(Program *prg, Pass pass)
 						prg->variables_map[v.name] = prg->locals[func_index][v.name];
 					}
 
-					printf("expr: '%s'\n", tok.c_str());
 					prg->variables[var_index].e = parse_expression(prg, &func, tok, var_i, expression_i, fish_i, pass);
 
 					Token t;
@@ -1113,7 +1107,6 @@ static void compile(Program *prg, Pass pass)
 						prg->variables_map[v.name] = prg->locals[func_index][v.name];
 					}
 
-					printf("expr: '%s'\n", tok.c_str());
 					prg->variables[var_index].f = parse_fish(prg, &func, tok, var_i, expression_i, fish_i, pass);
 
 					Token t;
@@ -1280,7 +1273,6 @@ static void compile(Program *prg, Pass pass)
 			else if (pass == PASS2) {
 				prg->variables_map[v.name] = var_index;
 			}
-			printf("expr: '%s'\n", tok.c_str());
 			prg->variables[var_index].e = parse_expression(prg, prg, tok, var_i, expression_i, fish_i, pass);
 
 			Token t;
@@ -1307,7 +1299,6 @@ static void compile(Program *prg, Pass pass)
 			else if (pass == PASS2) {
 				prg->variables_map[v.name] = var_index;
 			}
-			printf("expr: '%s'\n", tok.c_str());
 			prg->variables[var_index].f = parse_fish(prg, prg, tok, var_i, expression_i, fish_i, pass);
 
 			Token t;
@@ -1504,11 +1495,9 @@ double exprfunc_add(Program *prg, std::vector<Token> &v)
 	}
 
 	double n = as_number_inline(prg, v[0]);
-	printf("n=%g\n", n);
 
 	for (size_t i = 1; i < v.size(); i++) {
 		double tmp = as_number_inline(prg, v[i]);
-		printf("n=%g\n", tmp);
 		n += tmp;
 		//n += as_number_inline(prg, v[i]);
 	}
@@ -1751,36 +1740,23 @@ std::string itos(int i)
 
 double evaluate_expression(Program *prg, Variable::Expression &e)
 {
-	printf("eval: e.i=%d e.v.size()=%d\n", e.i, e.v.size());
-	for (size_t i = 0; i < e.v.size(); i++) {
-		printf("eval, token='%s'\n", e.v[i].token.c_str());
-	}
-	double tmp = expression_handlers[e.i](prg, e.v);
-	printf("tmp=%g\n", tmp);
-	return tmp;
+	return expression_handlers[e.i](prg, e.v);
 }
 
 Variable &go_fish(Program *prg, Variable::Fish &f)
 {
-	printf("c_i=%d f.v.size()=%d size=%d\n", f.c_i, f.v.size(), prg->variables.size());
 	Variable *v = &prg->variables[f.c_i];
 	int type = v->type;
-	printf("v->name='%s' type=%d\n", v->name.c_str(), type);
 
 	int index;
 	std::string key;
 
 	for (size_t i = 0; i < f.v.size(); i++) {
-		printf("token='%s'\n", f.v[i].token.c_str());
 		if (type == Variable::VECTOR) {
-			printf("tok type=%d\n", f.v[i].type);
-			printf("name='%s'\n", prg->variables[f.v[i].i].name.c_str());
 			index = as_number_inline(prg, f.v[i]);
-			printf("index=%d\n", index);
 		}
 		else {
 			key = as_string_inline(prg, f.v[i]);
-			printf("key='%s'\n", key.c_str());
 		}
 		if (i < f.v.size()-1) {
 			if (type == Variable::VECTOR) {
