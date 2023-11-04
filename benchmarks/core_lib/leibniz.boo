@@ -1,5 +1,10 @@
+number f
+file_open f "rounds.txt" "r"
+string s
+file_read f s
+file_close f
 number rounds
-= rounds (+ 3 (* 100000000 2))
+= rounds (+ 3 (* s 2))
 
 number x
 = x 1
