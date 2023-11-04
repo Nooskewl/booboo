@@ -21,16 +21,16 @@ number tmp
 / tmp w
 * tmp 3.14159
 * tmp 2
-sin tmp tmp
+sin tmp
 number tmp2
 = tmp2 i
 / tmp2 h
-cos tmp2 tmp2
+cos tmp2
 number tmp3
 = tmp3 i
 / tmp3 h
 * tmp3 3.14159
-sin tmp3 tmp3
+sin tmp3
 + tmp tmp2
 + tmp tmp3
 / tmp 3

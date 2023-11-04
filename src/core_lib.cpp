@@ -737,12 +737,12 @@ bool stringfunc_from_number(Program *prg, std::vector<Token> &v)
 
 bool mathfunc_sin(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
-		v1.n = sin(as_number(prg, v[1]));
+		v1.n = sin(v1.n);
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
@@ -753,12 +753,12 @@ bool mathfunc_sin(Program *prg, std::vector<Token> &v)
 
 bool mathfunc_cos(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
-		v1.n = cos(as_number(prg, v[1]));
+		v1.n = cos(v1.n);
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
@@ -769,12 +769,12 @@ bool mathfunc_cos(Program *prg, std::vector<Token> &v)
 
 bool mathfunc_atan2(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
-		v1.n = atan2(as_number(prg, v[1]), as_number(prg, v[2]));
+		v1.n = atan2(v1.n, as_number(prg, v[1]));
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
@@ -806,7 +806,7 @@ bool mathfunc_pow(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
-		v1.n = pow(as_number(prg, v[1]), as_number(prg, v[2]));
+		v1.n = pow(v1.n, as_number(prg, v[1]));
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
@@ -817,12 +817,12 @@ bool mathfunc_pow(Program *prg, std::vector<Token> &v)
 
 bool mathfunc_sqrt(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
-		v1.n = sqrt(as_number(prg, v[1]));
+		v1.n = sqrt(v1.n);
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));

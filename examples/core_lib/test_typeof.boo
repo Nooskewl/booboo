@@ -8,13 +8,13 @@ print "p=%\n" s
 typeof s n
 print "n=%\n" s
 
-typeof s label
+typeof s l
 print "label=%\n" s
 
 typeof s foo
 print "foo=%\n" s
 
-:label
+:l
 
 function foo
 {

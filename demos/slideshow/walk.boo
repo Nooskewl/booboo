@@ -120,7 +120,8 @@ function run
 	= y 288
 
 :do_angle
-	atan2 angle joy_y2 joy_x2
+	= angle joy_y2
+	atan2 angle joy_x2
 	number pi
 	= pi 3.14159
 	/ pi 2

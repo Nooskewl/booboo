@@ -49,10 +49,12 @@ function draw
 	number x
 	number y
 
-	cos x angle2
+	= x angle2
+	cos x
 	* x 85
 	+ x 320
-	sin y angle2
+	= y angle2
+	sin y
 	* y 85
 	+ y 180
 
@@ -67,24 +69,30 @@ function draw
 	number x3
 	number y3
 
-	cos x1 angle2
+	= x1 angle2
+	cos x1
 	* x1 5
 	+ x1 x
-	sin y1 angle2
+	= y1 angle2
+	sin y1
 	* y1 5
 	+ y1 y
 	= a1 angle2
 	+ a1 ninety
 	= a2 angle2
 	- a2 ninety
-	cos x2 a1
-	sin y2 a1
+	= x2 a1
+	cos x2
+	= y2 a1
+	sin y2
 	* x2 2.5
 	* y2 2.5
 	+ x2 x
 	+ y2 y
-	cos x3 a2
-	sin y3 a2
+	= x3 a2
+	cos x3
+	= y3 a2
+	sin y3
 	* x3 2.5
 	* y3 2.5
 	+ x3 x
@@ -95,42 +103,52 @@ function draw
 	number a2
 	= a2 angle2
 	+ a2 3.14159
-	cos x a2
+	= x a2
+	cos x
 	* x 10
 	+ x 320
-	sin y a2
+	= y a2
+	sin y
 	* y 10
 	+ y 180
 
 	line 0 0 0 255 x y 320 180 5 ; extend minute hand back
 
-	cos x angle3
+	= x angle3
+	cos x
 	* x 60
 	+ x 320
-	sin y angle3
+	= y angle3
+	sin y
 	* y 60
 	+ y 180
 
 	line 0 0 0 255 x y 320 180 10 ; hour hand
-	
-	cos x1 angle3
+
+	= x1 angle3	
+	cos x1
 	* x1 10
 	+ x1 x
-	sin y1 angle3
+	= y1 angle3
+	sin y1
 	* y1 10
 	+ y1 y
 	= a1 angle3
 	+ a1 ninety
 	= a2 angle3
 	- a2 ninety
-	cos x2 a1
-	sin y2 a1
+	= x2 a1
+	cos x2
+	= y2 a1
+	sin y2
 	* x2 5
 	* y2 5
 	+ x2 x
 	+ y2 y
-	cos x3 a2
-	sin y3 a2
+	= x3 a2
+	cos x3
+	= y3 a2
+	sin y3
 	* x3 5
 	* y3 5
 	+ x3 x
@@ -140,19 +158,23 @@ function draw
 	
 	= a2 angle3
 	+ a2 3.14159
-	cos x a2
+	= x a2
+	cos x
 	* x 10
 	+ x 320
-	sin y a2
+	= y a2
+	sin y
 	* y 10
 	+ y 180
 
 	line 0 0 0 255 x y 320 180 10 ; extend hour hand back
 
-	cos x angle
+	= x angle
+	cos x
 	* x 100
 	+ x 320
-	sin y angle
+	= y angle
+	sin y
 	* y 100
 	+ y 180
 
@@ -161,10 +183,12 @@ function draw
 	number a2
 	= a2 angle
 	+ a2 3.14159
-	cos x a2
+	= x a2
+	cos x
 	* x 15
 	+ x 320
-	sin y a2
+	= y a2
+	sin y
 	* y 15
 	+ y 180
 

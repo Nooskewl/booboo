@@ -27,12 +27,15 @@ number dy
 = dy y
 - dy 180
 number angle
-atan2 angle dy dx
+= angle dy
+atan2 angle dx
 number vx
-cos vx angle
+= vx angle
+cos vx
 * vx velocity
 number vy
-sin vy angle
+= vy angle
+sin vy
 * vy velocity
 vector_add v vx
 vector_add v vy
@@ -128,7 +131,7 @@ function draw
 	number dist
 	= dist dx
 	+ dist dy
-	sqrt dist dist
+	sqrt dist
 	; 410px is about the max it can get from diagonal to center
 	/ dist 410
 	* dist max_trail
@@ -139,10 +142,13 @@ function draw
 	= dy 180
 	- dy y
 	number angle
-	atan2 angle dy dx
-	cos dx angle
+	= angle dy
+	atan2 angle dx
+	= dx angle
+	cos dx
 	* dx dist
-	sin dy angle
+	= dy angle
+	sin dy
 	* dy dist
 	number trail_x
 	number trail_y

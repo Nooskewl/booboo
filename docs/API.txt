@@ -166,11 +166,11 @@ fmod
 
 sin
 	trigonometry functions
-	e.g. sin dest 3.14159
+	e.g. sin n
 
 cos
 	trigonometry functions
-	e.g. cos dest 3.14159
+	e.g. cos n
 
 atan2
 	trigonometry functions

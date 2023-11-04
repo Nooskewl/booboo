@@ -264,7 +264,7 @@ function find_closest r g b
 	* bb 0.0722
 	+ rr gg
 	+ rr bb
-	sqrt rr rr
+	sqrt rr
 	? rr smallest_diff
 	jge not_better
 	= smallest_diff rr

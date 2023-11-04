@@ -403,7 +403,7 @@ function bullet_collide bx by
 	* dx dx
 	* dy dy
 	+ dx dy
-	sqrt dx dx
+	sqrt dx
 	? dx 18
 	jge skip_it
 	vector_set coin 2 0
@@ -449,7 +449,7 @@ function bullet_collide bx by
 	* dx dx
 	* dy dy
 	+ dx dy
-	sqrt dx dx
+	sqrt dx
 	? dx 14
 	jge not_a_hit2
 	vector_set e 2 0
@@ -1024,11 +1024,11 @@ function run
 	= by pos_y
 	number f
 	= f ba
-	cos f f
+	cos f
 	* f 8
 	+ bx f
 	= f ba
-	sin f f
+	sin f
 	* f 8
 	+ by f
 	vector_add b bx
@@ -1051,12 +1051,12 @@ function run
 	number f
 
 	= f real_a
-	cos f f
+	cos f
 	* f ship_vel
 	+ pos_x f
 
 	= f real_a
-	sin f f
+	sin f
 	* f ship_vel
 	+ pos_y f
 
@@ -1125,7 +1125,8 @@ function run
 	* yy yy
 	+ xx yy
 	number dist
-	sqrt dist xx
+	= dist xx
+	sqrt dist
 	? dist 18
 	jge not_a_hit
 	vector_set tmp 2 0
@@ -1166,7 +1167,7 @@ function run
 	* dx dx
 	* dy dy
 	+ dx dy
-	sqrt dx dx
+	sqrt dx
 	? dx 14
 	jge player_didnt_hit_enemy
 	= dead 1
@@ -1269,10 +1270,10 @@ function run
 	vector_get b ba 2
 	number c
 	= c ba
-	cos c c
+	cos c
 	number s
 	= s ba
-	sin s s
+	sin s
 	number speed
 	= speed 16
 :next_step

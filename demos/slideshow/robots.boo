@@ -136,7 +136,7 @@ function start_board
 	* dx dx
 	* dy dy
 	+ dx dy
-	sqrt dx dx
+	sqrt dx
 	; dx is now distance from player
 	? dx 8
 	jl place_robot
