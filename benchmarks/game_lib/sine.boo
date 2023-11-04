@@ -6,8 +6,7 @@ function draw_at r g b x radius
 	number f
 	= f x
 	/ f 640
-	* f 3.14159
-	* f 2
+	* f 2 3.14159
 	sin f
 	* f 90
 	+ f 180
