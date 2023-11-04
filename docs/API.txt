@@ -66,7 +66,7 @@ typeof
 
 ()
 	evaluates to a number and can be used anywhere you use a number
-	e.g. (+ x (* y (* z 2))) in C would be x+(y*(z*2))
+	e.g. (+ x (* y (* z w 2))) in C would be x+(y*(z*w*2))
 
 -- Flow Control --------------------------------------------------------------
 
