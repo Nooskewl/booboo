@@ -1769,7 +1769,7 @@ Variable &go_fish(Program *prg, Variable::Fish &f)
 	Variable *v = &prg->variables[f.c_i];
 	int type = v->type;
 
-	int index;
+	int index = 0;
 	std::string key;
 
 	for (size_t i = 0; i < f.v.size(); i++) {
