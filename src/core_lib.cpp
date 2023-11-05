@@ -138,9 +138,7 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 
 bool corefunc_add(Program *prg, std::vector<Token> &v)
 {
-	if (v.size() < 2) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
-	}
+	COUNT_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
@@ -179,9 +177,7 @@ bool corefunc_add(Program *prg, std::vector<Token> &v)
 
 bool corefunc_subtract(Program *prg, std::vector<Token> &v)
 {
-	if (v.size() < 2) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
-	}
+	COUNT_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
@@ -199,9 +195,7 @@ bool corefunc_subtract(Program *prg, std::vector<Token> &v)
 
 bool corefunc_multiply(Program *prg, std::vector<Token> &v)
 {
-	if (v.size() < 2) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
-	}
+	COUNT_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
@@ -219,9 +213,7 @@ bool corefunc_multiply(Program *prg, std::vector<Token> &v)
 
 bool corefunc_divide(Program *prg, std::vector<Token> &v)
 {
-	if (v.size() < 2) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
-	}
+	COUNT_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
@@ -436,9 +428,7 @@ static std::string typeof_var(Variable &v1)
 
 bool corefunc_typeof(Program *prg, std::vector<Token> &v)
 {
-	if (v.size() < 2) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
-	}
+	COUNT_ARGS(2)
 
 	std::string res;
 
@@ -998,9 +988,7 @@ static bool vectorfunc_set(Program *prg, std::vector<Token> &v)
 	int val_index = v.size() - 1;
 	std::vector<int> indices;
 
-	if (v.size() < 3) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
-	}
+	COUNT_ARGS(3)
 
 	for (int i = 1; i < val_index; i++) {
 		indices.push_back(as_number_inline(prg, v[i]));
@@ -1096,9 +1084,7 @@ static bool vectorfunc_get(Program *prg, std::vector<Token> &v)
 	Variable &id = as_variable_inline(prg, v[0]);
 	std::vector<int> indices;
 
-	if (v.size() < 3) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
-	}
+	COUNT_ARGS(3)
 
 	for (size_t i = 2; i < v.size(); i++) {
 		int index = as_number_inline(prg, v[i]);
@@ -1176,9 +1162,7 @@ static bool vectorfunc_clear(Program *prg, std::vector<Token> &v)
 
 static bool mapfunc_set(Program *prg, std::vector<Token> &v)
 {
-	if (v.size() < 3) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
-	}
+	COUNT_ARGS(3)
 
 	Variable &id = as_variable_inline(prg, v[0]);
 
@@ -1221,9 +1205,7 @@ static bool mapfunc_set(Program *prg, std::vector<Token> &v)
 
 static bool mapfunc_get(Program *prg, std::vector<Token> &v)
 {
-	if (v.size() < 3) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
-	}
+	COUNT_ARGS(3)
 
 	Variable &id = as_variable_inline(prg, v[0]);
 

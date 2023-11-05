@@ -135,6 +135,6 @@ extern bool quit;
 
 // You can use this at the start of your library functions to ensure correct number of arguments
 // (if you are not using variable number of arguments)
-#define COUNT_ARGS(n) if (v.size() != n) throw Error(std::string(__FUNCTION__) + ": " + "Incorrect number of arguments at " + get_error_info(prg));
+#define COUNT_ARGS(n) if (v.size() < n) throw Error(std::string(__FUNCTION__) + ": " + "Incorrect number of arguments at " + get_error_info(prg));
 
 #endif // BOOBOO_H

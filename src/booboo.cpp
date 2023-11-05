@@ -1519,16 +1519,12 @@ static void init_token_map()
 
 double exprfunc_add(Program *prg, std::vector<Token> &v)
 {
-	if (v.size() < 2) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
-	}
+	COUNT_ARGS(2)
 
 	double n = as_number_inline(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		double tmp = as_number_inline(prg, v[i]);
-		n += tmp;
-		//n += as_number_inline(prg, v[i]);
+		n += as_number_inline(prg, v[i]);
 	}
 
 	return n;
@@ -1536,9 +1532,7 @@ double exprfunc_add(Program *prg, std::vector<Token> &v)
 
 double exprfunc_subtract(Program *prg, std::vector<Token> &v)
 {
-	if (v.size() < 2) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
-	}
+	COUNT_ARGS(2)
 
 	double n = as_number_inline(prg, v[0]);
 
@@ -1551,9 +1545,7 @@ double exprfunc_subtract(Program *prg, std::vector<Token> &v)
 
 double exprfunc_multiply(Program *prg, std::vector<Token> &v)
 {
-	if (v.size() < 2) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
-	}
+	COUNT_ARGS(2)
 
 	double n = as_number_inline(prg, v[0]);
 
@@ -1566,9 +1558,7 @@ double exprfunc_multiply(Program *prg, std::vector<Token> &v)
 
 double exprfunc_divide(Program *prg, std::vector<Token> &v)
 {
-	if (v.size() < 2) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Too few arguments at " + get_error_info(prg));
-	}
+	COUNT_ARGS(2)
 
 	double n = as_number_inline(prg, v[0]);
 
