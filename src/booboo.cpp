@@ -1401,7 +1401,8 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 	//prg->s->line = 1;
 	prg->s->pc = 0;
 
-	interpret(prg, 0);
+	while (interpret(prg, 0)) {
+	}
 
 	std::string bak = result.name;
 	result = prg->s->result;

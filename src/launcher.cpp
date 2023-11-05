@@ -127,7 +127,8 @@ again:
 
 	prg = booboo::create_program(code);
 
-	booboo::interpret(prg, 0);	
+	while (booboo::interpret(prg, 0)) {
+	}
 
 	booboo::destroy_program(prg);
 
