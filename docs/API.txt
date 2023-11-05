@@ -156,6 +156,7 @@ call_result
 string_format
 	format strings with replacements
 	e.g. string_format dest "I'm % years old" age
+	printf-equivalent formating options are available with %(...) for example %(3.16g)
 
 string_char_at
 	Get the value of character at index in a string
@@ -276,6 +277,7 @@ map_keys
 print
 	print a string (like string_format)
 	e.g. print "Hello, I'm % and I like % and %" name like1 like2
+	printf-equivalent formating options are available with %(...) for example %(3.16g)
 
 input
 	Read a word from stdin

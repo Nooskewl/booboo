@@ -519,8 +519,27 @@ bool corefunc_print(Program *prg, std::vector<Token> &v)
 
 	for (int arg = 0; arg < arg_count; arg++) {
 		int start = c;
+		std::string format;
+		int fmt_len = 1;
 		while (c < (int)fmt.length()) {
 			if (fmt[c] == '%' && prev != '%') {
+				if (c < (int)fmt.length()-1) {
+					if (fmt[c+1] == '(') {
+						int l = 2;
+						int st = c+l;
+						if (c+l >= (int)fmt.length()) {
+							throw Error(std::string(__FUNCTION__) + ": " + "Invalid format specifier at " + get_error_info(prg));
+						}
+						while (fmt[c+l] != ')' && c+l < (int)fmt.length()) {
+							l++;
+						}
+						if (c+l >= (int)fmt.length()) {
+							throw Error(std::string(__FUNCTION__) + ": " + "Invalid format specifier at " + get_error_info(prg));
+						}
+						format = fmt.substr(st, l-2);
+						fmt_len = l + 1;
+					}
+				}
 				break;
 			}
 			prev = fmt[c];
@@ -529,25 +548,36 @@ bool corefunc_print(Program *prg, std::vector<Token> &v)
 
 		result += fmt.substr(start, c-start);
 
-		std::string param = v[_tok++].token;
+		c += fmt_len;
+		prev = fmt[c];
 
 		std::string val;
 
-		if (param[0] == '-' || isdigit(param[0])) {
-			val = param;
+		if (v[_tok].type == Token::NUMBER) {
+			format = (format == "") ? "g" : format;
+			char buf[1000];
+			snprintf(buf, 1000, ("%" + format).c_str(), v[_tok].n);
+			val = buf;
 		}
-		else if (param[0] == '"') {
-			val = param;
+		else if (v[_tok].type == Token::STRING) {
+			format = (format == "") ? "s" : format;
+			char buf[1000];
+			snprintf(buf, 1000, ("%" + format).c_str(), v[_tok].s.c_str());
+			val = buf;
 		}
 		else {
-			Variable &v1 = as_variable_inline(prg, v[_tok-1]);
+			Variable &v1 = as_variable_inline(prg, v[_tok]);
 			if (v1.type == Variable::NUMBER) {
+				format = (format == "") ? "g" : format;
 				char buf[1000];
-				snprintf(buf, 1000, "%g", v1.n);
+				snprintf(buf, 1000, ("%" + format).c_str(), v1.n);
 				val = buf;
 			}
 			else if (v1.type == Variable::STRING) {
-				val = v1.s;
+				format = (format == "") ? "s" : format;
+				char buf[1000];
+				snprintf(buf, 1000, ("%" + format).c_str(), v1.s.c_str());
+				val = buf;
 			}
 			else if (v1.type == Variable::VECTOR) {
 				val = "-vector-";
@@ -565,15 +595,17 @@ bool corefunc_print(Program *prg, std::vector<Token> &v)
 				val = "-label-";
 			}
 			else if (v1.type == Variable::EXPRESSION) {
+				format = (format == "") ? "g" : format;
 				char buf[1000];
-				snprintf(buf, 1000, "%g", evaluate_expression(prg, v1.e));
+				snprintf(buf, 1000, ("%" + format).c_str(), evaluate_expression(prg, v1.e));
 				val = buf;
 			}
 			else if (v1.type == Variable::FISH) {
 				Variable &var = go_fish(prg, v1.f);
 				if (var.type == Variable::NUMBER) {
+					format = (format == "") ? "g" : format;
 					char buf[1000];
-					snprintf(buf, 1000, "%g", var.n);
+					snprintf(buf, 1000, ("%" + format).c_str(), var.n);
 					val = buf;
 				}
 				else if (var.type == Variable::STRING) {
@@ -600,9 +632,9 @@ bool corefunc_print(Program *prg, std::vector<Token> &v)
 			}
 		}
 
-		result += val;
+		_tok++;
 
-		c++;
+		result += val;
 	}
 
 	if (c < (int)fmt.length()) {
@@ -656,8 +688,27 @@ bool stringfunc_format(Program *prg, std::vector<Token> &v)
 
 	for (int arg = 0; arg < arg_count; arg++) {
 		int start = c;
+		std::string format;
+		int fmt_len = 1;
 		while (c < (int)fmt.length()) {
 			if (fmt[c] == '%' && prev != '%') {
+				if (c < (int)fmt.length()-1) {
+					if (fmt[c+1] == '(') {
+						int l = 2;
+						int st = c+l;
+						if (c+l >= (int)fmt.length()) {
+							throw Error(std::string(__FUNCTION__) + ": " + "Invalid format specifier at " + get_error_info(prg));
+						}
+						while (fmt[c+l] != ')' && c+l < (int)fmt.length()) {
+							l++;
+						}
+						if (c+l >= (int)fmt.length()) {
+							throw Error(std::string(__FUNCTION__) + ": " + "Invalid format specifier at " + get_error_info(prg));
+						}
+						format = fmt.substr(st, l-2);
+						fmt_len = l + 1;
+					}
+				}
 				break;
 			}
 			prev = fmt[c];
@@ -666,25 +717,36 @@ bool stringfunc_format(Program *prg, std::vector<Token> &v)
 
 		result += fmt.substr(start, c-start);
 
-		std::string param = v[_tok++].token;
+		c += fmt_len;
+		prev = fmt[c];
 
 		std::string val;
 
-		if (param[0] == '-' || isdigit(param[0])) {
-			val = param;
+		if (v[_tok].type == Token::NUMBER) {
+			format = (format == "") ? "g" : format;
+			char buf[1000];
+			snprintf(buf, 1000, ("%" + format).c_str(), v[_tok].n);
+			val = buf;
 		}
-		else if (param[0] == '"') {
-			val = param;
+		else if (v[_tok].type == Token::STRING) {
+			format = (format == "") ? "s" : format;
+			char buf[1000];
+			snprintf(buf, 1000, ("%" + format).c_str(), v[_tok].s.c_str());
+			val = buf;
 		}
 		else {
-			Variable &v1 = as_variable_inline(prg, v[_tok-1]);
+			Variable &v1 = as_variable_inline(prg, v[_tok]);
 			if (v1.type == Variable::NUMBER) {
+				format = (format == "") ? "g" : format;
 				char buf[1000];
-				snprintf(buf, 1000, "%g", v1.n);
+				snprintf(buf, 1000, ("%" + format).c_str(), v1.n);
 				val = buf;
 			}
 			else if (v1.type == Variable::STRING) {
-				val = v1.s;
+				format = (format == "") ? "s" : format;
+				char buf[1000];
+				snprintf(buf, 1000, ("%" + format).c_str(), v1.s.c_str());
+				val = buf;
 			}
 			else if (v1.type == Variable::VECTOR) {
 				val = "-vector-";
@@ -706,9 +768,9 @@ bool stringfunc_format(Program *prg, std::vector<Token> &v)
 			}
 		}
 
-		result += val;
+		_tok++;
 
-		c++;
+		result += val;
 	}
 
 	if (c < (int)fmt.length()) {

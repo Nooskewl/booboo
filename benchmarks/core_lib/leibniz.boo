@@ -22,4 +22,4 @@ jl next_loop
 
 * pi 4
 
-print "%\n" pi
+print "%(.20g)\n" pi
