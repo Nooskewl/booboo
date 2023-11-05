@@ -579,21 +579,6 @@ bool corefunc_print(Program *prg, std::vector<Token> &v)
 				snprintf(buf, 1000, ("%" + format).c_str(), v1.s.c_str());
 				val = buf;
 			}
-			else if (v1.type == Variable::VECTOR) {
-				val = "-vector-";
-			}
-			else if (v1.type == Variable::MAP) {
-				val = "-map-";
-			}
-			else if (v1.type == Variable::POINTER) {
-				val = "-pointer-";
-			}
-			else if (v1.type == Variable::FUNCTION) {
-				val = "-function-";
-			}
-			else if (v1.type == Variable::LABEL) {
-				val = "-label-";
-			}
 			else if (v1.type == Variable::EXPRESSION) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
@@ -608,27 +593,57 @@ bool corefunc_print(Program *prg, std::vector<Token> &v)
 					snprintf(buf, 1000, ("%" + format).c_str(), var.n);
 					val = buf;
 				}
-				else if (var.type == Variable::STRING) {
-					val = var.s;
-				}
-				else if (var.type == Variable::VECTOR) {
-					val = "-vector-";
-				}
-				else if (var.type == Variable::MAP) {
-					val = "-map-";
-				}
-				else if (var.type == Variable::POINTER) {
-					val = "-pointer-";
-				}
-				else if (var.type == Variable::FUNCTION) {
-					val = "-function-";
-				}
-				else if (var.type == Variable::LABEL) {
-					val = "-label-";
+				else {
+					if (var.type == Variable::STRING) {
+						val = var.s;
+					}
+					else if (var.type == Variable::VECTOR) {
+						val = "-vector-";
+					}
+					else if (var.type == Variable::MAP) {
+						val = "-map-";
+					}
+					else if (var.type == Variable::POINTER) {
+						val = "-pointer-";
+					}
+					else if (var.type == Variable::FUNCTION) {
+						val = "-function-";
+					}
+					else if (var.type == Variable::LABEL) {
+						val = "-label-";
+					}
+					else {
+						val = "-unknown-";
+					}
+					format = (format == "") ? "s" : format;
+					char buf[1000];
+					snprintf(buf, 1000, ("%" + format).c_str(), val.c_str());
+					val = buf;
 				}
 			}
 			else {
-				val = "-unknown-";
+				if (v1.type == Variable::VECTOR) {
+					val = "-vector-";
+				}
+				else if (v1.type == Variable::MAP) {
+					val = "-map-";
+				}
+				else if (v1.type == Variable::POINTER) {
+					val = "-pointer-";
+				}
+				else if (v1.type == Variable::FUNCTION) {
+					val = "-function-";
+				}
+				else if (v1.type == Variable::LABEL) {
+					val = "-label-";
+				}
+				else {
+					val = "-unknown-";
+				}
+				format = (format == "") ? "s" : format;
+				char buf[1000];
+				snprintf(buf, 1000, ("%" + format).c_str(), val.c_str());
+				val = buf;
 			}
 		}
 
@@ -748,23 +763,71 @@ bool stringfunc_format(Program *prg, std::vector<Token> &v)
 				snprintf(buf, 1000, ("%" + format).c_str(), v1.s.c_str());
 				val = buf;
 			}
-			else if (v1.type == Variable::VECTOR) {
-				val = "-vector-";
+			else if (v1.type == Variable::EXPRESSION) {
+				format = (format == "") ? "g" : format;
+				char buf[1000];
+				snprintf(buf, 1000, ("%" + format).c_str(), evaluate_expression(prg, v1.e));
+				val = buf;
 			}
-			else if (v1.type == Variable::MAP) {
-				val = "-map-";
-			}
-			else if (v1.type == Variable::POINTER) {
-				val = "-pointer-";
-			}
-			else if (v1.type == Variable::FUNCTION) {
-				val = "-function-";
-			}
-			else if (v1.type == Variable::LABEL) {
-				val = "-label-";
+			else if (v1.type == Variable::FISH) {
+				Variable &var = go_fish(prg, v1.f);
+				if (var.type == Variable::NUMBER) {
+					format = (format == "") ? "g" : format;
+					char buf[1000];
+					snprintf(buf, 1000, ("%" + format).c_str(), var.n);
+					val = buf;
+				}
+				else {
+					if (var.type == Variable::STRING) {
+						val = var.s;
+					}
+					else if (var.type == Variable::VECTOR) {
+						val = "-vector-";
+					}
+					else if (var.type == Variable::MAP) {
+						val = "-map-";
+					}
+					else if (var.type == Variable::POINTER) {
+						val = "-pointer-";
+					}
+					else if (var.type == Variable::FUNCTION) {
+						val = "-function-";
+					}
+					else if (var.type == Variable::LABEL) {
+						val = "-label-";
+					}
+					else {
+						val = "-unknown-";
+					}
+					format = (format == "") ? "s" : format;
+					char buf[1000];
+					snprintf(buf, 1000, ("%" + format).c_str(), val.c_str());
+					val = buf;
+				}
 			}
 			else {
-				val = "-unknown-";
+				if (v1.type == Variable::VECTOR) {
+					val = "-vector-";
+				}
+				else if (v1.type == Variable::MAP) {
+					val = "-map-";
+				}
+				else if (v1.type == Variable::POINTER) {
+					val = "-pointer-";
+				}
+				else if (v1.type == Variable::FUNCTION) {
+					val = "-function-";
+				}
+				else if (v1.type == Variable::LABEL) {
+					val = "-label-";
+				}
+				else {
+					val = "-unknown-";
+				}
+				format = (format == "") ? "s" : format;
+				char buf[1000];
+				snprintf(buf, 1000, ("%" + format).c_str(), val.c_str());
+				val = buf;
 			}
 		}
 
