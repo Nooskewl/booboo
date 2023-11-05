@@ -278,6 +278,33 @@ map_clear
 map_keys
 	Get the names of the keys from a map into a vector of strings e.g. map_keys m v
 
+-- File ----------------------------------------------------------------------
+
+file_open
+	open a file, mode can be either "a" "r" or "w"
+	number f file_open f "input.txt" "r"
+	f will be -1 on failure
+
+file_close
+	You should always close files you open with this
+	e.g. file_close f
+
+file_read
+	Read a word from a file
+	e.g. file_read f s
+
+file_read_line
+	Read a line from a file
+	e.g. file_read_line f s
+
+file_write
+	Write a word to a file
+	e.g. file_write f "turkey"
+
+file_print
+	Print to a file. Behaves exactly like print but takes a file
+	e.g. file_print f "%(20s)%(20s)%(20s)" x y z
+
 -- Other ---------------------------------------------------------------------
 
 print
