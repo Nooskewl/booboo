@@ -1,24 +1,25 @@
 -- Core Functions ------------------------------------------------------------
 
 number
-	declare a number
-	e.g. number x
+	declare a number or numbers
+	e.g. number x y z
+	
 
 string
-	declare a string
-	e.g. string s
+	declare a string or strings
+	e.g. string s1 s2
 
 vector
-	declare a vector
+	declare a vector or vectors
 	e.g. vector x
 
 map
-	declare a map
+	declare a map or maps
 	e.g. map m
 
 pointer
-	declare a pointer
-	e.g. pointer p
+	declare a pointer or pointers
+	e.g. pointer p1 p2 p3
 
 reset
 	load a different BooBoo script

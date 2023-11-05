@@ -954,6 +954,7 @@ static void compile(Program *prg, Pass pass)
 	int fish_i = 0;
 
 	while ((tok = token(prg, tt)) != "") {
+top:
 		if (tok == ";") {
 			while (prg->s->p < prg->s->code.length() && prg->s->code[prg->s->p] != '\n') {
 				prg->s->p++;
@@ -991,6 +992,7 @@ static void compile(Program *prg, Pass pass)
 			bool is_param = true;
 			bool finished = false;
 			while ((tok = token(prg, tt)) != "") {
+func_top:
 				if (tok == ";") {
 					while (prg->s->p < prg->s->code.length() && prg->s->code[prg->s->p] != '\n') {
 						prg->s->p++;
@@ -1023,59 +1025,67 @@ static void compile(Program *prg, Pass pass)
 					}
 				}
 				else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map" || tok == "pointer") {
-					std::string tok2 = token(prg, tt);
 					Statement s;
 					s.method = library_map[tok];
 					func.s->program.push_back(s);
 					if (pass == PASS2) {
-						if (func.line_numbers.size() != 0) {
+						//if (func.line_numbers.size() != 0) {
 							func.s->pc++;
-						}
+						//}
 						func.line_numbers.push_back(prg->s->line);
 					}
-					if (pass == PASS1) {
-						prg->locals[func_index][tok2] = var_i++;
-					}
-					else {
-						prg->variables_map[tok2] = prg->locals[func_index][tok2];
-						var_i++;
-					}
-					Variable v;
-					v.name = tok2;
-					if (tok == "number") {
-						v.type = Variable::NUMBER;
-					}
-					else if (tok == "string") {
-						v.type = Variable::STRING;
-					}
-					else if (tok == "vector") {
-						v.type = Variable::VECTOR;
-					}
-					else if (tok == "map") {
-						v.type = Variable::MAP;
-					}
-					else {
-						v.type = Variable::POINTER;
-					}
-					std::map<std::string, int>::iterator it;
-					it = prg->variables_map.find(tok2);
-					if (it != prg->variables_map.end()) {
-						Variable &var = prg->variables[(*it).second];
-						if (var.type != v.type) {
-							throw Error("Type for " + tok2 + " changed at " + get_error_info(&func));
+					int count = 0;
+					while (true) {
+						std::string tok2 = token(prg, tt);
+						if (tok2 == "" || (count != 0 && (tok2 == ";" || tok2 == "{" || tok2 == "}" || tok2 == ":" || tok2 == "function" || tok2[0] == '(' || tok2[0] == '[' || library_map.find(tok2) != library_map.end()))) {
+							tok = tok2;
+							goto func_top;
 						}
+						count++;
+						if (pass == PASS1) {
+							prg->locals[func_index][tok2] = var_i++;
+						}
+						else {
+							prg->variables_map[tok2] = prg->locals[func_index][tok2];
+							var_i++;
+						}
+						Variable v;
+						v.name = tok2;
+						if (tok == "number") {
+							v.type = Variable::NUMBER;
+						}
+						else if (tok == "string") {
+							v.type = Variable::STRING;
+						}
+						else if (tok == "vector") {
+							v.type = Variable::VECTOR;
+						}
+						else if (tok == "map") {
+							v.type = Variable::MAP;
+						}
+						else {
+							v.type = Variable::POINTER;
+						}
+						std::map<std::string, int>::iterator it;
+						it = prg->variables_map.find(tok2);
+						if (it != prg->variables_map.end()) {
+							Variable &var = prg->variables[(*it).second];
+							if (var.type != v.type) {
+								throw Error("Type for " + tok2 + " changed at " + get_error_info(&func));
+							}
+						}
+						if (pass == PASS1) {
+							prg->variables.push_back(v);
+						}
+						Token t;
+						t.type = Token::SYMBOL;
+						if (pass == PASS2) {
+							t.i = prg->variables_map[tok2];
+						}
+						t.s = tok2;
+						t.token = tok2;
+						func.s->program[func.s->program.size()-1].data.push_back(t);
 					}
-					if (pass == PASS1) {
-						prg->variables.push_back(v);
-					}
-					Token t;
-					t.type = Token::SYMBOL;
-					if (pass == PASS2) {
-						t.i = prg->variables_map[tok2];
-					}
-					t.s = tok2;
-					t.token = tok2;
-					func.s->program[func.s->program.size()-1].data.push_back(t);
 				}
 				else if (tok[0] == '(') {
 					Variable v;
@@ -1138,9 +1148,9 @@ static void compile(Program *prg, Pass pass)
 					s.method = library_map[tok];
 					func.s->program.push_back(s);
 					if (pass == PASS2) {
-						if (func.line_numbers.size() != 0) {
+						//if (func.line_numbers.size() != 0) {
 							func.s->pc++;
-						}
+						//}
 						func.line_numbers.push_back(prg->s->line);
 					}
 				}
@@ -1229,49 +1239,57 @@ static void compile(Program *prg, Pass pass)
 			}
 		}
 		else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map" || tok == "pointer") {
-			std::string tok2 = token(prg, tt);
 			Statement s;
 			s.method = library_map[tok];
 			prg->s->program.push_back(s);
 			if (pass == PASS2) {
-				if (prg->line_numbers.size() != 0) {
+				//if (prg->line_numbers.size() != 0) {
 					prg->s->pc++;
-				}
+				//}
 				prg->line_numbers.push_back(prg->s->line);
 			}
-			int var_index = var_i;
-			var_i++;
-			if (pass == PASS2) {
-				prg->variables_map[tok2] = var_index;
+			int count = 0;
+			while (true) {
+				std::string tok2 = token(prg, tt);
+				if (tok2 == "" || (count != 0 && (tok2 == ";" || tok2 == "{" || tok2 == "}" || tok2 == ":" || tok2 == "function" || tok2[0] == '(' || tok2[0] == '[' || library_map.find(tok2) != library_map.end()))) {
+					tok = tok2;
+					goto top;
+				}
+				count++;
+				int var_index = var_i;
+				var_i++;
+				if (pass == PASS2) {
+					prg->variables_map[tok2] = var_index;
+				}
+				Variable v;
+				v.name = tok2;
+				if (tok == "number") {
+					v.type = Variable::NUMBER;
+				}
+				else if (tok == "string") {
+					v.type = Variable::STRING;
+				}
+				else if (tok == "vector") {
+					v.type = Variable::VECTOR;
+				}
+				else if (tok == "map") {
+					v.type = Variable::MAP;
+				}
+				else {
+					v.type = Variable::POINTER;
+				}
+				if (pass == PASS1) {
+					prg->variables.push_back(v);
+				}
+				Token t;
+				t.type = Token::SYMBOL;
+				if (pass == PASS2) {
+					t.i = prg->variables_map[tok2];
+				}
+				t.s = tok2;
+				t.token = tok2;
+				prg->s->program[prg->s->program.size()-1].data.push_back(t);
 			}
-			Variable v;
-			v.name = tok2;
-			if (tok == "number") {
-				v.type = Variable::NUMBER;
-			}
-			else if (tok == "string") {
-				v.type = Variable::STRING;
-			}
-			else if (tok == "vector") {
-				v.type = Variable::VECTOR;
-			}
-			else if (tok == "map") {
-				v.type = Variable::MAP;
-			}
-			else {
-				v.type = Variable::POINTER;
-			}
-			if (pass == PASS1) {
-				prg->variables.push_back(v);
-			}
-			Token t;
-			t.type = Token::SYMBOL;
-			if (pass == PASS2) {
-				t.i = prg->variables_map[tok2];
-			}
-			t.s = tok2;
-			t.token = tok2;
-			prg->s->program[prg->s->program.size()-1].data.push_back(t);
 		}
 		else if (tok[0] == '(') {
 			Variable v;
@@ -1330,9 +1348,9 @@ static void compile(Program *prg, Pass pass)
 			s.method = library_map[tok];
 			prg->s->program.push_back(s);
 			if (pass == PASS2) {
-				if (prg->line_numbers.size() != 0) {
+				//if (prg->line_numbers.size() != 0) {
 					prg->s->pc++;
-				}
+				//}
 				prg->line_numbers.push_back(prg->s->line);
 			}
 		}

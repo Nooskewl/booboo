@@ -60,14 +60,21 @@ bool corefunc_string(Program *prg, std::vector<Token> &v)
 bool corefunc_vector(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
-	prg->variables[v[0].i].v.clear();
+	
+	for (size_t i = 0; i < v.size(); i++) {
+		prg->variables[v[i].i].v.clear();
+	}
+
 	return true;
 }
 
 bool corefunc_map(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
-	prg->variables[v[0].i].m.clear();
+	
+	for (size_t i = 0; i < v.size(); i++) {
+		prg->variables[v[i].i].m.clear();
+	}
 	return true;
 }
 
