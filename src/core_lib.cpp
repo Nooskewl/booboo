@@ -846,6 +846,107 @@ bool stringfunc_format(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+bool stringfunc_scan(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	if (v1.type == Variable::POINTER) {
+		v1 = *v1.p;
+	}
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected number at " + get_error_info(prg));
+	}
+	std::string fmt = as_string_inline(prg, v[1]);
+	std::string scan_str = as_string_inline(prg, v[2]);
+	int _tok = 3;
+	int p = 0;
+	int scanned = 0;
+	int gotten = 0;
+
+	while (p < fmt.length()) {
+		int start = p;
+		// scan up till %
+		while (p < fmt.length() && fmt[p] != '%') {
+			p++;
+		}
+		if (p < fmt.length()-1 && fmt[p+1] == '%') {
+			p += 2;
+			continue;
+		}
+		int scan_till = p >= fmt.length()-1 ? -1 : fmt[p+1];
+		if (p-start > 0) {
+			std::string const_str = fmt.substr(start, p-start);
+			bool all_whitespace = true;
+			for (size_t i = 0; i < const_str.length(); i++) {
+				if (!isspace(const_str[i])) {
+					all_whitespace = false;
+					break;
+				}
+			}
+			if (all_whitespace) {
+				while (scanned < scan_str.length() && isspace(scan_str[scanned])) {
+					scanned++;
+				}
+			}
+			else {
+				if (const_str != scan_str.substr(scanned, const_str.length())) {
+					break;
+				}
+				scanned += const_str.length();
+			}
+		}
+
+		Variable &var = as_variable_inline(prg, v[_tok]);
+		if (var.type == Variable::POINTER) {
+			var = *var.p;
+		}
+
+		int scan_start = scanned;
+
+		while (true) {
+			if (scanned >= scan_str.length()) {
+				break;
+			}
+			if (isspace(scan_till)) {
+				if (isspace(scan_str[scanned])) {
+					break;
+				}
+			}
+			else {
+				if (scan_str[scanned] == scan_till) {
+					break;
+				}
+			}
+			scanned++;
+		}
+
+		std::string got = scan_str.substr(scan_start, scanned-scan_start);
+
+		if (var.type == Variable::NUMBER) {
+			var.n = atof(got.c_str());
+		}
+		else if (var.type == Variable::STRING) {
+			var.s = got;
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Expected string or number at " + get_error_info(prg));
+		}
+
+		gotten++;
+		_tok++;
+		p++;
+
+		if (_tok >= v.size()) {
+			break;
+		}
+	}
+
+	v1.n = gotten;
+
+	return true;
+}
+
 bool stringfunc_char_at(Program *prg, std::vector<Token> &v)
 {
 	Variable &v1 = as_variable_inline(prg, v[0]);
@@ -1531,6 +1632,7 @@ void start_lib_core()
 	add_instruction("input", corefunc_input);
 
 	add_instruction("string_format", stringfunc_format);
+	add_instruction("string_scan", stringfunc_scan);
 	add_instruction("string_char_at", stringfunc_char_at);
 	add_instruction("string_length", stringfunc_length);
 	add_instruction("string_from_number", stringfunc_from_number);
