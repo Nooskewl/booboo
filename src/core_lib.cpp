@@ -500,6 +500,8 @@ bool corefunc_typeof(Program *prg, std::vector<Token> &v)
 
 bool corefunc_print(Program *prg, std::vector<Token> &v)
 {
+	COUNT_ARGS(1)
+
 	std::string fmt = as_string_inline(prg, v[0]);
 	int _tok = 1;
 	
@@ -1547,6 +1549,11 @@ static bool filefunc_open(Program *prg, std::vector<Token> &v)
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid file open mode at " + get_error_info(prg));
 	}
 
+	if (f->fail()) {
+		v1.n = -1;
+		return true;
+	}
+
 	info->files[info->file_id++] = f;
 
 	return true;
@@ -1583,6 +1590,29 @@ static bool filefunc_read(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool filefunc_read_line(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number_inline(prg, v[0]);
+	Variable &var = as_variable_inline(prg, v[1]);
+
+	if (var.type != Variable::STRING) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected string at " + get_error_info(prg));
+	}
+
+	File_Info *info = file_info(prg);
+
+	if ((*info->files[id]).eof()) {
+		var.s = "";
+	}
+	else {
+		std::getline(*info->files[id], var.s);
+	}
+
+	return true;
+}
+
 static bool filefunc_write(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -1593,6 +1623,172 @@ static bool filefunc_write(Program *prg, std::vector<Token> &v)
 	File_Info *info = file_info(prg);
 
 	(*info->files[id]) << val;
+
+	return true;
+}
+
+bool filefunc_print(Program *prg, std::vector<Token> &v)
+{
+	int id = as_number_inline(prg, v[0]);
+	std::string fmt = as_string_inline(prg, v[1]);
+	int _tok = 2;
+	
+	int prev = 0;
+	int arg_count = 0;
+
+	for (size_t i = 0; i < fmt.length(); i++) {
+		if (fmt[i] == '%' && prev != '%') {
+			arg_count++;
+		}
+		prev = fmt[i];
+	}
+
+	std::string result;
+	int c = 0;
+	prev = 0;
+
+	for (int arg = 0; arg < arg_count; arg++) {
+		int start = c;
+		std::string format;
+		int fmt_len = 1;
+		while (c < (int)fmt.length()) {
+			if (fmt[c] == '%' && prev != '%') {
+				if (c < (int)fmt.length()-1) {
+					if (fmt[c+1] == '(') {
+						int l = 2;
+						int st = c+l;
+						if (c+l >= (int)fmt.length()) {
+							throw Error(std::string(__FUNCTION__) + ": " + "Invalid format specifier at " + get_error_info(prg));
+						}
+						while (fmt[c+l] != ')' && c+l < (int)fmt.length()) {
+							l++;
+						}
+						if (c+l >= (int)fmt.length()) {
+							throw Error(std::string(__FUNCTION__) + ": " + "Invalid format specifier at " + get_error_info(prg));
+						}
+						format = fmt.substr(st, l-2);
+						fmt_len = l + 1;
+					}
+				}
+				break;
+			}
+			prev = fmt[c];
+			c++;
+		}
+
+		result += fmt.substr(start, c-start);
+
+		c += fmt_len;
+		prev = fmt[c];
+
+		std::string val;
+
+		if (v[_tok].type == Token::NUMBER) {
+			format = (format == "") ? "g" : format;
+			char buf[1000];
+			snprintf(buf, 1000, ("%" + format).c_str(), v[_tok].n);
+			val = buf;
+		}
+		else if (v[_tok].type == Token::STRING) {
+			format = (format == "") ? "s" : format;
+			char buf[1000];
+			snprintf(buf, 1000, ("%" + format).c_str(), v[_tok].s.c_str());
+			val = buf;
+		}
+		else {
+			Variable &v1 = as_variable_inline(prg, v[_tok]);
+			if (v1.type == Variable::NUMBER) {
+				format = (format == "") ? "g" : format;
+				char buf[1000];
+				snprintf(buf, 1000, ("%" + format).c_str(), v1.n);
+				val = buf;
+			}
+			else if (v1.type == Variable::STRING) {
+				format = (format == "") ? "s" : format;
+				char buf[1000];
+				snprintf(buf, 1000, ("%" + format).c_str(), v1.s.c_str());
+				val = buf;
+			}
+			else if (v1.type == Variable::EXPRESSION) {
+				format = (format == "") ? "g" : format;
+				char buf[1000];
+				snprintf(buf, 1000, ("%" + format).c_str(), evaluate_expression(prg, v1.e));
+				val = buf;
+			}
+			else if (v1.type == Variable::FISH) {
+				Variable &var = go_fish(prg, v1.f);
+				if (var.type == Variable::NUMBER) {
+					format = (format == "") ? "g" : format;
+					char buf[1000];
+					snprintf(buf, 1000, ("%" + format).c_str(), var.n);
+					val = buf;
+				}
+				else {
+					if (var.type == Variable::STRING) {
+						val = var.s;
+					}
+					else if (var.type == Variable::VECTOR) {
+						val = "-vector-";
+					}
+					else if (var.type == Variable::MAP) {
+						val = "-map-";
+					}
+					else if (var.type == Variable::POINTER) {
+						val = "-pointer-";
+					}
+					else if (var.type == Variable::FUNCTION) {
+						val = "-function-";
+					}
+					else if (var.type == Variable::LABEL) {
+						val = "-label-";
+					}
+					else {
+						val = "-unknown-";
+					}
+					format = (format == "") ? "s" : format;
+					char buf[1000];
+					snprintf(buf, 1000, ("%" + format).c_str(), val.c_str());
+					val = buf;
+				}
+			}
+			else {
+				if (v1.type == Variable::VECTOR) {
+					val = "-vector-";
+				}
+				else if (v1.type == Variable::MAP) {
+					val = "-map-";
+				}
+				else if (v1.type == Variable::POINTER) {
+					val = "-pointer-";
+				}
+				else if (v1.type == Variable::FUNCTION) {
+					val = "-function-";
+				}
+				else if (v1.type == Variable::LABEL) {
+					val = "-label-";
+				}
+				else {
+					val = "-unknown-";
+				}
+				format = (format == "") ? "s" : format;
+				char buf[1000];
+				snprintf(buf, 1000, ("%" + format).c_str(), val.c_str());
+				val = buf;
+			}
+		}
+
+		_tok++;
+
+		result += val;
+	}
+
+	if (c < (int)fmt.length()) {
+		result += fmt.substr(c);
+	}
+	
+	File_Info *info = file_info(prg);
+
+	(*info->files[id]) << result;
 
 	return true;
 }
@@ -1665,7 +1861,9 @@ void start_lib_core()
 	add_instruction("file_open", filefunc_open);
 	add_instruction("file_close", filefunc_close);
 	add_instruction("file_read", filefunc_read);
+	add_instruction("file_read_line", filefunc_read_line);
 	add_instruction("file_write", filefunc_write);
+	add_instruction("file_print", filefunc_print);
 }
 
 } // end namespace booboo
