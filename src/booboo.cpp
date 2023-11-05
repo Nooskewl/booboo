@@ -1,5 +1,6 @@
 #include <sys/stat.h>
 
+#include <climits>
 #include <fstream>
 
 #include "booboo/booboo.h"
@@ -1400,8 +1401,7 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 	//prg->s->line = 1;
 	prg->s->pc = 0;
 
-	while (interpret(prg)) {
-	}
+	interpret(prg, 0);
 
 	std::string bak = result.name;
 	result = prg->s->result;
@@ -1431,26 +1431,34 @@ void call_void_function(Program *prg, std::string function_name, std::vector<Tok
 	call_function(prg, function_name, params, tmp, ignore_params);
 }
 
-bool interpret(Program *prg)
+bool interpret(Program *prg, int instructions)
 {
-	bool ret = true;
-
-	if (prg->s->pc >= prg->s->program.size()) {
-		return false;
+	if (instructions == 0) {
+		instructions = INT_MAX;
 	}
 
-	Statement &s = prg->s->program[prg->s->pc];
+	for (int i = 0; i < instructions; i++) {
+		if (prg->s->pc >= prg->s->program.size()) {
+			return false;
+		}
 
-	unsigned int pc_bak = prg->s->pc;
+		Statement &s = prg->s->program[prg->s->pc];
 
-	library_func func = library[s.method];
-	ret = func(prg, s.data);
+		unsigned int pc_bak = prg->s->pc;
 
-	if (pc_bak == prg->s->pc) {
-		prg->s->pc++;
+		library_func func = library[s.method];
+		bool ret = func(prg, s.data);
+
+		if (pc_bak == prg->s->pc) {
+			prg->s->pc++;
+		}
+
+		if (ret == false) {
+			return false;
+		}
 	}
 
-	return ret;
+	return true;
 }
 
 void destroy_program(Program *prg)
