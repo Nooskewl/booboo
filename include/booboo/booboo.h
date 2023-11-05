@@ -134,7 +134,9 @@ extern bool quit;
 } // End namespace booboo
 
 // You can use this at the start of your library functions to ensure correct number of arguments
-// (if you are not using variable number of arguments)
+// You can comment out the first line and uncomment the second to skip error
+// checking and get a small speed improvement
 #define COUNT_ARGS(n) if (v.size() < n) throw Error(std::string(__FUNCTION__) + ": " + "Incorrect number of arguments at " + get_error_info(prg));
+//#define COUNT_ARGS(n)
 
 #endif // BOOBOO_H
