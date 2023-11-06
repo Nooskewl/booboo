@@ -142,6 +142,28 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+bool corefunc_if(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int end = v.size();
+	end -= (end % 2);
+
+	for (size_t i = 0; i < end; i += 2) {
+		bool b = as_number_inline(prg, v[i]);
+		if (b) {
+			prg->s->pc = as_label_inline(prg, v[i+1]);
+			return true;
+		}
+	}
+
+	if (v.size() % 2 == 1) {
+		prg->s->pc = as_label_inline(prg, v[v.size()-1]);
+	}
+
+	return true;
+}
+
 bool corefunc_set(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -2041,6 +2063,7 @@ void start_lib_core()
 	
 	add_instruction("address", corefunc_address);
 	add_instruction("for", corefunc_for);
+	add_instruction("if", corefunc_if);
 
 	add_instruction("=", corefunc_set);
 	add_instruction("+", corefunc_add);
