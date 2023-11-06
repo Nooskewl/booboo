@@ -117,7 +117,6 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 	if (count.type != Variable::NUMBER) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
-	count.n = 0;
 
 	int loops = as_number_inline(prg, v[1]);
 	int end = as_label_inline(prg, v[2]);
