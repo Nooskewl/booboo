@@ -283,12 +283,7 @@ bool corefunc_goto(Program *prg, std::vector<Token> &v)
 
 bool corefunc_compare(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
-
-	if (v.size() == 1) {
-		prg->compare_flag = as_number_inline(prg, v[0]) == 0;
-		return true;
-	}
+	COUNT_ARGS(2)
 
 	bool is_num = false;
 	double n;

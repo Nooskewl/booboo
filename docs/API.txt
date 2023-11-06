@@ -87,7 +87,7 @@ goto
 	Comparison
 	e.g. ? x 1
 	You can also evaluate an expression
-	? (&& (> a b) (< x y)) je true jne false
+	? 1 (&& (> a b) (< x y)) je true jne false
 
 je
 	Jumps like this one are based on the last comparison. If it was equal, this
