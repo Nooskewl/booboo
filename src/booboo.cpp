@@ -1419,7 +1419,7 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 	//prg->s->line = 1;
 	prg->s->pc = 0;
 
-	while (interpret(prg, 0)) {
+	while (interpret(prg, INT_MAX)) {
 	}
 
 	std::string bak = result.name;
@@ -1452,10 +1452,6 @@ void call_void_function(Program *prg, std::string function_name, std::vector<Tok
 
 bool interpret(Program *prg, int instructions)
 {
-	if (instructions == 0) {
-		instructions = INT_MAX;
-	}
-
 	for (int i = 0; i < instructions; i++) {
 		if (prg->s->pc >= prg->s->program.size()) {
 			return false;

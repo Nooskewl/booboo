@@ -913,7 +913,7 @@ again:
 
 	prg = booboo::create_program(code);
 
-	while (booboo::interpret(prg, 0)) {
+	while (booboo::interpret(prg, INT_MAX)) {
 	}
 
 #if defined LUA_BENCH_ANY
