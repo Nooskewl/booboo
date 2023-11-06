@@ -3,12 +3,10 @@ number x
 
 number i
 = i 0
-:next_loop
+for i 100000 1 next_loop
 call draw
 call run
-+ i 1
-? i 100000
-jl next_loop
+:next_loop
 
 function draw_at x
 {
@@ -26,11 +24,9 @@ function draw
 	number xx
 	= xx 0
 
-:loop
+	for xx 640 2 loop
 	call draw_at xx
-	+ xx 2
-	? xx 640
-	jl loop
+:loop
 
 	number tmp
 	= tmp x

@@ -22,11 +22,9 @@ function draw
 
 	start_primitives
 
-:loop
+	for xx 640 2 loop
 	call draw_at 0 255 0 xx 8
-	+ xx 2
-	? xx 640
-	jl loop
+:loop
 
 	number tmp
 	= tmp x
