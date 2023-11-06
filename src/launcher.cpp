@@ -2,6 +2,8 @@
 #include <unistd.h>
 #endif
 
+#include <climits>
+
 #include <sys/stat.h>
 
 #include "booboo/booboo.h"

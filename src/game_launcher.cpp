@@ -17,6 +17,8 @@
 #include <unistd.h>
 #endif
 
+#include <climits>
+
 #include <sys/stat.h>
 
 #ifdef CPP_BENCH
