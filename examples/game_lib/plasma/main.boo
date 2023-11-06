@@ -95,21 +95,17 @@ floor H
 vector frame
 number y
 = y 0
-:next_y
+for y H 1 next_y
 vector row
 number x
 = x 0
-:next_x
+for x W 1 next_x
 number r
 rand r 0 255
 vector_add row r
-+ x 1
-? x W
-jl next_x
+:next_x
 vector_add frame row
-+ y 1
-? y H
-jl next_y
+:next_y
 
 ; You can subdivide this down to 1 pixel, but even two subdivisions is kinda slow...
 call_result frame divide frame W H
@@ -140,25 +136,21 @@ function divide frame w h
 	vector empty_row
 	number i
 	= i 0
-:next_fill
+	for i new_w 1 next_fill
 	vector_add empty_row 0
-	+ i 1
-	? i new_w
-	jl next_fill
+:next_fill
 
 	= i 0
-:next_row_fill
+	for i new_h 1 next_row_fill
 	vector_add v empty_row
-	+ i 1
-	? i new_h
-	jl next_row_fill
+:next_row_fill
 
 	number y
 	number x
 	= y 0
-:next_y
+	for y new_h 1 next_y
 	= x 0
-:next_x
+	for x new_w 1 next_x
 	number r
 	= r 0
 	number g
@@ -173,13 +165,13 @@ function divide frame w h
 	number yy2
 	= yy (- y 1)
 	= yy2 (+ yy 3)
-:next_pixel_y
+	for yy yy2 1 next_pixel_y
 	= xx (- x 1)
 	= xx2 (+ xx 3)
 	number tmpy
 	= tmpy (/ yy 2)
 	floor tmpy
-:next_pixel_x
+	for xx xx2 1 next_pixel_x
 	+ valid 1
 	number tmpx
 	= tmpx (/ xx 2)
@@ -204,12 +196,8 @@ function divide frame w h
 	+ g gg
 	+ b bb
 :skip_it
-	+ xx 1
-	? xx xx2
-	jl next_pixel_x
-	+ yy 1
-	? yy yy2
-	jl next_pixel_y
+:next_pixel_x
+:next_pixel_y
 	/ r valid
 	/ g valid
 	/ b valid
@@ -219,12 +207,8 @@ function divide frame w h
 	number best_fit
 	call_result best_fit find_closest r g b
 	vector_set v y x best_fit
-	+ x 1
-	? x new_w
-	jl next_x
-	+ y 1
-	? y new_h
-	jl next_y
+:next_x
+:next_y
 	
 	return v
 }
