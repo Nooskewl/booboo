@@ -106,6 +106,42 @@ bool corefunc_address(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+bool corefunc_for(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &count = as_variable_inline(prg, v[0]);
+	if (count.type == Variable::POINTER) {
+		count = (*count.p);
+	}
+	if (count.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+	count.n = 0;
+
+	int loops = as_number_inline(prg, v[1]);
+	int end = as_label_inline(prg, v[2]);
+
+	prg->s->pc++;
+
+	int start = prg->s->pc;
+
+	while (true) {
+		if (interpret(prg, 1) == false) {
+			return false;
+		}
+		if (prg->s->pc == end) {
+			count.n++;
+			if (count.n == loops) {
+				break;
+			}
+			prg->s->pc = start;
+		}
+	}
+
+	return true;
+}
+
 bool corefunc_set(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -1813,6 +1849,8 @@ void start_lib_core()
 	add_instruction("pointer", corefunc_pointer);
 	
 	add_instruction("address", corefunc_address);
+	add_instruction("for", corefunc_for);
+
 	add_instruction("=", corefunc_set);
 	add_instruction("+", corefunc_add);
 	add_instruction("-", corefunc_subtract);

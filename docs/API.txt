@@ -118,6 +118,12 @@ call_result
 	Call a function that returns a value
 	e.g. call_result result my_func param1 param2
 
+for
+	A for loop
+	e.g. for i n end_label
+	will increment i for 0 to n-1 and loop everything between the for
+	and end_label n times.
+
 -- Arithmetic ----------------------------------------------------------------
 
 =
