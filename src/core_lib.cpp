@@ -108,7 +108,7 @@ bool corefunc_address(Program *prg, std::vector<Token> &v)
 
 bool corefunc_for(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(4)
 
 	Variable &count = as_variable_inline(prg, v[0]);
 	if (count.type == Variable::POINTER) {
@@ -119,7 +119,8 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 	}
 
 	int end = as_number_inline(prg, v[1]);
-	int end_label = as_label_inline(prg, v[2]);
+	int increment = as_number_inline(prg, v[2]);
+	int end_label = as_label_inline(prg, v[3]);
 
 	prg->s->pc++;
 
@@ -130,7 +131,7 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 			return false;
 		}
 		if (prg->s->pc == end_label) {
-			count.n++;
+			count.n += increment;
 			if (count.n >= end) {
 				break;
 			}
