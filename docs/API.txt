@@ -117,7 +117,8 @@ jge
 if
 	compare and jump
 	e.g. if (expr1) the_if (expr2) elseif1 (expr3) elseif2 the_else
-	the_if elseif1 elseif2 and the_else are labels
+	the_if elseif1 elseif2 and the_else are labels that are the bottom of
+	their code blocks
 
 call
 	Call a function that doesn't return anything

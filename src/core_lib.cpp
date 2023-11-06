@@ -148,17 +148,33 @@ bool corefunc_if(Program *prg, std::vector<Token> &v)
 
 	int end = v.size();
 	end -= (end % 2);
+	int prev = -1;
 
 	for (size_t i = 0; i < end; i += 2) {
 		bool b = as_number_inline(prg, v[i]);
 		if (b) {
-			prg->s->pc = as_label_inline(prg, v[i+1]);
+			if (prev == -1) {
+				prg->s->pc++;
+			}
+			else {
+				prg->s->pc = prev;
+			}
+			int end_block = as_label_inline(prg, v[i+1]);
+			while (prg->s->pc != end_block) {
+				interpret(prg, 1);
+			}
+			prg->s->pc = as_label_inline(prg, v[v.size()-1]);
 			return true;
 		}
+		prev = as_label_inline(prg, v[i+1]);
 	}
 
 	if (v.size() % 2 == 1) {
-		prg->s->pc = as_label_inline(prg, v[v.size()-1]);
+		prg->s->pc = prev;
+		int end_block = as_label_inline(prg, v[v.size()-1]);
+		while (prg->s->pc != end_block) {
+			interpret(prg, 1);
+		}
 	}
 
 	return true;
