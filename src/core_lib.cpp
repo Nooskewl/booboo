@@ -1960,10 +1960,11 @@ double exprfunc_greater(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	double b = as_number_inline(prg, v[0]);
+	double n = as_number_inline(prg, v[0]);
+	double b = n;
 
 	for (size_t i = 1; i < v.size(); i++) {
-		b = b > as_number_inline(prg, v[i]);
+		b = b && n > as_number_inline(prg, v[i]);
 	}
 
 	return b;
@@ -1973,10 +1974,11 @@ double exprfunc_less(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	double b = as_number_inline(prg, v[0]);
+	double n = as_number_inline(prg, v[0]);
+	bool b = n;
 
 	for (size_t i = 1; i < v.size(); i++) {
-		b = b < as_number_inline(prg, v[i]);
+		b = b && n < as_number_inline(prg, v[i]);
 	}
 
 	return b;
@@ -1989,7 +1991,7 @@ double exprfunc_greaterequal(Program *prg, std::vector<Token> &v)
 	double b = as_number_inline(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		b = b >= as_number_inline(prg, v[i]);
+		b = b && b >= as_number_inline(prg, v[i]);
 	}
 
 	return b;
@@ -2002,7 +2004,7 @@ double exprfunc_lessequal(Program *prg, std::vector<Token> &v)
 	double b = as_number_inline(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		b = b <= as_number_inline(prg, v[i]);
+		b = b && b <= as_number_inline(prg, v[i]);
 	}
 
 	return b;
@@ -2015,7 +2017,7 @@ double exprfunc_equal(Program *prg, std::vector<Token> &v)
 	double b = as_number_inline(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		b = b == as_number_inline(prg, v[i]);
+		b = b && b == as_number_inline(prg, v[i]);
 	}
 
 	return b;
@@ -2028,7 +2030,7 @@ double exprfunc_notequal(Program *prg, std::vector<Token> &v)
 	double b = as_number_inline(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		b = b != as_number_inline(prg, v[i]);
+		b = b && b != as_number_inline(prg, v[i]);
 	}
 
 	return b;
