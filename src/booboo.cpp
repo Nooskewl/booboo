@@ -1591,6 +1591,69 @@ double exprfunc_modulus(Program *prg, std::vector<Token> &v)
 	return (int)as_number_inline(prg, v[0]) % (int)as_number_inline(prg, v[1]);
 }
 
+double exprfunc_and(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	return as_number_inline(prg, v[0]) && as_number_inline(prg, v[1]);
+}
+
+double exprfunc_or(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	return as_number_inline(prg, v[0]) || as_number_inline(prg, v[1]);
+}
+
+double exprfunc_xor(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	return (int)as_number_inline(prg, v[0]) ^ (int)as_number_inline(prg, v[1]);
+}
+
+double exprfunc_greater(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	return as_number_inline(prg, v[0]) > as_number_inline(prg, v[1]);
+}
+
+double exprfunc_less(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	return as_number_inline(prg, v[0]) < as_number_inline(prg, v[1]);
+}
+
+double exprfunc_greaterequal(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	return as_number_inline(prg, v[0]) >= as_number_inline(prg, v[1]);
+}
+
+double exprfunc_lessequal(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	return as_number_inline(prg, v[0]) <= as_number_inline(prg, v[1]);
+}
+
+double exprfunc_equal(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	return as_number_inline(prg, v[0]) == as_number_inline(prg, v[1]);
+}
+
+double exprfunc_notequal(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	return as_number_inline(prg, v[0]) != as_number_inline(prg, v[1]);
+}
+
 static void init_expression_handlers()
 {
 	add_expression_handler("+", exprfunc_add);
@@ -1598,6 +1661,15 @@ static void init_expression_handlers()
 	add_expression_handler("*", exprfunc_multiply);
 	add_expression_handler("/", exprfunc_divide);
 	add_expression_handler("%", exprfunc_modulus);
+	add_expression_handler("&&", exprfunc_and);
+	add_expression_handler("||", exprfunc_or);
+	add_expression_handler("^", exprfunc_xor);
+	add_expression_handler(">", exprfunc_greater);
+	add_expression_handler("<", exprfunc_less);
+	add_expression_handler(">=", exprfunc_greaterequal);
+	add_expression_handler("<=", exprfunc_lessequal);
+	add_expression_handler("==", exprfunc_equal);
+	add_expression_handler("!=", exprfunc_notequal);
 }
 
 void start()

@@ -68,7 +68,7 @@ typeof
 ()
 	evaluates to a number and can be used anywhere you use a number
 	e.g. (+ x (* y (* z w 2))) in C would be x+(y*(z*w*2))
-	Supported operators are: + - * / %
+	Supported operators are: + - * / % && || ^ > < >= <= == !=
 	BooBoo supports adding these operators as well as regular
 	functions
 
@@ -86,6 +86,8 @@ goto
 ?
 	Comparison
 	e.g. ? x 1
+	You can also evaluate an expression
+	? (&& (> a b) (< x y)) je true jne false
 
 je
 	Jumps like this one are based on the last comparison. If it was equal, this
