@@ -121,8 +121,9 @@ call_result
 for
 	A for loop
 	e.g. for i n end_label
-	will increment i until it reaches n and loop everything between the for
-	and end_label n times.
+	will increment i until it reaches n and loop everything between the
+	for and end_label, e.g. if i is 0 and n is 3 the loop will be run
+	for i=0, 1 and 2.
 
 -- Arithmetic ----------------------------------------------------------------
 
