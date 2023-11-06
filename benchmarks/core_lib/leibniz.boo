@@ -4,7 +4,7 @@ string s
 file_read f s
 file_close f
 number rounds
-= rounds s
+= rounds (+ 3 (* s 2))
 
 number x
 = x 1
@@ -13,12 +13,9 @@ number pi
 number i
 = i 3
 
-number l
-= l 0
-for l rounds loop_end
+for i rounds 2 loop_end
 neg x
 + pi (/ x i)
-+ i 2
 :loop_end
 
 * pi 4
