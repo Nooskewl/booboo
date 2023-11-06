@@ -1943,19 +1943,6 @@ double exprfunc_or(Program *prg, std::vector<Token> &v)
 	return b;
 }
 
-double exprfunc_xor(Program *prg, std::vector<Token> &v)
-{
-	COUNT_ARGS(2)
-
-	double b = as_number_inline(prg, v[0]);
-
-	for (size_t i = 1; i < v.size(); i++) {
-		b = (int)b ^ (int)as_number_inline(prg, v[i]);
-	}
-
-	return b;
-}
-
 double exprfunc_greater(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -2045,7 +2032,6 @@ void start_lib_core()
 	add_expression_handler("%", exprfunc_modulus);
 	add_expression_handler("&&", exprfunc_and);
 	add_expression_handler("||", exprfunc_or);
-	add_expression_handler("^", exprfunc_xor);
 	add_expression_handler(">", exprfunc_greater);
 	add_expression_handler("<", exprfunc_less);
 	add_expression_handler(">=", exprfunc_greaterequal);
