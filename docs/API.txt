@@ -69,6 +69,8 @@ typeof
 	evaluates to a number and can be used anywhere you use a number
 	e.g. (+ x (* y (* z w 2))) in C would be x+(y*(z*w*2))
 	Supported operators are: + - * / %
+	BooBoo supports adding these operators as well as regular
+	functions
 
 []
 	Vector/map indexing operator
