@@ -1836,8 +1836,199 @@ bool filefunc_print(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+double exprfunc_add(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	double n = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n += as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_subtract(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	double n = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n -= as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_multiply(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	double n = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n *= as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_divide(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	double n = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n /= as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_modulus(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	return (int)as_number_inline(prg, v[0]) % (int)as_number_inline(prg, v[1]);
+}
+
+double exprfunc_and(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	double b = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		b = b && as_number_inline(prg, v[i]);
+	}
+
+	return b;
+}
+
+double exprfunc_or(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	double b = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		b = b || as_number_inline(prg, v[i]);
+	}
+
+	return b;
+}
+
+double exprfunc_xor(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	double b = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		b = (int)b ^ (int)as_number_inline(prg, v[i]);
+	}
+
+	return b;
+}
+
+double exprfunc_greater(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	double b = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		b = b > as_number_inline(prg, v[i]);
+	}
+
+	return b;
+}
+
+double exprfunc_less(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	double b = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		b = b < as_number_inline(prg, v[i]);
+	}
+
+	return b;
+}
+
+double exprfunc_greaterequal(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	double b = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		b = b >= as_number_inline(prg, v[i]);
+	}
+
+	return b;
+}
+
+double exprfunc_lessequal(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	double b = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		b = b <= as_number_inline(prg, v[i]);
+	}
+
+	return b;
+}
+
+double exprfunc_equal(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	double b = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		b = b == as_number_inline(prg, v[i]);
+	}
+
+	return b;
+}
+
+double exprfunc_notequal(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	double b = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		b = b != as_number_inline(prg, v[i]);
+	}
+
+	return b;
+}
+
 void start_lib_core()
 {
+	add_expression_handler("+", exprfunc_add);
+	add_expression_handler("-", exprfunc_subtract);
+	add_expression_handler("*", exprfunc_multiply);
+	add_expression_handler("/", exprfunc_divide);
+	add_expression_handler("%", exprfunc_modulus);
+	add_expression_handler("&&", exprfunc_and);
+	add_expression_handler("||", exprfunc_or);
+	add_expression_handler("^", exprfunc_xor);
+	add_expression_handler(">", exprfunc_greater);
+	add_expression_handler("<", exprfunc_less);
+	add_expression_handler(">=", exprfunc_greaterequal);
+	add_expression_handler("<=", exprfunc_lessequal);
+	add_expression_handler("==", exprfunc_equal);
+	add_expression_handler("!=", exprfunc_notequal);
+
 	add_instruction("reset", breaker_reset);
 	add_instruction("exit", breaker_exit);
 	add_instruction("return", breaker_return);
