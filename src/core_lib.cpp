@@ -118,8 +118,8 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
-	int loops = as_number_inline(prg, v[1]);
-	int end = as_label_inline(prg, v[2]);
+	int end = as_number_inline(prg, v[1]);
+	int end_label = as_label_inline(prg, v[2]);
 
 	prg->s->pc++;
 
@@ -129,9 +129,9 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 		if (interpret(prg, 1) == false) {
 			return false;
 		}
-		if (prg->s->pc == end) {
+		if (prg->s->pc == end_label) {
 			count.n++;
-			if (count.n == loops) {
+			if (count.n >= end) {
 				break;
 			}
 			prg->s->pc = start;
