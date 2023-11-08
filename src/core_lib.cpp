@@ -108,7 +108,7 @@ bool corefunc_address(Program *prg, std::vector<Token> &v)
 
 bool corefunc_for(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(4)
+	COUNT_ARGS(5)
 
 	Variable &count = as_variable_inline(prg, v[0]);
 	if (count.type == Variable::POINTER) {
@@ -118,9 +118,10 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
-	int end = as_number_inline(prg, v[1]);
-	int increment = as_number_inline(prg, v[2]);
-	int end_label = as_label_inline(prg, v[3]);
+	count.n = as_number_inline(prg, v[1]);
+	int end = as_number_inline(prg, v[2]);
+	int increment = as_number_inline(prg, v[3]);
+	int end_label = as_label_inline(prg, v[4]);
 
 	prg->s->pc++;
 

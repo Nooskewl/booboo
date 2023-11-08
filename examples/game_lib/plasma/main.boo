@@ -94,12 +94,10 @@ floor H
 ; generate the initial randomly-coloured TSZxTSZ blocks
 vector frame
 number y
-= y 0
-for y H 1 next_y
+for y 0 H 1 next_y
 vector row
 number x
-= x 0
-for x W 1 next_x
+for x 0 W 1 next_x
 number r
 rand r 0 255
 vector_add row r
@@ -135,22 +133,18 @@ function divide frame w h
 	vector v
 	vector empty_row
 	number i
-	= i 0
-	for i new_w 1 next_fill
+	for i 0 new_w 1 next_fill
 	vector_add empty_row 0
 :next_fill
 
-	= i 0
-	for i new_h 1 next_row_fill
+	for i 0 new_h 1 next_row_fill
 	vector_add v empty_row
 :next_row_fill
 
 	number y
 	number x
-	= y 0
-	for y new_h 1 next_y
-	= x 0
-	for x new_w 1 next_x
+	for y 0 new_h 1 next_y
+	for x 0 new_w 1 next_x
 	number r
 	= r 0
 	number g
@@ -161,17 +155,11 @@ function divide frame w h
 	= valid 0
 	number xx
 	number yy
-	number xx2
-	number yy2
-	= yy (- y 1)
-	= yy2 (+ yy 3)
-	for yy yy2 1 next_pixel_y
-	= xx (- x 1)
-	= xx2 (+ xx 3)
+	for yy (- y 1) (+ yy 3) 1 next_pixel_y
 	number tmpy
 	= tmpy (/ yy 2)
 	floor tmpy
-	for xx xx2 1 next_pixel_x
+	for xx (- x 1) (+ xx 3) 1 next_pixel_x
 	+ valid 1
 	number tmpx
 	= tmpx (/ xx 2)

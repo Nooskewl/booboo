@@ -2,8 +2,7 @@ number x
 = x 0
 
 number i
-= i 0
-for i 100000 1 next_loop
+for i 0 100000 1 next_loop
 call draw
 call run
 :next_loop
@@ -22,9 +21,8 @@ function draw_at x
 function draw
 {
 	number xx
-	= xx 0
 
-	for xx 640 2 loop
+	for xx 0 640 2 loop
 	call draw_at xx
 :loop
 

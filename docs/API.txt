@@ -132,7 +132,7 @@ call_result
 
 for
 	A for loop
-	e.g. for start end increment end_label
+	e.g. for i start end increment end_label
 	Loops until start >= end
 
 -- Arithmetic ----------------------------------------------------------------

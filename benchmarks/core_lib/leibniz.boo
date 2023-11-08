@@ -11,9 +11,8 @@ number x
 number pi
 = pi 1
 number i
-= i 3
 
-for i rounds 2 loop_end
+for i 3 rounds 2 loop_end
 neg x
 + pi (/ x i)
 :loop_end
