@@ -1267,6 +1267,14 @@ static bool vectorfunc_add(Program *prg, std::vector<Token> &v)
 		}
 		else {
 			var = as_variable_inline(prg, v[1]);
+			if (var.type == Variable::FISH) {
+				var = go_fish(prg, var.f);
+			}
+			else if (var.type == Variable::EXPRESSION) {
+				var.n = evaluate_expression(prg, var.e);
+				var.type = Variable::NUMBER;
+				var.name = "-calculated-";
+			}
 		}
 	}
 	else {
@@ -1495,6 +1503,14 @@ static bool mapfunc_set(Program *prg, std::vector<Token> &v)
 		}
 		else {
 			var = as_variable_inline(prg, v[val_index]);
+			if (var.type == Variable::FISH) {
+				var = go_fish(prg, var.f);
+			}
+			else if (var.type == Variable::EXPRESSION) {
+				var.n = evaluate_expression(prg, var.e);
+				var.type = Variable::NUMBER;
+				var.name = "-calculated-";
+			}
 		}
 	}
 	else {
