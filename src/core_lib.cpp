@@ -123,6 +123,11 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 	int increment = as_number_inline(prg, v[3]);
 	int end_label = as_label_inline(prg, v[4]);
 
+	if (count.n >= end) {
+		prg->s->pc = end_label;
+		return true;
+	}
+
 	prg->s->pc++;
 
 	int start = prg->s->pc;
