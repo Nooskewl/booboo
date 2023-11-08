@@ -6,18 +6,11 @@
 #include "booboo/booboo.h"
 #include "booboo/internal.h"
 
-namespace booboo {
-
-std::map<std::string, int> library_map;
-std::vector<library_func> library;
-std::map<char, token_func> token_map;
-std::map<std::string, int> expression_map;
-std::vector<expression_func> expression_handlers;
-
-std::string reset_game_name;
-std::string main_program_name;
-int return_code;
-bool quit;
+static std::map<std::string, int> library_map;
+static std::vector<booboo::library_func> library;
+static std::map<char, booboo::token_func> token_map;
+static std::map<std::string, int> expression_map;
+static std::vector<booboo::expression_func> expression_handlers;
 
 // First off maybe 10 utility functions taken from Nooskewl Shim
 
@@ -31,19 +24,19 @@ static std::string load_text_from_filesystem(std::string filename)
 		_sz = st.st_size;
 	}
 	else {
-		throw Error("Error getting file size: " + filename);
+		throw booboo::Error("booboo::Error getting file size: " + filename);
 	}
 
 	FILE *file = fopen(filename.c_str(), "rb");
 
 	if (file == nullptr) {
-		throw Error("File not found: " + filename);
+		throw booboo::Error("File not found: " + filename);
 	}
 
 	char *buf = new char[_sz+1];
 
 	if (fread(buf, _sz, 1, file) != 1) {
-		throw Error("File load error: " + filename);
+		throw booboo::Error("File load error: " + filename);
 	}
 
 	fclose(file);
@@ -146,7 +139,7 @@ static std::string unescape_string(std::string s)
 	return ret;
 }
 
-static void skip_whitespace(Program *prg)
+static void skip_whitespace(booboo::Program *prg)
 {
 	while (prg->s->p < prg->s->code.length() && isspace(prg->s->code[prg->s->p])) {
 		if (prg->s->code[prg->s->p] == '\n') {
@@ -173,15 +166,22 @@ static std::string remove_quotes(std::string s)
 	return s.substr(start, count);
 }
 
+namespace booboo {
+
+std::string reset_game_name;
+std::string main_program_name;
+int return_code;
+bool quit;
+
 // And this all makes BooBoo work
 
 File_Info *file_info(Program *prg)
 {
-	File_Info *info = (File_Info *)booboo::get_black_box(prg, "com.b1stable.booboo.files");
+	File_Info *info = (File_Info *)get_black_box(prg, "com.b1stable.booboo.files");
 	if (info == nullptr) {
 		info = new File_Info;
 		info->file_id = 0;
-		booboo::set_black_box(prg, "com.b1stable.booboo.files", info);
+		set_black_box(prg, "com.b1stable.booboo.files", info);
 	}
 	return info;
 }
@@ -235,13 +235,13 @@ std::string get_error_info(Program *prg)
 	return get_file_name(prg) + ":" + itos(get_line_num(prg));
 }
 
-static std::string tokenfunc_label(booboo::Program *prg)
+static std::string tokenfunc_label(Program *prg)
 {
 	prg->s->p++;
 	return ":";
 }
 
-static std::string tokenfunc_string(booboo::Program *prg)
+static std::string tokenfunc_string(Program *prg)
 {
 	char s[2];
 	s[1] = 0;
@@ -269,31 +269,31 @@ static std::string tokenfunc_string(booboo::Program *prg)
 	return tok;
 }
 
-static std::string tokenfunc_openbrace(booboo::Program *prg)
+static std::string tokenfunc_openbrace(Program *prg)
 {
 	prg->s->p++;
 	return "{";
 }
 
-static std::string tokenfunc_closebrace(booboo::Program *prg)
+static std::string tokenfunc_closebrace(Program *prg)
 {
 	prg->s->p++;
 	return "}";
 }
 
-static std::string tokenfunc_comment(booboo::Program *prg)
+static std::string tokenfunc_comment(Program *prg)
 {
 	prg->s->p++;
 	return ";";
 }
 
-static std::string tokenfunc_add(booboo::Program *prg)
+static std::string tokenfunc_add(Program *prg)
 {
 	prg->s->p++;
 	return "+";
 }
 
-static std::string tokenfunc_subtract(booboo::Program *prg)
+static std::string tokenfunc_subtract(Program *prg)
 {
 	char s[2];
 	s[1] = 0;
@@ -313,37 +313,37 @@ static std::string tokenfunc_subtract(booboo::Program *prg)
 	}
 }
 
-static std::string tokenfunc_equals(booboo::Program *prg)
+static std::string tokenfunc_equals(Program *prg)
 {
 	prg->s->p++;
 	return "=";
 }
 
-static std::string tokenfunc_compare(booboo::Program *prg)
+static std::string tokenfunc_compare(Program *prg)
 {
 	prg->s->p++;
 	return "?";
 }
 
-static std::string tokenfunc_multiply(booboo::Program *prg)
+static std::string tokenfunc_multiply(Program *prg)
 {
 	prg->s->p++;
 	return "*";
 }
 
-static std::string tokenfunc_divide(booboo::Program *prg)
+static std::string tokenfunc_divide(Program *prg)
 {
 	prg->s->p++;
 	return "/";
 }
 
-static std::string tokenfunc_modulus(booboo::Program *prg)
+static std::string tokenfunc_modulus(Program *prg)
 {
 	prg->s->p++;
 	return "%";
 }
 
-static std::string tokenfunc_expression(booboo::Program *prg)
+static std::string tokenfunc_expression(Program *prg)
 {
 	std::string e;
 	int open = 0;
@@ -371,7 +371,7 @@ static std::string tokenfunc_expression(booboo::Program *prg)
 	return e;
 }
 
-static std::string tokenfunc_fish(booboo::Program *prg)
+static std::string tokenfunc_fish(Program *prg)
 {
 	std::string e;
 	int open = 0;
@@ -1488,7 +1488,7 @@ void destroy_program(Program *prg)
 	}
 	delete file_i;
 
-	booboo::set_black_box(prg, "com.b1stable.booboo.files", nullptr);
+	set_black_box(prg, "com.b1stable.booboo.files", nullptr);
 	for (size_t i = 0; i < prg->functions.size(); i++) {
 		delete prg->functions[i].s;
 	}
