@@ -272,28 +272,22 @@ function draw
 	vector_size row w
 
 	number y
-	= y 0
-:next_y
 	number x
-	= x 0
+	for y 0 h 1 next_y
+		for x 0 w 1 next_x
+			number pal_index
+			vector_get frame pal_index y x
+			+ pal_index ticks
+			% pal_index 256
+			number r
+			number g
+			number b
+			vector_get palette r pal_index 0
+			vector_get palette g pal_index 1
+			vector_get palette b pal_index 2
+			filled_rectangle r g b 255 r g b 255 r g b 255 r g b 255 (* x xsz) (* y ysz) xsz ysz
 :next_x
-	number pal_index
-	vector_get frame pal_index y x
-	+ pal_index ticks
-	% pal_index 256
-	number r
-	number g
-	number b
-	vector_get palette r pal_index 0
-	vector_get palette g pal_index 1
-	vector_get palette b pal_index 2
-	filled_rectangle r g b 255 r g b 255 r g b 255 r g b 255 (* x xsz) (* y ysz) xsz ysz
-	+ x 1
-	? x w
-	jl next_x
-	+ y 1
-	? y h
-	jl next_y
+:next_y
 
 	end_primitives
 }
