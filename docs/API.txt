@@ -75,7 +75,9 @@ typeof
 []
 	Vector/map indexing operator
 	e.g. = x [v [m "key"]] in C++ would be x = v[m["key"]]
-	Can be used anywhere a variable is expected
+	Can be used anywhere a variable is expected.
+	You can use multiple indexes but the first parameter can't
+	be another fish, e.g. [v 3 2 1 0] is like v[3][2][1][0].
 
 -- Flow Control --------------------------------------------------------------
 
