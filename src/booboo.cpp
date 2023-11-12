@@ -758,6 +758,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, int &var_i, int &expression_i, int &fish_i, Pass pass)
 {
 	int p = 0;
+	Variable::Fish e;
 
 	while (isspace(expr[p]) && p < (int)expr.length()) {
 		p++;
@@ -766,22 +767,62 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid fish at " + get_error_info(func));
 	}
 	p++; // skip [
-	std::string name;
-	while (!isspace(expr[p]) && p < (int)expr.length()) {
-		char buf[2];
-		buf[0] = expr[p];
-		buf[1] = 0;
-		name += buf;
+	while (isspace(expr[p]) && p < (int)expr.length()) {
 		p++;
 	}
-	if (pass == PASS2) {
-		if (prg->variables_map.find(name) == prg->variables_map.end()) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Unknown variable at " + get_error_info(func));
+	if (expr[p] == '[') {
+		int start = p;
+		int open = 1;
+		p++;
+		while (p < expr.length()) {
+			if (expr[p] == '[') {
+				open++;
+			}
+			else if (expr[p] == ']') {
+				open--;
+				if (open == 0) {
+					p++;
+					break;
+				}
+			}
+			p++;
+		}
+		std::string s = expr.substr(start, p-start);
+		Variable::Fish f = parse_fish(prg, func, s, var_i, expression_i, fish_i, pass);
+
+		Variable v;
+		v.name = "__fish" + itos(fish_i++);
+		v.type = Variable::FISH;
+		v.f = f;
+
+		e.c_i = var_i;
+
+		if (pass == PASS1) {
+			prg->variables.push_back(v);
+			var_i++;
+		}
+		else if (pass == PASS2) {
+			prg->variables_map[v.name] = var_i;
+			var_i++;
 		}
 	}
+	else {
+		std::string name;
+		while (!isspace(expr[p]) && p < (int)expr.length()) {
+			char buf[2];
+			buf[0] = expr[p];
+			buf[1] = 0;
+			name += buf;
+			p++;
+		}
+		if (pass == PASS2) {
+			if (prg->variables_map.find(name) == prg->variables_map.end()) {
+				throw Error(std::string(__FUNCTION__) + ": " + "Unknown variable at " + get_error_info(func));
+			}
+		}
 
-	Variable::Fish e;
-	e.c_i = prg->variables_map[name];
+		e.c_i = prg->variables_map[name];
+	}
 
 	bool done = false;
 
@@ -1708,10 +1749,15 @@ double evaluate_expression(Program *prg, Variable::Expression &e)
 	return expression_handlers[e.i](prg, e.v);
 }
 
-Variable &go_fish(Program *prg, Variable::Fish &f)
+Variable &go_fish(Program *prg, Variable::Fish &f, bool return_container)
 {
 	Variable *v = &prg->variables[f.c_i];
 	int type = v->type;
+
+	if (type == Variable::FISH) {
+		*v = go_fish(prg, v->f, true);
+		type = v->type;
+	}
 
 	int index = 0;
 	std::string key;
@@ -1731,6 +1777,10 @@ Variable &go_fish(Program *prg, Variable::Fish &f)
 				v = &v->m[key];
 			}
 		}
+	}
+
+	if (return_container == true) {
+		return *v;
 	}
 
 	if (type == Variable::VECTOR) {
