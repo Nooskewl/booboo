@@ -66,7 +66,7 @@ File_Info *file_info(Program *prg);
 std::string itos(int i);
 
 double evaluate_expression(Program *prg, Variable::Expression &e);
-Variable &go_fish(Program *prg, Variable::Fish &f, bool return_container = false);
+Variable &go_fish(Program *prg, Variable::Fish &f);
 
 // This automatically gets called when you call booboo::start
 void start_lib_core();

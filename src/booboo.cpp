@@ -787,24 +787,22 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			}
 			p++;
 		}
-		std::string s = expr.substr(start, p-start);
-		Variable::Fish f = parse_fish(prg, func, s, var_i, expression_i, fish_i, pass);
 
 		Variable v;
 		v.name = "__fish" + itos(fish_i++);
 		v.type = Variable::FISH;
-		v.f = f;
-
-		e.c_i = var_i;
 
 		if (pass == PASS1) {
 			prg->variables.push_back(v);
-			var_i++;
 		}
 		else if (pass == PASS2) {
 			prg->variables_map[v.name] = var_i;
-			var_i++;
 		}
+		e.c_i = var_i;
+		var_i++;
+
+		std::string s = expr.substr(start, p-start);
+		prg->variables[e.c_i].f = parse_fish(prg, func, s, var_i, expression_i, fish_i, pass);
 	}
 	else {
 		std::string name;
@@ -819,9 +817,8 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			if (prg->variables_map.find(name) == prg->variables_map.end()) {
 				throw Error(std::string(__FUNCTION__) + ": " + "Unknown variable at " + get_error_info(func));
 			}
+			e.c_i = prg->variables_map[name];
 		}
-
-		e.c_i = prg->variables_map[name];
 	}
 
 	bool done = false;
@@ -1749,13 +1746,13 @@ double evaluate_expression(Program *prg, Variable::Expression &e)
 	return expression_handlers[e.i](prg, e.v);
 }
 
-Variable &go_fish(Program *prg, Variable::Fish &f, bool return_container)
+Variable &go_fish(Program *prg, Variable::Fish &f)
 {
 	Variable *v = &prg->variables[f.c_i];
 	int type = v->type;
 
-	if (type == Variable::FISH) {
-		*v = go_fish(prg, v->f, true);
+	while (type == Variable::FISH) {
+		v = &go_fish(prg, v->f);
 		type = v->type;
 	}
 
@@ -1777,10 +1774,6 @@ Variable &go_fish(Program *prg, Variable::Fish &f, bool return_container)
 				v = &v->m[key];
 			}
 		}
-	}
-
-	if (return_container == true) {
-		return *v;
 	}
 
 	if (type == Variable::VECTOR) {
