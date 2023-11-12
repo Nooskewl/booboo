@@ -27,13 +27,11 @@ function draw
 	number r
 	string c
 	rand r 0 1
-	? r 0
-	jne one
+	if (== r 0) c_zero c_one
 	= c "0"
-	goto draw_it
-:one
+:c_zero
 	= c "1"
-:draw_it
+:c_one
 	font_draw f 32 32 32 255 c dx dy
 :next_x
 :next_y
