@@ -9,33 +9,21 @@ font_width f fw "0"
 
 function draw
 {
-	clear 0 0 0
-
 	number cols
 	number rows
 
-	= cols 640
-	/ cols fw
-
-	= rows 360
-	/ rows fh
-
-	+ cols 1
-	+ rows 1
+	= cols (+ 1 (/ 640 fw))
+	= rows (+ 1 (/ 360 fh))
 
 	number x
 	number y
 
-	= y 0
-:next_y
-	= x 0
-:next_x
+	for y 0 rows 1 next_y
+	for x 0 cols 1 next_x
 	number dx
 	number dy
-	= dx x
-	* dx fw
-	= dy y
-	* dy fh
+	= dx (* x fw)
+	= dy (* y fh)
 	number r
 	string c
 	rand r 0 1
@@ -47,10 +35,6 @@ function draw
 	= c "1"
 :draw_it
 	font_draw f 32 32 32 255 c dx dy
-	+ x 1
-	? x cols
-	jl next_x
-	+ y 1
-	? y rows
-	jl next_y
+:next_x
+:next_y
 }
