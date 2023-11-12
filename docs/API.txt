@@ -131,11 +131,11 @@ call_result
 	Call a function that returns a value
 	e.g. call_result result my_func param1 param2
 
--- Loops ---------------------------------------------------------------------
-
 for
 	A for loop
 	e.g. for i start end increment end_label
+	; you loop code here
+	:end_label
 	Loops until start >= end
 
 -- Arithmetic ----------------------------------------------------------------
