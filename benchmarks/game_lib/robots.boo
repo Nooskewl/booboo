@@ -9,49 +9,38 @@ image_size grass img_w img_h
 function draw
 {
 	number w
-	= w 640
-	/ w img_w
+	= w (/ 640 img_w)
 	number h
-	= h 360
-	/ h img_h
+	= h (/ 360 img_h)
+
+	number x
+	number y
+	number xx
+	number yy
 
 	image_start grass
 
-	number y
-	= y 0
-
-:loop_y
-	number x
-	= x 0
+	for y 0 h 1 loop_y
+		for x 0 w 1 loop_x
+			= xx x
+			* xx img_w
+			= yy y
+			* yy img_h
+			image_draw grass 255 255 255 255 xx yy 0 0
 :loop_x
-	number xx
-	= xx x
-	* xx img_w
-	number yy
-	= yy y
-	* yy img_h
-	image_draw grass 255 255 255 255 xx yy 0 0
-	+ x 1
-	? x w
-	jl loop_x
-	+ y 1
-	? y h
-	jl loop_y
+:loop_y
 
 	image_end grass
 
-	= x 0
-	- w 1
-	- h 1
+	image_start robot
+
+	for x 0 17 1 loop_robot
+		rand xx 0 w
+		* xx img_w
+		rand yy 0 h
+		* yy img_h
+		image_draw robot 255 255 255 255 xx yy 0 0
 :loop_robot
-	number xx
-	rand xx 0 w
-	* xx img_w
-	number yy
-	rand yy 0 h
-	* yy img_h
-	image_draw robot 255 255 255 255 xx yy 0 0
-	+ x 1
-	? x 17
-	jl loop_robot
+
+	image_end robot
 }
