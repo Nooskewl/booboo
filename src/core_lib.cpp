@@ -175,7 +175,7 @@ bool corefunc_if(Program *prg, std::vector<Token> &v)
 		prev = as_label_inline(prg, v[i+1]);
 	}
 
-	if (v.size() % 2 == 1) {
+	if (v.size() <= 2 || v.size() % 2 == 1) {
 		prg->s->pc = prev;
 		int end_block = as_label_inline(prg, v[v.size()-1]);
 		while (prg->s->pc != end_block) {
