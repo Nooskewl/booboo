@@ -118,25 +118,25 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 	unsigned int end_label = as_label_inline(prg, v[4]);
 
 	if (count.n >= end) {
-		prg->s->pc = end_label;
+		prg->s->pc = end_label+1;
 		return true;
 	}
 
 	prg->s->pc++;
 
-	int start = prg->s->pc;
+	unsigned int start = prg->s->pc;
 
 	while (true) {
-		unsigned int bak = prg->s->pc;
 		if (interpret(prg, 1) == false) {
 			return false;
 		}
-		if (prg->s->pc != bak+1) {
+		if (prg->s->pc < start || prg->s->pc > end_label) {
 			break;
 		}
 		if (prg->s->pc == end_label) {
 			count.n += increment;
 			if (count.n >= end) {
+				prg->s->pc++;
 				break;
 			}
 			prg->s->pc = start;

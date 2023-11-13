@@ -1051,6 +1051,11 @@ func_top:
 				else if (tok == ":") {
 					std::string tok2 = token(prg, tt);
 
+					Variable v;
+					v.name = tok2;
+					v.type = Variable::LABEL;
+					v.n = func.s->program.size();
+
 					Statement s;
 					s.method = library_map[tok];
 					func.s->program.push_back(s);
@@ -1062,16 +1067,16 @@ func_top:
 					t.token = tok2;
 					func.s->program[func.s->program.size()-1].data.push_back(t);
 
-					Variable v;
-					v.name = tok2;
-					v.type = Variable::LABEL;
-					v.n = func.s->program.size();
-
 					if (pass == PASS1) {
 						prg->locals[func_index][tok2] = var_i;
-						prg->variables.push_back(v);
 					}
-					prg->variables_map[tok2] = var_i;
+					prg->variables.push_back(v);
+					if (pass == PASS1 && prg->variables_map.find(tok2) != prg->variables_map.end()) {
+						//throw Error(std::string(__FUNCTION__) + ": " + "Duplicate label at " + get_error_info(&func));
+					}
+					else if (pass == PASS2) {
+						prg->variables_map[tok2] = prg->locals[func_index][tok2];
+					}
 					var_i++;
 				}
 				else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map" || tok == "pointer") {
@@ -1274,6 +1279,11 @@ func_top:
 		else if (tok == ":") {
 			std::string tok2 = token(prg, tt);
 
+			Variable v;
+			v.name = tok2;
+			v.type = Variable::LABEL;
+			v.n = prg->s->program.size();
+
 			Statement s;
 			s.method = library_map[tok];
 			prg->s->program.push_back(s);
@@ -1285,12 +1295,10 @@ func_top:
 			t.token = tok2;
 			prg->s->program[prg->s->program.size()-1].data.push_back(t);
 
-			Variable v;
-			v.name = tok2;
-			v.type = Variable::LABEL;
-			v.n = prg->s->program.size();
-
 			prg->variables.push_back(v);
+			if (pass == PASS1 && prg->variables_map.find(tok2) != prg->variables_map.end()) {
+				//throw Error(std::string(__FUNCTION__) + ": " + "Duplicate label at " + get_error_info(prg));
+			}
 			prg->variables_map[tok2] = var_i;
 			var_i++;
 		}
