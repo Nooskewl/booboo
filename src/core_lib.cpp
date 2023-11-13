@@ -163,22 +163,31 @@ bool corefunc_if(Program *prg, std::vector<Token> &v)
 			else {
 				prg->s->pc = prev;
 			}
+			unsigned int start = prg->s->pc;
 			unsigned int end_block = as_label_inline(prg, v[i+1]);
 			while (prg->s->pc != end_block) {
 				interpret(prg, 1);
+				if (prg->s->pc < start || prg->s->pc > end_block) {
+					return true;
+				}
 			}
-			prg->s->pc = as_label_inline(prg, v[v.size()-1]);
+			prg->s->pc = as_label_inline(prg, v[v.size()-1])+1;
 			return true;
 		}
-		prev = as_label_inline(prg, v[i+1]);
+		prev = as_label_inline(prg, v[i+1])+1;
 	}
 
 	if (v.size() <= 2 || v.size() % 2 == 1) {
 		prg->s->pc = prev;
+		unsigned int start = prg->s->pc;
 		unsigned int end_block = as_label_inline(prg, v[v.size()-1]);
 		while (prg->s->pc != end_block) {
 			interpret(prg, 1);
+			if (prg->s->pc < start || prg->s->pc > end_block) {
+				return true;
+			}
 		}
+		prg->s->pc++;
 	}
 
 	return true;
@@ -325,7 +334,7 @@ bool corefunc_goto(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	prg->s->pc = as_label_inline(prg, v[0]);
+	prg->s->pc = as_label_inline(prg, v[0])+1;
 
 	return true;
 }
@@ -407,7 +416,7 @@ bool corefunc_je(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	if (prg->compare_flag == 0) {
-		prg->s->pc = as_label_inline(prg, v[0]);
+		prg->s->pc = as_label_inline(prg, v[0])+1;
 	}
 
 	return true;
@@ -418,7 +427,7 @@ bool corefunc_jne(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	if (prg->compare_flag != 0) {
-		prg->s->pc = as_label_inline(prg, v[0]);
+		prg->s->pc = as_label_inline(prg, v[0])+1;
 	}
 
 	return true;
@@ -429,7 +438,7 @@ bool corefunc_jl(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	if (prg->compare_flag < 0) {
-		prg->s->pc = as_label_inline(prg, v[0]);
+		prg->s->pc = as_label_inline(prg, v[0])+1;
 	}
 
 	return true;
@@ -440,7 +449,7 @@ bool corefunc_jle(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	if (prg->compare_flag <= 0) {
-		prg->s->pc = as_label_inline(prg, v[0]);
+		prg->s->pc = as_label_inline(prg, v[0])+1;
 	}
 
 	return true;
@@ -451,7 +460,7 @@ bool corefunc_jg(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	if (prg->compare_flag > 0) {
-		prg->s->pc = as_label_inline(prg, v[0]);
+		prg->s->pc = as_label_inline(prg, v[0])+1;
 	}
 
 	return true;
@@ -462,7 +471,7 @@ bool corefunc_jge(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	if (prg->compare_flag >= 0) {
-		prg->s->pc = as_label_inline(prg, v[0]);
+		prg->s->pc = as_label_inline(prg, v[0])+1;
 	}
 
 	return true;
