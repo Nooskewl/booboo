@@ -774,7 +774,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 		int start = p;
 		int open = 1;
 		p++;
-		while (p < expr.length()) {
+		while (p < (int)expr.length()) {
 			if (expr[p] == '[') {
 				open++;
 			}
@@ -1050,17 +1050,29 @@ func_top:
 				}
 				else if (tok == ":") {
 					std::string tok2 = token(prg, tt);
+
+					Statement s;
+					s.method = library_map[tok];
+					func.s->program.push_back(s);
+
+					Token t;
+					t.type = Token::SYMBOL;
+					t.i = var_i;
+					t.s = tok2;
+					t.token = tok2;
+					func.s->program[func.s->program.size()-1].data.push_back(t);
+
 					Variable v;
 					v.name = tok2;
 					v.type = Variable::LABEL;
 					v.n = func.s->program.size();
+
 					if (pass == PASS1) {
-						prg->locals[func_index][tok2] = var_i++;
+						prg->locals[func_index][tok2] = var_i;
 						prg->variables.push_back(v);
 					}
-					else {
-						var_i++;
-					}
+					prg->variables_map[tok2] = var_i;
+					var_i++;
 				}
 				else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map" || tok == "pointer") {
 					Statement s;
@@ -1068,7 +1080,7 @@ func_top:
 					func.s->program.push_back(s);
 					if (pass == PASS2) {
 						//if (func.line_numbers.size() != 0) {
-							func.s->pc++;
+							//func.s->pc++;
 						//}
 						func.line_numbers.push_back(prg->s->line);
 					}
@@ -1187,7 +1199,7 @@ func_top:
 					func.s->program.push_back(s);
 					if (pass == PASS2) {
 						//if (func.line_numbers.size() != 0) {
-							func.s->pc++;
+							//func.s->pc++;
 						//}
 						func.line_numbers.push_back(prg->s->line);
 					}
@@ -1261,20 +1273,26 @@ func_top:
 		}
 		else if (tok == ":") {
 			std::string tok2 = token(prg, tt);
+
+			Statement s;
+			s.method = library_map[tok];
+			prg->s->program.push_back(s);
+
+			Token t;
+			t.type = Token::SYMBOL;
+			t.i = var_i;
+			t.s = tok2;
+			t.token = tok2;
+			prg->s->program[prg->s->program.size()-1].data.push_back(t);
+
 			Variable v;
 			v.name = tok2;
 			v.type = Variable::LABEL;
 			v.n = prg->s->program.size();
-			if (prg->variables_map.find(tok2) != prg->variables_map.end()) {
-				if (pass == PASS1) {
-					printf("duplicate label %s\n", tok2.c_str());
-				}
-			}
 
-			prg->variables_map[tok2] = var_i++;
-			if (pass == PASS1) {
-				prg->variables.push_back(v);
-			}
+			prg->variables.push_back(v);
+			prg->variables_map[tok2] = var_i;
+			var_i++;
 		}
 		else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map" || tok == "pointer") {
 			Statement s;
@@ -1282,7 +1300,7 @@ func_top:
 			prg->s->program.push_back(s);
 			if (pass == PASS2) {
 				//if (prg->line_numbers.size() != 0) {
-					prg->s->pc++;
+					//prg->s->pc++;
 				//}
 				prg->line_numbers.push_back(prg->s->line);
 			}
@@ -1387,7 +1405,7 @@ func_top:
 			prg->s->program.push_back(s);
 			if (pass == PASS2) {
 				//if (prg->line_numbers.size() != 0) {
-					prg->s->pc++;
+					//prg->s->pc++;
 				//}
 				prg->line_numbers.push_back(prg->s->line);
 			}

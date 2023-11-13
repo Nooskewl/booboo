@@ -84,12 +84,6 @@ bool corefunc_pointer(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_label(Program *prg, std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-	return true;
-}
-
 bool corefunc_address(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -121,7 +115,7 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 	count.n = as_number_inline(prg, v[1]);
 	int end = as_number_inline(prg, v[2]);
 	int increment = as_number_inline(prg, v[3]);
-	int end_label = as_label_inline(prg, v[4]);
+	unsigned int end_label = as_label_inline(prg, v[4]);
 
 	if (count.n >= end) {
 		prg->s->pc = end_label;
@@ -133,8 +127,12 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 	int start = prg->s->pc;
 
 	while (true) {
+		unsigned int bak = prg->s->pc;
 		if (interpret(prg, 1) == false) {
 			return false;
+		}
+		if (prg->s->pc != bak+1) {
+			break;
 		}
 		if (prg->s->pc == end_label) {
 			count.n += increment;
@@ -156,7 +154,7 @@ bool corefunc_if(Program *prg, std::vector<Token> &v)
 	end -= (end % 2);
 	int prev = -1;
 
-	for (size_t i = 0; i < end; i += 2) {
+	for (int i = 0; i < end; i += 2) {
 		bool b = as_number_inline(prg, v[i]);
 		if (b) {
 			if (prev == -1) {
@@ -165,7 +163,7 @@ bool corefunc_if(Program *prg, std::vector<Token> &v)
 			else {
 				prg->s->pc = prev;
 			}
-			int end_block = as_label_inline(prg, v[i+1]);
+			unsigned int end_block = as_label_inline(prg, v[i+1]);
 			while (prg->s->pc != end_block) {
 				interpret(prg, 1);
 			}
@@ -177,7 +175,7 @@ bool corefunc_if(Program *prg, std::vector<Token> &v)
 
 	if (v.size() <= 2 || v.size() % 2 == 1) {
 		prg->s->pc = prev;
-		int end_block = as_label_inline(prg, v[v.size()-1]);
+		unsigned int end_block = as_label_inline(prg, v[v.size()-1]);
 		while (prg->s->pc != end_block) {
 			interpret(prg, 1);
 		}
@@ -312,6 +310,13 @@ bool corefunc_divide(Program *prg, std::vector<Token> &v)
 			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 		}
 	}
+
+	return true;
+}
+
+bool corefunc_label(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
 
 	return true;
 }
@@ -953,17 +958,17 @@ bool stringfunc_scan(Program *prg, std::vector<Token> &v)
 	int scanned = 0;
 	int gotten = 0;
 
-	while (p < fmt.length()) {
+	while (p < (int)fmt.length()) {
 		int start = p;
 		// scan up till %
-		while (p < fmt.length() && fmt[p] != '%') {
+		while (p < (int)fmt.length() && fmt[p] != '%') {
 			p++;
 		}
-		if (p < fmt.length()-1 && fmt[p+1] == '%') {
+		if (p < (int)fmt.length()-1 && fmt[p+1] == '%') {
 			p += 2;
 			continue;
 		}
-		int scan_till = p >= fmt.length()-1 ? -1 : fmt[p+1];
+		int scan_till = p >= (int)fmt.length()-1 ? -1 : fmt[p+1];
 		if (p-start > 0) {
 			std::string const_str = fmt.substr(start, p-start);
 			bool all_whitespace = true;
@@ -974,7 +979,7 @@ bool stringfunc_scan(Program *prg, std::vector<Token> &v)
 				}
 			}
 			if (all_whitespace) {
-				while (scanned < scan_str.length() && isspace(scan_str[scanned])) {
+				while (scanned < (int)scan_str.length() && isspace(scan_str[scanned])) {
 					scanned++;
 				}
 			}
@@ -994,7 +999,7 @@ bool stringfunc_scan(Program *prg, std::vector<Token> &v)
 		int scan_start = scanned;
 
 		while (true) {
-			if (scanned >= scan_str.length()) {
+			if (scanned >= (int)scan_str.length()) {
 				break;
 			}
 			if (isspace(scan_till)) {
@@ -1026,7 +1031,7 @@ bool stringfunc_scan(Program *prg, std::vector<Token> &v)
 		_tok++;
 		p++;
 
-		if (_tok >= v.size()) {
+		if (_tok >= (int)v.size()) {
 			break;
 		}
 	}
@@ -2101,6 +2106,7 @@ void start_lib_core()
 	add_instruction("*", corefunc_multiply);
 	add_instruction("/", corefunc_divide);
 	
+	add_instruction(":", corefunc_label);
 	add_instruction("goto", corefunc_goto);
 	add_instruction("?", corefunc_compare);
 	add_instruction("je", corefunc_je);
