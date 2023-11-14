@@ -19,20 +19,20 @@ function draw
 	number y
 
 	for y 0 rows 1 next_y
-	for x 0 cols 1 next_x
-	number dx
-	number dy
-	= dx (* x fw)
-	= dy (* y fh)
-	number r
-	string c
-	rand r 0 1
-	if (== r 0) c_zero c_one
-	= c "0"
+		for x 0 cols 1 next_x
+			number dx
+			number dy
+			= dx (* x fw)
+			= dy (* y fh)
+			number r
+			string c
+			rand r 0 1
+			if (== r 0) c_zero c_one
+			= c "0"
 :c_zero
-	= c "1"
+			= c "1"
 :c_one
-	font_draw f 32 32 32 255 c dx dy
+			font_draw f 32 32 32 255 c dx dy
 :next_x
 :next_y
 }
