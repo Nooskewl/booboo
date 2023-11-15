@@ -182,6 +182,18 @@ mml_stop
 	stop a looping sound
 	e.g. mml_stop blast
 
+sample_load
+	load a sample
+	e.g. sample_load s "example.wav"
+
+sample_play
+	play a sample
+	e.g. sample_play s volume loop
+
+sample_stop
+	Stop a looping sample
+	e.g. sample_stop s
+
 -- Joystick Functions --------------------------------------------------------
 
 joystick_poll
