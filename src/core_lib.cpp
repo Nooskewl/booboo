@@ -189,6 +189,10 @@ bool corefunc_if(Program *prg, std::vector<Token> &v)
 		}
 		prg->s->pc++;
 	}
+	else {
+		unsigned int end_block = as_label_inline(prg, v[v.size()-1]);
+		prg->s->pc = end_block+1;
+	}
 
 	return true;
 }
