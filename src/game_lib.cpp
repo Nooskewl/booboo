@@ -11,6 +11,11 @@ struct MML_Info {
 	std::map<int, audio::MML *> mmls;
 };
 
+struct Sample_Info {
+	int sample_id;
+	std::map<int, audio::Sample *> samples;
+};
+
 struct Image_Info {
 	int image_id;
 	std::map<int, gfx::Image *> images;
@@ -58,6 +63,17 @@ static MML_Info *mml_info(Program *prg)
 		info = new MML_Info;
 		info->mml_id = 0;
 		booboo::set_black_box(prg, "com.b1stable.booboo.mml", info);
+	}
+	return info;
+}
+
+static Sample_Info *sample_info(Program *prg)
+{
+	Sample_Info *info = (Sample_Info *)booboo::get_black_box(prg, "com.b1stable.booboo.sample");
+	if (info == nullptr) {
+		info = new Sample_Info;
+		info->sample_id = 0;
+		booboo::set_black_box(prg, "com.b1stable.booboo.sample", info);
 	}
 	return info;
 }
@@ -638,6 +654,76 @@ static bool mmlfunc_stop(Program *prg, std::vector<Token> &v)
 	audio::MML *mml = info->mmls[id];
 
 	mml->stop();
+
+	return true;
+}
+
+static bool samplefunc_load(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+
+	Sample_Info *info = sample_info(prg);
+
+	if (v1.type == Variable::NUMBER) {
+		v1.n = info->sample_id;
+	}
+	else if (v1.type == Variable::STRING) {
+		v1.s = util::itos(info->sample_id);
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	audio::Sample *sample = new audio::Sample(name);
+
+	info->samples[info->sample_id++] = sample;
+
+	return true;
+}
+
+static bool samplefunc_play(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	int id = as_number(prg, v[0]);
+	float volume = as_number(prg, v[1]);
+	bool loop = as_number(prg, v[2]);
+
+	Sample_Info *info = sample_info(prg);
+
+#ifdef DEBUG
+	if (info->samples.find(id) == info->samples.end()) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid Sample at " + get_error_info(prg));
+	}
+#endif
+
+	audio::Sample *sample = info->samples[id];
+
+	sample->play(volume, loop);
+
+	return true;
+}
+
+static bool samplefunc_stop(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number(prg, v[0]);
+
+	Sample_Info *info = sample_info(prg);
+
+#ifdef DEBUG
+	if (info->samples.find(id) == info->samples.end()) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid Sample at " + get_error_info(prg));
+	}
+#endif
+
+	audio::Sample *sample = info->samples[id];
+
+	sample->stop();
 
 	return true;
 }
@@ -1439,6 +1525,9 @@ void start_lib_game()
 	add_instruction("mml_load", mmlfunc_load);
 	add_instruction("mml_play", mmlfunc_play);
 	add_instruction("mml_stop", mmlfunc_stop);
+	add_instruction("sample_load", samplefunc_load);
+	add_instruction("sample_play", samplefunc_play);
+	add_instruction("sample_stop", samplefunc_stop);
 	add_instruction("joystick_poll", joyfunc_poll);
 	add_instruction("joystick_count", joyfunc_count);
 	add_instruction("cfg_load", cfgfunc_load);
@@ -1460,6 +1549,10 @@ void game_lib_destroy_program(Program *prg)
 	for (size_t i = 0; i < mml_i->mmls.size(); i++) {
 		delete mml_i->mmls[i];
 	}
+	Sample_Info *sample_i = sample_info(prg);
+	for (size_t i = 0; i < sample_i->samples.size(); i++) {
+		delete sample_i->samples[i];
+	}
 	Image_Info *image_i = image_info(prg);
 	for (size_t i = 0; i < image_i->images.size(); i++) {
 		delete image_i->images[i];
@@ -1471,11 +1564,13 @@ void game_lib_destroy_program(Program *prg)
 	CFG_Info *cfg_i = cfg_info(prg);
 
 	delete mml_i;
+	delete sample_i;
 	delete image_i;
 	delete font_i;
 	delete cfg_i;
 
 	booboo::set_black_box(prg, "com.b1stable.booboo.mml", nullptr);
+	booboo::set_black_box(prg, "com.b1stable.booboo.sample", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.image", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.font", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.cfg", nullptr);
