@@ -40,6 +40,7 @@ The following sections describe the API:
 	Joystick Functions
 	Vector Functions
 	Configuration Functions
+	Shader Functions
 
 -- Core Functions ------------------------------------------------------------
 
@@ -234,3 +235,33 @@ cfg_exists
 	check if a value exists in a config file
 	e.g. cfg_exists cfg exists "x"
 
+-- Shader Functions ----------------------------------------------------------
+
+shader_load
+	Load a shader
+	e.g. shader_load n "vertex_shader.txt" VP "fragment_shader.txt" FP
+	Where VP and FP and precisions from 0 to 2 (low, medium, high.)
+
+shader_use
+	Use or unuse a shader
+	e.g. shader_use shader 1
+
+shader_set_bool
+	Set a boolean value in a shader
+	e.g. shader_set_bool shader "b" 0
+
+shader_set_int
+	Set an integer value in a shader
+	e.g. shader_set_int shader "i" 1298
+
+shader_set_float
+	Set a float value in a shader
+	e.g. shader_set_float shader "f" 10.1
+
+shader_set_colour
+	Set a colour value in a shader
+	e.g. shader_set_colour shader "c" r g b a
+
+shader_set_texture
+	Set a texture value in a shader
+	e.g. shader_set_texture shader "tex" my_img
