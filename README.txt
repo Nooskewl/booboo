@@ -7,7 +7,7 @@ to run game library examples)
 
 If you wish to distribute BooBooGame as a standalone app (with your
 main.boo and other files,) you need a license available at
-cmykilluminati.net.
+cmykilluminati.net. BooBoo and libBooBoo are MIT licensed and can be distributed freely.
 
 Your data/ directory can be compressed into data.cpa with compress_dir.
 Just enter data/ and run it, and it will create ../data.cpa. The shaders
