@@ -24,10 +24,10 @@ function draw
 	= t (- 1 t)
 :pingpong
 
-	shader_use shader 1
+	shader_use shader
 	shader_set_float shader "t" t
 	filled_rectangle 0 0 0 255 0 0 0 255 0 0 0 255 0 0 0 255 0 0 640 360
-	shader_use shader 0
+	shader_use_default
 }
 
 function run

@@ -243,8 +243,12 @@ shader_load
 	Where VP and FP and precisions from 0 to 2 (low, medium, high.)
 
 shader_use
-	Use or unuse a shader
-	e.g. shader_use shader 1
+	Use a shader
+	e.g. shader_use shader
+
+shader_use_default
+	Use the default shader
+	e.g. shader_use_default
 
 shader_set_bool
 	Set a boolean value in a shader

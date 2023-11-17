@@ -1543,22 +1543,25 @@ static bool shaderfunc_load(Program *prg, std::vector<Token> &v)
 
 static bool shaderfunc_use(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	double id = as_number(prg, v[0]);
-	bool onoff = as_number(prg, v[1]);
 	
 	Shader_Info *info = shader_info(prg);
 	gfx::Shader *shader = info->shaders[id];
 
-	if (onoff) {
-		shader->use();
-		gfx::update_projection();
-	}
-	else {
-		shim::default_shader->use();
-		gfx::update_projection();
-	}
+	shader->use();
+	gfx::update_projection();
+
+	return true;
+}
+
+static bool shaderfunc_use_default(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	shim::default_shader->use();
+	gfx::update_projection();
 
 	return true;
 }
@@ -1703,6 +1706,7 @@ void start_lib_game()
 	add_instruction("cfg_exists", cfgfunc_exists);
 	add_instruction("shader_load", shaderfunc_load);
 	add_instruction("shader_use", shaderfunc_use);
+	add_instruction("shader_use_default", shaderfunc_use_default);
 	add_instruction("shader_set_bool", shaderfunc_set_bool);
 	add_instruction("shader_set_int", shaderfunc_set_int);
 	add_instruction("shader_set_float", shaderfunc_set_float);
