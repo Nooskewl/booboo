@@ -39,6 +39,11 @@ struct CFG_Info {
 	std::map<int, std::map<std::string, Config_Value> > cfgs;
 };
 
+struct Shader_Info {
+	int shader_id;
+	std::map<int, gfx::Shader *> shaders;
+};
+
 static std::string remove_quotes(std::string s)
 {
 	int start = 0;
@@ -107,6 +112,17 @@ static CFG_Info *cfg_info(Program *prg)
 		info = new CFG_Info;
 		info->cfg_id = 0;
 		booboo::set_black_box(prg, "com.b1stable.booboo.cfg", info);
+	}
+	return info;
+}
+
+static Shader_Info *shader_info(Program *prg)
+{
+	Shader_Info *info = (Shader_Info *)booboo::get_black_box(prg, "com.b1stable.booboo.shader");
+	if (info == nullptr) {
+		info = new Shader_Info;
+		info->shader_id = 0;
+		booboo::set_black_box(prg, "com.b1stable.booboo.shader", info);
 	}
 	return info;
 }
@@ -1491,6 +1507,154 @@ static bool cfgfunc_exists(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool shaderfunc_load(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(5)
+
+	Variable &v1 = as_variable(prg, v[0]);
+
+	std::string vname = as_string(prg, v[1]);
+	std::string fname = as_string(prg, v[3]);
+
+	gfx::Shader::Precision vp = (gfx::Shader::Precision)as_number(prg, v[2]);
+	gfx::Shader::Precision fp = (gfx::Shader::Precision)as_number(prg, v[4]);
+	
+	Shader_Info *info = shader_info(prg);
+
+	if (v1.type == Variable::NUMBER) {
+		v1.n = info->shader_id;
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	std::string vs = util::load_text("gfx/shaders/" + vname);
+	std::string fs = util::load_text("gfx/shaders/" + fname);
+
+	gfx::Shader::OpenGL_Shader *vert = gfx::Shader::load_opengl_vertex_shader(vs, vp);
+	gfx::Shader::OpenGL_Shader *frag = gfx::Shader::load_opengl_fragment_shader(fs, fp);
+
+	gfx::Shader *shader = new gfx::Shader(vert, frag);
+
+	info->shaders[info->shader_id++] = shader;
+
+	return true;
+}
+
+static bool shaderfunc_use(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	double id = as_number(prg, v[0]);
+	bool onoff = as_number(prg, v[1]);
+	
+	Shader_Info *info = shader_info(prg);
+	gfx::Shader *shader = info->shaders[id];
+
+	if (onoff) {
+		shader->use();
+		gfx::update_projection();
+	}
+	else {
+		shim::default_shader->use();
+		gfx::update_projection();
+	}
+
+	return true;
+}
+
+static bool shaderfunc_set_bool(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	double id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	bool b = as_number(prg, v[2]);
+	
+	Shader_Info *info = shader_info(prg);
+	gfx::Shader *shader = info->shaders[id];
+
+	shader->set_bool(name, b);
+
+	return true;
+}
+
+static bool shaderfunc_set_int(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	double id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	int i = as_number(prg, v[2]);
+	
+	Shader_Info *info = shader_info(prg);
+	gfx::Shader *shader = info->shaders[id];
+
+	shader->set_int(name, i);
+
+	return true;
+}
+
+static bool shaderfunc_set_float(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	double id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	double f = as_number(prg, v[2]);
+	
+	Shader_Info *info = shader_info(prg);
+	gfx::Shader *shader = info->shaders[id];
+
+	shader->set_float(name, f);
+
+	return true;
+}
+
+static bool shaderfunc_set_texture(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	double id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	double t = as_number(prg, v[2]);
+	
+	Shader_Info *info = shader_info(prg);
+	gfx::Shader *shader = info->shaders[id];
+
+	Image_Info *info2 = image_info(prg);
+	gfx::Image *img = info2->images[t];
+
+	shader->set_texture(name, img);
+
+	return true;
+}
+
+static bool shaderfunc_set_colour(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(6)
+
+	double id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	int r = as_number(prg, v[2]);
+	int g = as_number(prg, v[3]);
+	int b = as_number(prg, v[4]);
+	int a = as_number(prg, v[5]);
+	
+	Shader_Info *info = shader_info(prg);
+	gfx::Shader *shader = info->shaders[id];
+
+	SDL_Colour c;
+	c.r = r;
+	c.g = g;
+	c.b = b;
+	c.a = a;
+
+	shader->set_colour(name, c);
+
+	return true;
+}
+
 void start_lib_game()
 {
 	add_instruction("inspect", miscfunc_inspect);
@@ -1537,6 +1701,13 @@ void start_lib_game()
 	add_instruction("cfg_set_number", cfgfunc_set_number);
 	add_instruction("cfg_set_string", cfgfunc_set_string);
 	add_instruction("cfg_exists", cfgfunc_exists);
+	add_instruction("shader_load", shaderfunc_load);
+	add_instruction("shader_use", shaderfunc_use);
+	add_instruction("shader_set_bool", shaderfunc_set_bool);
+	add_instruction("shader_set_int", shaderfunc_set_int);
+	add_instruction("shader_set_float", shaderfunc_set_float);
+	add_instruction("shader_set_colour", shaderfunc_set_colour);
+	add_instruction("shader_set_texture", shaderfunc_set_texture);
 }
 
 void end_lib_game()
@@ -1561,6 +1732,10 @@ void game_lib_destroy_program(Program *prg)
 	for (size_t i = 0; i < font_i->fonts.size(); i++) {
 		delete font_i->fonts[i];
 	}
+	Shader_Info *shader_i = shader_info(prg);
+	for (size_t i = 0; i < shader_i->shaders.size(); i++) {
+		delete shader_i->shaders[i];
+	}
 	CFG_Info *cfg_i = cfg_info(prg);
 
 	delete mml_i;
@@ -1568,10 +1743,12 @@ void game_lib_destroy_program(Program *prg)
 	delete image_i;
 	delete font_i;
 	delete cfg_i;
+	delete shader_i;
 
 	booboo::set_black_box(prg, "com.b1stable.booboo.mml", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.sample", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.image", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.font", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.cfg", nullptr);
+	booboo::set_black_box(prg, "com.b1stable.booboo.shader", nullptr);
 }

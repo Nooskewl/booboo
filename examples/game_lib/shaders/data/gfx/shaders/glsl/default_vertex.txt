@@ -1,0 +1,15 @@
+uniform mat4 modelview;
+uniform mat4 proj;
+
+attribute vec3 in_position;
+attribute vec2 in_texcoord;
+attribute vec4 in_colour;
+
+varying vec2 texcoord;
+varying vec4 colour;
+
+void main() {
+	colour = in_colour;
+	texcoord = in_texcoord;
+	gl_Position = proj * modelview * vec4(in_position, 1.0);
+}
