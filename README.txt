@@ -6,7 +6,8 @@ To run the examples, run ./BooBoo <path/to/file.boo> (or use ./BooBooGame
 to run game library examples)
 
 If you wish to distribute BooBooGame or BooBoo as a standalone app (with your
-main.boo and other files,) you can, but please be thoughtful and donate if you find it useful.
+main.boo and other files,) you can, but please be thoughtful and donate if
+you find it useful.
 
 Your data/ directory can be compressed into data.cpa with compress_dir.
 Just enter data/ and run it, and it will create ../data.cpa. The shaders
