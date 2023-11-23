@@ -1,7 +1,5 @@
 #define M_PI 3.1415926535897932384626433832795
 
-uniform int screen_w;
-uniform int screen_h;
 uniform float t;
 uniform float mush_x;
 uniform float mush_y;
