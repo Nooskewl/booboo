@@ -346,6 +346,64 @@ static bool gfxfunc_resize(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool gfxfunc_get_screen_size(Program *prg, std::vector<Token> &v)
+{
+	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v2 = as_variable(prg, v[1]);
+	
+	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v1.n = shim::real_screen_size.w;
+	v2.n = shim::real_screen_size.h;
+
+	return true;
+}
+
+static bool gfxfunc_get_buffer_size(Program *prg, std::vector<Token> &v)
+{
+	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v2 = as_variable(prg, v[1]);
+	
+	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v1.n = shim::screen_size.w;
+	v2.n = shim::screen_size.h;
+
+	return true;
+}
+
+static bool gfxfunc_get_screen_offset(Program *prg, std::vector<Token> &v)
+{
+	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v2 = as_variable(prg, v[1]);
+	
+	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v1.n = shim::screen_offset.x;
+	v2.n = shim::screen_offset.y;
+
+	return true;
+}
+
+static bool gfxfunc_get_scale(Program *prg, std::vector<Token> &v)
+{
+	Variable &v1 = as_variable(prg, v[0]);
+	
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v1.n = shim::scale;
+
+	return true;
+}
+
 static bool primfunc_start_primitives(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -1667,6 +1725,10 @@ void start_lib_game()
 	add_instruction("clear", gfxfunc_clear);
 	add_instruction("flip", gfxfunc_flip);
 	add_instruction("resize", gfxfunc_resize);
+	add_instruction("get_screen_size", gfxfunc_get_screen_size);
+	add_instruction("get_buffer_size", gfxfunc_get_buffer_size);
+	add_instruction("get_screen_offset", gfxfunc_get_screen_offset);
+	add_instruction("get_scale", gfxfunc_get_scale);
 	add_instruction("start_primitives", primfunc_start_primitives);
 	add_instruction("end_primitives", primfunc_end_primitives);
 	add_instruction("line", primfunc_line);

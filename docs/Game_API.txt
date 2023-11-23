@@ -74,6 +74,29 @@ resize
 	resize the drawing area projection
 	e.g. resize 240 160
 
+get_screen_size
+	Get the actual (unscaled) size of the screen/window
+	e.g. screen_size scr_w scr_h
+
+get_buffer_size
+	Get the size of the drawing area projection.
+	This is what "resize" changes and it starts at 640x360.
+	e.g. buffer_size bw bh
+
+get_screen_offset
+	The BooBoo window is managed in a way that resizing the screen in
+	any way produces a working game with a correct image. Sometimes
+	this requires "black bars". screen_offset gives you the position of
+	the top left of the drawing given any black bars. This is mainly
+	useful for some shaders.
+	e.g. screen_offset ox oy
+
+get_scale
+	Retrieve the scale of the projection. BooBoo starts in a 1280x720
+	window with a 640x360 buffer, so e.g. the scale would be 2 to start
+	and would change based on window size and buffer size.
+	e.g. scale s
+
 -- Primitive Functions -------------------------------------------------------
 
 start_primitives
