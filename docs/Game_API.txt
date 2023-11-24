@@ -38,6 +38,7 @@ The following sections describe the API:
 	Font Functions
 	Audio Functions
 	Joystick Functions
+	Mouse Functions
 	Vector Functions
 	Configuration Functions
 	Shader Functions
@@ -227,6 +228,17 @@ joystick_poll
 joystick_count
 	get number of connected joysticks
 	e.g. joystick_count num_joysticks
+
+-- Mouse Functions -----------------------------------------------------------
+
+mouse_get_position
+	Get the mouse position scaled relative to the projection
+	The full window starts mapped to 640x360.
+	e.g. mouse_get_position mx my
+
+mouse_get_buttons
+	Get the mouse button state
+	e.g. mouse_get_buttons b1 b2 b3
 
 -- Configuration Functions ---------------------------------------------------
 

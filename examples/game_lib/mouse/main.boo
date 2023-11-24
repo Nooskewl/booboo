@@ -5,8 +5,8 @@ function draw
 {
 	number mx my
 	number b1 b2 b3
-	get_mouse_position mx my
-	get_mouse_buttons b1 b2 b3
+	mouse_get_position mx my
+	mouse_get_buttons b1 b2 b3
 
 	string s
 

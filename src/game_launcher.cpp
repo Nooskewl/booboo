@@ -13,6 +13,8 @@
 #include "booboo/booboo.h"
 #include "booboo/game_lib.h"
 
+using namespace booboo;
+
 #if defined __linux__ || defined __LP64__
 #include <unistd.h>
 #endif
@@ -26,7 +28,7 @@ gfx::Image *grass;
 gfx::Image *robot;
 #endif
 
-booboo::Program *prg;
+Program *prg;
 
 int orig_argc;
 char **orig_argv;
@@ -373,6 +375,47 @@ void init_lua()
 }
 #endif
 
+static util::Point<int> mouse_pos;
+static bool mouse_b1;
+static bool mouse_b2;
+static bool mouse_b3;
+
+static bool mousefunc_get_position(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v2 = as_variable(prg, v[1]);
+	
+	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v1.n = mouse_pos.x;
+	v2.n = mouse_pos.y;
+
+	return true;
+}
+
+static bool mousefunc_get_buttons(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v2 = as_variable(prg, v[1]);
+	Variable &v3 = as_variable(prg, v[2]);
+	
+	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER || v3.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v1.n = mouse_b1;
+	v2.n = mouse_b2;
+	v3.n = mouse_b3;
+
+	return true;
+}
+
 bool start()
 {
 	// This is basically 16:9 only, with a tiny bit of leeway
@@ -481,7 +524,43 @@ void handle_event(TGUI_Event *event)
 		return;
 	}
 	else if (event->type == TGUI_QUIT) {
-		booboo::quit = true;
+		quit = true;
+	}
+	else if (event->type == TGUI_MOUSE_AXIS) {
+		if (event->mouse.normalised) {
+			mouse_pos.x = event->mouse.x * shim::screen_size.w;
+			mouse_pos.y = event->mouse.y * shim::screen_size.h;
+		}
+		else {
+			mouse_pos.x = event->mouse.x;
+			mouse_pos.y = event->mouse.y;
+		}
+	}
+	else if (event->type == TGUI_MOUSE_DOWN && !event->mouse.is_repeat) {
+		switch (event->mouse.button) {
+			case 1:
+				mouse_b1 = true;
+				break;
+			case 2:
+				mouse_b2 = true;
+				break;
+			case 3:
+				mouse_b3 = true;
+				break;
+		}
+	}
+	else if (event->type == TGUI_MOUSE_UP) {
+		switch (event->mouse.button) {
+			case 1:
+				mouse_b1 = false;
+				break;
+			case 2:
+				mouse_b2 = false;
+				break;
+			case 3:
+				mouse_b3 = false;
+				break;
+		}
 	}
 }
 
@@ -527,8 +606,8 @@ void draw_all()
 		robot->draw(util::Point<float>(x*robot->size.w, y*robot->size.h));
 	}
 #else
-	std::vector<booboo::Token> tmp;
-	booboo::call_void_function(prg, "draw", tmp);
+	std::vector<Token> tmp;
+	call_void_function(prg, "draw", tmp);
 #endif
 
 	gfx::draw_guis();
@@ -552,7 +631,7 @@ static void loop()
 #endif
 	int curr_logic_rate = shim::logic_rate;
 
-	while (booboo::quit == false) {
+	while (quit == false) {
 		// EVENTS
 		while (true) {
 			SDL_Event sdl_event;
@@ -575,7 +654,7 @@ static void loop()
 				if (sdl_event.type == SDL_QUIT) {
 					if (can_logic == false) {
 						shim::handle_event(&sdl_event);
-						booboo::quit = true;
+						quit = true;
 						break;
 					}
 				}
@@ -633,12 +712,12 @@ static void loop()
 #if defined LUA_BENCH_ANY
 			call_lua(lua_state, "run", "");
 #else
-			std::vector<booboo::Token> tmp;
-			booboo::call_void_function(prg, "run", tmp);
+			std::vector<Token> tmp;
+			call_void_function(prg, "run", tmp);
 #endif
 
-			if (booboo::reset_game_name != "") {
-				booboo::quit = true;
+			if (reset_game_name != "") {
+				quit = true;
 			}
 
 			logic_frames++;
@@ -657,7 +736,7 @@ static void loop()
 			draw_all();
 		}
 
-		if (booboo::quit) {
+		if (quit) {
 			break;
 		}
 
@@ -858,7 +937,7 @@ int main(int argc, char **argv)
 	//shim::create_depth_buffer = true;
 	shim::font_size = 24;
 
-	start();
+	::start();
 
 	if (shim::font != nullptr) {
 		shim::devsettings_num_rows = (shim::screen_size.h-16)/shim::font->get_height();
@@ -867,14 +946,16 @@ int main(int argc, char **argv)
 
 	booboo::start();
 	start_lib_game();
+	add_instruction("mouse_get_position", mousefunc_get_position);
+	add_instruction("mouse_get_buttons", mousefunc_get_buttons);
 
 again:
-	booboo::quit = false;
+	quit = false;
 	bool was_reset = false;
 
-	if (booboo::reset_game_name != "") {
-		fn = booboo::reset_game_name;
-		booboo::reset_game_name = "";
+	if (reset_game_name != "") {
+		fn = reset_game_name;
+		reset_game_name = "";
 		was_reset = true;
 	}
 
@@ -888,7 +969,7 @@ again:
 			gui::fatalerror("ERROR", "Program is missing or corrupt!", gui::OK, true);
 		}
 
-		booboo::main_program_name = fn;
+		main_program_name = fn;
 	}
 	else {
 		if (fn != "") {
@@ -899,7 +980,7 @@ again:
 				gui::fatalerror("ERROR", "Program is missing or corrupt!", gui::OK, true);
 			}
 
-			booboo::main_program_name = fn;
+			main_program_name = fn;
 		}
 		else {
 			try {
@@ -909,13 +990,13 @@ again:
 				gui::fatalerror("ERROR", "Program is missing or corrupt!", gui::OK, true);
 			}
 			
-			booboo::main_program_name = "main.boo";
+			main_program_name = "main.boo";
 		}
 	}
 
-	prg = booboo::create_program(code);
+	prg = create_program(code);
 
-	while (booboo::interpret(prg, INT_MAX)) {
+	while (interpret(prg, INT_MAX)) {
 	}
 
 #if defined LUA_BENCH_ANY
@@ -925,17 +1006,17 @@ again:
 	robot = new gfx::Image("misc/robot.tga");
 #endif
 
-	if (booboo::reset_game_name == "") {
+	if (reset_game_name == "") {
 		go();
 	}
 
-	std::vector<booboo::Token> tmp;
-	booboo::call_void_function(prg, "end", tmp);
+	std::vector<Token> tmp;
+	call_void_function(prg, "end", tmp);
 
 	game_lib_destroy_program(prg);
-	booboo::destroy_program(prg);
+	destroy_program(prg);
 
-	if (booboo::reset_game_name != "") {
+	if (reset_game_name != "") {
 		fn = "";
 		goto again;
 	}
@@ -943,15 +1024,15 @@ again:
 	end_lib_game();
 	booboo::end();
 
-	end();
+	::end();
 
 	}
 	catch (util::Error &e) {
 		gui::fatalerror("ERROR", e.error_message.c_str(), gui::OK, true);
 	}
-	catch (booboo::Error &e) {
+	catch (Error &e) {
 		gui::fatalerror("ERROR", e.error_message.c_str(), gui::OK, true);
 	}
 
-	return booboo::return_code;
+	return return_code;
 }
