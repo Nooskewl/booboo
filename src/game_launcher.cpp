@@ -416,8 +416,42 @@ static bool mousefunc_get_buttons(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+std::list<int> keys_pressed;
+
+static bool keyfunc_get(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable(prg, v[0]);
+	
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	bool pressed = false;
+	int checking = as_number(prg, v[1]);
+
+	for (std::list<int>::iterator it = keys_pressed.begin(); it != keys_pressed.end(); it++) {
+		int &k = *it;
+		if (k == checking) {
+			pressed = true;
+			break;
+		}
+	}
+
+	v1.n = pressed;
+
+	return true;
+}
+
 bool start()
 {
+	mouse_pos.x = 0;
+	mouse_pos.y = 0;
+	mouse_b1 = false;
+	mouse_b2 = false;
+	mouse_b3 = false;
+
 	// This is basically 16:9 only, with a tiny bit of leeway
 	gfx::set_min_aspect_ratio(1.776f);
 	gfx::set_max_aspect_ratio(1.778f);
@@ -560,6 +594,31 @@ void handle_event(TGUI_Event *event)
 			case 3:
 				mouse_b3 = false;
 				break;
+		}
+	}
+	else if (event->type == TGUI_KEY_DOWN && !event->keyboard.is_repeat) {
+		bool exists = false;
+		for (std::list<int>::iterator it = keys_pressed.begin(); it != keys_pressed.end(); it++) {
+			int &k = *it;
+			if (k == event->keyboard.code) {
+				exists = true;
+				break;
+			}
+		}
+		if (exists == false) {
+			keys_pressed.push_back(event->keyboard.code);
+		}
+	}
+	else if (event->type == TGUI_KEY_UP) {
+		std::list<int>::iterator it;
+		for (it = keys_pressed.begin(); it != keys_pressed.end();) {
+			int &k = *it;
+			if (k == event->keyboard.code) {
+				it = keys_pressed.erase(it);
+			}
+			else {
+				it++;
+			}
 		}
 	}
 }
@@ -948,6 +1007,7 @@ int main(int argc, char **argv)
 	start_lib_game();
 	add_instruction("mouse_get_position", mousefunc_get_position);
 	add_instruction("mouse_get_buttons", mousefunc_get_buttons);
+	add_instruction("key_get", keyfunc_get);
 
 again:
 	quit = false;

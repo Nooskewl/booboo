@@ -37,8 +37,7 @@ The following sections describe the API:
 	Image Functions
 	Font Functions
 	Audio Functions
-	Joystick Functions
-	Mouse Functions
+	Input Functions
 	Vector Functions
 	Configuration Functions
 	Shader Functions
@@ -219,7 +218,7 @@ sample_stop
 	Stop a looping sample
 	e.g. sample_stop s
 
--- Joystick Functions --------------------------------------------------------
+-- Input Functions -----------------------------------------------------------
 
 joystick_poll
 	poll a joystick for input
@@ -229,8 +228,6 @@ joystick_count
 	get number of connected joysticks
 	e.g. joystick_count num_joysticks
 
--- Mouse Functions -----------------------------------------------------------
-
 mouse_get_position
 	Get the mouse position scaled relative to the projection
 	The full window starts mapped to 640x360.
@@ -239,6 +236,11 @@ mouse_get_position
 mouse_get_buttons
 	Get the mouse button state
 	e.g. mouse_get_buttons b1 b2 b3
+
+key_get
+	Read if a key is pressed or not. Please use or modify keycodes.inc
+	From the 'keys' example for keycode constants.
+	e.g. key_get dest KEY_SPACE
 
 -- Configuration Functions ---------------------------------------------------
 
