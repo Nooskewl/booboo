@@ -524,6 +524,8 @@ bool process_includes(Program *prg)
 			total_added += nlines;
 
 			ret = true;
+
+			break;
 		}
 
 		prev = prg->s->p;
