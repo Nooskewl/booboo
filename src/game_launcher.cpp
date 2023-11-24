@@ -996,6 +996,8 @@ int main(int argc, char **argv)
 	//shim::create_depth_buffer = true;
 	shim::font_size = 24;
 
+	shim::convert_directions_to_focus_events = false;
+
 	::start();
 
 	if (shim::font != nullptr) {
