@@ -404,6 +404,36 @@ static bool gfxfunc_get_scale(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool gfxfunc_set_target(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	double id = as_number(prg, v[0]);
+
+	Image_Info *info = image_info(prg);
+
+#ifdef DEBUG
+	if (info->images.find(id) == info->images.end()) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid Image at " + get_error_info(prg));
+	}
+#endif
+
+	gfx::Image *img = info->images[id];
+
+	gfx::set_target_image(img);
+
+	return true;
+}
+
+static bool gfxfunc_set_target_backbuffer(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	gfx::set_target_backbuffer();
+
+	return true;
+}
+
 static bool primfunc_start_primitives(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -798,6 +828,34 @@ static bool samplefunc_stop(Program *prg, std::vector<Token> &v)
 	audio::Sample *sample = info->samples[id];
 
 	sample->stop();
+
+	return true;
+}
+
+static bool imagefunc_create(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	Variable &v1 = as_variable(prg, v[0]);
+
+	int w = as_number(prg, v[1]);
+	int h = as_number(prg, v[2]);
+
+	Image_Info *info = image_info(prg);
+
+	if (v1.type == Variable::NUMBER) {
+		v1.n = info->image_id;
+	}
+	else if (v1.type == Variable::STRING) {
+		v1.s = util::itos(info->image_id);
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Image *img = new gfx::Image(util::Size<int>(w, h));
+
+	info->images[info->image_id++] = img;
 
 	return true;
 }
@@ -1695,6 +1753,8 @@ void start_lib_game()
 	add_instruction("get_buffer_size", gfxfunc_get_buffer_size);
 	add_instruction("get_screen_offset", gfxfunc_get_screen_offset);
 	add_instruction("get_scale", gfxfunc_get_scale);
+	add_instruction("set_target", gfxfunc_set_target);
+	add_instruction("set_target_backbuffer", gfxfunc_set_target_backbuffer);
 	add_instruction("start_primitives", primfunc_start_primitives);
 	add_instruction("end_primitives", primfunc_end_primitives);
 	add_instruction("line", primfunc_line);
@@ -1705,6 +1765,7 @@ void start_lib_game()
 	add_instruction("filled_ellipse", primfunc_filled_ellipse);
 	add_instruction("circle", primfunc_circle);
 	add_instruction("filled_circle", primfunc_filled_circle);
+	add_instruction("image_create", imagefunc_create);
 	add_instruction("image_load", imagefunc_load);
 	add_instruction("image_draw", imagefunc_draw);
 	add_instruction("image_stretch_region", imagefunc_stretch_region);
