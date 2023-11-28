@@ -26,6 +26,11 @@ struct Font_Info {
 	std::map<int, gfx::TTF *> fonts;
 };
 
+struct Tilemap_Info {
+	int tilemap_id;
+	std::map<int, gfx::Tilemap *> tilemaps;
+};
+
 struct Config_Value
 {
 	Variable::Variable_Type type;
@@ -101,6 +106,17 @@ static Font_Info *font_info(Program *prg)
 		info = new Font_Info;
 		info->font_id = 0;
 		booboo::set_black_box(prg, "com.b1stable.booboo.font", info);
+	}
+	return info;
+}
+
+static Tilemap_Info *tilemap_info(Program *prg)
+{
+	Tilemap_Info *info = (Tilemap_Info *)booboo::get_black_box(prg, "com.b1stable.booboo.tilemap");
+	if (info == nullptr) {
+		info = new Tilemap_Info;
+		info->tilemap_id = 0;
+		booboo::set_black_box(prg, "com.b1stable.booboo.tilemap", info);
 	}
 	return info;
 }
@@ -1214,6 +1230,101 @@ static bool fontfunc_height(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool tilemapfunc_set_tile_size(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	shim::tile_size = as_number(prg, v[0]);
+
+	return true;
+}
+
+static bool tilemapfunc_load(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	Tilemap_Info *info = tilemap_info(prg);
+
+	if (v1.type == Variable::NUMBER) {
+		v1.n = info->tilemap_id;
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Tilemap *tilemap = new gfx::Tilemap(name);
+
+	info->tilemaps[info->tilemap_id++] = tilemap;
+
+	return true;
+}
+
+static bool tilemapfunc_draw(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(5)
+
+	int id = as_number(prg, v[0]);
+	int start_layer = as_number(prg, v[1]);
+	int end_layer = as_number(prg, v[2]);
+	double x = as_number(prg, v[3]);
+	double y = as_number(prg, v[4]);
+	
+	Tilemap_Info *info = tilemap_info(prg);
+
+	gfx::Tilemap *tilemap = info->tilemaps[id];
+	
+	tilemap->draw(start_layer, end_layer, util::Point<float>(x, y));
+
+	return true;
+}
+
+static bool tilemapfunc_num_layers(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	Variable &v1 = as_variable(prg, v[1]);
+	
+	Tilemap_Info *info = tilemap_info(prg);
+
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Tilemap *tilemap = info->tilemaps[id];
+
+	v1.n = tilemap->get_num_layers();
+
+	return true;
+}
+
+static bool tilemapfunc_size(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	int id = as_number(prg, v[0]);
+	Variable &v1 = as_variable(prg, v[1]);
+	Variable &v2 = as_variable(prg, v[2]);
+	
+	Tilemap_Info *info = tilemap_info(prg);
+
+	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Tilemap *tilemap = info->tilemaps[id];
+
+	util::Size<int> sz = tilemap->get_size();
+
+	v1.n = sz.w;
+	v2.n = sz.h;
+
+	return true;
+}
+
 static void set_string_or_number(Program *prg, int index, double value)
 {
        Variable &v1 = booboo::get_variable(prg, index);
@@ -1777,6 +1888,11 @@ void start_lib_game()
 	add_instruction("font_draw", fontfunc_draw);
 	add_instruction("font_width", fontfunc_width);
 	add_instruction("font_height", fontfunc_height);
+	add_instruction("set_tile_size", tilemapfunc_set_tile_size);
+	add_instruction("tilemap_load", tilemapfunc_load);
+	add_instruction("tilemap_draw", tilemapfunc_draw);
+	add_instruction("tilemap_num_layers", tilemapfunc_num_layers);
+	add_instruction("tilemap_size", tilemapfunc_size);
 	add_instruction("mml_create", mmlfunc_create);
 	add_instruction("mml_load", mmlfunc_load);
 	add_instruction("mml_play", mmlfunc_play);
@@ -1825,6 +1941,10 @@ void game_lib_destroy_program(Program *prg)
 	for (size_t i = 0; i < font_i->fonts.size(); i++) {
 		delete font_i->fonts[i];
 	}
+	Tilemap_Info *tilemap_i = tilemap_info(prg);
+	for (size_t i = 0; i < tilemap_i->tilemaps.size(); i++) {
+		delete tilemap_i->tilemaps[i];
+	}
 	Shader_Info *shader_i = shader_info(prg);
 	for (size_t i = 0; i < shader_i->shaders.size(); i++) {
 		delete shader_i->shaders[i];
@@ -1835,6 +1955,7 @@ void game_lib_destroy_program(Program *prg)
 	delete sample_i;
 	delete image_i;
 	delete font_i;
+	delete tilemap_i;
 	delete cfg_i;
 	delete shader_i;
 
@@ -1842,6 +1963,7 @@ void game_lib_destroy_program(Program *prg)
 	booboo::set_black_box(prg, "com.b1stable.booboo.sample", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.image", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.font", nullptr);
+	booboo::set_black_box(prg, "com.b1stable.booboo.tilemap", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.cfg", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.shader", nullptr);
 }

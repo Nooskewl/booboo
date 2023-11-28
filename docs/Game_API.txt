@@ -29,6 +29,7 @@ The following sections describe the API:
 	Primitives Functions
 	Image Functions
 	Font Functions
+	Tilemap Functions
 	Shader Functions
 	Audio Functions
 	Input Functions
@@ -193,6 +194,32 @@ font_width
 font_height
 	get the height of a font
 	e.g. font_height font dest
+
+-- Tilemap Functions ---------------------------------------------------------
+
+set_tile_size
+	You should call this to set a (square) tile size before tilemap_load
+	unless your tiles are the default, 16 pixels in size.
+	e.g. set_tile_size 32
+
+tilemap_load
+	Load a tilemap from data/misc/maps. Tiles should be located in
+	data/gfx/images/tiles and named tiles0.png, tiles1.png and so on
+	(.tga is also supported.) See AshEdit for more details on maps
+	and creating them.
+	e.g. tilemap_load a_number "map.wm2"
+
+tilemap_draw
+	Draw a selection of tilemap layers
+	e.g. tilemap_draw tilemap start_layer_inclusive end_layer_inclusive x y
+
+tilemap_num_layers
+	Get the number of layers in a tilemap
+	e.g. tilemap_num_layers tilemap nl
+
+tilemap_size
+	Get the size of a tilemap in tiles
+	e.g. tilemap_size tilemap w h
 
 -- Shader Functions ----------------------------------------------------------
 
