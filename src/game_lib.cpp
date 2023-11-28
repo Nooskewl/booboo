@@ -31,6 +31,11 @@ struct Tilemap_Info {
 	std::map<int, gfx::Tilemap *> tilemaps;
 };
 
+struct Sprite_Info {
+	int sprite_id;
+	std::map<int, gfx::Sprite *> sprites;
+};
+
 struct Config_Value
 {
 	Variable::Variable_Type type;
@@ -117,6 +122,17 @@ static Tilemap_Info *tilemap_info(Program *prg)
 		info = new Tilemap_Info;
 		info->tilemap_id = 0;
 		booboo::set_black_box(prg, "com.b1stable.booboo.tilemap", info);
+	}
+	return info;
+}
+
+static Sprite_Info *sprite_info(Program *prg)
+{
+	Sprite_Info *info = (Sprite_Info *)booboo::get_black_box(prg, "com.b1stable.booboo.sprite");
+	if (info == nullptr) {
+		info = new Sprite_Info;
+		info->sprite_id = 0;
+		booboo::set_black_box(prg, "com.b1stable.booboo.sprite", info);
 	}
 	return info;
 }
@@ -1347,6 +1363,208 @@ static bool tilemapfunc_is_solid(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool spritefunc_load(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	if (v1.type == Variable::NUMBER) {
+		v1.n = info->sprite_id;
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Sprite *sprite = new gfx::Sprite(name, name);
+
+	info->sprites[info->sprite_id++] = sprite;
+
+	return true;
+}
+
+struct Sprite_Callback_Data
+{
+	Program *prg;
+	int function;
+};
+
+static void sprite_callback(void *data)
+{
+	Sprite_Callback_Data *d = static_cast<Sprite_Callback_Data *>(data);
+	std::vector<Token> v;
+	call_void_function(d->prg, d->function, v, 1);
+	delete d;
+}
+
+static bool spritefunc_set_animation(Program *prg, std::vector<Token> &v)
+{
+	int id = as_number(prg, v[0]);
+	std::string anim = as_string(prg, v[1]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	if (v.size() > 2) {
+		Sprite_Callback_Data *d = new Sprite_Callback_Data;
+		d->prg = prg;
+		d->function = as_function(prg, v[2]);
+		sprite->set_animation(anim, sprite_callback, d);
+	}
+	else {
+		sprite->set_animation(anim);
+	}
+
+	return true;
+}
+
+static bool spritefunc_get_animation(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	Variable &v1 = as_variable(prg, v[1]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	if (v1.type != Variable::STRING) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	v1.s = sprite->get_animation();
+
+	return true;
+}
+
+static bool spritefunc_get_current_frame(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	Variable &v1 = as_variable(prg, v[1]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	v1.n = sprite->get_current_frame();
+
+	return true;
+}
+
+static bool spritefunc_get_num_frames(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	Variable &v1 = as_variable(prg, v[1]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	v1.n = sprite->get_num_frames();
+
+	return true;
+}
+
+static bool spritefunc_get_length(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	Variable &v1 = as_variable(prg, v[1]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	v1.n = sprite->get_length();
+
+	return true;
+}
+
+static bool spritefunc_get_current_frame_size(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	int id = as_number(prg, v[0]);
+	Variable &v1 = as_variable(prg, v[1]);
+	Variable &v2 = as_variable(prg, v[2]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	gfx::Image *img = sprite->get_current_image();
+
+	v1.n = img->size.w;
+	v2.n = img->size.h;
+
+	return true;
+}
+
+static bool spritefunc_draw(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(9)
+
+	int id = as_number(prg, v[0]);
+	int r = as_number(prg, v[1]);
+	int g = as_number(prg, v[2]);
+	int b = as_number(prg, v[3]);
+	int a = as_number(prg, v[4]);
+	double dx = as_number(prg, v[5]);
+	double dy = as_number(prg, v[6]);
+	int flip_h = as_number(prg, v[7]);
+	int flip_v = as_number(prg, v[8]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	gfx::Image *img = sprite->get_current_image();
+
+	int flags = 0;
+	if (flip_h != 0.0) {
+		flags |= gfx::Image::FLIP_H;
+	}
+	if (flip_v != 0.0) {
+		flags |= gfx::Image::FLIP_V;
+	}
+
+	SDL_Colour tint;
+	tint.r = r;
+	tint.g = g;
+	tint.b = b;
+	tint.a = a;
+
+	img->draw_tinted(tint, util::Point<float>(dx, dy), flags);
+
+	return true;
+}
+
 static void set_string_or_number(Program *prg, int index, double value)
 {
        Variable &v1 = booboo::get_variable(prg, index);
@@ -1915,6 +2133,15 @@ void start_lib_game()
 	add_instruction("tilemap_draw", tilemapfunc_draw);
 	add_instruction("tilemap_num_layers", tilemapfunc_num_layers);
 	add_instruction("tilemap_size", tilemapfunc_size);
+	add_instruction("tilemap_is_solid", tilemapfunc_is_solid);
+	add_instruction("sprite_load", spritefunc_load);
+	add_instruction("sprite_set_animation", spritefunc_set_animation);
+	add_instruction("sprite_get_animation", spritefunc_get_animation);
+	add_instruction("sprite_get_length", spritefunc_get_length);
+	add_instruction("sprite_get_current_frame", spritefunc_get_current_frame);
+	add_instruction("sprite_get_num_frames", spritefunc_get_num_frames);
+	add_instruction("sprite_get_current_frame_size", spritefunc_get_current_frame_size);
+	add_instruction("sprite_draw", spritefunc_draw);
 	add_instruction("mml_create", mmlfunc_create);
 	add_instruction("mml_load", mmlfunc_load);
 	add_instruction("mml_play", mmlfunc_play);
@@ -1967,6 +2194,10 @@ void game_lib_destroy_program(Program *prg)
 	for (size_t i = 0; i < tilemap_i->tilemaps.size(); i++) {
 		delete tilemap_i->tilemaps[i];
 	}
+	Sprite_Info *sprite_i = sprite_info(prg);
+	for (size_t i = 0; i < sprite_i->sprites.size(); i++) {
+		delete sprite_i->sprites[i];
+	}
 	Shader_Info *shader_i = shader_info(prg);
 	for (size_t i = 0; i < shader_i->shaders.size(); i++) {
 		delete shader_i->shaders[i];
@@ -1986,6 +2217,7 @@ void game_lib_destroy_program(Program *prg)
 	booboo::set_black_box(prg, "com.b1stable.booboo.image", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.font", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.tilemap", nullptr);
+	booboo::set_black_box(prg, "com.b1stable.booboo.sprite", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.cfg", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.shader", nullptr);
 }

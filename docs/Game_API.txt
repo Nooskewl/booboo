@@ -28,6 +28,7 @@ The following sections describe the API:
 	Graphics Functions
 	Primitives Functions
 	Image Functions
+	Sprite Functions
 	Font Functions
 	Tilemap Functions
 	Shader Functions
@@ -175,6 +176,40 @@ image_end
 image_size
 	get image width/height
 	e.g. image_size img w h
+
+-- Sprite Functions ----------------------------------------------------------
+
+sprite_load
+	Load a sprite. Please see the example for the format of a sprite.
+	Basically, each animation in a sprite is a sprite sheet exported
+	from Aseprite. Then there is a sprite.json which has a list of
+	animation names.
+	e.g. sprite_load sprite "my_sprite"
+
+sprite_set_animation
+	Set the current animation. You can optionally add a callback which
+	will be called when the animation is finished.
+	e.g. sprite_set_animation sprite "punch" my_function
+
+sprite_get_animation
+	Returns the name of the current animation
+	e.g. sprite_get_animation sprite anim_name
+
+sprite_get_length
+	Returns the total length in milliseconds of the current animation
+	e.g. sprite_get_length sprite l
+
+sprite_get_current_frame
+	Returns the current frame number
+	e.g.  sprite_get_current_frame sprite n
+
+sprite_get_num_frames
+	Gets the number of frames in the current animation
+	e.g. sprite_get_num_frames sprite nf
+
+sprite_get_current_frame_size
+	Returns the size of the current frame's image
+	e.g. sprite_get_current_frame_size sprite w h
 
 -- Font Functions ------------------------------------------------------------
 
