@@ -188,7 +188,9 @@ sprite_load
 
 sprite_set_animation
 	Set the current animation. You can optionally add a callback which
-	will be called when the animation is finished.
+	will be called when the animation is finished. The callback takes
+	1 parameter which will be the sprite (number) that set_animation
+	was called on.
 	e.g. sprite_set_animation sprite "punch" my_function
 
 sprite_get_animation
