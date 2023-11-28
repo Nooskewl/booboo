@@ -1,3 +1,5 @@
+#include <shim4/shim4.h>
+
 #include <sys/stat.h>
 
 #include <climits>
@@ -14,131 +16,6 @@ static std::vector<booboo::expression_func> expression_handlers;
 
 // First off maybe 10 utility functions taken from Nooskewl Shim
 
-// FIXME: make a utility file because this is shared with core_launcher
-static std::string load_text_from_filesystem(std::string filename)
-{
-	int _sz;
-	struct stat st;
-	int r = stat(filename.c_str(), &st);
-	if (r == 0) {
-		_sz = st.st_size;
-	}
-	else {
-		throw booboo::Error("booboo::Error getting file size: " + filename);
-	}
-
-	FILE *file = fopen(filename.c_str(), "rb");
-
-	if (file == nullptr) {
-		throw booboo::Error("File not found: " + filename);
-	}
-
-	char *buf = new char[_sz+1];
-
-	if (fread(buf, _sz, 1, file) != 1) {
-		throw booboo::Error("File load error: " + filename);
-	}
-
-	fclose(file);
-
-	buf[_sz] = 0;
-
-	std::string text = buf;
-
-	delete[] buf;
-
-	return text;
-}
-
-static std::string &ltrim(std::string &s)
-{
-	int i = 0;
-	while (i < (int)s.length() && isspace(s[i])) {
-		i++;
-	}
-	if (i >= (int)s.length()) {
-		s = "";
-	}
-	else {
-		s = s.substr(i);
-	}
-	return s;
-}
-
-static std::string &rtrim(std::string &s)
-{
-	int i = (int)s.length() - 1;
-	while (i >= 0 && isspace(s[i])) {
-		i--;
-	}
-	if (i < 0) {
-		s = "";
-	}
-	else {
-		s = s.substr(0, i+1);
-	}
-	return s;
-}
-
-static std::string &trim(std::string &s)
-{
-	return ltrim(rtrim(s));
-}
-
-static std::string unescape_string(std::string s)
-{
-	std::string ret;
-	int p = 0;
-	char buf[2];
-	buf[1] = 0;
-
-	if (s.length() == 0) {
-		return "";
-	}
-
-	while (p < (int)s.length()) {
-		if (s[p] == '\\') {
-			if (p+1 < (int)s.length()) {
-				if (s[p+1] == '\\' || s[p+1] == '"') {
-					p++;
-					buf[0] = s[p];
-					ret += buf;
-					p++;
-				}
-				else if (s[p+1] == 'n') {
-					p++;
-					buf[0] = '\n';
-					ret += buf;
-					p++;
-				}
-				else if (s[p+1] == 't') {
-					p++;
-					buf[0] = '\t';
-					ret += buf;
-					p++;
-				}
-				else {
-					buf[0] = '\\';
-					ret += buf;
-					p++;
-				}
-			}
-			else {
-				buf[0] = '\\';
-				ret += buf;
-				p++;
-			}
-		}
-		else {
-			buf[0] = s[p];
-			ret += buf;
-			p++;
-		}
-	}
-
-	return ret;
-}
-
 static void skip_whitespace(booboo::Program *prg)
 {
 	while (prg->s->p < prg->s->code.length() && isspace(prg->s->code[prg->s->p])) {
@@ -151,19 +28,19 @@ static void skip_whitespace(booboo::Program *prg)
 
 static std::string remove_quotes(std::string s)
 {
-	int start = 0;
-	int count = s.length();
+       int start = 0;
+       int count = s.length();
 
-	if (s[0] == '"') {
-		start++;
-		count--;
-	}
+       if (s[0] == '"') {
+               start++;
+               count--;
+       }
 
-	if (s[s.length()-1] == '"') {
-		count--;
-	}
+       if (s[s.length()-1] == '"') {
+               count--;
+       }
 
-	return s.substr(start, count);
+       return s.substr(start, count);
 }
 
 namespace booboo {
@@ -490,16 +367,16 @@ bool process_includes(Program *prg)
 				throw Error(std::string(__FUNCTION__) + ": " + "Invalid include name at " + get_error_info(prg));
 			}
 
-			name = remove_quotes(unescape_string(name));
+			name = remove_quotes(util::unescape_string(name));
 
 			code += prg->s->code.substr(start, prev-start);
 
 			std::string new_code;
 			std::string fn;
 			fn = name;
-			new_code = load_text_from_filesystem(name);
+			new_code = util::load_text("scripts/" + name);
 
-			new_code = trim(new_code);
+			new_code = util::trim(new_code);
 
 			int nlines = 1;
 			int i = 0;
@@ -721,7 +598,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 				prev = buf[0];
 				p++;
 			}
-			str = remove_quotes(unescape_string(str));
+			str = remove_quotes(util::unescape_string(str));
 			tok.token = str;
 			tok.s = str;
 		}
@@ -944,7 +821,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 				prev = buf[0];
 				p++;
 			}
-			str = remove_quotes(unescape_string(str));
+			str = remove_quotes(util::unescape_string(str));
 			tok.token = str;
 			tok.s = str;
 		}
@@ -1237,10 +1114,10 @@ func_top:
 					t.type = tt;
 					switch (tt) {
 						case Token::STRING:
-							t.s = remove_quotes(unescape_string(tok));
+							t.s = remove_quotes(util::unescape_string(tok));
 							break;
 						case Token::SYMBOL:
-							t.s = remove_quotes(unescape_string(tok));
+							t.s = remove_quotes(util::unescape_string(tok));
 							if (pass == PASS2 && prg->variables_map.find(t.s) == prg->variables_map.end()) {
 								func.line_numbers.push_back(prg->s->line); // can help give better line number
 								throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok + " at " + get_error_info(&func));
@@ -1430,10 +1307,10 @@ func_top:
 			t.type = tt;
 			switch (tt) {
 				case Token::STRING:
-					t.s = remove_quotes(unescape_string(tok));
+					t.s = remove_quotes(util::unescape_string(tok));
 					break;
 				case Token::SYMBOL:
-					t.s = remove_quotes(unescape_string(tok));
+					t.s = remove_quotes(util::unescape_string(tok));
 					if (pass == PASS2 && prg->variables_map.find(t.s) == prg->variables_map.end()) {
 						throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok + " at " + get_error_info(prg));
 					}

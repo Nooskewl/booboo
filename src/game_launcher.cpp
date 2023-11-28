@@ -1025,7 +1025,7 @@ again:
 
 	if (was_reset) {
 		try {
-			code = util::load_text_from_filesystem(fn);
+			code = util::load_text("scripts/" + fn);
 		}
 		catch (util::Error &e) {
 			gui::fatalerror("ERROR", "Program is missing or corrupt!", gui::OK, true);
@@ -1036,7 +1036,7 @@ again:
 	else {
 		if (fn != "") {
 			try {
-				code = util::load_text_from_filesystem(fn);
+				code = util::load_text("scripts/" + fn);
 			}
 			catch (util::Error &e) {
 				gui::fatalerror("ERROR", "Program is missing or corrupt!", gui::OK, true);
@@ -1046,7 +1046,7 @@ again:
 		}
 		else {
 			try {
-				code = util::load_text_from_filesystem("main.boo");
+				code = util::load_text("scripts/main.boo");
 			}
 			catch (util::Error &e) {
 				gui::fatalerror("ERROR", "Program is missing or corrupt!", gui::OK, true);
