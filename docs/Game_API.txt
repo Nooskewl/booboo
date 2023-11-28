@@ -221,6 +221,10 @@ tilemap_size
 	Get the size of a tilemap in tiles
 	e.g. tilemap_size tilemap w h
 
+tilemap_is_solid
+	Check if a tile is walkable
+	e.g. tilemap_is_solid tilemap solid x y
+
 -- Shader Functions ----------------------------------------------------------
 
 shader_load

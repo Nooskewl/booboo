@@ -1325,6 +1325,28 @@ static bool tilemapfunc_size(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool tilemapfunc_is_solid(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int id = as_number(prg, v[0]);
+	Variable &v1 = as_variable(prg, v[1]);
+	int x = as_number(prg, v[2]);
+	int y = as_number(prg, v[3]);
+	
+	Tilemap_Info *info = tilemap_info(prg);
+
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Tilemap *tilemap = info->tilemaps[id];
+
+	v1.n = tilemap->is_solid(-1, util::Point<int>(x, y));
+
+	return true;
+}
+
 static void set_string_or_number(Program *prg, int index, double value)
 {
        Variable &v1 = booboo::get_variable(prg, index);
