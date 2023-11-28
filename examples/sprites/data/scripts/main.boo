@@ -41,15 +41,15 @@ vector_add names "attack_limbs_a_flailin"
 vector_add names "attack_defend"
 vector_add names "defend"
 
-call callback
+call callback sprite
 
-function callback
+function callback id
 {
 	number sz
 	vector_size names sz
 	number r
 	rand r 0 (- sz 1)
-	sprite_set_animation sprite [names r] callback
+	sprite_set_animation id [names r] callback
 }
 
 function draw

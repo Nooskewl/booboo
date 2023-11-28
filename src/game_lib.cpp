@@ -1390,12 +1390,17 @@ struct Sprite_Callback_Data
 {
 	Program *prg;
 	int function;
+	int id;
 };
 
 static void sprite_callback(void *data)
 {
 	Sprite_Callback_Data *d = static_cast<Sprite_Callback_Data *>(data);
 	std::vector<Token> v;
+	Token t;
+	t.type = Token::NUMBER;
+	t.n = d->id;
+	v.push_back(t);
 	call_void_function(d->prg, d->function, v, 1);
 	delete d;
 }
@@ -1413,6 +1418,7 @@ static bool spritefunc_set_animation(Program *prg, std::vector<Token> &v)
 		Sprite_Callback_Data *d = new Sprite_Callback_Data;
 		d->prg = prg;
 		d->function = as_function(prg, v[2]);
+		d->id = id;
 		sprite->set_animation(anim, sprite_callback, d);
 	}
 	else {
