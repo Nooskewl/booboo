@@ -35,6 +35,7 @@ The following sections describe the API:
 	Audio Functions
 	Input Functions
 	Vector Functions
+	JSON Functions
 	Configuration Functions
 
 -- Core Functions ------------------------------------------------------------
@@ -350,6 +351,22 @@ key_get
 	Read if a key is pressed or not. Please use or modify keycodes.inc
 	From the 'keys' example for keycode constants.
 	e.g. key_get dest KEY_SPACE
+
+-- JSON Functions ------------------------------------------------------------
+
+json_load
+	Load a JSON file
+	e.g. json_load j "file.json"
+
+json_as_string
+	Read a string from JSON
+	You can dig down into the file by separating keys with ">"
+	e.g. json_as_string json s "settings>profile>name"
+
+json_as_number
+	Read a number from JSON
+	You can dig down into the file by separating keys with ">"
+	e.g. json_as_number json n "settings>mouse>sensitivity"
 
 -- Configuration Functions ---------------------------------------------------
 

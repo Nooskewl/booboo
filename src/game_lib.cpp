@@ -54,6 +54,11 @@ struct Shader_Info {
 	std::map<int, gfx::Shader *> shaders;
 };
 
+struct JSON_Info {
+	int json_id;
+	std::map<int, util::JSON *> jsons;
+};
+
 static std::string remove_quotes(std::string s)
 {
 	int start = 0;
@@ -155,6 +160,17 @@ static Shader_Info *shader_info(Program *prg)
 		info = new Shader_Info;
 		info->shader_id = 0;
 		booboo::set_black_box(prg, "com.b1stable.booboo.shader", info);
+	}
+	return info;
+}
+
+static JSON_Info *json_info(Program *prg)
+{
+	JSON_Info *info = (JSON_Info *)booboo::get_black_box(prg, "com.b1stable.booboo.json");
+	if (info == nullptr) {
+		info = new JSON_Info;
+		info->json_id = 0;
+		booboo::set_black_box(prg, "com.b1stable.booboo.json", info);
 	}
 	return info;
 }
@@ -2097,6 +2113,74 @@ static bool shaderfunc_set_colour(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool jsonfunc_load(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable(prg, v[0]);
+
+	std::string name = as_string(prg, v[1]);
+
+	JSON_Info *info = json_info(prg);
+
+	if (v1.type == Variable::NUMBER) {
+		v1.n = info->json_id;
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	util::JSON *json = new util::JSON(name);
+
+	info->jsons[info->json_id++] = json;
+
+	return true;
+}
+
+static bool jsonfunc_as_string(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	double id = as_number(prg, v[0]);
+	Variable &v1 = as_variable(prg, v[1]);
+	std::string name = as_string(prg, v[2]);
+	
+	JSON_Info *info = json_info(prg);
+	util::JSON *json = info->jsons[id];
+
+	if (v1.type == Variable::STRING) {
+		util::JSON::Node *n = json->get_root()->find(name);
+		v1.s = n->as_string();
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
+static bool jsonfunc_as_number(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	double id = as_number(prg, v[0]);
+	Variable &v1 = as_variable(prg, v[1]);
+	std::string name = as_string(prg, v[2]);
+	
+	JSON_Info *info = json_info(prg);
+	util::JSON *json = info->jsons[id];
+
+	if (v1.type == Variable::NUMBER) {
+		util::JSON::Node *n = json->get_root()->find(name);
+		v1.n = n->as_float();
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
 void start_lib_game()
 {
 	add_instruction("inspect", miscfunc_inspect);
@@ -2172,6 +2256,9 @@ void start_lib_game()
 	add_instruction("shader_set_float", shaderfunc_set_float);
 	add_instruction("shader_set_colour", shaderfunc_set_colour);
 	add_instruction("shader_set_texture", shaderfunc_set_texture);
+	add_instruction("json_load", jsonfunc_load);
+	add_instruction("json_as_string", jsonfunc_as_string);
+	add_instruction("json_as_number", jsonfunc_as_number);
 }
 
 void end_lib_game()
@@ -2208,6 +2295,10 @@ void game_lib_destroy_program(Program *prg)
 	for (size_t i = 0; i < shader_i->shaders.size(); i++) {
 		delete shader_i->shaders[i];
 	}
+	JSON_Info *json_i = json_info(prg);
+	for (size_t i = 0; i < json_i->jsons.size(); i++) {
+		delete json_i->jsons[i];
+	}
 	CFG_Info *cfg_i = cfg_info(prg);
 
 	delete mml_i;
@@ -2226,4 +2317,5 @@ void game_lib_destroy_program(Program *prg)
 	booboo::set_black_box(prg, "com.b1stable.booboo.sprite", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.cfg", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.shader", nullptr);
+	booboo::set_black_box(prg, "com.b1stable.booboo.json", nullptr);
 }
