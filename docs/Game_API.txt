@@ -361,11 +361,13 @@ json_load
 json_as_string
 	Read a string from JSON
 	You can dig down into the file by separating keys with ">"
+	"[0]" "[1]" etc can be used to access arrays.
 	e.g. json_as_string json s "settings>profile>name"
 
 json_as_number
 	Read a number from JSON
 	You can dig down into the file by separating keys with ">"
+	"[0]" "[1]" etc can be used to access arrays.
 	e.g. json_as_number json n "settings>mouse>sensitivity"
 
 -- Configuration Functions ---------------------------------------------------
