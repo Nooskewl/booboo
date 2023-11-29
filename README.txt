@@ -7,6 +7,7 @@ Just enter data/ and run it, and it will create ../data.cpa. The shaders
 you'll find in the examples' data/ directories are all or partly required
 to make BooBoo work.
 
-BooBoo is free to download and use, be redistribution requires a license.
-Please send $100 CAD via PayPal to trentgamblin@hotmail.com to get a
-redistribution license.
+BooBoo is free to download and use, but redistribution requires a license.
+Please send $100 CAD via PayPal to contact@cmykilluminati.net to get a
+redistribution license. Send email to the same address for further details.
+
