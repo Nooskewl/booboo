@@ -2137,7 +2137,7 @@ static bool jsonfunc_load(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool jsonfunc_as_string(Program *prg, std::vector<Token> &v)
+static bool jsonfunc_get_string(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -2159,7 +2159,7 @@ static bool jsonfunc_as_string(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool jsonfunc_as_number(Program *prg, std::vector<Token> &v)
+static bool jsonfunc_get_number(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -2257,8 +2257,8 @@ void start_lib_game()
 	add_instruction("shader_set_colour", shaderfunc_set_colour);
 	add_instruction("shader_set_texture", shaderfunc_set_texture);
 	add_instruction("json_load", jsonfunc_load);
-	add_instruction("json_as_string", jsonfunc_as_string);
-	add_instruction("json_as_number", jsonfunc_as_number);
+	add_instruction("json_get_string", jsonfunc_get_string);
+	add_instruction("json_get_number", jsonfunc_get_number);
 }
 
 void end_lib_game()
