@@ -3,7 +3,7 @@ project("BooBoo")
 
 # Options
 
-option(GAME_LAUNCHER "Build the game launcher" OFF)
+option(GAME_LAUNCHER "Build the game launcher" ON)
 option(LUA "Link with Lua for benchmarks" OFF)
 option(DEBUG "Debug build" OFF)
 option(USE_STATIC_LIBS "Link with static libraries" ON)
