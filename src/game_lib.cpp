@@ -1417,7 +1417,7 @@ static void sprite_callback(void *data)
 	t.type = Token::NUMBER;
 	t.n = d->id;
 	v.push_back(t);
-	call_void_function(d->prg, d->function, v, 1);
+	call_void_function(d->prg, d->function, v, 0);
 	delete d;
 }
 
