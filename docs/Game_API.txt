@@ -373,7 +373,7 @@ json_get_number
 -- Configuration Functions ---------------------------------------------------
 
 cfg_load
-	load a config file checking for success
+	load a config file
 	e.g. cfg_load cfg "com.b1stable.example"
 
 cfg_save
