@@ -2200,7 +2200,7 @@ static bool jsonfunc_get_number(Program *prg, std::vector<Token> &v)
 
 	if (v1.type == Variable::NUMBER) {
 		util::JSON::Node *n = json->get_root()->find(name);
-		v1.n = n->as_float();
+		v1.n = n->as_double();
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
