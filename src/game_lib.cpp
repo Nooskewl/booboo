@@ -355,6 +355,33 @@ static bool miscfunc_rand(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool miscfunc_argc(Program *prg, std::vector<Token> &v)
+{
+	Variable &v1 = as_variable(prg, v[0]);
+	
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v1.n = shim::argc;
+
+	return true;
+}
+
+static bool miscfunc_argv(Program *prg, std::vector<Token> &v)
+{
+	Variable &v1 = as_variable(prg, v[0]);
+	int i = as_number(prg, v[1]);
+	
+	if (v1.type != Variable::STRING) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v1.s = shim::argv[i];
+
+	return true;
+}
+
 static bool gfxfunc_clear(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
@@ -2187,6 +2214,8 @@ void start_lib_game()
 	add_instruction("delay", miscfunc_delay);
 	add_instruction("get_ticks", miscfunc_get_ticks);
 	add_instruction("rand", miscfunc_rand);
+	add_instruction("argc", miscfunc_argc);
+	add_instruction("argv", miscfunc_argv);
 	add_instruction("clear", gfxfunc_clear);
 	add_instruction("flip", gfxfunc_flip);
 	add_instruction("resize", gfxfunc_resize);
