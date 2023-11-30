@@ -1,6 +1,7 @@
 #include <shim4/shim4.h>
 
 #include "booboo/booboo.h"
+#include "booboo/internal.h"
 
 using namespace booboo;
 
@@ -315,14 +316,14 @@ static bool miscfunc_delay(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int millis = (int)as_number(prg, v[0]);
+	int millis = (int)as_number_inline(prg, v[0]);
 	SDL_Delay(millis);
 	return true;
 }
 
 static bool miscfunc_get_ticks(Program *prg, std::vector<Token> &v)
 {
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 	
 	if (v1.type != Variable::NUMBER) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -337,10 +338,10 @@ static bool miscfunc_rand(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
-	int min_incl = as_number(prg, v[1]);
-	int max_incl = as_number(prg, v[2]);
+	int min_incl = as_number_inline(prg, v[1]);
+	int max_incl = as_number_inline(prg, v[2]);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = util::rand(min_incl, max_incl);
@@ -357,7 +358,7 @@ static bool miscfunc_rand(Program *prg, std::vector<Token> &v)
 
 static bool miscfunc_argc(Program *prg, std::vector<Token> &v)
 {
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 	
 	if (v1.type != Variable::NUMBER) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -370,8 +371,8 @@ static bool miscfunc_argc(Program *prg, std::vector<Token> &v)
 
 static bool miscfunc_argv(Program *prg, std::vector<Token> &v)
 {
-	Variable &v1 = as_variable(prg, v[0]);
-	int i = as_number(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	int i = as_number_inline(prg, v[1]);
 	
 	if (v1.type != Variable::STRING) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -387,9 +388,9 @@ static bool gfxfunc_clear(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(3)
 
 	SDL_Colour c;
-	c.r = as_number(prg, v[0]);
-	c.g = as_number(prg, v[1]);
-	c.b = as_number(prg, v[2]);
+	c.r = as_number_inline(prg, v[0]);
+	c.g = as_number_inline(prg, v[1]);
+	c.b = as_number_inline(prg, v[2]);
 	c.a = 255;
 
 	gfx::clear(c);
@@ -410,8 +411,8 @@ static bool gfxfunc_resize(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 	
-	int w = as_number(prg, v[0]);
-	int h = as_number(prg, v[1]);
+	int w = as_number_inline(prg, v[0]);
+	int h = as_number_inline(prg, v[1]);
 
 	float aspect = (float)w/h;
 	gfx::set_min_aspect_ratio(aspect-0.001f);
@@ -423,8 +424,8 @@ static bool gfxfunc_resize(Program *prg, std::vector<Token> &v)
 
 static bool gfxfunc_get_screen_size(Program *prg, std::vector<Token> &v)
 {
-	Variable &v1 = as_variable(prg, v[0]);
-	Variable &v2 = as_variable(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	Variable &v2 = as_variable_inline(prg, v[1]);
 	
 	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -438,8 +439,8 @@ static bool gfxfunc_get_screen_size(Program *prg, std::vector<Token> &v)
 
 static bool gfxfunc_get_buffer_size(Program *prg, std::vector<Token> &v)
 {
-	Variable &v1 = as_variable(prg, v[0]);
-	Variable &v2 = as_variable(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	Variable &v2 = as_variable_inline(prg, v[1]);
 	
 	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -453,8 +454,8 @@ static bool gfxfunc_get_buffer_size(Program *prg, std::vector<Token> &v)
 
 static bool gfxfunc_get_screen_offset(Program *prg, std::vector<Token> &v)
 {
-	Variable &v1 = as_variable(prg, v[0]);
-	Variable &v2 = as_variable(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	Variable &v2 = as_variable_inline(prg, v[1]);
 	
 	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -468,7 +469,7 @@ static bool gfxfunc_get_screen_offset(Program *prg, std::vector<Token> &v)
 
 static bool gfxfunc_get_scale(Program *prg, std::vector<Token> &v)
 {
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 	
 	if (v1.type != Variable::NUMBER) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -483,7 +484,7 @@ static bool gfxfunc_set_target(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double id = as_number(prg, v[0]);
+	double id = as_number_inline(prg, v[0]);
 
 	Image_Info *info = image_info(prg);
 
@@ -532,19 +533,19 @@ static bool primfunc_line(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(9)
 
 	SDL_Colour c;
-	c.r = as_number(prg, v[0]);
-	c.g = as_number(prg, v[1]);
-	c.b = as_number(prg, v[2]);
-	c.a = as_number(prg, v[3]);
+	c.r = as_number_inline(prg, v[0]);
+	c.g = as_number_inline(prg, v[1]);
+	c.b = as_number_inline(prg, v[2]);
+	c.a = as_number_inline(prg, v[3]);
 
 	util::Point<float> p1, p2;
 
-	p1.x = as_number(prg, v[4]);
-	p1.y = as_number(prg, v[5]);
-	p2.x = as_number(prg, v[6]);
-	p2.y = as_number(prg, v[7]);
+	p1.x = as_number_inline(prg, v[4]);
+	p1.y = as_number_inline(prg, v[5]);
+	p2.x = as_number_inline(prg, v[6]);
+	p2.y = as_number_inline(prg, v[7]);
 
-	float thick = as_number(prg, v[8]);
+	float thick = as_number_inline(prg, v[8]);
 
 	gfx::draw_line(c, p1, p2, thick);
 
@@ -556,27 +557,27 @@ static bool primfunc_filled_triangle(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(18)
 
 	SDL_Colour c[3];
-	c[0].r = as_number(prg, v[0]);
-	c[0].g = as_number(prg, v[1]);
-	c[0].b = as_number(prg, v[2]);
-	c[0].a = as_number(prg, v[3]);
-	c[1].r = as_number(prg, v[4]);
-	c[1].g = as_number(prg, v[5]);
-	c[1].b = as_number(prg, v[6]);
-	c[1].a = as_number(prg, v[7]);
-	c[2].r = as_number(prg, v[8]);
-	c[2].g = as_number(prg, v[9]);
-	c[2].b = as_number(prg, v[10]);
-	c[2].a = as_number(prg, v[11]);
+	c[0].r = as_number_inline(prg, v[0]);
+	c[0].g = as_number_inline(prg, v[1]);
+	c[0].b = as_number_inline(prg, v[2]);
+	c[0].a = as_number_inline(prg, v[3]);
+	c[1].r = as_number_inline(prg, v[4]);
+	c[1].g = as_number_inline(prg, v[5]);
+	c[1].b = as_number_inline(prg, v[6]);
+	c[1].a = as_number_inline(prg, v[7]);
+	c[2].r = as_number_inline(prg, v[8]);
+	c[2].g = as_number_inline(prg, v[9]);
+	c[2].b = as_number_inline(prg, v[10]);
+	c[2].a = as_number_inline(prg, v[11]);
 
 	util::Point<float> p1, p2, p3;
 
-	p1.x = as_number(prg, v[12]);
-	p1.y = as_number(prg, v[13]);
-	p2.x = as_number(prg, v[14]);
-	p2.y = as_number(prg, v[15]);
-	p3.x = as_number(prg, v[16]);
-	p3.y = as_number(prg, v[17]);
+	p1.x = as_number_inline(prg, v[12]);
+	p1.y = as_number_inline(prg, v[13]);
+	p2.x = as_number_inline(prg, v[14]);
+	p2.y = as_number_inline(prg, v[15]);
+	p3.x = as_number_inline(prg, v[16]);
+	p3.y = as_number_inline(prg, v[17]);
 
 	gfx::draw_filled_triangle(c, p1, p2, p3);
 
@@ -588,20 +589,20 @@ static bool primfunc_rectangle(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(9)
 
 	SDL_Colour c;
-	c.r = as_number(prg, v[0]);
-	c.g = as_number(prg, v[1]);
-	c.b = as_number(prg, v[2]);
-	c.a = as_number(prg, v[3]);
+	c.r = as_number_inline(prg, v[0]);
+	c.g = as_number_inline(prg, v[1]);
+	c.b = as_number_inline(prg, v[2]);
+	c.a = as_number_inline(prg, v[3]);
 
 	util::Point<float> p;
 	util::Size<float> sz;
 
-	p.x = as_number(prg, v[4]);
-	p.y = as_number(prg, v[5]);
-	sz.w = as_number(prg, v[6]);
-	sz.h = as_number(prg, v[7]);
+	p.x = as_number_inline(prg, v[4]);
+	p.y = as_number_inline(prg, v[5]);
+	sz.w = as_number_inline(prg, v[6]);
+	sz.h = as_number_inline(prg, v[7]);
 
-	float thick = as_number(prg, v[8]);
+	float thick = as_number_inline(prg, v[8]);
 
 	gfx::draw_rectangle(c, p, sz, thick);
 
@@ -613,32 +614,32 @@ static bool primfunc_filled_rectangle(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(20)
 
 	SDL_Colour c[4];
-	c[0].r = as_number(prg, v[0]);
-	c[0].g = as_number(prg, v[1]);
-	c[0].b = as_number(prg, v[2]);
-	c[0].a = as_number(prg, v[3]);
-	c[1].r = as_number(prg, v[4]);
-	c[1].g = as_number(prg, v[5]);
-	c[1].b = as_number(prg, v[6]);
-	c[1].a = as_number(prg, v[7]);
-	c[2].r = as_number(prg, v[8]);
-	c[2].g = as_number(prg, v[9]);
-	c[2].b = as_number(prg, v[10]);
-	c[2].a = as_number(prg, v[11]);
-	c[3].r = as_number(prg, v[12]);
-	c[3].g = as_number(prg, v[13]);
-	c[3].b = as_number(prg, v[14]);
-	c[3].a = as_number(prg, v[15]);
+	c[0].r = as_number_inline(prg, v[0]);
+	c[0].g = as_number_inline(prg, v[1]);
+	c[0].b = as_number_inline(prg, v[2]);
+	c[0].a = as_number_inline(prg, v[3]);
+	c[1].r = as_number_inline(prg, v[4]);
+	c[1].g = as_number_inline(prg, v[5]);
+	c[1].b = as_number_inline(prg, v[6]);
+	c[1].a = as_number_inline(prg, v[7]);
+	c[2].r = as_number_inline(prg, v[8]);
+	c[2].g = as_number_inline(prg, v[9]);
+	c[2].b = as_number_inline(prg, v[10]);
+	c[2].a = as_number_inline(prg, v[11]);
+	c[3].r = as_number_inline(prg, v[12]);
+	c[3].g = as_number_inline(prg, v[13]);
+	c[3].b = as_number_inline(prg, v[14]);
+	c[3].a = as_number_inline(prg, v[15]);
 
 	util::Point<float> p;
 
-	p.x = as_number(prg, v[16]);
-	p.y = as_number(prg, v[17]);
+	p.x = as_number_inline(prg, v[16]);
+	p.y = as_number_inline(prg, v[17]);
 
 	util::Size<float> sz;
 
-	sz.w = as_number(prg, v[18]);
-	sz.h = as_number(prg, v[19]);
+	sz.w = as_number_inline(prg, v[18]);
+	sz.h = as_number_inline(prg, v[19]);
 
 	gfx::draw_filled_rectangle(c, p, sz);
 
@@ -650,20 +651,20 @@ static bool primfunc_ellipse(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(10)
 
 	SDL_Colour c;
-	c.r = as_number(prg, v[0]);
-	c.g = as_number(prg, v[1]);
-	c.b = as_number(prg, v[2]);
-	c.a = as_number(prg, v[3]);
+	c.r = as_number_inline(prg, v[0]);
+	c.g = as_number_inline(prg, v[1]);
+	c.b = as_number_inline(prg, v[2]);
+	c.a = as_number_inline(prg, v[3]);
 
 	util::Point<float> p;
 
-	p.x = as_number(prg, v[4]);
-	p.y = as_number(prg, v[5]);
+	p.x = as_number_inline(prg, v[4]);
+	p.y = as_number_inline(prg, v[5]);
 
-	float _rx = as_number(prg, v[6]);
-	float _ry = as_number(prg, v[7]);
-	float thick = as_number(prg, v[8]);
-	float _sections = as_number(prg, v[9]);
+	float _rx = as_number_inline(prg, v[6]);
+	float _ry = as_number_inline(prg, v[7]);
+	float thick = as_number_inline(prg, v[8]);
+	float _sections = as_number_inline(prg, v[9]);
 
 	gfx::draw_ellipse(c, p, _rx, _ry, thick, _sections);
 
@@ -675,19 +676,19 @@ static bool primfunc_filled_ellipse(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(9)
 
 	SDL_Colour c;
-	c.r = as_number(prg, v[0]);
-	c.g = as_number(prg, v[1]);
-	c.b = as_number(prg, v[2]);
-	c.a = as_number(prg, v[3]);
+	c.r = as_number_inline(prg, v[0]);
+	c.g = as_number_inline(prg, v[1]);
+	c.b = as_number_inline(prg, v[2]);
+	c.a = as_number_inline(prg, v[3]);
 
 	util::Point<float> p;
 
-	p.x = as_number(prg, v[4]);
-	p.y = as_number(prg, v[5]);
+	p.x = as_number_inline(prg, v[4]);
+	p.y = as_number_inline(prg, v[5]);
 
-	float _rx = as_number(prg, v[6]);
-	float _ry = as_number(prg, v[7]);
-	float _sections = as_number(prg, v[8]);
+	float _rx = as_number_inline(prg, v[6]);
+	float _ry = as_number_inline(prg, v[7]);
+	float _sections = as_number_inline(prg, v[8]);
 
 	gfx::draw_filled_ellipse(c, p, _rx, _ry, _sections);
 
@@ -699,18 +700,18 @@ static bool primfunc_circle(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(9)
 
 	SDL_Colour c;
-	c.r = as_number(prg, v[0]);
-	c.g = as_number(prg, v[1]);
-	c.b = as_number(prg, v[2]);
-	c.a = as_number(prg, v[3]);
+	c.r = as_number_inline(prg, v[0]);
+	c.g = as_number_inline(prg, v[1]);
+	c.b = as_number_inline(prg, v[2]);
+	c.a = as_number_inline(prg, v[3]);
 
 	util::Point<float> p;
 
-	p.x = as_number(prg, v[4]);
-	p.y = as_number(prg, v[5]);
-	float _r = as_number(prg, v[6]);
-	float thick = as_number(prg, v[7]);
-	int _sections = as_number(prg, v[8]);
+	p.x = as_number_inline(prg, v[4]);
+	p.y = as_number_inline(prg, v[5]);
+	float _r = as_number_inline(prg, v[6]);
+	float thick = as_number_inline(prg, v[7]);
+	int _sections = as_number_inline(prg, v[8]);
 
 	gfx::draw_circle(c, p, _r, thick, _sections);
 
@@ -722,17 +723,17 @@ static bool primfunc_filled_circle(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(8)
 
 	SDL_Colour c;
-	c.r = as_number(prg, v[0]);
-	c.g = as_number(prg, v[1]);
-	c.b = as_number(prg, v[2]);
-	c.a = as_number(prg, v[3]);
+	c.r = as_number_inline(prg, v[0]);
+	c.g = as_number_inline(prg, v[1]);
+	c.b = as_number_inline(prg, v[2]);
+	c.a = as_number_inline(prg, v[3]);
 
 	util::Point<float> p;
 
-	p.x = as_number(prg, v[4]);
-	p.y = as_number(prg, v[5]);
-	float _r = as_number(prg, v[6]);
-	int _sections = as_number(prg, v[7]);
+	p.x = as_number_inline(prg, v[4]);
+	p.y = as_number_inline(prg, v[5]);
+	float _r = as_number_inline(prg, v[6]);
+	int _sections = as_number_inline(prg, v[7]);
 
 	gfx::draw_filled_circle(c, p, _r, _sections);
 
@@ -743,8 +744,8 @@ static bool mmlfunc_create(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string str = as_string(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string str = as_string_inline(prg, v[1]);
 	
 	MML_Info *info = mml_info(prg);
 
@@ -771,8 +772,8 @@ static bool mmlfunc_load(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string name = as_string_inline(prg, v[1]);
 
 	MML_Info *info = mml_info(prg);
 
@@ -797,9 +798,9 @@ static bool mmlfunc_play(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	int id = as_number(prg, v[0]);
-	float volume = as_number(prg, v[1]);
-	bool loop = as_number(prg, v[2]);
+	int id = as_number_inline(prg, v[0]);
+	float volume = as_number_inline(prg, v[1]);
+	bool loop = as_number_inline(prg, v[2]);
 
 	MML_Info *info = mml_info(prg);
 
@@ -820,7 +821,7 @@ static bool mmlfunc_stop(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number_inline(prg, v[0]);
 
 	MML_Info *info = mml_info(prg);
 
@@ -841,8 +842,8 @@ static bool samplefunc_load(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string name = as_string_inline(prg, v[1]);
 
 	Sample_Info *info = sample_info(prg);
 
@@ -867,9 +868,9 @@ static bool samplefunc_play(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	int id = as_number(prg, v[0]);
-	float volume = as_number(prg, v[1]);
-	bool loop = as_number(prg, v[2]);
+	int id = as_number_inline(prg, v[0]);
+	float volume = as_number_inline(prg, v[1]);
+	bool loop = as_number_inline(prg, v[2]);
 
 	Sample_Info *info = sample_info(prg);
 
@@ -890,7 +891,7 @@ static bool samplefunc_stop(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number_inline(prg, v[0]);
 
 	Sample_Info *info = sample_info(prg);
 
@@ -911,10 +912,10 @@ static bool imagefunc_create(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
-	int w = as_number(prg, v[1]);
-	int h = as_number(prg, v[2]);
+	int w = as_number_inline(prg, v[1]);
+	int h = as_number_inline(prg, v[2]);
 
 	Image_Info *info = image_info(prg);
 
@@ -939,8 +940,8 @@ static bool imagefunc_load(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string name = as_string_inline(prg, v[1]);
 
 	Image_Info *info = image_info(prg);
 
@@ -965,15 +966,15 @@ static bool imagefunc_draw(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(9)
 
-	double id = as_number(prg, v[0]);
-	double r = as_number(prg, v[1]);
-	double g = as_number(prg, v[2]);
-	double b = as_number(prg, v[3]);
-	double a = as_number(prg, v[4]);
-	double x = as_number(prg, v[5]);
-	double y = as_number(prg, v[6]);
-	double flip_h = as_number(prg, v[7]);
-	double flip_v = as_number(prg, v[8]);
+	double id = as_number_inline(prg, v[0]);
+	double r = as_number_inline(prg, v[1]);
+	double g = as_number_inline(prg, v[2]);
+	double b = as_number_inline(prg, v[3]);
+	double a = as_number_inline(prg, v[4]);
+	double x = as_number_inline(prg, v[5]);
+	double y = as_number_inline(prg, v[6]);
+	double flip_h = as_number_inline(prg, v[7]);
+	double flip_v = as_number_inline(prg, v[8]);
 
 	Image_Info *info = image_info(prg);
 
@@ -1008,21 +1009,21 @@ static bool imagefunc_stretch_region(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(15)
 
-	double id = as_number(prg, v[0]);
-	double r = as_number(prg, v[1]);
-	double g = as_number(prg, v[2]);
-	double b = as_number(prg, v[3]);
-	double a = as_number(prg, v[4]);
-	double sx = as_number(prg, v[5]);
-	double sy = as_number(prg, v[6]);
-	double sw = as_number(prg, v[7]);
-	double sh = as_number(prg, v[8]);
-	double dx = as_number(prg, v[9]);
-	double dy = as_number(prg, v[10]);
-	double dw = as_number(prg, v[11]);
-	double dh = as_number(prg, v[12]);
-	double flip_h = as_number(prg, v[13]);
-	double flip_v = as_number(prg, v[14]);
+	double id = as_number_inline(prg, v[0]);
+	double r = as_number_inline(prg, v[1]);
+	double g = as_number_inline(prg, v[2]);
+	double b = as_number_inline(prg, v[3]);
+	double a = as_number_inline(prg, v[4]);
+	double sx = as_number_inline(prg, v[5]);
+	double sy = as_number_inline(prg, v[6]);
+	double sw = as_number_inline(prg, v[7]);
+	double sh = as_number_inline(prg, v[8]);
+	double dx = as_number_inline(prg, v[9]);
+	double dy = as_number_inline(prg, v[10]);
+	double dw = as_number_inline(prg, v[11]);
+	double dh = as_number_inline(prg, v[12]);
+	double flip_h = as_number_inline(prg, v[13]);
+	double flip_v = as_number_inline(prg, v[14]);
 	
 	Image_Info *info = image_info(prg);
 
@@ -1057,20 +1058,20 @@ static bool imagefunc_draw_rotated_scaled(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(14)
 
-	double id = as_number(prg, v[0]);
-	double r = as_number(prg, v[1]);
-	double g = as_number(prg, v[2]);
-	double b = as_number(prg, v[3]);
-	double a = as_number(prg, v[4]);
-	double cx = as_number(prg, v[5]);
-	double cy = as_number(prg, v[6]);
-	double x = as_number(prg, v[7]);
-	double y = as_number(prg, v[8]);
-	double angle = as_number(prg, v[9]);
-	double scale_x = as_number(prg, v[10]);
-	double scale_y = as_number(prg, v[11]);
-	double flip_h = as_number(prg, v[12]);
-	double flip_v = as_number(prg, v[13]);
+	double id = as_number_inline(prg, v[0]);
+	double r = as_number_inline(prg, v[1]);
+	double g = as_number_inline(prg, v[2]);
+	double b = as_number_inline(prg, v[3]);
+	double a = as_number_inline(prg, v[4]);
+	double cx = as_number_inline(prg, v[5]);
+	double cy = as_number_inline(prg, v[6]);
+	double x = as_number_inline(prg, v[7]);
+	double y = as_number_inline(prg, v[8]);
+	double angle = as_number_inline(prg, v[9]);
+	double scale_x = as_number_inline(prg, v[10]);
+	double scale_y = as_number_inline(prg, v[11]);
+	double flip_h = as_number_inline(prg, v[12]);
+	double flip_v = as_number_inline(prg, v[13]);
 
 	Image_Info *info = image_info(prg);
 
@@ -1105,7 +1106,7 @@ static bool imagefunc_start(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double img = as_number(prg, v[0]);
+	double img = as_number_inline(prg, v[0]);
 
 	Image_Info *info = image_info(prg);
 
@@ -1126,7 +1127,7 @@ static bool imagefunc_end(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double img = as_number(prg, v[0]);
+	double img = as_number_inline(prg, v[0]);
 
 	Image_Info *info = image_info(prg);
 
@@ -1147,10 +1148,10 @@ static bool imagefunc_size(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	double id = as_number(prg, v[0]);
+	double id = as_number_inline(prg, v[0]);
 
-	Variable &v1 = as_variable(prg, v[1]);
-	Variable &v2 = as_variable(prg, v[2]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
+	Variable &v2 = as_variable_inline(prg, v[2]);
 	
 	Image_Info *info = image_info(prg);
 
@@ -1182,11 +1183,11 @@ static bool fontfunc_load(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
-	std::string name = as_string(prg, v[1]);
-	int size = as_number(prg, v[2]);
-	bool smooth = as_number(prg, v[3]);
+	std::string name = as_string_inline(prg, v[1]);
+	int size = as_number_inline(prg, v[2]);
+	bool smooth = as_number_inline(prg, v[3]);
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	Font_Info *info = font_info(prg);
 
@@ -1212,14 +1213,14 @@ static bool fontfunc_draw(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(8)
 
-	double id = as_number(prg, v[0]);
-	double r = as_number(prg, v[1]);
-	double g = as_number(prg, v[2]);
-	double b = as_number(prg, v[3]);
-	double a = as_number(prg, v[4]);
-	std::string text = as_string(prg, v[5]);
-	double x = as_number(prg, v[6]);
-	double y = as_number(prg, v[7]);
+	double id = as_number_inline(prg, v[0]);
+	double r = as_number_inline(prg, v[1]);
+	double g = as_number_inline(prg, v[2]);
+	double b = as_number_inline(prg, v[3]);
+	double a = as_number_inline(prg, v[4]);
+	std::string text = as_string_inline(prg, v[5]);
+	double x = as_number_inline(prg, v[6]);
+	double y = as_number_inline(prg, v[7]);
 
 	Font_Info *info = font_info(prg);
 
@@ -1246,9 +1247,9 @@ static bool fontfunc_width(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	double id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	std::string text = as_string(prg, v[2]);
+	double id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
+	std::string text = as_string_inline(prg, v[2]);
 	
 	Font_Info *info = font_info(prg);
 
@@ -1270,8 +1271,8 @@ static bool fontfunc_height(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	double id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
+	double id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
 	
 	Font_Info *info = font_info(prg);
 
@@ -1293,7 +1294,7 @@ static bool tilemapfunc_set_tile_size(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	shim::tile_size = as_number(prg, v[0]);
+	shim::tile_size = as_number_inline(prg, v[0]);
 
 	return true;
 }
@@ -1302,8 +1303,8 @@ static bool tilemapfunc_load(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string name = as_string_inline(prg, v[1]);
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
@@ -1325,11 +1326,11 @@ static bool tilemapfunc_draw(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(5)
 
-	int id = as_number(prg, v[0]);
-	int start_layer = as_number(prg, v[1]);
-	int end_layer = as_number(prg, v[2]);
-	double x = as_number(prg, v[3]);
-	double y = as_number(prg, v[4]);
+	int id = as_number_inline(prg, v[0]);
+	int start_layer = as_number_inline(prg, v[1]);
+	int end_layer = as_number_inline(prg, v[2]);
+	double x = as_number_inline(prg, v[3]);
+	double y = as_number_inline(prg, v[4]);
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
@@ -1344,8 +1345,8 @@ static bool tilemapfunc_num_layers(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
+	int id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
@@ -1364,9 +1365,9 @@ static bool tilemapfunc_size(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	Variable &v2 = as_variable(prg, v[2]);
+	int id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
+	Variable &v2 = as_variable_inline(prg, v[2]);
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
@@ -1388,10 +1389,10 @@ static bool tilemapfunc_is_solid(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
-	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	int x = as_number(prg, v[2]);
-	int y = as_number(prg, v[3]);
+	int id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
+	int x = as_number_inline(prg, v[2]);
+	int y = as_number_inline(prg, v[3]);
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
@@ -1410,8 +1411,8 @@ static bool spritefunc_load(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string name = as_string_inline(prg, v[1]);
 	
 	Sprite_Info *info = sprite_info(prg);
 
@@ -1450,8 +1451,8 @@ static void sprite_callback(void *data)
 
 static bool spritefunc_set_animation(Program *prg, std::vector<Token> &v)
 {
-	int id = as_number(prg, v[0]);
-	std::string anim = as_string(prg, v[1]);
+	int id = as_number_inline(prg, v[0]);
+	std::string anim = as_string_inline(prg, v[1]);
 	
 	Sprite_Info *info = sprite_info(prg);
 
@@ -1460,7 +1461,7 @@ static bool spritefunc_set_animation(Program *prg, std::vector<Token> &v)
 	if (v.size() > 2) {
 		Sprite_Callback_Data *d = new Sprite_Callback_Data;
 		d->prg = prg;
-		d->function = as_function(prg, v[2]);
+		d->function = as_function_inline(prg, v[2]);
 		d->id = id;
 		sprite->set_animation(anim, sprite_callback, d);
 	}
@@ -1475,8 +1476,8 @@ static bool spritefunc_get_animation(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
+	int id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
 	
 	Sprite_Info *info = sprite_info(prg);
 
@@ -1495,8 +1496,8 @@ static bool spritefunc_get_current_frame(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
+	int id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
 	
 	Sprite_Info *info = sprite_info(prg);
 
@@ -1515,8 +1516,8 @@ static bool spritefunc_get_num_frames(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
+	int id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
 	
 	Sprite_Info *info = sprite_info(prg);
 
@@ -1535,8 +1536,8 @@ static bool spritefunc_get_length(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
+	int id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
 	
 	Sprite_Info *info = sprite_info(prg);
 
@@ -1555,9 +1556,9 @@ static bool spritefunc_get_current_frame_size(Program *prg, std::vector<Token> &
 {
 	COUNT_ARGS(3)
 
-	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	Variable &v2 = as_variable(prg, v[2]);
+	int id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
+	Variable &v2 = as_variable_inline(prg, v[2]);
 	
 	Sprite_Info *info = sprite_info(prg);
 
@@ -1579,15 +1580,15 @@ static bool spritefunc_draw(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(9)
 
-	int id = as_number(prg, v[0]);
-	int r = as_number(prg, v[1]);
-	int g = as_number(prg, v[2]);
-	int b = as_number(prg, v[3]);
-	int a = as_number(prg, v[4]);
-	double dx = as_number(prg, v[5]);
-	double dy = as_number(prg, v[6]);
-	int flip_h = as_number(prg, v[7]);
-	int flip_v = as_number(prg, v[8]);
+	int id = as_number_inline(prg, v[0]);
+	int r = as_number_inline(prg, v[1]);
+	int g = as_number_inline(prg, v[2]);
+	int b = as_number_inline(prg, v[3]);
+	int a = as_number_inline(prg, v[4]);
+	double dx = as_number_inline(prg, v[5]);
+	double dy = as_number_inline(prg, v[6]);
+	int flip_h = as_number_inline(prg, v[7]);
+	int flip_v = as_number_inline(prg, v[8]);
 	
 	Sprite_Info *info = sprite_info(prg);
 
@@ -1630,7 +1631,7 @@ static bool joyfunc_poll(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(21)
 
-	double num = as_number(prg, v[0]);
+	double num = as_number_inline(prg, v[0]);
 	int x1 = v[1].i;
 	int y1 = v[2].i;
 	int x2 = v[3].i;
@@ -1783,7 +1784,7 @@ static bool joyfunc_count(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = input::get_num_joysticks();
@@ -1799,8 +1800,8 @@ static bool cfgfunc_load(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string cfg_name = as_string(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string cfg_name = as_string_inline(prg, v[1]);
 
 	CFG_Info *info = cfg_info(prg);
 
@@ -1821,9 +1822,9 @@ static bool cfgfunc_save(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	std::string cfg_name = as_string(prg, v[2]);
+	int id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
+	std::string cfg_name = as_string_inline(prg, v[2]);
 
 	bool success = save_cfg(prg, id, cfg_name);
 	
@@ -1841,9 +1842,9 @@ static bool cfgfunc_get_number(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	Variable &v2 = as_variable(prg, v[1]);
-	std::string name = as_string(prg, v[2]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	Variable &v2 = as_variable_inline(prg, v[1]);
+	std::string name = as_string_inline(prg, v[2]);
 
 	CFG_Info *info = cfg_info(prg);
 
@@ -1875,9 +1876,9 @@ static bool cfgfunc_get_string(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	Variable &v2 = as_variable(prg, v[1]);
-	std::string name = as_string(prg, v[2]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	Variable &v2 = as_variable_inline(prg, v[1]);
+	std::string name = as_string_inline(prg, v[2]);
 
 	CFG_Info *info = cfg_info(prg);
 
@@ -1909,9 +1910,9 @@ static bool cfgfunc_set_number(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	int id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-	double val = as_number(prg, v[2]);
+	int id = as_number_inline(prg, v[0]);
+	std::string name = as_string_inline(prg, v[1]);
+	double val = as_number_inline(prg, v[2]);
 
 	CFG_Info *info = cfg_info(prg);
 
@@ -1934,9 +1935,9 @@ static bool cfgfunc_set_string(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-	std::string val = as_string(prg, v[2]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string name = as_string_inline(prg, v[1]);
+	std::string val = as_string_inline(prg, v[2]);
 
 	CFG_Info *info = cfg_info(prg);
 
@@ -1965,9 +1966,9 @@ static bool cfgfunc_exists(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	std::string name = as_string(prg, v[2]);
+	int id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
+	std::string name = as_string_inline(prg, v[2]);
 
 	CFG_Info *info = cfg_info(prg);
 
@@ -1993,13 +1994,13 @@ static bool shaderfunc_load(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(5)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
-	std::string vname = as_string(prg, v[1]);
-	std::string fname = as_string(prg, v[3]);
+	std::string vname = as_string_inline(prg, v[1]);
+	std::string fname = as_string_inline(prg, v[3]);
 
-	gfx::Shader::Precision vp = (gfx::Shader::Precision)as_number(prg, v[2]);
-	gfx::Shader::Precision fp = (gfx::Shader::Precision)as_number(prg, v[4]);
+	gfx::Shader::Precision vp = (gfx::Shader::Precision)as_number_inline(prg, v[2]);
+	gfx::Shader::Precision fp = (gfx::Shader::Precision)as_number_inline(prg, v[4]);
 	
 	Shader_Info *info = shader_info(prg);
 
@@ -2027,7 +2028,7 @@ static bool shaderfunc_use(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double id = as_number(prg, v[0]);
+	double id = as_number_inline(prg, v[0]);
 	
 	Shader_Info *info = shader_info(prg);
 	gfx::Shader *shader = info->shaders[id];
@@ -2052,9 +2053,9 @@ static bool shaderfunc_set_bool(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	double id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-	bool b = as_number(prg, v[2]);
+	double id = as_number_inline(prg, v[0]);
+	std::string name = as_string_inline(prg, v[1]);
+	bool b = as_number_inline(prg, v[2]);
 	
 	Shader_Info *info = shader_info(prg);
 	gfx::Shader *shader = info->shaders[id];
@@ -2068,9 +2069,9 @@ static bool shaderfunc_set_int(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	double id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-	int i = as_number(prg, v[2]);
+	double id = as_number_inline(prg, v[0]);
+	std::string name = as_string_inline(prg, v[1]);
+	int i = as_number_inline(prg, v[2]);
 	
 	Shader_Info *info = shader_info(prg);
 	gfx::Shader *shader = info->shaders[id];
@@ -2084,9 +2085,9 @@ static bool shaderfunc_set_float(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	double id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-	double f = as_number(prg, v[2]);
+	double id = as_number_inline(prg, v[0]);
+	std::string name = as_string_inline(prg, v[1]);
+	double f = as_number_inline(prg, v[2]);
 	
 	Shader_Info *info = shader_info(prg);
 	gfx::Shader *shader = info->shaders[id];
@@ -2100,9 +2101,9 @@ static bool shaderfunc_set_texture(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	double id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-	double t = as_number(prg, v[2]);
+	double id = as_number_inline(prg, v[0]);
+	std::string name = as_string_inline(prg, v[1]);
+	double t = as_number_inline(prg, v[2]);
 	
 	Shader_Info *info = shader_info(prg);
 	gfx::Shader *shader = info->shaders[id];
@@ -2119,12 +2120,12 @@ static bool shaderfunc_set_colour(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(6)
 
-	double id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-	int r = as_number(prg, v[2]);
-	int g = as_number(prg, v[3]);
-	int b = as_number(prg, v[4]);
-	int a = as_number(prg, v[5]);
+	double id = as_number_inline(prg, v[0]);
+	std::string name = as_string_inline(prg, v[1]);
+	int r = as_number_inline(prg, v[2]);
+	int g = as_number_inline(prg, v[3]);
+	int b = as_number_inline(prg, v[4]);
+	int a = as_number_inline(prg, v[5]);
 	
 	Shader_Info *info = shader_info(prg);
 	gfx::Shader *shader = info->shaders[id];
@@ -2144,9 +2145,9 @@ static bool jsonfunc_load(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
-	std::string name = as_string(prg, v[1]);
+	std::string name = as_string_inline(prg, v[1]);
 
 	JSON_Info *info = json_info(prg);
 
@@ -2168,9 +2169,9 @@ static bool jsonfunc_get_string(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	double id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	std::string name = as_string(prg, v[2]);
+	double id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
+	std::string name = as_string_inline(prg, v[2]);
 	
 	JSON_Info *info = json_info(prg);
 	util::JSON *json = info->jsons[id];
@@ -2190,9 +2191,9 @@ static bool jsonfunc_get_number(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	double id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	std::string name = as_string(prg, v[2]);
+	double id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
+	std::string name = as_string_inline(prg, v[2]);
 	
 	JSON_Info *info = json_info(prg);
 	util::JSON *json = info->jsons[id];
