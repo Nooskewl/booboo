@@ -2057,13 +2057,30 @@ double exprfunc_lessequal(Program *prg, std::vector<Token> &v)
 
 double exprfunc_equal(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
-
-	double n = as_number_inline(prg, v[0]);
 	bool b = true;
 
-	for (size_t i = 1; i < v.size(); i++) {
-		b = b && n == as_number_inline(prg, v[i]);
+	bool string = v[0].type == Token::STRING ? true : false;
+
+	if (string == false && v[0].type == Token::SYMBOL) {
+		Variable &var = as_variable_inline(prg, v[0]);
+		if (var.type == Variable::STRING) {
+			string = true;
+		}
+	}
+
+	if (string) {
+		std::string s = as_string_inline(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && s == as_string_inline(prg, v[i]);
+		}
+	}
+	else {
+		double n = as_number_inline(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && n == as_number_inline(prg, v[i]);
+		}
 	}
 
 	return b;
@@ -2071,13 +2088,30 @@ double exprfunc_equal(Program *prg, std::vector<Token> &v)
 
 double exprfunc_notequal(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
-
-	double n = as_number_inline(prg, v[0]);
 	bool b = true;
 
-	for (size_t i = 1; i < v.size(); i++) {
-		b = b && n != as_number_inline(prg, v[i]);
+	bool string = v[0].type == Token::STRING ? true : false;
+
+	if (string == false && v[0].type == Token::SYMBOL) {
+		Variable &var = as_variable_inline(prg, v[0]);
+		if (var.type == Variable::STRING) {
+			string = true;
+		}
+	}
+
+	if (string) {
+		std::string s = as_string_inline(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && s != as_string_inline(prg, v[i]);
+		}
+	}
+	else {
+		double n = as_number_inline(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && n != as_number_inline(prg, v[i]);
+		}
 	}
 
 	return b;
