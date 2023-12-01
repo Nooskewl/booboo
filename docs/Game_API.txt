@@ -409,16 +409,3 @@ cfg_exists
 	check if a value exists in a config file
 	e.g. cfg_exists cfg exists "x"
 
--- Steamworks Functions ------------------------------------------------------
-
-steam_start
-	Start steamworks functionality
-	e.g. steam_start
-
-steam_achieve
-	Achieve an achievement
-	e.g. steam_achieve "beat_boss1"
-
-steam_get_language
-	Get the user language in the Steam client for your game
-	e.g. steam_get_language lang
