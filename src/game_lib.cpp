@@ -2210,42 +2210,6 @@ static bool jsonfunc_get_number(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool steamfunc_start(Program *prg, std::vector<Token> &v)
-{
-	COUNT_ARGS(0)
-
-	util::start_steamworks();
-
-	return true;
-}
-
-static bool steamfunc_achieve(Program *prg, std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-
-	std::string achievement = as_string_inline(prg, v[0]);
-
-	util::achieve_steam(achievement);
-
-	return true;
-}
-
-static bool steamfunc_get_language(Program *prg, std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-
-	Variable &v1 = as_variable_inline(prg, v[0]);
-	
-	if (v1.type == Variable::STRING) {
-		v1.s = util::get_steam_language();
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
-
-	return true;
-}
-
 void start_lib_game()
 {
 	add_instruction("inspect", miscfunc_inspect);
@@ -2326,9 +2290,6 @@ void start_lib_game()
 	add_instruction("json_load", jsonfunc_load);
 	add_instruction("json_get_string", jsonfunc_get_string);
 	add_instruction("json_get_number", jsonfunc_get_number);
-	add_instruction("steam_start", steamfunc_start);
-	add_instruction("steam_achieve", steamfunc_achieve);
-	add_instruction("steam_get_language", steamfunc_get_language);
 }
 
 void end_lib_game()
