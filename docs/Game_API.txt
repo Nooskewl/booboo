@@ -293,6 +293,14 @@ tilemap_get_group
 	Get info about a group
 	e.g. tilemap_get_group tilemap type x y w h index
 
+tilemap_set_animated_tiles
+	Tile groups can be animated. The delay is in milliseconds. Width
+	and height are the width and height of the area to animate. Then
+	the vector contains the topleft tile position of each frame of
+	animation (should be width by height) as a vector of vectors of
+	2 numbers each (x/y)
+	e.g. tilemap_set_animated_tiles tilemap delay w h anim_data
+
 -- Shader Functions ----------------------------------------------------------
 
 shader_load

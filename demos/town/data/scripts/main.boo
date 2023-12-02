@@ -19,6 +19,17 @@ image_load carrot_img "misc/carrot.png"
 
 number tilemap
 tilemap_load tilemap "map.wm3"
+		
+vector anim
+vector frame
+vector_add frame 8
+vector_add frame 7
+vector_add anim frame
+vector_clear frame
+vector_add frame 12
+vector_add frame 7
+vector_add anim frame
+tilemap_set_animated_tiles tilemap 500 4 3 anim
 
 vector collectibles
 number num_groups

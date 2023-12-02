@@ -1459,6 +1459,43 @@ static bool tilemapfunc_get_group(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool tilemapfunc_set_animated_tiles(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(5)
+
+	int id = as_number_inline(prg, v[0]);
+	int delay = (int)as_number_inline(prg, v[1]);
+	int w = (int)as_number_inline(prg, v[2]);
+	int h = (int)as_number_inline(prg, v[3]);
+	Variable &v1 = as_variable_inline(prg, v[4]);
+	
+	Tilemap_Info *info = tilemap_info(prg);
+
+	if (v1.type != Variable::VECTOR) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Tilemap *tilemap = info->tilemaps[id];
+	
+	gfx::Tilemap::Animation_Data anim;
+	anim.topleft.x = v1.v[0].v[0].n;
+	anim.topleft.y = v1.v[0].v[1].n;
+	anim.delay = delay;
+	anim.size.w = w;
+	anim.size.h = h;
+
+	for (size_t i = 1; i < v1.v.size(); i++) {
+		util::Point<int> p;
+		p.x = v1.v[i].v[0].n;
+		p.y = v1.v[i].v[1].n;
+		anim.frames.push_back(p);
+	}
+
+	tilemap->add_animation_data(anim);
+
+	return true;
+}
+
 static bool spritefunc_load(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -2353,6 +2390,7 @@ void start_lib_game()
 	add_instruction("tilemap_is_solid", tilemapfunc_is_solid);
 	add_instruction("tilemap_num_groups", tilemapfunc_num_groups);
 	add_instruction("tilemap_get_group", tilemapfunc_get_group);
+	add_instruction("tilemap_set_animated_tiles", tilemapfunc_set_animated_tiles);
 	add_instruction("sprite_load", spritefunc_load);
 	add_instruction("sprite_set_animation", spritefunc_set_animation);
 	add_instruction("sprite_get_animation", spritefunc_get_animation);
