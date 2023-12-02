@@ -1616,6 +1616,51 @@ static bool spritefunc_draw(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool spritefunc_start(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	int id = as_number_inline(prg, v[0]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	sprite->start();
+
+	return true;
+}
+
+static bool spritefunc_stop(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	int id = as_number_inline(prg, v[0]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	sprite->stop();
+
+	return true;
+}
+
+static bool spritefunc_reset(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	int id = as_number_inline(prg, v[0]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	sprite->reset();
+
+	return true;
+}
+
 static void set_string_or_number(Program *prg, int index, double value)
 {
        Variable &v1 = booboo::get_variable(prg, index);
@@ -2263,6 +2308,9 @@ void start_lib_game()
 	add_instruction("sprite_get_num_frames", spritefunc_get_num_frames);
 	add_instruction("sprite_get_current_frame_size", spritefunc_get_current_frame_size);
 	add_instruction("sprite_draw", spritefunc_draw);
+	add_instruction("sprite_start", spritefunc_start);
+	add_instruction("sprite_stop", spritefunc_stop);
+	add_instruction("sprite_reset", spritefunc_reset);
 	add_instruction("mml_create", mmlfunc_create);
 	add_instruction("mml_load", mmlfunc_load);
 	add_instruction("mml_play", mmlfunc_play);

@@ -222,6 +222,18 @@ sprite_get_current_frame_size
 	Returns the size of the current frame's image
 	e.g. sprite_get_current_frame_size sprite w h
 
+sprite_start
+	Start a sprite's animation (if stopped)
+	e.g. sprite_start sprite
+
+sprite_stop
+	Stop a sprite's animation
+	e.g. sprite_stop sprite
+
+sprite_reset
+	Reset a sprite's animation to the beginning
+	e.g. sprite_reset sprite
+
 -- Font Functions ------------------------------------------------------------
 
 font_load
