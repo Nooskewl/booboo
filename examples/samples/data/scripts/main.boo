@@ -11,8 +11,8 @@ number a b playing
 
 function draw
 {
-	font_draw font 64 64 64 255 "ENTER: Start/stop loop" 10 10
-	font_draw font 64 64 64 255 "SPACE: Play once" 10 50
+	font_draw font 64 64 64 255 "Z: Play once" 10 10
+	font_draw font 64 64 64 255 "X: Start/stop loop" 10 40
 }
 
 function run
