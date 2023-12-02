@@ -1,3 +1,15 @@
+Sections:
+	Core
+	Flow Control
+	Arithmetic
+	Strings
+	Math
+	Vectors
+	Maps
+	Files
+	Bits
+	Other
+
 -- Core Functions ------------------------------------------------------------
 
 number
@@ -64,14 +76,14 @@ typeof
 	Returns a string respresentation of the type of the second parameter
 	e.g. typeof type_string my_var
 
-	typeof has the ability to index into vectors and maps. Simply add numbers
-	for vectors and strings for maps after the final parameter. You cannot
-	mix vectors and maps this way.
+	typeof has the ability to index into vectors and maps. Simply add
+	numbers	for vectors and strings for maps after the final parameter.
+	You cannot mix vectors and maps this way.
 
 ()
 	evaluates to a number and can be used anywhere you use a number
 	e.g. (+ x (* y (* z w 2))) in C would be x+(y*(z*w*2))
-	Supported operators are: + - * / % && || > < >= <= == !=
+	Supported operators are: + - * / % && || > < >= <= == != | ^ & << >>
 	The boolean operators return 1 or 0
 	BooBoo supports adding these operators as well as regular
 	functions
@@ -96,8 +108,8 @@ goto
 	? 1 (&& (> a b) (< x y)) je true jne false
 
 je
-	Jumps like this one are based on the last comparison. If it was equal, this
-	will jump, if not, it won't
+	Jumps like this one are based on the last comparison. If it was equal,
+	this will jump, if not, it won't
 	e.g. je process_x_equals_1
 
 jne
@@ -180,13 +192,15 @@ for
 string_format
 	format strings with replacements
 	e.g. string_format dest "I'm % years old" age
-	printf-equivalent formating options are available with %(...) for example %(3.16g)
+	printf-equivalent formating options are available with %(...) for
+	example %(3.16g)
 
 string_scan
 	Kind of like sscanf, it can parse out a little bit of info from text
-	e.g., string_scan num_result_gotten "%:%:%" time_string hours minutes seconds
-	That would read hours/minutes/seconds from a time in the format "23:59:00"
-	Formatting parameters in () are not currently supported for this function
+	e.g., string_scan num_result_gotten "%:%:%" time_string hours minutes
+	seconds That would read hours/minutes/seconds from a time in the
+	format "23:59:00" Formatting parameters in () are not currently
+	supported for this function
 
 string_char_at
 	Get the value of character at index in a string
@@ -252,9 +266,9 @@ vector_set
 	set an element in a vector
 	e.g. vector_set vec index value
 	
-	Note: you can use multiple indices if you know you have a multidimensional vector.
-	BooBoo will dig down into as many vectors as you specify indices for (followed by
-	the value you're setting it to)
+	Note: you can use multiple indices if you know you have a
+	multidimensional vector. BooBoo will dig down into as many vectors as
+	you specify indices for (followed by the value you're setting it to)
 
 vector_insert
 	insert a value in any position in a vector
@@ -264,8 +278,9 @@ vector_get
 	get the value at index in vector
 	e.g. vector_get v output index
 
-	Note: you can use multiple indices if you know you have a multidimensional vector.
-	For example vector_get v colour y x to index into a 2D array of palette indices
+	Note: you can use multiple indices if you know you have a
+	multidimensional vector. For example vector_get v colour y x to index
+	into a 2D array of palette indices
 
 vector_erase
 	remove from a vector
@@ -275,7 +290,7 @@ vector_clear
 	empty a vector
 	e.g. vector_clear v
 
--- Maps ----------------------------------------------------------------------
+-- Map Functions -------------------------------------------------------------
 
 map_set
 	set a key in a map
@@ -300,9 +315,10 @@ map_clear
 	e.g. map_clear m
 
 map_keys
-	Get the names of the keys from a map into a vector of strings e.g. map_keys m v
+	Get the names of the keys from a map into a vector of strings
+	e.g. map_keys m v
 
--- File ----------------------------------------------------------------------
+-- File Functions ------------------------------------------------------------
 
 file_open
 	open a file, mode can be either "a" "r" or "w"
@@ -329,13 +345,38 @@ file_print
 	Print to a file. Behaves exactly like print but takes a file
 	e.g. file_print f "%(20s)%(20s)%(20s)" x y z
 
+-- Bitwise Functions ---------------------------------------------------------
+
+|
+	Bitwise or
+	All bitwise functions cast the numbers to int first
+	e.g. | x 128
+
+^
+	Bitwise xor
+	e.g. ^ x y
+
+&
+	Bitwise and
+	e.g. & x 255
+
+<<
+	Left shift
+	e.g. << x 3
+
+>>
+	Right shift
+	e.g. >> x 3
+
 -- Other ---------------------------------------------------------------------
 
 print
 	print a string (like string_format)
 	e.g. print "Hello, I'm % and I like % and %" name like1 like2
-	printf-equivalent formating options are available with %(...) for example %(3.16g)
+	printf-equivalent formating options are available with %(...) for
+	example %(3.16g)
 
 input
 	Read a word from stdin
 	e.g. input str
+
