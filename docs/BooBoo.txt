@@ -55,6 +55,9 @@ function
 
 address
 	store an address in a pointer
+	Works with variables, functions and labels
+	Note: Some variables and labels are local to a function and
+	it doesn't make sense to use them after it returns
 	e.g. address p var_or_function
 
 typeof
