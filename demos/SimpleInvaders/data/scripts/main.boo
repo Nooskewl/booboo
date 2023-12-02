@@ -3,7 +3,7 @@ vector bullets
 vector buildings
 
 number i
-for i 0 640 20 add_building
+for i 0 (< i 640) 20 add_building
 vector_add buildings 1
 :add_building
 
@@ -26,20 +26,20 @@ function draw
 	number sz
 	vector_size buildings sz
 	number i
-	for i 0 sz 1 next_building
+	for i 0 (< i sz) 1 next_building
 	? 1 [buildings i]
 	jne next_building
 	filled_rectangle 0 255 0 255 0 255 0 255 0 255 0 255 0 255 0 255 (* i 20) (+ bottom 20) 20 10
 :next_building
 
 	vector_size rocks sz
-	for i 0 sz 1 next_rock
+	for i 0 (< i sz) 1 next_rock
 	filled_circle 255 0 255 255 (+ 10 (* [rocks i 0] 20)) [rocks i 1] 8 -1
 :next_rock
 
 	number sz
 	vector_size bullets sz
-	for i 0 sz 1 next_bullet
+	for i 0 (< i sz) 1 next_bullet
 	filled_circle 255 0 0 255 [bullets i 0] [bullets i 1] 4 -1
 :next_bullet
 }
@@ -102,7 +102,7 @@ function run
 
 	number sz
 	vector_size rocks sz
-	for i 0 sz 1 check_hit_building
+	for i 0 (< i sz) 1 check_hit_building
 	vector rock
 	vector_get rocks rock i
 	? 1 (>= [rock 1] (+ bottom 20))

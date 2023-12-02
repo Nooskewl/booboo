@@ -8,7 +8,7 @@ number velocity
 vector stars
 
 number i
-for i 0 num_stars 1 add_another_star
+for i 0 (< i num_stars) 1 add_another_star
 	vector v
 	number r
 	number x
@@ -40,7 +40,7 @@ for i 0 num_stars 1 add_another_star
 :add_another_star
 
 ; cycle the animation so they don't all start in the centre
-for i 0 120 1 next_cycle
+for i 0 (< i 120) 1 next_cycle
 	call run
 :next_cycle
 
@@ -49,7 +49,7 @@ function run
 	number sz
 	vector_size stars sz
 
-	for i 0 num_stars 1 next_update
+	for i 0 (< i num_stars) 1 next_update
 		vector v
 		vector_get stars v i
 		number x
@@ -91,7 +91,7 @@ function draw
 	number sz
 	vector_size stars sz
 
-	for i 0 num_stars 1 next_draw
+	for i 0 (< i num_stars) 1 next_draw
 		vector v
 		vector_get stars v i
 		number x

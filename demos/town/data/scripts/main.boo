@@ -35,7 +35,7 @@ vector collectibles
 number num_groups
 tilemap_num_groups tilemap num_groups
 number i
-for i 0 num_groups 1 next_group
+for i 0 (< i num_groups) 1 next_group
 number group_type gx gy gw gh
 tilemap_get_group tilemap group_type gx gy gw gh i
 vector c
@@ -124,7 +124,7 @@ function draw
 	number i
 	number sz
 	vector_size collectibles sz
-	for i 0 sz 1 next_collectible
+	for i 0 (< i sz) 1 next_collectible
 		vector c
 		vector_get collectibles c i
 		number dx dy
@@ -251,7 +251,7 @@ function run
 
 	number i sz
 	vector_size collectibles sz
-	for i 0 sz 1 next_pickup_check
+	for i 0 (< i sz) 1 next_pickup_check
 		vector c
 		vector_get collectibles c i
 		number cx cy

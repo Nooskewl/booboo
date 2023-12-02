@@ -16,7 +16,6 @@ number
 	declare a number or numbers
 	e.g. number x y z
 	
-
 string
 	declare a string or strings
 	e.g. string s1 s2
@@ -44,6 +43,7 @@ exit
 return
 	Return a value from a function
 	e.g. return 1
+	or just return if the function doesn't return a value
 
 include
 	Include a BooBoo file at this point in the code
@@ -76,17 +76,11 @@ typeof
 	Returns a string respresentation of the type of the second parameter
 	e.g. typeof type_string my_var
 
-	typeof has the ability to index into vectors and maps. Simply add
-	numbers	for vectors and strings for maps after the final parameter.
-	You cannot mix vectors and maps this way.
-
 ()
 	evaluates to a number and can be used anywhere you use a number
 	e.g. (+ x (* y (* z w 2))) in C would be x+(y*(z*w*2))
 	Supported operators are: + - * / % && || > < >= <= == != | ^ & << >>
 	The boolean operators return 1 or 0
-	BooBoo supports adding these operators as well as regular
-	functions
 
 []
 	Vector/map indexing operator
@@ -135,6 +129,11 @@ jge
 if
 	compare and jump
 	e.g. if (expr1) the_if (expr2) elseif1 (expr3) elseif2 the_else
+	...
+	:the_if
+	...
+	...
+	:the_else
 	the_if elseif1 elseif2 and the_else are labels that are the bottom of
 	their code blocks
 
@@ -148,10 +147,9 @@ call_result
 
 for
 	A for loop
-	e.g. for i start end increment end_label
-	; you loop code here
+	e.g. for i start (expression) increment end_label
+	; your loop code here
 	:end_label
-	Loops until start >= end
 
 -- Arithmetic ----------------------------------------------------------------
 

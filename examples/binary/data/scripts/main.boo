@@ -18,8 +18,8 @@ function draw
 	number x
 	number y
 
-	for y 0 rows 1 next_y
-		for x 0 cols 1 next_x
+	for y 0 (< y rows) 1 next_y
+		for x 0 (< x cols) 1 next_x
 			number dx
 			number dy
 			= dx (* x fw)

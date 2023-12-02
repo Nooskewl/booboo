@@ -115,11 +115,15 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 	}
 
 	count.n = as_number_inline(prg, v[1]);
-	int end = as_number_inline(prg, v[2]);
+	Variable &expr = as_variable_inline(prg, v[2]);
 	int increment = as_number_inline(prg, v[3]);
 	unsigned int end_label = as_label_inline(prg, v[4]);
 
-	if (count.n >= end) {
+	if (expr.type != Variable::EXPRESSION) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	if (evaluate_expression(prg, expr.e) == 0) {
 		prg->s->pc = end_label;
 		return true;
 	}
@@ -137,7 +141,7 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 		}
 		if (prg->s->pc == end_label) {
 			count.n += increment;
-			if (count.n >= end) {
+			if (evaluate_expression(prg, expr.e) == 0) {
 				prg->s->pc++;
 				break;
 			}
