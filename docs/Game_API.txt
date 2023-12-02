@@ -283,6 +283,16 @@ tilemap_is_solid
 	Check if a tile is walkable
 	e.g. tilemap_is_solid tilemap solid x y
 
+tilemap_num_groups
+	AshEdit can mark arbitrary rectangles as any 32 number or 32 bit
+	bitmask (you can decide how to use it.) This retrieves the number
+	of groups marked.
+	e.g. tilemap_num_groups tilemap ng
+
+tilemap_get_group
+	Get info about a group
+	e.g. tilemap_get_group tilemap type x y w h index
+
 -- Shader Functions ----------------------------------------------------------
 
 shader_load
