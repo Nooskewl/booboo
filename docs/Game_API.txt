@@ -7,7 +7,7 @@ end - called when the program is exiting
 At startup, global code is run. Then the above mentioned callbacks get called
 at intervals or shutdown.
 
-The screen is 640x360 by default, stretch to the window size appropriately.
+The screen is 640x360 by default, stretched to the window size appropriately.
 
 There are loads of command line switches you can use which come from Shim.
 A switch starting with + enables and a - disables things, but here are a
@@ -101,15 +101,6 @@ get_scale
 	and would change based on window size and buffer size.
 	e.g. scale s
 
-set_target
-	Set the render target. This only works with images created with
-	image_create.
-	e.g. set_target img
-
-set_target_backbuffer
-	Set the render target to the backbuffer
-	e.g. set_target_backbuffer
-
 -- Primitive Functions -------------------------------------------------------
 
 start_primitives
@@ -157,6 +148,15 @@ filled_circle
 image_create
 	create a render target
 	e.g. image_create dest w h
+
+set_target
+	Set the render target. This only works with images created with
+	image_create.
+	e.g. set_target img
+
+set_target_backbuffer
+	Set the render target to the backbuffer
+	e.g. set_target_backbuffer
 
 image_load
 	load an image
@@ -206,6 +206,10 @@ sprite_get_animation
 	Returns the name of the current animation
 	e.g. sprite_get_animation sprite anim_name
 
+sprite_get_previous_animation
+	Returns the name of the previous animation
+	e.g. sprite_get_animation sprite anim_name
+
 sprite_get_length
 	Returns the total length in milliseconds of the current animation
 	e.g. sprite_get_length sprite l
@@ -233,6 +237,10 @@ sprite_stop
 sprite_reset
 	Reset a sprite's animation to the beginning
 	e.g. sprite_reset sprite
+
+sprite_get_bounds
+	Returns the top left/bottom rightmost opaque pixels in the sprite
+	e.g. sprite_get_bounds sprite x1 y1 x2 y2
 
 -- Font Functions ------------------------------------------------------------
 

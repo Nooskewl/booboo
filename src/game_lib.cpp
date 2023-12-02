@@ -1581,6 +1581,26 @@ static bool spritefunc_get_animation(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool spritefunc_get_previous_animation(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	if (v1.type != Variable::STRING) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	v1.s = sprite->get_previous_animation();
+
+	return true;
+}
+
 static bool spritefunc_get_current_frame(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -1745,6 +1765,37 @@ static bool spritefunc_reset(Program *prg, std::vector<Token> &v)
 	gfx::Sprite *sprite = info->sprites[id];
 
 	sprite->reset();
+
+	return true;
+}
+
+static bool spritefunc_get_bounds(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(5)
+
+	int id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
+	Variable &v2 = as_variable_inline(prg, v[2]);
+	Variable &v3 = as_variable_inline(prg, v[3]);
+	Variable &v4 = as_variable_inline(prg, v[4]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER || v3.type != Variable::NUMBER || v4.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	util::Point<int> topleft;
+	util::Point<int> bottomright;
+
+	sprite->get_bounds(topleft, bottomright);
+
+	v1.n = topleft.x;
+	v2.n = topleft.y;
+	v3.n = bottomright.x;
+	v4.n = bottomright.y;
 
 	return true;
 }
@@ -2394,6 +2445,7 @@ void start_lib_game()
 	add_instruction("sprite_load", spritefunc_load);
 	add_instruction("sprite_set_animation", spritefunc_set_animation);
 	add_instruction("sprite_get_animation", spritefunc_get_animation);
+	add_instruction("sprite_get_previous_animation", spritefunc_get_previous_animation);
 	add_instruction("sprite_get_length", spritefunc_get_length);
 	add_instruction("sprite_get_current_frame", spritefunc_get_current_frame);
 	add_instruction("sprite_get_num_frames", spritefunc_get_num_frames);
@@ -2402,6 +2454,7 @@ void start_lib_game()
 	add_instruction("sprite_start", spritefunc_start);
 	add_instruction("sprite_stop", spritefunc_stop);
 	add_instruction("sprite_reset", spritefunc_reset);
+	add_instruction("sprite_get_bounds", spritefunc_get_bounds);
 	add_instruction("mml_create", mmlfunc_create);
 	add_instruction("mml_load", mmlfunc_load);
 	add_instruction("mml_play", mmlfunc_play);
