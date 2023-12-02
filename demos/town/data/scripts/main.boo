@@ -2,6 +2,9 @@ number music
 mml_load music "music/town.mml"
 mml_play music 0.5 1
 
+number pickup
+mml_load pickup "sfx/pickup.mml"
+
 number W H
 = W 240
 = H 135
@@ -10,8 +13,30 @@ resize W H
 number sprite
 sprite_load sprite "pleasant"
 
+number apple_img carrot_img
+image_load apple_img "misc/apple.png"
+image_load carrot_img "misc/carrot.png"
+
 number tilemap
-tilemap_load tilemap "map.wm2"
+tilemap_load tilemap "map.wm3"
+
+vector collectibles
+number num_groups
+tilemap_num_groups tilemap num_groups
+number i
+for i 0 num_groups 1 next_group
+number group_type gx gy gw gh
+tilemap_get_group tilemap group_type gx gy gw gh i
+vector c
+if (& group_type 1) apple carrot
+vector_add c apple_img
+:apple
+vector_add c carrot_img
+:carrot
+vector_add c gx
+vector_add c gy
+vector_add collectibles c
+:next_group
 
 number TILE_SIZE px py dir_x dir_y moving move_count MOVE_TIME
 = TILE_SIZE 16
@@ -84,6 +109,18 @@ function draw
 	tilemap_num_layers tilemap layers
 
 	tilemap_draw tilemap 0 1 (* ox -1) (* oy -1)
+
+	number i
+	number sz
+	vector_size collectibles sz
+	for i 0 sz 1 next_collectible
+		vector c
+		vector_get collectibles c i
+		number dx dy
+		= dx (- (* [c 1] TILE_SIZE) ox)
+		= dy (- (* [c 2] TILE_SIZE) oy)
+		image_draw [c 0] 255 255 255 255 dx dy 0 0
+	:next_collectible
 
 	sprite_draw sprite 255 255 255 255 (- sx ox) (- sy oy) 0 0
 	
@@ -193,4 +230,28 @@ function run
 	sprite_set_animation sprite a
 	:stand2
 :not_moving
+
+	? joy_a 1
+	jne no_pickup
+
+	number dx dy
+	= dx (+ px dir_x)
+	= dy (+ py dir_y)
+
+	number i sz
+	vector_size collectibles sz
+	for i 0 sz 1 next_pickup_check
+		vector c
+		vector_get collectibles c i
+		number cx cy
+		= cx [c 1]
+		= cy [c 2]
+		if (&& (== cx dx) (== cy dy)) pick_it_up
+			mml_play pickup 1 0
+			vector_erase collectibles i
+			goto no_pickup
+		:pick_it_up
+	:next_pickup_check
+
+:no_pickup
 }
