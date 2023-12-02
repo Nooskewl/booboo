@@ -37,7 +37,6 @@ The following sections describe the API:
 	Vector Functions
 	JSON Functions
 	Configuration Functions
-	Steamworks Functions
 
 -- Core Functions ------------------------------------------------------------
 
