@@ -1914,6 +1914,96 @@ bool filefunc_print(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+bool bitfunc_or(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		if (v1.type == Variable::NUMBER) {
+			v1.n = (int)v1.n | (int)as_number_inline(prg, v[i]);
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
+	}
+
+	return true;
+}
+
+bool bitfunc_xor(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		if (v1.type == Variable::NUMBER) {
+			v1.n = (int)v1.n ^ (int)as_number_inline(prg, v[i]);
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
+	}
+
+	return true;
+}
+
+bool bitfunc_and(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		if (v1.type == Variable::NUMBER) {
+			v1.n = (int)v1.n & (int)as_number_inline(prg, v[i]);
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
+	}
+
+	return true;
+}
+
+bool bitfunc_leftshift(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		if (v1.type == Variable::NUMBER) {
+			v1.n = (int)v1.n << (int)as_number_inline(prg, v[i]);
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
+	}
+
+	return true;
+}
+
+bool bitfunc_rightshift(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		if (v1.type == Variable::NUMBER) {
+			v1.n = (int)v1.n >> (int)as_number_inline(prg, v[i]);
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
+	}
+
+	return true;
+}
+
 double exprfunc_add(Program *prg, std::vector<Token> &v)
 {
 	double n = as_number_inline(prg, v[0]);
@@ -2173,6 +2263,61 @@ double exprfunc_notequal(Program *prg, std::vector<Token> &v)
 	return b;
 }
 
+double exprfunc_bitor(Program *prg, std::vector<Token> &v)
+{
+	int n = (int)as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n |= (int)as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_xor(Program *prg, std::vector<Token> &v)
+{
+	int n = (int)as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n ^= (int)as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_bitand(Program *prg, std::vector<Token> &v)
+{
+	int n = (int)as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n &= (int)as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_leftshift(Program *prg, std::vector<Token> &v)
+{
+	int n = (int)as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n <<= (int)as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_rightshift(Program *prg, std::vector<Token> &v)
+{
+	int n = (int)as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n >>= (int)as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
 void start_lib_core()
 {
 	add_expression_handler("+", exprfunc_add);
@@ -2188,6 +2333,11 @@ void start_lib_core()
 	add_expression_handler("<=", exprfunc_lessequal);
 	add_expression_handler("==", exprfunc_equal);
 	add_expression_handler("!=", exprfunc_notequal);
+	add_expression_handler("|", exprfunc_bitor);
+	add_expression_handler("^", exprfunc_xor);
+	add_expression_handler("&", exprfunc_bitand);
+	add_expression_handler("<<", exprfunc_leftshift);
+	add_expression_handler(">>", exprfunc_rightshift);
 
 	add_instruction("reset", breaker_reset);
 	add_instruction("exit", breaker_exit);
@@ -2262,6 +2412,12 @@ void start_lib_core()
 	add_instruction("file_read_line", filefunc_read_line);
 	add_instruction("file_write", filefunc_write);
 	add_instruction("file_print", filefunc_print);
+	
+	add_instruction("|", bitfunc_or);
+	add_instruction("^", bitfunc_xor);
+	add_instruction("&", bitfunc_and);
+	add_instruction("<<", bitfunc_leftshift);
+	add_instruction(">>", bitfunc_rightshift);
 }
 
 } // end namespace booboo

@@ -276,6 +276,48 @@ static std::string tokenfunc_fish(Program *prg)
 	return e;
 }
 
+static std::string tokenfunc_or(Program *prg)
+{
+	prg->s->p++;
+	return "|";
+}
+
+static std::string tokenfunc_xor(Program *prg)
+{
+	prg->s->p++;
+	return "^";
+}
+
+static std::string tokenfunc_and(Program *prg)
+{
+	prg->s->p++;
+	return "&";
+}
+
+static std::string tokenfunc_leftshift(Program *prg)
+{
+	prg->s->p++;
+	if (prg->s->p < prg->s->code.length()-1) {
+		if (prg->s->code[prg->s->p] != '<') {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid token at " + get_error_info(prg));
+		}
+	}
+	prg->s->p++;
+	return "<<";
+}
+
+static std::string tokenfunc_rightshift(Program *prg)
+{
+	prg->s->p++;
+	if (prg->s->p < prg->s->code.length()-1) {
+		if (prg->s->code[prg->s->p] != '>') {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid token at " + get_error_info(prg));
+		}
+	}
+	prg->s->p++;
+	return ">>";
+}
+
 static std::string token(Program *prg, Token::Token_Type &ret_type)
 {
 	skip_whitespace(prg);
@@ -1473,6 +1515,11 @@ static void init_token_map()
 	add_token_handler('%', tokenfunc_modulus);
 	add_token_handler('(', tokenfunc_expression);
 	add_token_handler('[', tokenfunc_fish);
+	add_token_handler('|', tokenfunc_or);
+	add_token_handler('^', tokenfunc_xor);
+	add_token_handler('&', tokenfunc_and);
+	add_token_handler('<', tokenfunc_leftshift);
+	add_token_handler('>', tokenfunc_rightshift);
 }
 
 void start()
