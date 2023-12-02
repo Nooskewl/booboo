@@ -6,6 +6,8 @@
 #include "booboo/booboo.h"
 #include "booboo/internal.h"
 
+#include <shim4/shim4.h>
+
 namespace booboo {
 
 bool breaker_reset(Program *prg, std::vector<Token> &v)
@@ -1056,11 +1058,11 @@ bool stringfunc_scan(Program *prg, std::vector<Token> &v)
 
 bool stringfunc_char_at(Program *prg, std::vector<Token> &v)
 {
-	Variable &v1 = as_variable_inline(prg, v[0]);
-	std::string s = as_string_inline(prg, v[1]);
+	std::string s = as_string_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
 	int index = as_number_inline(prg, v[2]);
 
-	int value = s[index];
+	Uint32 value = util::utf8_char(s, index);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = value;
@@ -1074,11 +1076,11 @@ bool stringfunc_char_at(Program *prg, std::vector<Token> &v)
 
 bool stringfunc_length(Program *prg, std::vector<Token> &v)
 {
-	Variable &v1 = as_variable_inline(prg, v[0]);
-	std::string s = as_string_inline(prg, v[1]);
+	std::string s = as_string_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
 
 	if (v1.type == Variable::NUMBER) {
-		v1.n = s.length();
+		v1.n = util::utf8_len(s);
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -1090,14 +1092,10 @@ bool stringfunc_length(Program *prg, std::vector<Token> &v)
 bool stringfunc_from_number(Program *prg, std::vector<Token> &v)
 {
 	Variable &v1 = as_variable_inline(prg, v[0]);
-	int n = as_number_inline(prg, v[1]);
-
-	static char buf[2] = { 0, 0 };
-	
-	buf[0] = n;
+	Uint32 n = as_number_inline(prg, v[1]);
 
 	if (v1.type == Variable::STRING) {
-		v1.s = buf;
+		v1.s = util::utf8_char_to_string(n);
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
