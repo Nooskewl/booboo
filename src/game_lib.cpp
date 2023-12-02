@@ -1408,6 +1408,57 @@ static bool tilemapfunc_is_solid(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool tilemapfunc_num_groups(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
+	
+	Tilemap_Info *info = tilemap_info(prg);
+
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Tilemap *tilemap = info->tilemaps[id];
+
+	v1.n = tilemap->get_groups().size();
+
+	return true;
+}
+
+static bool tilemapfunc_get_group(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(7)
+
+	int id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
+	Variable &v2 = as_variable_inline(prg, v[2]);
+	Variable &v3 = as_variable_inline(prg, v[3]);
+	Variable &v4 = as_variable_inline(prg, v[4]);
+	Variable &v5 = as_variable_inline(prg, v[5]);
+	int group_num = (int)as_number_inline(prg, v[6]);
+	
+	Tilemap_Info *info = tilemap_info(prg);
+
+	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER || v3.type != Variable::NUMBER || v4.type != Variable::NUMBER || v5.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Tilemap *tilemap = info->tilemaps[id];
+
+	gfx::Tilemap::Group &g = tilemap->get_groups()[group_num];
+
+	v1.n = g.type;
+	v2.n = g.x;
+	v3.n = g.y;
+	v4.n = g.w;
+	v5.n = g.h;
+
+	return true;
+}
+
 static bool spritefunc_load(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -2300,6 +2351,8 @@ void start_lib_game()
 	add_instruction("tilemap_num_layers", tilemapfunc_num_layers);
 	add_instruction("tilemap_size", tilemapfunc_size);
 	add_instruction("tilemap_is_solid", tilemapfunc_is_solid);
+	add_instruction("tilemap_num_groups", tilemapfunc_num_groups);
+	add_instruction("tilemap_get_group", tilemapfunc_get_group);
 	add_instruction("sprite_load", spritefunc_load);
 	add_instruction("sprite_set_animation", spritefunc_set_animation);
 	add_instruction("sprite_get_animation", spritefunc_get_animation);
