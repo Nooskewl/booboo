@@ -1062,8 +1062,8 @@ bool stringfunc_scan(Program *prg, std::vector<Token> &v)
 
 bool stringfunc_char_at(Program *prg, std::vector<Token> &v)
 {
-	std::string s = as_string_inline(prg, v[0]);
-	Variable &v1 = as_variable_inline(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string s = as_string_inline(prg, v[1]);
 	int index = as_number_inline(prg, v[2]);
 
 	Uint32 value = util::utf8_char(s, index);
@@ -1080,8 +1080,8 @@ bool stringfunc_char_at(Program *prg, std::vector<Token> &v)
 
 bool stringfunc_length(Program *prg, std::vector<Token> &v)
 {
-	std::string s = as_string_inline(prg, v[0]);
-	Variable &v1 = as_variable_inline(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string s = as_string_inline(prg, v[1]);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = util::utf8_len(s);
