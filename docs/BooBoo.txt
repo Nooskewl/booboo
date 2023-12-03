@@ -325,6 +325,7 @@ file_open
 	open a file, mode can be either "a" "r" or "w"
 	number f file_open f "input.txt" "r"
 	f will be -1 on failure
+	e.g. file_open f "out.txt "w"
 
 file_close
 	You should always close files you open with this
