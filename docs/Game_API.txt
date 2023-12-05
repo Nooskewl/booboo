@@ -97,6 +97,10 @@ get_scale
 	and would change based on window size and buffer size.
 	e.g. scale s
 
+screen_shake
+	Apply a screen shake effect
+	e.g. screen_shake amount_in_pixels duration_in_millis
+
 -- Primitive Functions -------------------------------------------------------
 
 start_primitives
@@ -181,6 +185,11 @@ image_end
 image_size
 	get image width/height
 	e.g. image_size img w h
+
+image_draw_9patch
+	Draw an image as a 9patch (9 equal chunks, 3x3 with the edges
+	outlining and the centre filled with the centre chunk)
+	e.g. image_draw_9patch img tint_r tint_g tint_b tint_a x y w h
 
 -- Sprite Functions ----------------------------------------------------------
 

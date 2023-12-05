@@ -505,6 +505,18 @@ static bool gfxfunc_set_target_backbuffer(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool gfxfunc_screen_shake(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	float amount = as_number_inline(prg, v[0]);
+	Uint32 duration = as_number_inline(prg, v[1]);
+
+	gfx::screen_shake(amount, duration);
+
+	return true;
+}
+
 static bool primfunc_start_primitives(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -1170,6 +1182,42 @@ static bool imagefunc_size(Program *prg, std::vector<Token> &v)
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
+
+	return true;
+}
+
+static bool imagefunc_draw_9patch(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(9)
+
+	double id = as_number_inline(prg, v[0]);
+	int r = as_number_inline(prg, v[1]);
+	int g = as_number_inline(prg, v[2]);
+	int b = as_number_inline(prg, v[3]);
+	int a = as_number_inline(prg, v[4]);
+	float x = as_number_inline(prg, v[5]);
+	float y = as_number_inline(prg, v[6]);
+	int w = as_number_inline(prg, v[7]);
+	int h = as_number_inline(prg, v[8]);
+
+	Image_Info *info = image_info(prg);
+
+#ifdef DEBUG
+	if (info->images.find(id) == info->images.end()) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid image at " + get_error_info(prg));
+	}
+#endif
+
+	gfx::Image *img = info->images[id];
+
+	SDL_Colour c;
+	c.r = r;
+	c.g = g;
+	c.b = b;
+	c.a = a;
+
+	gfx::draw_9patch_tinted(c, img, util::Point<float>(x, y), util::Size<int>(w, h));
+
 
 	return true;
 }
@@ -2495,6 +2543,7 @@ void start_lib_game()
 	add_instruction("get_scale", gfxfunc_get_scale);
 	add_instruction("set_target", gfxfunc_set_target);
 	add_instruction("set_target_backbuffer", gfxfunc_set_target_backbuffer);
+	add_instruction("screen_shake", gfxfunc_screen_shake);
 	add_instruction("start_primitives", primfunc_start_primitives);
 	add_instruction("end_primitives", primfunc_end_primitives);
 	add_instruction("line", primfunc_line);
@@ -2513,6 +2562,7 @@ void start_lib_game()
 	add_instruction("image_start", imagefunc_start);
 	add_instruction("image_end", imagefunc_end);
 	add_instruction("image_size", imagefunc_size);
+	add_instruction("image_draw_9patch", imagefunc_draw_9patch);
 	add_instruction("font_load", fontfunc_load);
 	add_instruction("font_draw", fontfunc_draw);
 	add_instruction("font_width", fontfunc_width);
