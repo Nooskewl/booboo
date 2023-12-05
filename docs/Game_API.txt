@@ -305,6 +305,11 @@ tilemap_set_animated_tiles
 	2 numbers each (x/y)
 	e.g. tilemap_set_animated_tiles tilemap delay w h anim_data
 
+tilemap_find_path
+	A* pathfinding using the tilemap solids and your own supplied points.
+	The path returned is a vector of vectors of x/y values
+	e.g. tilemap_find_path tilemap path extra start_x start_y end_x end_y
+
 -- Shader Functions ----------------------------------------------------------
 
 shader_load

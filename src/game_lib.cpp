@@ -1490,6 +1490,67 @@ static bool tilemapfunc_set_animated_tiles(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool tilemapfunc_find_path(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(7)
+
+	int id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
+	std::vector<Variable> &entity_solids = as_vector_inline(prg, v[2]);
+	int start_x = (int)as_number_inline(prg, v[3]);
+	int start_y = (int)as_number_inline(prg, v[4]);
+	int end_x = (int)as_number_inline(prg, v[5]);
+	int end_y = (int)as_number_inline(prg, v[6]);
+	
+	if (v1.type != Variable::VECTOR) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	Tilemap_Info *info = tilemap_info(prg);
+
+	gfx::Tilemap *tilemap = info->tilemaps[id];
+
+	std::vector< util::Rectangle<int> > entity_rects;
+	for (size_t i = 0; i < entity_solids.size(); i++) {
+		int x = entity_solids[i].v[0].n;
+		int y = entity_solids[i].v[1].n;
+		util::Rectangle<int> r;
+		r.pos.x = x;
+		r.pos.y = y;
+		r.size.w = 1;
+		r.size.h = 1;
+		entity_rects.push_back(r);
+	}
+
+	util::A_Star *a_star = new util::A_Star(tilemap, entity_rects);	
+	
+	std::list<util::A_Star::Node> path = a_star->find_path(util::Point<int>(start_x, start_y), util::Point<int>(end_x, end_y));
+
+	v1.v.clear();
+
+	for (std::list<util::A_Star::Node>::iterator it = path.begin(); it != path.end(); it++) {
+		util::A_Star::Node &n = *it;
+		Variable vec;
+		vec.type = Variable::VECTOR;
+		vec.name = "-constant-";
+		Variable x;
+		x.type = Variable::NUMBER;
+		x.name = "-constant-";
+		x.n = n.position.x;
+		vec.v.push_back(x);
+		Variable y;
+		y.type = Variable::NUMBER;
+		y.name = "-constant-";
+		y.n = n.position.y;
+		vec.v.push_back(y);
+		v1.v.push_back(vec);
+	}
+
+	delete a_star;
+
+	return true;
+}
+
 static bool spritefunc_load(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -2465,6 +2526,7 @@ void start_lib_game()
 	add_instruction("tilemap_num_groups", tilemapfunc_num_groups);
 	add_instruction("tilemap_get_group", tilemapfunc_get_group);
 	add_instruction("tilemap_set_animated_tiles", tilemapfunc_set_animated_tiles);
+	add_instruction("tilemap_find_path", tilemapfunc_find_path);
 	add_instruction("sprite_load", spritefunc_load);
 	add_instruction("sprite_set_animation", spritefunc_set_animation);
 	add_instruction("sprite_get_animation", spritefunc_get_animation);
