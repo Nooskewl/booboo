@@ -309,8 +309,8 @@ tilemap_set_animated_tiles
 
 shader_load
 	Load a shader
-	e.g. shader_load n "vertex_shader.txt" VP "fragment_shader.txt" FP
-	Where VP and FP and precisions from 0 to 2 (low, medium, high.)
+	e.g. shader_load n "fragment_shader.txt" FP
+	Where FP is a precision from 0 to 2 (low, medium, high.)
 
 shader_use
 	Use a shader

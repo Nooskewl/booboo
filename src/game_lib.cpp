@@ -2201,15 +2201,15 @@ static bool cfgfunc_erase(Program *prg, std::vector<Token> &v)
 
 static bool shaderfunc_load(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(5)
+	COUNT_ARGS(3)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
-	std::string vname = as_string_inline(prg, v[1]);
-	std::string fname = as_string_inline(prg, v[3]);
+	std::string vname = "glsl/default_vertex.txt";
+	std::string fname = as_string_inline(prg, v[1]);
 
-	gfx::Shader::Precision vp = (gfx::Shader::Precision)as_number_inline(prg, v[2]);
-	gfx::Shader::Precision fp = (gfx::Shader::Precision)as_number_inline(prg, v[4]);
+	gfx::Shader::Precision vp = gfx::Shader::HIGH;
+	gfx::Shader::Precision fp = (gfx::Shader::Precision)as_number_inline(prg, v[2]);
 	
 	Shader_Info *info = shader_info(prg);
 
