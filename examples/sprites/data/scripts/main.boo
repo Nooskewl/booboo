@@ -55,7 +55,7 @@ function callback id
 function draw
 {
 	number w h
-	sprite_get_current_frame_size sprite w h
+	sprite_current_frame_size sprite w h
 
 	number dx dy
 	= dx (- 160 (/ w 2))

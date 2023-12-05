@@ -1601,7 +1601,7 @@ static bool spritefunc_get_previous_animation(Program *prg, std::vector<Token> &
 	return true;
 }
 
-static bool spritefunc_get_current_frame(Program *prg, std::vector<Token> &v)
+static bool spritefunc_current_frame(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1621,7 +1621,7 @@ static bool spritefunc_get_current_frame(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_get_num_frames(Program *prg, std::vector<Token> &v)
+static bool spritefunc_num_frames(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1641,7 +1641,7 @@ static bool spritefunc_get_num_frames(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_get_length(Program *prg, std::vector<Token> &v)
+static bool spritefunc_length(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1661,7 +1661,7 @@ static bool spritefunc_get_length(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_get_current_frame_size(Program *prg, std::vector<Token> &v)
+static bool spritefunc_current_frame_size(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -1769,7 +1769,7 @@ static bool spritefunc_reset(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_get_bounds(Program *prg, std::vector<Token> &v)
+static bool spritefunc_bounds(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(5)
 
@@ -2446,15 +2446,15 @@ void start_lib_game()
 	add_instruction("sprite_set_animation", spritefunc_set_animation);
 	add_instruction("sprite_get_animation", spritefunc_get_animation);
 	add_instruction("sprite_get_previous_animation", spritefunc_get_previous_animation);
-	add_instruction("sprite_get_length", spritefunc_get_length);
-	add_instruction("sprite_get_current_frame", spritefunc_get_current_frame);
-	add_instruction("sprite_get_num_frames", spritefunc_get_num_frames);
-	add_instruction("sprite_get_current_frame_size", spritefunc_get_current_frame_size);
+	add_instruction("sprite_length", spritefunc_length);
+	add_instruction("sprite_current_frame", spritefunc_current_frame);
+	add_instruction("sprite_num_frames", spritefunc_num_frames);
+	add_instruction("sprite_current_frame_size", spritefunc_current_frame_size);
 	add_instruction("sprite_draw", spritefunc_draw);
 	add_instruction("sprite_start", spritefunc_start);
 	add_instruction("sprite_stop", spritefunc_stop);
 	add_instruction("sprite_reset", spritefunc_reset);
-	add_instruction("sprite_get_bounds", spritefunc_get_bounds);
+	add_instruction("sprite_bounds", spritefunc_bounds);
 	add_instruction("mml_create", mmlfunc_create);
 	add_instruction("mml_load", mmlfunc_load);
 	add_instruction("mml_play", mmlfunc_play);

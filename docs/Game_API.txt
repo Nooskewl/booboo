@@ -210,21 +210,21 @@ sprite_get_previous_animation
 	Returns the name of the previous animation
 	e.g. sprite_get_animation sprite anim_name
 
-sprite_get_length
+sprite_length
 	Returns the total length in milliseconds of the current animation
-	e.g. sprite_get_length sprite l
+	e.g. sprite_length sprite l
 
-sprite_get_current_frame
+sprite_current_frame
 	Returns the current frame number
-	e.g.  sprite_get_current_frame sprite n
+	e.g.  sprite_current_frame sprite n
 
-sprite_get_num_frames
+sprite_num_frames
 	Gets the number of frames in the current animation
-	e.g. sprite_get_num_frames sprite nf
+	e.g. sprite_num_frames sprite nf
 
-sprite_get_current_frame_size
+sprite_current_frame_size
 	Returns the size of the current frame's image
-	e.g. sprite_get_current_frame_size sprite w h
+	e.g. sprite_current_frame_size sprite w h
 
 sprite_start
 	Start a sprite's animation (if stopped)
@@ -238,9 +238,9 @@ sprite_reset
 	Reset a sprite's animation to the beginning
 	e.g. sprite_reset sprite
 
-sprite_get_bounds
+sprite_bounds
 	Returns the top left/bottom rightmost opaque pixels in the sprite
-	e.g. sprite_get_bounds sprite x1 y1 x2 y2
+	e.g. sprite_bounds sprite x1 y1 x2 y2
 
 -- Font Functions ------------------------------------------------------------
 
