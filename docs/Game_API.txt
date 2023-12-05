@@ -56,13 +56,9 @@ rand
 	random integers between two numbers inclusive
 	e.g. rand r 0 99
 
-argc
-	Get the number of command line arguments
-	e.g. argc nargs
-
-argv
-	Get a command line argument
-	e.g. argv arg index
+args
+	Populate a vector with strings of the command line arguments
+	e.g. args v
 
 -- Graphics Functions --------------------------------------------------------
 
