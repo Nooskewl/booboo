@@ -446,3 +446,6 @@ cfg_exists
 	check if a value exists in a config file
 	e.g. cfg_exists cfg exists "x"
 
+cfg_erase
+	Erase a value in a config file
+	e.g. cfg_erase cfg "example"

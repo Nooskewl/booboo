@@ -2175,6 +2175,36 @@ static bool cfgfunc_exists(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool cfgfunc_erase(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string name = as_string_inline(prg, v[1]);
+
+	CFG_Info *info = cfg_info(prg);
+
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	int id = v1.n;
+	
+#ifdef DEBUG
+	if (info->cfgs.find(id) == info->cfgs.end()) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid CFG Value at " + get_error_info(prg));
+	}
+#endif
+
+	std::map<std::string, Config_Value>::iterator it;
+	if ((it = info->cfgs[id].find(name)) == info->cfgs[id].end()) {
+		return true;
+	}
+	info->cfgs[id].erase(it);
+
+	return true;
+}
+
 static bool shaderfunc_load(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(5)
@@ -2471,6 +2501,7 @@ void start_lib_game()
 	add_instruction("cfg_set_number", cfgfunc_set_number);
 	add_instruction("cfg_set_string", cfgfunc_set_string);
 	add_instruction("cfg_exists", cfgfunc_exists);
+	add_instruction("cfg_erase", cfgfunc_erase);
 	add_instruction("shader_load", shaderfunc_load);
 	add_instruction("shader_use", shaderfunc_use);
 	add_instruction("shader_use_default", shaderfunc_use_default);
