@@ -32,20 +32,22 @@ vector_add anim frame
 tilemap_set_animated_tiles tilemap 500 4 3 anim
 
 vector collectibles
+vector groups
+tilemap_get_groups tilemap groups
 number num_groups
-tilemap_num_groups tilemap num_groups
+vector_size groups num_groups
 number i
 for i 0 (< i num_groups) 1 next_group
-number group_type gx gy gw gh
-tilemap_get_group tilemap group_type gx gy gw gh i
+vector group
+= group [groups i]
 vector c
-if (& group_type 1) apple carrot
+if (& [group 0] 1) apple carrot
 vector_add c apple_img
 :apple
 vector_add c carrot_img
 :carrot
-vector_add c gx
-vector_add c gy
+vector_add c [group 1]
+vector_add c [group 2]
 vector_add collectibles c
 :next_group
 
