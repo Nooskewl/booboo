@@ -1120,6 +1120,29 @@ bool stringfunc_from_number(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+bool stringfunc_substr(Program *prg, std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	int start = as_number_inline(prg, v[1]);
+	int end = -1;
+	
+	if (v.size() >= 3) {
+		end = as_number_inline(prg, v[2]);
+	}
+
+	if (v1.type == Variable::STRING) {
+		v1.s = util::utf8_substr(v1.s, start, end);
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	return true;
+}
+SHIM4_EXPORT std::string utf8_substr(std::string s, int start, int count = -1);
+
 bool mathfunc_sin(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -2396,6 +2419,7 @@ void start_lib_core()
 	add_instruction("string_char_at", stringfunc_char_at);
 	add_instruction("string_length", stringfunc_length);
 	add_instruction("string_from_number", stringfunc_from_number);
+	add_instruction("string_substr", stringfunc_substr);
 
 	add_instruction("sin", mathfunc_sin);
 	add_instruction("cos", mathfunc_cos);

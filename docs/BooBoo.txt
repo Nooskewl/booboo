@@ -215,6 +215,12 @@ string_from_number
 	This function is UTF8 compliant
 	e.g. string_from_number str 97 ; creates "a"
 
+string_substr
+	Create a substring of a string
+	e.g. substr s start end
+	End is optional, if not specified it will cut from start till the
+	end of the string.
+
 -- Math Functions ------------------------------------------------------------
 
 fmod
