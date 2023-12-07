@@ -49,19 +49,19 @@ bool breaker_return(Program *prg, std::vector<Token> &v)
 
 bool corefunc_number(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	MIN_ARGS(1)
 	return true;
 }
 
 bool corefunc_string(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	MIN_ARGS(1)
 	return true;
 }
 
 bool corefunc_vector(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	MIN_ARGS(1)
 	
 	for (size_t i = 0; i < v.size(); i++) {
 		prg->variables[v[i].i].v.clear();
@@ -72,7 +72,7 @@ bool corefunc_vector(Program *prg, std::vector<Token> &v)
 
 bool corefunc_map(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	MIN_ARGS(1)
 	
 	for (size_t i = 0; i < v.size(); i++) {
 		prg->variables[v[i].i].m.clear();
@@ -82,7 +82,7 @@ bool corefunc_map(Program *prg, std::vector<Token> &v)
 
 bool corefunc_pointer(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	MIN_ARGS(1)
 	return true;
 }
 
@@ -154,7 +154,7 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 
 bool corefunc_if(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
 	int end = v.size();
 	end -= (end % 2);
@@ -242,7 +242,7 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 
 bool corefunc_add(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
@@ -281,7 +281,7 @@ bool corefunc_add(Program *prg, std::vector<Token> &v)
 
 bool corefunc_subtract(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
@@ -299,7 +299,7 @@ bool corefunc_subtract(Program *prg, std::vector<Token> &v)
 
 bool corefunc_multiply(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
@@ -317,7 +317,7 @@ bool corefunc_multiply(Program *prg, std::vector<Token> &v)
 
 bool corefunc_divide(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
@@ -489,6 +489,8 @@ bool corefunc_jge(Program *prg, std::vector<Token> &v)
 
 bool corefunc_call(Program *prg, std::vector<Token> &v)
 {
+	MIN_ARGS(1)
+
 	int function = as_function_inline(prg, v[0]);
 
 	call_void_function(prg, function, v, 1);
@@ -498,6 +500,8 @@ bool corefunc_call(Program *prg, std::vector<Token> &v)
 
 bool corefunc_call_result(Program *prg, std::vector<Token> &v)
 {
+	MIN_ARGS(2)
+
 	Variable &result = prg->variables[v[0].i];
 	int function = as_function_inline(prg, v[1]);
 
@@ -611,7 +615,7 @@ bool corefunc_typeof(Program *prg, std::vector<Token> &v)
 
 bool corefunc_print(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	MIN_ARGS(1)
 
 	std::string fmt = as_string_inline(prg, v[0]);
 	int _tok = 1;
@@ -796,6 +800,8 @@ bool corefunc_input(Program *prg, std::vector<Token> &v)
 
 bool stringfunc_format(Program *prg, std::vector<Token> &v)
 {
+	MIN_ARGS(2)
+
 	Variable &v1 = as_variable_inline(prg, v[0]);
 	std::string fmt = as_string_inline(prg, v[1]);
 	int _tok = 2;
@@ -961,7 +967,7 @@ bool stringfunc_format(Program *prg, std::vector<Token> &v)
 
 bool stringfunc_scan(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(4)
+	MIN_ARGS(4)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 	if (v1.type == Variable::POINTER) {
@@ -1062,6 +1068,8 @@ bool stringfunc_scan(Program *prg, std::vector<Token> &v)
 
 bool stringfunc_char_at(Program *prg, std::vector<Token> &v)
 {
+	COUNT_ARGS(3)
+
 	Variable &v1 = as_variable_inline(prg, v[0]);
 	std::string s = as_string_inline(prg, v[1]);
 	int index = as_number_inline(prg, v[2]);
@@ -1080,6 +1088,8 @@ bool stringfunc_char_at(Program *prg, std::vector<Token> &v)
 
 bool stringfunc_length(Program *prg, std::vector<Token> &v)
 {
+	COUNT_ARGS(2)
+
 	Variable &v1 = as_variable_inline(prg, v[0]);
 	std::string s = as_string_inline(prg, v[1]);
 
@@ -1095,6 +1105,8 @@ bool stringfunc_length(Program *prg, std::vector<Token> &v)
 
 bool stringfunc_from_number(Program *prg, std::vector<Token> &v)
 {
+	COUNT_ARGS(2)
+
 	Variable &v1 = as_variable_inline(prg, v[0]);
 	Uint32 n = as_number_inline(prg, v[1]);
 
@@ -1331,7 +1343,7 @@ static bool vectorfunc_set(Program *prg, std::vector<Token> &v)
 	int val_index = v.size() - 1;
 	std::vector<int> indices;
 
-	COUNT_ARGS(3)
+	MIN_ARGS(3)
 
 	for (int i = 1; i < val_index; i++) {
 		indices.push_back(as_number_inline(prg, v[i]));
@@ -1427,7 +1439,7 @@ static bool vectorfunc_get(Program *prg, std::vector<Token> &v)
 	Variable &id = as_variable_inline(prg, v[0]);
 	std::vector<int> indices;
 
-	COUNT_ARGS(3)
+	MIN_ARGS(3)
 
 	for (size_t i = 2; i < v.size(); i++) {
 		int index = as_number_inline(prg, v[i]);
@@ -1505,7 +1517,7 @@ static bool vectorfunc_clear(Program *prg, std::vector<Token> &v)
 
 static bool mapfunc_set(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	MIN_ARGS(3)
 
 	Variable &id = as_variable_inline(prg, v[0]);
 
@@ -1556,7 +1568,7 @@ static bool mapfunc_set(Program *prg, std::vector<Token> &v)
 
 static bool mapfunc_get(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	MIN_ARGS(3)
 
 	Variable &id = as_variable_inline(prg, v[0]);
 
@@ -1752,6 +1764,8 @@ static bool filefunc_write(Program *prg, std::vector<Token> &v)
 
 bool filefunc_print(Program *prg, std::vector<Token> &v)
 {
+	MIN_ARGS(2)
+
 	int id = as_number_inline(prg, v[0]);
 	std::string fmt = as_string_inline(prg, v[1]);
 	int _tok = 2;
@@ -1918,7 +1932,7 @@ bool filefunc_print(Program *prg, std::vector<Token> &v)
 
 bool bitfunc_or(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
@@ -1936,7 +1950,7 @@ bool bitfunc_or(Program *prg, std::vector<Token> &v)
 
 bool bitfunc_xor(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
@@ -1954,7 +1968,7 @@ bool bitfunc_xor(Program *prg, std::vector<Token> &v)
 
 bool bitfunc_and(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
@@ -1972,7 +1986,7 @@ bool bitfunc_and(Program *prg, std::vector<Token> &v)
 
 bool bitfunc_leftshift(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
@@ -1990,7 +2004,7 @@ bool bitfunc_leftshift(Program *prg, std::vector<Token> &v)
 
 bool bitfunc_rightshift(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
