@@ -81,6 +81,10 @@ typeof
 	e.g. (+ x (* y (* z w 2))) in C would be x+(y*(z*w*2))
 	Supported operators are: + - * / % && || > < >= <= == != | ^ & << >>
 	The boolean operators return 1 or 0
+	Expressions are generally a little bit faster than using multiple
+	instructions to do the same thing, but the benefits get larger
+	for longer expressions. Expression operators returns numbers only
+	as an optimisation.
 
 []
 	Vector/map indexing operator
