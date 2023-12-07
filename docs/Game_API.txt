@@ -247,6 +247,16 @@ sprite_bounds
 	Returns the top left/bottom rightmost opaque pixels in the sprite
 	e.g. sprite_bounds sprite x1 y1 x2 y2
 
+sprite_elapsed
+	Get the number of milliseconds of elapsed time of the current
+	animation
+	e.g. sprite_elapsed sprite n
+
+sprite_frame_times
+	Get a vector of numbers which are the duration of each frame in the
+	sprite in milliseconds
+	e.g. sprite_frame_times sprite v
+
 -- Font Functions ------------------------------------------------------------
 
 font_load

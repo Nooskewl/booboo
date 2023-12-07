@@ -1960,6 +1960,30 @@ static bool spritefunc_elapsed(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool spritefunc_frame_times(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number_inline(prg, v[0]);
+	std::vector<Variable> &vec = as_vector_inline(prg, v[1]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	std::vector<Uint32> times = sprite->get_frame_times();
+
+	for (size_t i = 0; i < times.size(); i++) {
+		Variable v;
+		v.type = Variable::NUMBER;
+		v.name = "-constant-";
+		v.n = times[i];
+		vec.push_back(v);
+	}
+
+	return true;
+}
+
 static void set_string_or_number(Program *prg, int index, double value)
 {
        Variable &v1 = booboo::get_variable(prg, index);
@@ -2649,6 +2673,7 @@ void start_lib_game()
 	add_instruction("sprite_reset", spritefunc_reset);
 	add_instruction("sprite_bounds", spritefunc_bounds);
 	add_instruction("sprite_elapsed", spritefunc_elapsed);
+	add_instruction("sprite_frame_times", spritefunc_frame_times);
 	add_instruction("mml_create", mmlfunc_create);
 	add_instruction("mml_load", mmlfunc_load);
 	add_instruction("mml_play", mmlfunc_play);
