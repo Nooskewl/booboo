@@ -315,6 +315,14 @@ tilemap_find_path
 	e.g. tilemap_find_path tilemap path extra start_x start_y end_x end_y
 	path will be empty if no path is found
 
+tilemap_set_solid
+	Set the solid flag of a tile
+	e.g. tilemap_set_solid tilemap x y onoff
+
+tilemap_set_tile
+	Change a tile in the tilemap to the tile x/y given
+	e.g. tilemap_set_tile tilemap layer posx posy tile_x tile_y solid
+
 -- Shader Functions ----------------------------------------------------------
 
 shader_load

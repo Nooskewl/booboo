@@ -1597,6 +1597,45 @@ static bool tilemapfunc_find_path(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool tilemapfunc_set_solid(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int id = as_number_inline(prg, v[0]);
+	int x = as_number_inline(prg, v[1]);
+	int y = as_number_inline(prg, v[2]);
+	bool solid = as_number_inline(prg, v[3]);
+	
+	Tilemap_Info *info = tilemap_info(prg);
+
+	gfx::Tilemap *tilemap = info->tilemaps[id];
+
+	tilemap->set_solid(-1, util::Point<int>(x, y), util::Size<int>(1, 1), solid);
+
+	return true;
+}
+
+static bool tilemapfunc_set_tile(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(7)
+
+	int id = as_number_inline(prg, v[0]);
+	int layer = as_number_inline(prg, v[1]);
+	int x = as_number_inline(prg, v[2]);
+	int y = as_number_inline(prg, v[3]);
+	int tile_x = as_number_inline(prg, v[4]);
+	int tile_y = as_number_inline(prg, v[5]);
+	bool solid = as_number_inline(prg, v[6]);
+	
+	Tilemap_Info *info = tilemap_info(prg);
+
+	gfx::Tilemap *tilemap = info->tilemaps[id];
+
+	tilemap->set_tile(layer, util::Point<int>(x, y), util::Point<int>(tile_x, tile_y), solid);
+
+	return true;
+}
+
 static bool spritefunc_load(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -1897,6 +1936,26 @@ static bool spritefunc_bounds(Program *prg, std::vector<Token> &v)
 	v2.n = topleft.y;
 	v3.n = bottomright.x;
 	v4.n = bottomright.y;
+
+	return true;
+}
+
+static bool spritefunc_elapsed(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	v1.n = sprite->get_elapsed();
 
 	return true;
 }
@@ -2574,6 +2633,8 @@ void start_lib_game()
 	add_instruction("tilemap_get_groups", tilemapfunc_get_groups);
 	add_instruction("tilemap_set_animated_tiles", tilemapfunc_set_animated_tiles);
 	add_instruction("tilemap_find_path", tilemapfunc_find_path);
+	add_instruction("tilemap_set_solid", tilemapfunc_set_solid);
+	add_instruction("tilemap_set_tile", tilemapfunc_set_tile);
 	add_instruction("sprite_load", spritefunc_load);
 	add_instruction("sprite_set_animation", spritefunc_set_animation);
 	add_instruction("sprite_get_animation", spritefunc_get_animation);
@@ -2587,6 +2648,7 @@ void start_lib_game()
 	add_instruction("sprite_stop", spritefunc_stop);
 	add_instruction("sprite_reset", spritefunc_reset);
 	add_instruction("sprite_bounds", spritefunc_bounds);
+	add_instruction("sprite_elapsed", spritefunc_elapsed);
 	add_instruction("mml_create", mmlfunc_create);
 	add_instruction("mml_load", mmlfunc_load);
 	add_instruction("mml_play", mmlfunc_play);
