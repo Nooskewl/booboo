@@ -1,10 +1,3 @@
-number min_wait
-number max_wait
-= min_wait 500
-* min_wait 60
-= max_wait 1000
-* max_wait 60
-
 number drop_img
 number idle_img
 number jump_img
