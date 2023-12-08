@@ -2016,6 +2016,26 @@ static bool spritefunc_frame_times(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool spritefunc_is_started(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	v1.n = sprite->is_started();
+
+	return true;
+}
+
 static void set_string_or_number(Program *prg, int index, double value)
 {
        Variable &v1 = booboo::get_variable(prg, index);
@@ -2707,6 +2727,7 @@ void start_lib_game()
 	add_instruction("sprite_bounds", spritefunc_bounds);
 	add_instruction("sprite_elapsed", spritefunc_elapsed);
 	add_instruction("sprite_frame_times", spritefunc_frame_times);
+	add_instruction("sprite_is_started", spritefunc_is_started);
 	add_instruction("mml_create", mmlfunc_create);
 	add_instruction("mml_load", mmlfunc_load);
 	add_instruction("mml_play", mmlfunc_play);

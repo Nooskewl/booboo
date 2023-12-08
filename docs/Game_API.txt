@@ -257,6 +257,10 @@ sprite_frame_times
 	sprite in milliseconds
 	e.g. sprite_frame_times sprite v
 
+sprite_is_started
+	Check if a sprite is started or not
+	e.g. sprite_is_started sprite onoff
+
 -- Font Functions ------------------------------------------------------------
 
 font_load
