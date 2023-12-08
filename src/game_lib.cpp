@@ -1636,6 +1636,38 @@ static bool tilemapfunc_set_tile(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool tilemapfunc_get_tile(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(7)
+
+	int id = as_number_inline(prg, v[0]);
+	Variable &vx = as_variable_inline(prg, v[1]);
+	Variable &vy = as_variable_inline(prg, v[2]);
+	Variable &vs = as_variable_inline(prg, v[3]);
+	int layer = as_number_inline(prg, v[4]);
+	int x = as_number_inline(prg, v[5]);
+	int y = as_number_inline(prg, v[6]);
+
+	if (vx.type != Variable::NUMBER || vy.type != Variable::NUMBER || vs.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+	
+	Tilemap_Info *info = tilemap_info(prg);
+
+	gfx::Tilemap *tilemap = info->tilemaps[id];
+
+	util::Point<int> tile_xy;
+	bool solid;
+
+	tilemap->get_tile(layer, util::Point<int>(x, y), tile_xy, solid);
+
+	vx.n = tile_xy.x;
+	vy.n = tile_xy.y;
+	vs.n = solid;
+
+	return true;
+}
+
 static bool spritefunc_load(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -2659,6 +2691,7 @@ void start_lib_game()
 	add_instruction("tilemap_find_path", tilemapfunc_find_path);
 	add_instruction("tilemap_set_solid", tilemapfunc_set_solid);
 	add_instruction("tilemap_set_tile", tilemapfunc_set_tile);
+	add_instruction("tilemap_get_tile", tilemapfunc_get_tile);
 	add_instruction("sprite_load", spritefunc_load);
 	add_instruction("sprite_set_animation", spritefunc_set_animation);
 	add_instruction("sprite_get_animation", spritefunc_get_animation);

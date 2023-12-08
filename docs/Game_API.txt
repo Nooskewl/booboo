@@ -333,6 +333,11 @@ tilemap_set_tile
 	Change a tile in the tilemap to the tile x/y given
 	e.g. tilemap_set_tile tilemap layer posx posy tile_x tile_y solid
 
+tilemap_get_tile
+	Get tile x/y and solid flag of layer/position in tilemap
+	e.g. tilemap_get_tile tilemap out_tx out_ty out_solid layer x y
+	out_tx/ty refers to x/y position within the tile sheet.
+
 -- Shader Functions ----------------------------------------------------------
 
 shader_load
