@@ -7,6 +7,6 @@ Just enter data/ and run it, and it will create ../data.cpa. The shaders
 you'll find in the examples' data/ directories are all or partly required
 to make BooBoo work.
 
-BooBoo is free to download and use, but donations are appreciated. Send
-PayPal donations to contact@cmykilluminati.net.
+BooBoo is free to download, use and redistribute, but donations are
+appreciated. Send PayPal donations to contact@cmykilluminati.net.
 
