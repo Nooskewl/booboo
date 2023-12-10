@@ -12,6 +12,8 @@ namespace booboo {
 
 bool breaker_reset(Program *prg, std::vector<Token> &v)
 {
+	COUNT_ARGS(1)
+
 	reset_game_name = as_string_inline(prg, v[0]);
 
 	return false;
@@ -19,6 +21,8 @@ bool breaker_reset(Program *prg, std::vector<Token> &v)
 
 bool breaker_exit(Program *prg, std::vector<Token> &v)
 {
+	COUNT_ARGS(1)
+
 	return_code = as_number_inline(prg, v[0]);
 	reset_game_name = "";
 	quit = true;
@@ -27,6 +31,8 @@ bool breaker_exit(Program *prg, std::vector<Token> &v)
 
 bool breaker_return(Program *prg, std::vector<Token> &v)
 {
+	COUNT_ARGS(1)
+
 	Variable &v1 = prg->s->result;
 
 	if (v[0].type == Token::SYMBOL) {
@@ -1141,7 +1147,6 @@ bool stringfunc_substr(Program *prg, std::vector<Token> &v)
 
 	return true;
 }
-SHIM4_EXPORT std::string utf8_substr(std::string s, int start, int count = -1);
 
 bool mathfunc_sin(Program *prg, std::vector<Token> &v)
 {
