@@ -224,6 +224,7 @@ string_substr
 	e.g. substr s start end
 	End is optional, if not specified it will cut from start till the
 	end of the string.
+	This is UTF8 compliant
 
 -- Math Functions ------------------------------------------------------------
 
