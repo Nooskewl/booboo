@@ -23,6 +23,9 @@ few of them:
 Some of the demo games will auto-play by an AI if a joystick isn't connected.
 I'll leave it as an exercise if you want to play them with keyboard.
 
+The file shim4.json can be put in your data/ directory to supply some extra
+parameters and info such as window title and other things.
+
 The following sections describe the API:
 	Core Functions
 	Graphics Functions
