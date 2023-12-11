@@ -526,6 +526,51 @@ static bool gfxfunc_screen_shake(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool gfxfunc_add_notification(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	std::string s = as_string_inline(prg, v[0]);
+
+	gfx::add_notification(s);
+
+	return true;
+}
+
+static bool gfxfunc_is_fullscreen(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v1.n = gfx::is_fullscreen();
+
+	return true;
+}
+
+static void gen_f11()
+{
+	TGUI_Event event;
+	event.type = TGUI_KEY_DOWN;
+	event.keyboard.is_repeat = false;
+	event.keyboard.code = TGUIK_F11;
+	event.keyboard.simulated = true;
+	shim::push_event(event);
+}
+
+static bool gfxfunc_toggle_fullscreen(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	gen_f11();
+
+	return true;
+}
+
 static bool primfunc_start_primitives(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -2668,6 +2713,9 @@ void start_lib_game()
 	add_instruction("set_target", gfxfunc_set_target);
 	add_instruction("set_target_backbuffer", gfxfunc_set_target_backbuffer);
 	add_instruction("screen_shake", gfxfunc_screen_shake);
+	add_instruction("add_notification", gfxfunc_add_notification);
+	add_instruction("is_fullscreen", gfxfunc_is_fullscreen);
+	add_instruction("toggle_fullscreen", gfxfunc_toggle_fullscreen);
 	add_instruction("start_primitives", primfunc_start_primitives);
 	add_instruction("end_primitives", primfunc_end_primitives);
 	add_instruction("line", primfunc_line);
