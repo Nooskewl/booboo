@@ -276,6 +276,10 @@ neg
 	Invert the sign of a number
 	e.g. neg x
 
+sign
+	Returns the sign of a number
+	e.g. sign x
+
 -- Vector Functions ----------------------------------------------------------
 
 vector_add
@@ -417,3 +421,8 @@ list_directory
 	List files and directories in a glob
 	e.g. list_directory dest_vector "/home/Pelvis/*"
 	Directories returned will end with "/" and regular files will not.
+
+get_system_language
+	Returns the user interface language of the system
+	e.g. get_system_language lang
+	lang will be in Steam format e.g. "french", "brazilian" etc

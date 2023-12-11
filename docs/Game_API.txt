@@ -63,6 +63,15 @@ args
 	Populate a vector with strings of the command line arguments
 	e.g. args v
 
+get_logic_rate
+	Query the logic rate (default 60)
+	e.g. get_logic_rate r
+
+set_logic_rate
+	Change the logic rate. Values between 1 and 1000 inclusive are
+	supported.
+	e.g. set_logic_rate 144
+
 -- Graphics Functions --------------------------------------------------------
 
 clear
@@ -122,14 +131,15 @@ get_refresh_rate
 	Query the refresh rate
 	e.g. get_refresh_rate r
 
-get_logic_rate
-	Query the logic rate (default 60)
-	e.g. get_logic_rate r
+set_scissor
+	Set a scissor rectangle. This is based on the projection you're
+	using, not actual pixel coordinates to make it easier. Anything
+	drawn outside of this will not be drawn.
+	e.g. set_scissor x y w h
 
-set_logic_rate
-	Change the logic rate. Values between 1 and 1000 inclusive are
-	supported.
-	e.g. set_logic_rate 144
+unset_scissor
+	Undo a set_scissor, reverting the scissor rectangle to fullscreen.
+	e.g. unset_scissor
 
 -- Primitive Functions -------------------------------------------------------
 

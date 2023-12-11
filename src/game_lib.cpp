@@ -616,6 +616,29 @@ static bool gfxfunc_set_logic_rate(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool gfxfunc_set_scissor(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int x = as_number_inline(prg, v[0]);
+	int y = as_number_inline(prg, v[1]);
+	int w = as_number_inline(prg, v[2]);
+	int h = as_number_inline(prg, v[3]);
+
+	gfx::set_scissor(x, y, w, h);
+
+	return true;
+}
+
+static bool gfxfunc_unset_scissor(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	gfx::unset_scissor();
+
+	return true;
+}
+
 static bool primfunc_start_primitives(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -2764,6 +2787,8 @@ void start_lib_game()
 	add_instruction("get_refresh_rate", gfxfunc_get_refresh_rate);
 	add_instruction("get_logic_rate", gfxfunc_get_logic_rate);
 	add_instruction("set_logic_rate", gfxfunc_set_logic_rate);
+	add_instruction("set_scissor", gfxfunc_set_scissor);
+	add_instruction("unset_scissor", gfxfunc_unset_scissor);
 	add_instruction("start_primitives", primfunc_start_primitives);
 	add_instruction("end_primitives", primfunc_end_primitives);
 	add_instruction("line", primfunc_line);

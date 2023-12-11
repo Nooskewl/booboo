@@ -829,6 +829,21 @@ bool corefunc_mkdir(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+bool corefunc_get_system_language(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	if (v1.type != Variable::STRING) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v1.s = util::get_system_language();
+
+	return true;
+}
+
 bool corefunc_list_directory(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -1401,6 +1416,22 @@ bool mathfunc_fmod(Program *prg, std::vector<Token> &v)
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = fmod(v1.n, d);
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
+bool mathfunc_sign(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	if (v1.type == Variable::NUMBER) {
+		v1.n = util::sign(v1.n);
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -2522,6 +2553,7 @@ void start_lib_core()
 	add_instruction("print", corefunc_print);
 	add_instruction("input", corefunc_input);
 	add_instruction("mkdir", corefunc_mkdir);
+	add_instruction("get_system_language", corefunc_get_system_language);
 
 	add_instruction("string_format", stringfunc_format);
 	add_instruction("string_scan", stringfunc_scan);
@@ -2543,6 +2575,7 @@ void start_lib_core()
 	add_instruction("neg", mathfunc_neg);
 	add_instruction("%", mathfunc_intmod);
 	add_instruction("fmod", mathfunc_fmod);
+	add_instruction("sign", mathfunc_sign);
 
 	add_instruction("vector_add", vectorfunc_add);
 	add_instruction("vector_size", vectorfunc_size);
