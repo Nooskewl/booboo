@@ -8,5 +8,5 @@ you'll find in the examples' data/ directories are all or partly required
 to make BooBoo work.
 
 BooBoo is free to download, use and redistribute, but donations are
-appreciated. Send PayPal donations to contact@cmykilluminati.net.
+appreciated. Send PayPal donations to: skinmarquee@gmail.com
 
