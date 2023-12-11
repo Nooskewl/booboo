@@ -324,6 +324,8 @@ static bool miscfunc_delay(Program *prg, std::vector<Token> &v)
 
 static bool miscfunc_get_ticks(Program *prg, std::vector<Token> &v)
 {
+	COUNT_ARGS(1)
+
 	Variable &v1 = as_variable_inline(prg, v[0]);
 	
 	if (v1.type != Variable::NUMBER) {
@@ -346,9 +348,6 @@ static bool miscfunc_rand(Program *prg, std::vector<Token> &v)
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = util::rand(min_incl, max_incl);
-	}
-	else if (v1.type == Variable::STRING) {
-		v1.s = util::itos(util::rand(min_incl, max_incl));
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
@@ -759,9 +758,6 @@ static bool mmlfunc_create(Program *prg, std::vector<Token> &v)
 	if (v1.type == Variable::NUMBER) {
 		v1.n = info->mml_id;
 	}
-	else if (v1.type == Variable::STRING) {
-		v1.s = util::itos(info->mml_id);
-	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
@@ -786,9 +782,6 @@ static bool mmlfunc_load(Program *prg, std::vector<Token> &v)
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = info->mml_id;
-	}
-	else if (v1.type == Variable::STRING) {
-		v1.s = util::itos(info->mml_id);
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -856,9 +849,6 @@ static bool samplefunc_load(Program *prg, std::vector<Token> &v)
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = info->sample_id;
-	}
-	else if (v1.type == Variable::STRING) {
-		v1.s = util::itos(info->sample_id);
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -929,9 +919,6 @@ static bool imagefunc_create(Program *prg, std::vector<Token> &v)
 	if (v1.type == Variable::NUMBER) {
 		v1.n = info->image_id;
 	}
-	else if (v1.type == Variable::STRING) {
-		v1.s = util::itos(info->image_id);
-	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
@@ -954,9 +941,6 @@ static bool imagefunc_load(Program *prg, std::vector<Token> &v)
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = info->image_id;
-	}
-	else if (v1.type == Variable::STRING) {
-		v1.s = util::itos(info->image_id);
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -1236,9 +1220,6 @@ static bool fontfunc_load(Program *prg, std::vector<Token> &v)
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = info->font_id;
-	}
-	else if (v1.type == Variable::STRING) {
-		v1.s = util::itos(info->font_id);
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));

@@ -1,5 +1,5 @@
 #!/bin/sh
 mkdir ~/code/b
-cp ~/code/booboo/build/booboo ~/code/booboo/build/boobooGame ~/code/booboo/docs/3rd_party.html ~/code/booboo/docs/API.txt ~/code/booboo/docs/Game_API.txt ~/code/b
-cp -a ~/code/booboo/data ~/code/b
-cp -a ~/code/booboo/examples ~/code/b
+cp ~/code/BooBoo/build/BooBoo ~/code/BooBoo/build/BooBooGame ~/code/BooBoo/docs/3rd_party.html ~/code/BooBoo/docs/API.txt ~/code/BooBoo/docs/Game_API.txt ~/code/b
+cp -a ~/code/BooBoo/data ~/code/b
+cp -a ~/code/BooBoo/examples ~/code/b
