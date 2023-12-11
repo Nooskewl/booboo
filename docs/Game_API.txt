@@ -118,6 +118,19 @@ add_notification
 	away after a few seconds. This uses the default font named font.ttf.
 	e.g. add_notification "You won!"
 
+get_refresh_rate
+	Query the refresh rate
+	e.g. get_refresh_rate r
+
+get_logic_rate
+	Query the logic rate (default 60)
+	e.g. get_logic_rate r
+
+set_logic_rate
+	Change the logic rate. Values between 1 and 1000 inclusive are
+	supported.
+	e.g. set_logic_rate 144
+
 -- Primitive Functions -------------------------------------------------------
 
 start_primitives
