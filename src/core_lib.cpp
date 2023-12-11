@@ -829,6 +829,34 @@ bool corefunc_mkdir(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+bool corefunc_list_directory(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	std::vector<Variable> &vec = as_vector_inline(prg, v[0]);
+	std::string glob = as_string_inline(prg, v[1]);
+
+	util::List_Directory l(glob);
+
+	std::string fn;
+
+	while ((fn = l.next()) != "") {
+		struct stat s;
+		if (stat(fn.c_str(), &s) == 0) {
+			if ((s.st_mode & S_IFMT) == S_IFDIR) {
+				fn += "/";
+			}
+		}
+		Variable v;
+		v.type = Variable::STRING;
+		v.name = "-constant-";
+		v.s = fn;
+		vec.push_back(v);
+	}
+
+	return true;
+}
+
 bool stringfunc_format(Program *prg, std::vector<Token> &v)
 {
 	MIN_ARGS(2)
@@ -2471,6 +2499,7 @@ void start_lib_core()
 	add_instruction("for", corefunc_for);
 	add_instruction("if", corefunc_if);
 	add_instruction("getenv", corefunc_getenv);
+	add_instruction("list_directory", corefunc_list_directory);
 
 	add_instruction("=", corefunc_set);
 	add_instruction("+", corefunc_add);

@@ -412,3 +412,8 @@ getenv
 mkdir
 	Create a directory
 	e.g. mkdir my_string_path
+
+list_directory
+	List files and directories in a glob
+	e.g. list_directory dest_vector "/home/Pelvis/*"
+	Directories returned will end with "/" and regular files will not.
