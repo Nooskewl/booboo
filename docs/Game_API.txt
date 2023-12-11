@@ -457,6 +457,10 @@ joystick_count
 	get number of connected joysticks
 	e.g. joystick_count num_joysticks
 
+rumble
+	Rumble the joysticks
+	e.g. rumble duration_in_ms
+
 mouse_get_position
 	Get the mouse position scaled relative to the projection
 	The full window starts mapped to 640x360.

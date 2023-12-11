@@ -2321,6 +2321,17 @@ static bool joyfunc_count(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool joyfunc_rumble(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int ms = as_number_inline(prg, v[0]);
+
+	input::rumble(ms);
+
+	return true;
+}
+
 static bool cfgfunc_load(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -2849,6 +2860,7 @@ void start_lib_game()
 	add_instruction("sample_stop", samplefunc_stop);
 	add_instruction("joystick_poll", joyfunc_poll);
 	add_instruction("joystick_count", joyfunc_count);
+	add_instruction("rumble", joyfunc_rumble);
 	add_instruction("cfg_load", cfgfunc_load);
 	add_instruction("cfg_save", cfgfunc_save);
 	add_instruction("cfg_get_number", cfgfunc_get_number);
