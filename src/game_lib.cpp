@@ -681,6 +681,174 @@ static bool primfunc_line(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool get_pts(float thick, float x1, float y1, float x2, float y2, float x3, float y3, float xx1, float yy1, float xx2, float yy2, float xx3, float yy3, float xx4, float yy4, float *outx1, float *outy1, float *outx2, float *outy2)
+{
+	float xxx1, yyy1, xxx2, yyy2;
+
+	xxx1 = (xx1 + xx2) / 2;
+	yyy1 = (yy1 + yy2) / 2;
+	xxx2 = (xx3 + xx4) / 2;
+	yyy2 = (yy3 + yy4) / 2;
+
+	float a1, a2;
+
+	a1 = atan2(yy2-yy1, xx2-xx1);
+	a2 = atan2(yy4-yy3, xx4-xx3);
+
+	float aa11, aa12, aa21, aa22;
+
+	aa11 = a1 + (M_PI/2.0f);
+	aa12 = a1 - (M_PI/2.0f);
+	aa21 = a2 - (M_PI/2.0f);
+	aa22 = a2 + (M_PI/2.0f);
+
+	float _x1, _y1, _x2, _y2, _x3, _y3, _x4, _y4;
+
+	_x1 = xxx1 + cos(aa11) * (thick / 2.0f);
+	_y1 = yyy1 + sin(aa11) * (thick / 2.0f);
+	_x2 = xxx1 + cos(aa12) * (thick / 2.0f);
+	_y2 = yyy1 + sin(aa12) * (thick / 2.0f);
+	_x3 = xxx2 + cos(aa21) * (thick / 2.0f);
+	_y3 = yyy2 + sin(aa21) * (thick / 2.0f);
+	_x4 = xxx2 + cos(aa22) * (thick / 2.0f);
+	_y4 = yyy2 + sin(aa22) * (thick / 2.0f);
+
+	float __x1, __y1, __x2, __y2, __x3, __y3, __x4, __y4;
+
+	const float BIGNUM = 1000000;
+
+	__x1 = _x1 + cos(a1) * BIGNUM;
+	__y1 = _y1 + sin(a1) * BIGNUM;
+	__x2 = _x2 + cos(a1) * BIGNUM;
+	__y2 = _y2 + sin(a1) * BIGNUM;
+	__x3 = _x3 + cos(a2) * BIGNUM;
+	__y3 = _y3 + sin(a2) * BIGNUM;
+	__x4 = _x4 + cos(a2) * BIGNUM;
+	__y4 = _y4 + sin(a2) * BIGNUM;
+
+	util::Point<float> p1, p2, p3, p4;
+
+	p1.x = _x1;
+	p1.y = _y1;
+	p2.x = __x1;
+	p2.y = __y1;
+	p3.x = _x3;
+	p3.y = _y3;
+	p4.x = __x3;
+	p4.y = __y3;
+
+	util::Point<float> result;
+
+	if (cd::line_line(&p1, &p2, &p3, &p4, &result) == false) {
+		// FIXME: warning
+		return false;
+	}
+
+	*outx1 = result.x;
+	*outy1 = result.y;
+
+	p1.x = _x2;
+	p1.y = _y2;
+	p2.x = __x2;
+	p2.y = __y2;
+	p3.x = _x4;
+	p3.y = _y4;
+	p4.x = __x4;
+	p4.y = __y4;
+
+	if (cd::line_line(&p1, &p2, &p3, &p4, &result) == false) {
+		// FIXME: warning
+		return false;
+	}
+
+	*outx2 = result.x;
+	*outy2 = result.y;
+
+	return true;
+}
+
+static bool primfunc_triangle(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(11)
+
+	SDL_Colour c;
+	c.r = as_number_inline(prg, v[0]);
+	c.g = as_number_inline(prg, v[1]);
+	c.b = as_number_inline(prg, v[2]);
+	c.a = as_number_inline(prg, v[3]);
+	float x1 = as_number_inline(prg, v[4]);
+	float y1 = as_number_inline(prg, v[5]);
+	float x2 = as_number_inline(prg, v[6]);
+	float y2 = as_number_inline(prg, v[7]);
+	float x3 = as_number_inline(prg, v[8]);
+	float y3 = as_number_inline(prg, v[9]);
+	float thick = as_number_inline(prg, v[10]);
+
+	float results[6][2];
+	float xx1, yy1, xx2, yy2, xx3, yy3, xx4, yy4;
+
+	xx1 = x1;
+	yy1 = y1;
+	xx2 = x2;
+	yy2 = y2;
+	xx3 = x3;
+	yy3 = y3;
+	xx4 = x2;
+	yy4 = y2;
+
+	if (get_pts(thick, x1, y1, x2, y2, x3, y3, xx1, yy1, xx2, yy2, xx3, yy3, xx4, yy4, &results[0][0], &results[0][1], &results[1][0], &results[1][1]) == false) {
+		// FIXME warning
+		return true;
+	}
+
+	xx1 = x2;
+	yy1 = y2;
+	xx2 = x3;
+	yy2 = y3;
+	xx3 = x1;
+	yy3 = y1;
+	xx4 = x3;
+	yy4 = y3;
+
+	if (get_pts(thick, x1, y1, x2, y2, x3, y3, xx1, yy1, xx2, yy2, xx3, yy3, xx4, yy4, &results[2][0], &results[2][1], &results[3][0], &results[3][1]) == false) {
+		// FIXME: warning
+		return true;
+	}
+
+	xx1 = x3;
+	yy1 = y3;
+	xx2 = x1;
+	yy2 = y1;
+	xx3 = x2;
+	yy3 = y2;
+	xx4 = x1;
+	yy4 = y1;
+
+	if (get_pts(thick, x1, y1, x2, y2, x3, y3, xx1, yy1, xx2, yy2, xx3, yy3, xx4, yy4, &results[4][0], &results[4][1], &results[5][0], &results[5][1]) == false) {
+		// FIXME: warning
+		return true;
+	}
+	
+	gfx::draw_filled_triangle(c, util::Point<float>(x2, y2), util::Point<float>(results[0][0], results[0][1]), util::Point<float>(x1, y1));
+	gfx::draw_filled_triangle(c, util::Point<float>(x1, y1), util::Point<float>(results[4][0], results[4][1]), util::Point<float>(results[0][0], results[0][1]));
+	gfx::draw_filled_triangle(c, util::Point<float>(x2, y2), util::Point<float>(results[1][0], results[1][1]), util::Point<float>(x1, y1));
+	gfx::draw_filled_triangle(c, util::Point<float>(x1, y1), util::Point<float>(results[5][0], results[5][1]), util::Point<float>(results[1][0], results[1][1]));
+
+
+	gfx::draw_filled_triangle(c, util::Point<float>(x3, y3), util::Point<float>(results[2][0], results[2][1]), util::Point<float>(x1, y1));
+	gfx::draw_filled_triangle(c, util::Point<float>(x1, y1), util::Point<float>(results[4][0], results[4][1]), util::Point<float>(results[2][0], results[2][1]));
+	gfx::draw_filled_triangle(c, util::Point<float>(x3, y3), util::Point<float>(results[3][0], results[3][1]), util::Point<float>(x1, y1));
+	gfx::draw_filled_triangle(c, util::Point<float>(x1, y1), util::Point<float>(results[5][0], results[5][1]), util::Point<float>(results[3][0], results[3][1]));
+
+
+	gfx::draw_filled_triangle(c, util::Point<float>(x3, y3), util::Point<float>(results[2][0], results[2][1]), util::Point<float>(x2, y2));
+	gfx::draw_filled_triangle(c, util::Point<float>(x2, y2), util::Point<float>(results[0][0], results[0][1]), util::Point<float>(results[2][0], results[2][1]));
+	gfx::draw_filled_triangle(c, util::Point<float>(x3, y3), util::Point<float>(results[3][0], results[3][1]), util::Point<float>(x2, y2));
+	gfx::draw_filled_triangle(c, util::Point<float>(x2, y2), util::Point<float>(results[1][0], results[1][1]), util::Point<float>(results[3][0], results[3][1]));
+
+	return true;
+}
+
 static bool primfunc_filled_triangle(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(18)
@@ -2803,6 +2971,7 @@ void start_lib_game()
 	add_instruction("start_primitives", primfunc_start_primitives);
 	add_instruction("end_primitives", primfunc_end_primitives);
 	add_instruction("line", primfunc_line);
+	add_instruction("triangle", primfunc_triangle);
 	add_instruction("filled_triangle", primfunc_filled_triangle);
 	add_instruction("rectangle", primfunc_rectangle);
 	add_instruction("filled_rectangle", primfunc_filled_rectangle);
