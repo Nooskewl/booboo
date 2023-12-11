@@ -426,3 +426,4 @@ get_system_language
 	Returns the user interface language of the system
 	e.g. get_system_language lang
 	lang will be in Steam format e.g. "french", "brazilian" etc
+
