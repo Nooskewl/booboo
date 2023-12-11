@@ -681,41 +681,41 @@ static bool primfunc_line(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool get_pts(float thick, float x1, float y1, float x2, float y2, float x3, float y3, float xx1, float yy1, float xx2, float yy2, float xx3, float yy3, float xx4, float yy4, float *outx1, float *outy1, float *outx2, float *outy2)
+static bool get_pts(double thick, double x1, double y1, double x2, double y2, double x3, double y3, double xx1, double yy1, double xx2, double yy2, double xx3, double yy3, double xx4, double yy4, double *outx1, double *outy1, double *outx2, double *outy2)
 {
-	float xxx1, yyy1, xxx2, yyy2;
+	double xxx1, yyy1, xxx2, yyy2;
 
 	xxx1 = (xx1 + xx2) / 2;
 	yyy1 = (yy1 + yy2) / 2;
 	xxx2 = (xx3 + xx4) / 2;
 	yyy2 = (yy3 + yy4) / 2;
 
-	float a1, a2;
+	double a1, a2;
 
 	a1 = atan2(yy2-yy1, xx2-xx1);
 	a2 = atan2(yy4-yy3, xx4-xx3);
 
-	float aa11, aa12, aa21, aa22;
+	double aa11, aa12, aa21, aa22;
 
-	aa11 = a1 + (M_PI/2.0f);
-	aa12 = a1 - (M_PI/2.0f);
-	aa21 = a2 - (M_PI/2.0f);
-	aa22 = a2 + (M_PI/2.0f);
+	aa11 = a1 + (M_PI/2.0);
+	aa12 = a1 - (M_PI/2.0);
+	aa21 = a2 - (M_PI/2.0);
+	aa22 = a2 + (M_PI/2.0);
 
-	float _x1, _y1, _x2, _y2, _x3, _y3, _x4, _y4;
+	double _x1, _y1, _x2, _y2, _x3, _y3, _x4, _y4;
 
-	_x1 = xxx1 + cos(aa11) * (thick / 2.0f);
-	_y1 = yyy1 + sin(aa11) * (thick / 2.0f);
-	_x2 = xxx1 + cos(aa12) * (thick / 2.0f);
-	_y2 = yyy1 + sin(aa12) * (thick / 2.0f);
-	_x3 = xxx2 + cos(aa21) * (thick / 2.0f);
-	_y3 = yyy2 + sin(aa21) * (thick / 2.0f);
-	_x4 = xxx2 + cos(aa22) * (thick / 2.0f);
-	_y4 = yyy2 + sin(aa22) * (thick / 2.0f);
+	_x1 = xxx1 + cos(aa11) * (thick / 2.0);
+	_y1 = yyy1 + sin(aa11) * (thick / 2.0);
+	_x2 = xxx1 + cos(aa12) * (thick / 2.0);
+	_y2 = yyy1 + sin(aa12) * (thick / 2.0);
+	_x3 = xxx2 + cos(aa21) * (thick / 2.0);
+	_y3 = yyy2 + sin(aa21) * (thick / 2.0);
+	_x4 = xxx2 + cos(aa22) * (thick / 2.0);
+	_y4 = yyy2 + sin(aa22) * (thick / 2.0);
 
-	float __x1, __y1, __x2, __y2, __x3, __y3, __x4, __y4;
+	double __x1, __y1, __x2, __y2, __x3, __y3, __x4, __y4;
 
-	const float BIGNUM = 1000000;
+	const double BIGNUM = 1000000000.0;
 
 	__x1 = _x1 + cos(a1) * BIGNUM;
 	__y1 = _y1 + sin(a1) * BIGNUM;
@@ -740,7 +740,6 @@ static bool get_pts(float thick, float x1, float y1, float x2, float y2, float x
 	util::Point<float> result;
 
 	if (cd::line_line(&p1, &p2, &p3, &p4, &result) == false) {
-		// FIXME: warning
 		return false;
 	}
 
@@ -757,7 +756,6 @@ static bool get_pts(float thick, float x1, float y1, float x2, float y2, float x
 	p4.y = __y4;
 
 	if (cd::line_line(&p1, &p2, &p3, &p4, &result) == false) {
-		// FIXME: warning
 		return false;
 	}
 
@@ -776,16 +774,16 @@ static bool primfunc_triangle(Program *prg, std::vector<Token> &v)
 	c.g = as_number_inline(prg, v[1]);
 	c.b = as_number_inline(prg, v[2]);
 	c.a = as_number_inline(prg, v[3]);
-	float x1 = as_number_inline(prg, v[4]);
-	float y1 = as_number_inline(prg, v[5]);
-	float x2 = as_number_inline(prg, v[6]);
-	float y2 = as_number_inline(prg, v[7]);
-	float x3 = as_number_inline(prg, v[8]);
-	float y3 = as_number_inline(prg, v[9]);
-	float thick = as_number_inline(prg, v[10]);
+	double x1 = as_number_inline(prg, v[4]);
+	double y1 = as_number_inline(prg, v[5]);
+	double x2 = as_number_inline(prg, v[6]);
+	double y2 = as_number_inline(prg, v[7]);
+	double x3 = as_number_inline(prg, v[8]);
+	double y3 = as_number_inline(prg, v[9]);
+	double thick = as_number_inline(prg, v[10]);
 
-	float results[6][2];
-	float xx1, yy1, xx2, yy2, xx3, yy3, xx4, yy4;
+	double results[6][2];
+	double xx1, yy1, xx2, yy2, xx3, yy3, xx4, yy4;
 
 	xx1 = x1;
 	yy1 = y1;
@@ -797,7 +795,32 @@ static bool primfunc_triangle(Program *prg, std::vector<Token> &v)
 	yy4 = y2;
 
 	if (get_pts(thick, x1, y1, x2, y2, x3, y3, xx1, yy1, xx2, yy2, xx3, yy3, xx4, yy4, &results[0][0], &results[0][1], &results[1][0], &results[1][1]) == false) {
-		// FIXME warning
+		double xx1, yy1, xx2, yy2, xx3, yy3;
+		double _x, _y;
+		double dx, dy;
+		float a;
+		_x = (x2 + x3) / 2.0;
+		_y = (y2 + y3) / 2.0;
+		dx = x1 - _x;
+		dy = y1 - _y;
+		a = atan2(dy, dx);
+		xx1 = x1 + cos(a) * (thick / 2.0);
+		yy1 = y1 + sin(a) * (thick / 2.0);
+		_x = (x1 + x3) / 2.0;
+		_y = (y1 + y3) / 2.0;
+		dx = x2 - _x;
+		dy = y2 - _y;
+		a = atan2(dy, dx);
+		xx2 = x2 + cos(a) * (thick / 2.0);
+		yy2 = y2 + sin(a) * (thick / 2.0);
+		_x = (x1 + x2) / 2.0;
+		_y = (y1 + y2) / 2.0;
+		dx = x3 - _x;
+		dy = y3 - _y;
+		a = atan2(dy, dx);
+		xx3 = x3 + cos(a) * (thick / 2.0);
+		yy3 = y3 + sin(a) * (thick / 2.0);
+		gfx::draw_filled_triangle(c, util::Point<float>(xx1, yy1), util::Point<float>(xx2, yy2), util::Point<float>(xx3, yy3));
 		return true;
 	}
 
@@ -811,7 +834,32 @@ static bool primfunc_triangle(Program *prg, std::vector<Token> &v)
 	yy4 = y3;
 
 	if (get_pts(thick, x1, y1, x2, y2, x3, y3, xx1, yy1, xx2, yy2, xx3, yy3, xx4, yy4, &results[2][0], &results[2][1], &results[3][0], &results[3][1]) == false) {
-		// FIXME: warning
+		double xx1, yy1, xx2, yy2, xx3, yy3;
+		double _x, _y;
+		double dx, dy;
+		float a;
+		_x = (x2 + x3) / 2.0;
+		_y = (y2 + y3) / 2.0;
+		dx = x1 - _x;
+		dy = y1 - _y;
+		a = atan2(dy, dx);
+		xx1 = x1 + cos(a) * (thick / 2.0);
+		yy1 = y1 + sin(a) * (thick / 2.0);
+		_x = (x1 + x3) / 2.0;
+		_y = (y1 + y3) / 2.0;
+		dx = x2 - _x;
+		dy = y2 - _y;
+		a = atan2(dy, dx);
+		xx2 = x2 + cos(a) * (thick / 2.0);
+		yy2 = y2 + sin(a) * (thick / 2.0);
+		_x = (x1 + x2) / 2.0;
+		_y = (y1 + y2) / 2.0;
+		dx = x3 - _x;
+		dy = y3 - _y;
+		a = atan2(dy, dx);
+		xx3 = x3 + cos(a) * (thick / 2.0);
+		yy3 = y3 + sin(a) * (thick / 2.0);
+		gfx::draw_filled_triangle(c, util::Point<float>(xx1, yy1), util::Point<float>(xx2, yy2), util::Point<float>(xx3, yy3));
 		return true;
 	}
 
@@ -825,7 +873,32 @@ static bool primfunc_triangle(Program *prg, std::vector<Token> &v)
 	yy4 = y1;
 
 	if (get_pts(thick, x1, y1, x2, y2, x3, y3, xx1, yy1, xx2, yy2, xx3, yy3, xx4, yy4, &results[4][0], &results[4][1], &results[5][0], &results[5][1]) == false) {
-		// FIXME: warning
+		double xx1, yy1, xx2, yy2, xx3, yy3;
+		double _x, _y;
+		double dx, dy;
+		float a;
+		_x = (x2 + x3) / 2.0;
+		_y = (y2 + y3) / 2.0;
+		dx = x1 - _x;
+		dy = y1 - _y;
+		a = atan2(dy, dx);
+		xx1 = x1 + cos(a) * (thick / 2.0);
+		yy1 = y1 + sin(a) * (thick / 2.0);
+		_x = (x1 + x3) / 2.0;
+		_y = (y1 + y3) / 2.0;
+		dx = x2 - _x;
+		dy = y2 - _y;
+		a = atan2(dy, dx);
+		xx2 = x2 + cos(a) * (thick / 2.0);
+		yy2 = y2 + sin(a) * (thick / 2.0);
+		_x = (x1 + x2) / 2.0;
+		_y = (y1 + y2) / 2.0;
+		dx = x3 - _x;
+		dy = y3 - _y;
+		a = atan2(dy, dx);
+		xx3 = x3 + cos(a) * (thick / 2.0);
+		yy3 = y3 + sin(a) * (thick / 2.0);
+		gfx::draw_filled_triangle(c, util::Point<float>(xx1, yy1), util::Point<float>(xx2, yy2), util::Point<float>(xx3, yy3));
 		return true;
 	}
 	
