@@ -358,6 +358,8 @@ static bool miscfunc_rand(Program *prg, std::vector<Token> &v)
 
 static bool miscfunc_args(Program *prg, std::vector<Token> &v)
 {
+	COUNT_ARGS(1)
+
 	Variable &v1 = as_variable_inline(prg, v[0]);
 	
 	if (v1.type != Variable::VECTOR) {
@@ -418,6 +420,8 @@ static bool gfxfunc_resize(Program *prg, std::vector<Token> &v)
 
 static bool gfxfunc_get_screen_size(Program *prg, std::vector<Token> &v)
 {
+	COUNT_ARGS(2)
+
 	Variable &v1 = as_variable_inline(prg, v[0]);
 	Variable &v2 = as_variable_inline(prg, v[1]);
 	
@@ -433,6 +437,8 @@ static bool gfxfunc_get_screen_size(Program *prg, std::vector<Token> &v)
 
 static bool gfxfunc_get_buffer_size(Program *prg, std::vector<Token> &v)
 {
+	COUNT_ARGS(2)
+
 	Variable &v1 = as_variable_inline(prg, v[0]);
 	Variable &v2 = as_variable_inline(prg, v[1]);
 	
@@ -448,6 +454,8 @@ static bool gfxfunc_get_buffer_size(Program *prg, std::vector<Token> &v)
 
 static bool gfxfunc_get_screen_offset(Program *prg, std::vector<Token> &v)
 {
+	COUNT_ARGS(2)
+
 	Variable &v1 = as_variable_inline(prg, v[0]);
 	Variable &v2 = as_variable_inline(prg, v[1]);
 	
@@ -463,6 +471,8 @@ static bool gfxfunc_get_screen_offset(Program *prg, std::vector<Token> &v)
 
 static bool gfxfunc_get_scale(Program *prg, std::vector<Token> &v)
 {
+	COUNT_ARGS(1)
+
 	Variable &v1 = as_variable_inline(prg, v[0]);
 	
 	if (v1.type != Variable::NUMBER) {
