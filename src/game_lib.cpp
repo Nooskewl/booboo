@@ -571,6 +571,51 @@ static bool gfxfunc_toggle_fullscreen(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool gfxfunc_get_refresh_rate(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v1.n = shim::refresh_rate;
+
+	return true;
+}
+
+static bool gfxfunc_get_logic_rate(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v1.n = shim::logic_rate;
+
+	return true;
+}
+
+static bool gfxfunc_set_logic_rate(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int rate = as_number_inline(prg, v[0]);
+
+	if (rate < 1 || rate > 1000) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Logic rate must be between 1 and 1000 at " + get_error_info(prg));
+	}
+
+	shim::logic_rate = rate;
+
+	return true;
+}
+
 static bool primfunc_start_primitives(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -2716,6 +2761,9 @@ void start_lib_game()
 	add_instruction("add_notification", gfxfunc_add_notification);
 	add_instruction("is_fullscreen", gfxfunc_is_fullscreen);
 	add_instruction("toggle_fullscreen", gfxfunc_toggle_fullscreen);
+	add_instruction("get_refresh_rate", gfxfunc_get_refresh_rate);
+	add_instruction("get_logic_rate", gfxfunc_get_logic_rate);
+	add_instruction("set_logic_rate", gfxfunc_set_logic_rate);
 	add_instruction("start_primitives", primfunc_start_primitives);
 	add_instruction("end_primitives", primfunc_end_primitives);
 	add_instruction("line", primfunc_line);
