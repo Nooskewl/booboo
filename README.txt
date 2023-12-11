@@ -7,6 +7,9 @@ Just enter data/ and run it, and it will create ../data.cpa. The shaders
 you'll find in the examples' data/ directories are all or partly required
 to make BooBoo work.
 
+Note: the examples and demos came about as the language evolved, so a
+lot of "old" style and syntax may be found in some of them.
+
 BooBoo is free to download, use and redistribute, but donations are
 appreciated. Send PayPal donations to: skinmarquee@gmail.com
 
