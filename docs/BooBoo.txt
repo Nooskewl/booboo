@@ -130,6 +130,14 @@ jge
 	Jump if greater or equal
 	e.g. jge my_label
 
+call
+	Call a function that doesn't return anything
+	e.g. call my_func param1 param2 param2
+
+call_result
+	Call a function that returns a value
+	e.g. call_result result my_func param1 param2
+
 if
 	compare and jump
 	e.g. if (expr1) the_if (expr2) elseif1 (expr3) elseif2 the_else
@@ -140,14 +148,6 @@ if
 	:the_else
 	the_if elseif1 elseif2 and the_else are labels that are the bottom of
 	their code blocks
-
-call
-	Call a function that doesn't return anything
-	e.g. call my_func param1 param2 param2
-
-call_result
-	Call a function that returns a value
-	e.g. call_result result my_func param1 param2
 
 for
 	A for loop
