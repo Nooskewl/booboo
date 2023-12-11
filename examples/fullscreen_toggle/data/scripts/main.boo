@@ -1,5 +1,3 @@
-include "keycodes.inc"
-
 number font
 font_load font "font.ttf" 16 1
 

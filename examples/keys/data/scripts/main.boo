@@ -14,8 +14,6 @@ function draw
 
 function run
 {
-	include "keycodes.inc"
-
 	number f
 	key_get f KEY_f
 

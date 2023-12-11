@@ -23,8 +23,6 @@ joystick_poll 0 joy_x1 joy_y1 joy_x2 joy_y2 joy_x3 joy_y3 joy_l joy_r joy_u joy_
 
 ; This provides some keyboard support mapped to joystick
 
-include "keycodes.inc"
-
 number _key_l _key_r _key_u _key_d _key_a _key_b _key_back
 key_get _key_l KEY_LEFT
 key_get _key_r KEY_RIGHT

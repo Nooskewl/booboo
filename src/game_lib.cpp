@@ -1,5 +1,5 @@
-#define STEAMWORKS
 #include <shim4/shim4.h>
+#include <shim4/shaders/glsl/default_vertex.h>
 
 #include "booboo/booboo.h"
 #include "booboo/internal.h"
@@ -2730,7 +2730,6 @@ static bool shaderfunc_load(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
-	std::string vname = "glsl/default_vertex.txt";
 	std::string fname = as_string_inline(prg, v[1]);
 
 	gfx::Shader::Precision vp = gfx::Shader::HIGH;
@@ -2745,7 +2744,7 @@ static bool shaderfunc_load(Program *prg, std::vector<Token> &v)
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
-	std::string vs = util::load_text("gfx/shaders/" + vname);
+	std::string vs = DEFAULT_GLSL_VERTEX_SHADER;
 	std::string fs = util::load_text("gfx/shaders/" + fname);
 
 	gfx::Shader::OpenGL_Shader *vert = gfx::Shader::load_opengl_vertex_shader(vs, vp);

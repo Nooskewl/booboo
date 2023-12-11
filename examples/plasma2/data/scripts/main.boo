@@ -19,7 +19,7 @@ number j
 number tmp
 = tmp j
 / tmp w
-* tmp 3.14159
+* tmp PI
 * tmp 2
 sin tmp
 number tmp2
@@ -29,7 +29,7 @@ cos tmp2
 number tmp3
 = tmp3 i
 / tmp3 h
-* tmp3 3.14159
+* tmp3 PI
 sin tmp3
 + tmp tmp2
 + tmp tmp3
