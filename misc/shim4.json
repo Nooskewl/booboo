@@ -28,7 +28,8 @@
 		"misc": {
 			"window_title": "BooBoo",
 			"organisation_name": "b1stable",
-			"game_name": "BooBoo"
+			"game_name": "BooBoo",
+			"logic_rate": 60
 		},
 		"audio": {
 			"samplerate": 0

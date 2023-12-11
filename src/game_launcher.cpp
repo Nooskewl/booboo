@@ -750,13 +750,14 @@ static void loop()
 		}
 
 		// TIMING
+		float ms_per_logic_frame = 1000 / shim::logic_rate;
 		Uint32 now = SDL_GetTicks();
 		int diff = now - start;
 		bool skip_drawing = false;
-		int logic_reps = diff / 16;
+		int logic_reps = diff / ms_per_logic_frame;
 
 		if (logic_reps > 0) {
-			start += 16 * logic_reps;
+			start += ms_per_logic_frame * logic_reps;
 		}
 
 		for (int logic = 0; logic < logic_reps; logic++) {
