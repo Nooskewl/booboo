@@ -85,6 +85,8 @@ typeof
 	instructions to do the same thing, but the benefits get larger
 	for longer expressions. Expression operators returns numbers only
 	as an optimisation.
+	User functions can be supplied as operators, but builtin functions
+	like sin/etc cannot (you can build your own if you like.)
 
 []
 	Vector/map indexing operator
