@@ -379,6 +379,50 @@ static bool miscfunc_args(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool miscfunc_get_logic_rate(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	if (v1.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v1.n = shim::logic_rate;
+
+	return true;
+}
+
+static bool miscfunc_set_logic_rate(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int rate = as_number_inline(prg, v[0]);
+
+	if (rate < 1 || rate > 1000) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Logic rate must be between 1 and 1000 at " + get_error_info(prg));
+	}
+
+	shim::logic_rate = rate;
+
+	return true;
+}
+
+static bool gfxfunc_set_scissor(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int x = as_number_inline(prg, v[0]);
+	int y = as_number_inline(prg, v[1]);
+	int w = as_number_inline(prg, v[2]);
+	int h = as_number_inline(prg, v[3]);
+
+	gfx::set_scissor(x, y, w, h);
+
+	return true;
+}
+
 static bool gfxfunc_clear(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
@@ -582,50 +626,6 @@ static bool gfxfunc_get_refresh_rate(Program *prg, std::vector<Token> &v)
 	}
 
 	v1.n = shim::refresh_rate;
-
-	return true;
-}
-
-static bool gfxfunc_get_logic_rate(Program *prg, std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-
-	Variable &v1 = as_variable_inline(prg, v[0]);
-
-	if (v1.type != Variable::NUMBER) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
-
-	v1.n = shim::logic_rate;
-
-	return true;
-}
-
-static bool gfxfunc_set_logic_rate(Program *prg, std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-
-	int rate = as_number_inline(prg, v[0]);
-
-	if (rate < 1 || rate > 1000) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Logic rate must be between 1 and 1000 at " + get_error_info(prg));
-	}
-
-	shim::logic_rate = rate;
-
-	return true;
-}
-
-static bool gfxfunc_set_scissor(Program *prg, std::vector<Token> &v)
-{
-	COUNT_ARGS(4)
-
-	int x = as_number_inline(prg, v[0]);
-	int y = as_number_inline(prg, v[1]);
-	int w = as_number_inline(prg, v[2]);
-	int h = as_number_inline(prg, v[3]);
-
-	gfx::set_scissor(x, y, w, h);
 
 	return true;
 }
@@ -2771,6 +2771,8 @@ void start_lib_game()
 	add_instruction("get_ticks", miscfunc_get_ticks);
 	add_instruction("rand", miscfunc_rand);
 	add_instruction("args", miscfunc_args);
+	add_instruction("get_logic_rate", miscfunc_get_logic_rate);
+	add_instruction("set_logic_rate", miscfunc_set_logic_rate);
 	add_instruction("clear", gfxfunc_clear);
 	add_instruction("flip", gfxfunc_flip);
 	add_instruction("resize", gfxfunc_resize);
@@ -2785,8 +2787,6 @@ void start_lib_game()
 	add_instruction("is_fullscreen", gfxfunc_is_fullscreen);
 	add_instruction("toggle_fullscreen", gfxfunc_toggle_fullscreen);
 	add_instruction("get_refresh_rate", gfxfunc_get_refresh_rate);
-	add_instruction("get_logic_rate", gfxfunc_get_logic_rate);
-	add_instruction("set_logic_rate", gfxfunc_set_logic_rate);
 	add_instruction("set_scissor", gfxfunc_set_scissor);
 	add_instruction("unset_scissor", gfxfunc_unset_scissor);
 	add_instruction("start_primitives", primfunc_start_primitives);
