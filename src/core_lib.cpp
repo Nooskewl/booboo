@@ -8,6 +8,8 @@
 
 #include <shim4/shim4.h>
 
+#include <sys/stat.h>
+
 namespace booboo {
 
 bool breaker_reset(Program *prg, std::vector<Token> &v)
