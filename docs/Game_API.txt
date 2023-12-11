@@ -101,6 +101,20 @@ screen_shake
 	Apply a screen shake effect
 	e.g. screen_shake amount_in_pixels duration_in_millis
 
+is_fullscreen
+	Find out if the screen is currently fullscreen
+	e.g. is_fullscreen onoff
+
+toggle_fullscreen
+	Change from fullscreen to windows or vice versa depending on the
+	current windowed/fullscreen state.
+	e.g. toggle_fullscreen
+
+add_notification
+	Add a popup notification in the top right of the screen that goes
+	away after a few seconds. This uses the default font named font.ttf.
+	e.g. add_notification "You won!"
+
 -- Primitive Functions -------------------------------------------------------
 
 start_primitives
