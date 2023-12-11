@@ -109,10 +109,15 @@ inline double as_number_inline(Program *prg, Token &t)
 		}
 		else if (v->type == Variable::FISH) {
 			Variable &var = go_fish(prg, v->f);
-			if (var.type != Variable::NUMBER) {
+			if (var.type == Variable::NUMBER) {
+				return var.n;
+			}
+			else if (var.type == Variable::STRING) {
+				return atof(var.s.c_str());
+			}
+			else {
 				throw Error(std::string(__FUNCTION__) + ": " + "Fished out the wrong type at " + get_error_info(prg));
 			}
-			return var.n;
 		}
 		else {
 			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
