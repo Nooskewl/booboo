@@ -986,6 +986,8 @@ int main(int argc, char **argv)
 
 	//set_shim_args(true, false, true);
 	set_shim_args(true, true, false);
+	
+	shim::use_cwd = true;
 
 	shim::static_start_all();
 	
