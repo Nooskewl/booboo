@@ -512,12 +512,17 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 		name += buf;
 		p++;
 	}
-	if (expression_map.find(name) == expression_map.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Unknown expression function at " + get_error_info(func));
-	}
 
 	Variable::Expression e;
-	e.i = expression_map[name];
+
+	if (expression_map.find(name) == expression_map.end()) {
+		//throw Error(std::string(__FUNCTION__) + ": " + "Unknown expression function at " + get_error_info(func));
+		e.i = -1;
+		e.name = name;
+	}
+	else {
+		e.i = expression_map[name];
+	}
 
 	bool done = false;
 
@@ -1950,6 +1955,21 @@ std::string itos(int i)
 
 double evaluate_expression(Program *prg, Variable::Expression &e)
 {
+	if (e.i == -1) {
+		std::map<std::string, int>::iterator it = prg->variables_map.find(e.name);
+		if (it == prg->variables_map.end()) {
+			throw Error(std::string(__FUNCTION__) + ": " + "Unknown expression function '" + e.name + "' at " + get_error_info(prg));
+
+		}
+
+		Variable &func = prg->variables[it->second];
+
+		Variable result;
+
+		call_function(prg, func.n, e.v, result);
+
+		return result.n;
+	}
 	return expression_handlers[e.i](prg, e.v);
 }
 

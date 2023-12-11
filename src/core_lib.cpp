@@ -34,20 +34,17 @@ bool breaker_return(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	Variable &v1 = prg->s->result;
+	Variable &v2 = as_variable_inline(prg, v[0]);
 
-	if (v[0].type == Token::SYMBOL) {
-		v1 = prg->variables[v[0].i];
-	}
-	else if (v[0].type == Token::NUMBER) {
+	if (v2.type == Variable::EXPRESSION) {
 		v1.type = Variable::NUMBER;
-		v1.n = v[0].n;
+		v1.n = evaluate_expression(prg, v2.e);
 	}
-	else if (v[0].type == Token::STRING) {
-		v1.type = Variable::STRING;
-		v1.s = v[0].s;
+	else if (v2.type == Variable::FISH) {
+		v1 = go_fish(prg, v2.f);
 	}
 	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		v1 = v2;
 	}
 
 	return false;

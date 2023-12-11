@@ -51,6 +51,7 @@ struct Variable
 	struct Expression
 	{
 		int i;
+		std::string name;
 		std::vector<Token> v;
 	};
 
