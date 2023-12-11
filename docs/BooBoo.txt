@@ -393,3 +393,6 @@ input
 	Read a word from stdin
 	e.g. input str
 
+getenv
+	Get an environment variable
+	e.g. getenv dest "HOME"

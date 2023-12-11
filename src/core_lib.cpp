@@ -92,6 +92,109 @@ bool corefunc_pointer(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static std::string typeof_var(Variable &v1)
+{
+	std::string res;
+	if (v1.type == Variable::NUMBER) {
+		res = "number";
+	}
+	else if (v1.type == Variable::STRING) {
+		res = "string";
+	}
+	else if (v1.type == Variable::VECTOR) {
+		res = "vector";
+	}
+	else if (v1.type == Variable::MAP) {
+		res = "map";
+	}
+	else if (v1.type == Variable::POINTER) {
+		res = "pointer";
+	}
+	else if (v1.type == Variable::FUNCTION) {
+		res = "function";
+	}
+	else if (v1.type == Variable::LABEL) {
+		res = "label";
+	}
+	else {
+		res = "unknown";
+	}
+
+	return res;
+}
+
+bool corefunc_typeof(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	std::string res;
+
+	if (v[1].type != Token::SYMBOL) {
+		if (v[1].type == Token::NUMBER) {
+			res = "number";
+		}
+		else if (v[1].type == Token::STRING) {
+			res = "string";
+		}
+		else {
+			res = "unknown";
+		}
+	}
+	else {
+		Variable &v1 = prg->variables[v[1].i];
+
+		if (v1.type == Variable::VECTOR) {
+			if (v.size() > 2) {
+				std::vector<Variable> *p;
+				p = &v1.v;
+				int index = 0;
+				for (size_t i = 2; i < v.size(); i++) {
+					index = as_number_inline(prg, v[i]);
+					if (i < v.size()-1) {
+						p = &(*p)[index].v;
+					}
+				}
+				Variable &v2 = (*p)[index];
+				res = typeof_var(v2);
+			}
+			else {
+				res = "vector";
+			}
+		}
+		else if (v1.type == Variable::MAP) {
+			if (v.size() > 2) {
+				std::map<std::string, Variable> *p;
+				p = &v1.m;
+				std::string key = "";
+				for (size_t i = 2; i < v.size(); i++) {
+					key = as_string_inline(prg, v[i]);
+					if (i < v.size()-1) {
+						p = &(*p)[key].m;
+					}
+				}
+				Variable &v2 = (*p)[key];
+				res = typeof_var(v2);
+			}
+			else {
+				res = "map";
+			}
+		}
+		else {
+			res = typeof_var(v1);
+		}
+	}
+
+	Variable &v2 = as_variable_inline(prg, v[0]);
+
+	if (v2.type != Variable::STRING) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v2.s = res;
+
+	return true;
+}
+
 bool corefunc_address(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -205,6 +308,20 @@ bool corefunc_if(Program *prg, std::vector<Token> &v)
 		unsigned int end_block = as_label_inline(prg, v[v.size()-1]);
 		prg->s->pc = end_block;
 	}
+
+	return true;
+}
+
+bool corefunc_getenv(Program *prg, std::vector<Token> &v)
+{
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string get = as_string_inline(prg, v[1]);
+
+	if (v1.type != Variable::STRING) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v1.s = getenv(get.c_str());
 
 	return true;
 }
@@ -512,109 +629,6 @@ bool corefunc_call_result(Program *prg, std::vector<Token> &v)
 	int function = as_function_inline(prg, v[1]);
 
 	call_function(prg, function, v, result, 2);
-
-	return true;
-}
-
-static std::string typeof_var(Variable &v1)
-{
-	std::string res;
-	if (v1.type == Variable::NUMBER) {
-		res = "number";
-	}
-	else if (v1.type == Variable::STRING) {
-		res = "string";
-	}
-	else if (v1.type == Variable::VECTOR) {
-		res = "vector";
-	}
-	else if (v1.type == Variable::MAP) {
-		res = "map";
-	}
-	else if (v1.type == Variable::POINTER) {
-		res = "pointer";
-	}
-	else if (v1.type == Variable::FUNCTION) {
-		res = "function";
-	}
-	else if (v1.type == Variable::LABEL) {
-		res = "label";
-	}
-	else {
-		res = "unknown";
-	}
-
-	return res;
-}
-
-bool corefunc_typeof(Program *prg, std::vector<Token> &v)
-{
-	COUNT_ARGS(2)
-
-	std::string res;
-
-	if (v[1].type != Token::SYMBOL) {
-		if (v[1].type == Token::NUMBER) {
-			res = "number";
-		}
-		else if (v[1].type == Token::STRING) {
-			res = "string";
-		}
-		else {
-			res = "unknown";
-		}
-	}
-	else {
-		Variable &v1 = prg->variables[v[1].i];
-
-		if (v1.type == Variable::VECTOR) {
-			if (v.size() > 2) {
-				std::vector<Variable> *p;
-				p = &v1.v;
-				int index = 0;
-				for (size_t i = 2; i < v.size(); i++) {
-					index = as_number_inline(prg, v[i]);
-					if (i < v.size()-1) {
-						p = &(*p)[index].v;
-					}
-				}
-				Variable &v2 = (*p)[index];
-				res = typeof_var(v2);
-			}
-			else {
-				res = "vector";
-			}
-		}
-		else if (v1.type == Variable::MAP) {
-			if (v.size() > 2) {
-				std::map<std::string, Variable> *p;
-				p = &v1.m;
-				std::string key = "";
-				for (size_t i = 2; i < v.size(); i++) {
-					key = as_string_inline(prg, v[i]);
-					if (i < v.size()-1) {
-						p = &(*p)[key].m;
-					}
-				}
-				Variable &v2 = (*p)[key];
-				res = typeof_var(v2);
-			}
-			else {
-				res = "map";
-			}
-		}
-		else {
-			res = typeof_var(v1);
-		}
-	}
-
-	Variable &v2 = as_variable_inline(prg, v[0]);
-
-	if (v2.type != Variable::STRING) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
-
-	v2.s = res;
 
 	return true;
 }
@@ -2393,9 +2407,11 @@ void start_lib_core()
 	add_instruction("map", corefunc_map);
 	add_instruction("pointer", corefunc_pointer);
 	
+	add_instruction("typeof", corefunc_typeof);
 	add_instruction("address", corefunc_address);
 	add_instruction("for", corefunc_for);
 	add_instruction("if", corefunc_if);
+	add_instruction("getenv", corefunc_getenv);
 
 	add_instruction("=", corefunc_set);
 	add_instruction("+", corefunc_add);
@@ -2415,7 +2431,6 @@ void start_lib_core()
 	add_instruction("call", corefunc_call);
 	add_instruction("call_result", corefunc_call_result);
 	
-	add_instruction("typeof", corefunc_typeof);
 	add_instruction("print", corefunc_print);
 	add_instruction("input", corefunc_input);
 
