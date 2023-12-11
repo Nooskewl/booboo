@@ -226,6 +226,18 @@ string_substr
 	end of the string.
 	This is UTF8 compliant
 
+string_uppercase
+	Make a string uppercase
+	e.g. string_uppercase s
+
+string_lowercase
+	Make a string lowercase
+	e.g. string_lowercase s
+
+string_trim
+	Trim leading and trailing whitespace from a string
+	e.g. string_trim s
+
 -- Math Functions ------------------------------------------------------------
 
 fmod
@@ -396,3 +408,7 @@ input
 getenv
 	Get an environment variable
 	e.g. getenv dest "HOME"
+
+mkdir
+	Create a directory
+	e.g. mkdir my_string_path

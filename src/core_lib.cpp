@@ -818,6 +818,17 @@ bool corefunc_input(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+bool corefunc_mkdir(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	std::string path = as_string_inline(prg, v[0]);
+
+	util::mkdir(path);
+
+	return true;
+}
+
 bool stringfunc_format(Program *prg, std::vector<Token> &v)
 {
 	MIN_ARGS(2)
@@ -1154,6 +1165,54 @@ bool stringfunc_substr(Program *prg, std::vector<Token> &v)
 
 	if (v1.type == Variable::STRING) {
 		v1.s = util::utf8_substr(v1.s, start, end);
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
+bool stringfunc_uppercase(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	if (v1.type == Variable::STRING) {
+		v1.s = util::uppercase(v1.s);
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
+bool stringfunc_lowercase(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	if (v1.type == Variable::STRING) {
+		v1.s = util::lowercase(v1.s);
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
+bool stringfunc_trim(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	if (v1.type == Variable::STRING) {
+		v1.s = util::trim(v1.s);
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -2433,6 +2492,7 @@ void start_lib_core()
 	
 	add_instruction("print", corefunc_print);
 	add_instruction("input", corefunc_input);
+	add_instruction("mkdir", corefunc_mkdir);
 
 	add_instruction("string_format", stringfunc_format);
 	add_instruction("string_scan", stringfunc_scan);
@@ -2440,6 +2500,9 @@ void start_lib_core()
 	add_instruction("string_length", stringfunc_length);
 	add_instruction("string_from_number", stringfunc_from_number);
 	add_instruction("string_substr", stringfunc_substr);
+	add_instruction("string_uppercase", stringfunc_uppercase);
+	add_instruction("string_lowercase", stringfunc_lowercase);
+	add_instruction("string_trim", stringfunc_trim);
 
 	add_instruction("sin", mathfunc_sin);
 	add_instruction("cos", mathfunc_cos);
