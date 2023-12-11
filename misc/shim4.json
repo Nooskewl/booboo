@@ -1,0 +1,40 @@
+{
+	"shim": {
+		"gfx": {
+			"colours": {
+				"black.r": 255,
+				"black.g": 0,
+				"black.b": 0,
+				"black.a": 255,
+				"white.r": 255,
+				"white.g": 255,
+				"white.b": 255,
+				"white.a": 255,
+				"magenta.r": 255,
+				"magenta.g": 0,
+				"magenta.b": 255,
+				"magenta.a": 255,
+				"transparent.r": 0,
+				"transparent.g": 0,
+				"transparent.b": 0,
+				"transparent.a": 0
+			},
+			"notification_duration": 3000,
+			"notification_fade_duration": 500,
+			"tile_size": 16,
+			"vsync": true,
+			"show_fps": false
+		},
+		"misc": {
+			"window_title": "BooBoo",
+			"organisation_name": "b1stable",
+			"game_name": "BooBoo"
+		},
+		"audio": {
+			"samplerate": 0
+		},
+		"input": {
+			"fullscreen_key": 1073741892
+		}
+	}
+}
