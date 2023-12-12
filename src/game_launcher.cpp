@@ -16,9 +16,9 @@
 
 using namespace booboo;
 
-#if defined __linux__ || defined __LP64__
+//#if defined __linux__ || defined __LP64__
 #include <unistd.h>
-#endif
+//#endif
 
 #include <climits>
 
@@ -1288,6 +1288,7 @@ again:
 	}
 
 	if (relaunch) {
+#ifdef __linux__
 		pid_t pid = fork();
 		if (pid != -1 && pid != 0) {
 			exit(0);
@@ -1301,6 +1302,18 @@ again:
 			execv(argv[0], args);
 			exit(0);
 		}
+#else
+		STARTUPINFO info={sizeof(info)};
+		PROCESS_INFORMATION processInfo;
+		char cmd[1000];
+		snprintf(cmd, 1000, "%s \"%s\"", argv[0], dir.c_str());
+		if (CreateProcess(NULL, cmd, NULL, NULL, TRUE, 0, NULL, NULL, &info, &processInfo)) {
+			WaitForSingleObject(processInfo.hProcess, INFINITE);
+			CloseHandle(processInfo.hProcess);
+			CloseHandle(processInfo.hThread);
+		}
+		exit(0);
+#endif
 	}
 
 	if (reset_game_name != "") {
