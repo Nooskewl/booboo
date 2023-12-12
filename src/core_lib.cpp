@@ -872,9 +872,12 @@ bool corefunc_list_directory(Program *prg, std::vector<Token> &v)
 	vec.clear();
 
 	while ((fn = l.next()) != "") {
+		if (fn == "." || fn == "..") {
+			continue;
+		}
 		struct stat s;
 		if (stat(fn.c_str(), &s) == 0) {
-			if ((s.st_mode & S_IFMT) == S_IFDIR) {
+			if (S_ISDIR(s.st_mode)) {
 				fn += "/";
 			}
 		}
