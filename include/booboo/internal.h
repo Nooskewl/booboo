@@ -280,6 +280,8 @@ inline std::map<std::string, Variable> &as_map_inline(Program *prg, Token &t)
 	return v->m;
 }
 
+std::string remove_quotes(std::string s);
+
 } // End namespace booboo
 
 #endif // BOOBOO_INTERNAL_H

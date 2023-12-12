@@ -11,6 +11,7 @@
 #include <shim4/shim4.h>
 
 #include "booboo/booboo.h"
+#include "booboo/internal.h"
 #include "booboo/game_lib.h"
 
 using namespace booboo;
@@ -22,6 +23,192 @@ using namespace booboo;
 #include <climits>
 
 #include <sys/stat.h>
+
+std::string launcher_code =
+"number font\n" \
+"font_load font \"font.ttf\" 20 1\n" \
+"\n" \
+"number num\n" \
+"= num 360\n" \
+"/ num 20\n" \
+"floor num\n" \
+"- num 2\n" \
+"\n" \
+"number old_u old_d old_a old_b\n" \
+"= old_u 0\n" \
+"= old_d 0\n" \
+"= old_a 0\n" \
+"= old_b 0\n" \
+"\n" \
+"number selected\n" \
+"number top\n" \
+"vector filenames\n" \
+"string dir\n" \
+"\n" \
+"call list_dir \".\"\n" \
+"\n" \
+"function list_dir name\n" \
+"{\n" \
+"	= dir name\n" \
+"	+ name \"/*\"\n" \
+"	list_directory filenames name\n" \
+"	vector_insert filenames 0 \"../\"\n" \
+"	= selected 0\n" \
+"	= top 0\n" \
+"}\n" \
+"\n" \
+"function chop_dir s\n" \
+"{\n" \
+"	number p\n" \
+"	string_length s p\n" \
+"	- p 2\n" \
+"	if (< p 0) none\n" \
+"		return s\n" \
+":none\n" \
+"	number i\n" \
+"	for i p (>= i 0) -1 loop\n" \
+"		number c\n" \
+"		string_char_at s c i\n" \
+"		string cs\n" \
+"		string_from_number cs c\n" \
+"		if (|| (== cs \"/\") (== cs \"\\\\\")) found\n" \
+"			+ i 1\n" \
+"			string_substr s i\n" \
+"			return s\n" \
+":found\n" \
+":loop\n" \
+"\n" \
+"	return s\n" \
+"}\n" \
+"\n" \
+"function draw\n" \
+"{\n" \
+"	number sz\n" \
+"	vector_size filenames sz\n" \
+"	number i\n" \
+"	number y\n" \
+"	= y 0\n" \
+"\n" \
+"	filled_rectangle 255 0 216 255 255 0 216 255 255 0 216 255 255 0 216 255 0 (+ (* num 20) 5) 640 (- 360 (+ (* num 20) 5))\n" \
+"	string str\n" \
+"	= str \"[A/Z] Navigate, [B/X] Launch Here\"\n" \
+"	number w\n" \
+"	font_width font w str\n" \
+"	/ w 2\n" \
+"	font_draw font 255 216 0 255 str (- 320 w) (+ (* num 20) 10)\n" \
+"\n" \
+"	for i top (&& (< i sz) (< i (+ top num))) 1 loop\n" \
+"		string s\n" \
+"		= s [filenames i]\n" \
+"		call_result s chop_dir s\n" \
+"		number c\n" \
+"		= c 128\n" \
+"		if (== i selected) draw_bg\n" \
+"			= c 255\n" \
+"			filled_rectangle 0 216 255 255 0 216 255 255 0 216 255 255 0 216 255 255 0 y 640 20\n" \
+":draw_bg\n" \
+"		font_draw font c c c 255 s 5 y\n" \
+"		+ y 20\n" \
+":loop\n" \
+"}\n" \
+"\n" \
+"function run\n" \
+"{\n" \
+"	number sz\n" \
+"	vector_size filenames sz\n" \
+"\n" \
+"	number joy_x1\n" \
+"	number joy_y1\n" \
+"	number joy_x2\n" \
+"	number joy_y2\n" \
+"	number joy_x3\n" \
+"	number joy_y3\n" \
+"	number joy_l\n" \
+"	number joy_r\n" \
+"	number joy_u\n" \
+"	number joy_d\n" \
+"	number joy_a\n" \
+"	number joy_b\n" \
+"	number joy_x\n" \
+"	number joy_y\n" \
+"	number joy_lb\n" \
+"	number joy_rb\n" \
+"	number joy_ls\n" \
+"	number joy_rs\n" \
+"	number joy_back\n" \
+"	number joy_start\n" \
+"\n" \
+"	joystick_poll 0 joy_x1 joy_y1 joy_x2 joy_y2 joy_x3 joy_y3 joy_l joy_r joy_u joy_d joy_a joy_b joy_x joy_y joy_lb joy_rb joy_ls joy_rs joy_back joy_start\n" \
+"\n" \
+"	; This provides some keyboard support mapped to joystick\n" \
+"\n" \
+"	number _key_l _key_r _key_u _key_d _key_a _key_b _key_back\n" \
+"	key_get _key_l KEY_LEFT\n" \
+"	key_get _key_r KEY_RIGHT\n" \
+"	key_get _key_u KEY_UP\n" \
+"	key_get _key_d KEY_DOWN\n" \
+"	key_get _key_a KEY_z\n" \
+"	key_get _key_b KEY_x\n" \
+"	key_get _key_back KEY_ESCAPE\n" \
+"\n" \
+"	= joy_l (|| (== _key_l 1) (== joy_l 1))\n" \
+"	= joy_r (|| (== _key_r 1) (== joy_r 1))\n" \
+"	= joy_u (|| (== _key_u 1) (== joy_u 1))\n" \
+"	= joy_d (|| (== _key_d 1) (== joy_d 1))\n" \
+"	= joy_a (|| (== _key_a 1) (== joy_a 1))\n" \
+"	= joy_b (|| (== _key_b 1) (== joy_b 1))\n" \
+"	= joy_back (|| (== _key_back 1) (== joy_back 1))\n" \
+"\n" \
+"	if (&& (== joy_u 1) (== old_u 0)) do_up (&& (== joy_d 1) (== old_d 0)) do_down\n" \
+"		- selected 1\n" \
+"		if (< selected 0) zero\n" \
+"			= selected 0\n" \
+":zero\n" \
+"		if (< selected top) dec_top\n" \
+"			= top selected\n" \
+":dec_top\n" \
+":do_up\n" \
+"		+ selected 1\n" \
+"		if (>= selected sz) fix\n" \
+"			= selected (- sz 1)\n" \
+":fix\n" \
+"		if (<= (+ top num) selected) adjust\n" \
+"			= top (- selected (- num 1))\n" \
+":adjust\n" \
+":do_down\n" \
+"\n" \
+"	if (&& (== joy_a 1) (== old_a 0)) dig\n" \
+"		string s\n" \
+"		= s [filenames selected]\n" \
+"		call_result s chop_dir s\n" \
+"		number len\n" \
+"		string_length s len\n" \
+"		number c\n" \
+"		string_char_at s c (- len 1)\n" \
+"		string cs\n" \
+"		string_from_number cs c\n" \
+"		if (|| (== cs \"/\") (== cs \"\\\\\")) go_dir\n" \
+"			string d\n" \
+"			= d dir\n" \
+"			+ d \"/\" s\n" \
+"			call list_dir d\n" \
+":go_dir\n" \
+":dig\n" \
+"\n" \
+"	if (&& (== joy_b 1) (== old_b 0)) go\n" \
+"		number cfg\n" \
+"		cfg_load cfg \"com.b1stable.launcher\"\n" \
+"		cfg_set_string cfg \"launch\" dir\n" \
+"		number success\n" \
+"		cfg_save cfg success \"com.b1stable.launcher\"\n" \
+"		exit 0\n" \
+":go\n" \
+"\n" \
+"	= old_u joy_u\n" \
+"	= old_d joy_d\n" \
+"	= old_a joy_a\n" \
+"	= old_b joy_b\n" \
+"}\n";
 
 #ifdef CPP_BENCH
 gfx::Image *grass;
@@ -1049,7 +1236,7 @@ again:
 				code = util::load_text("scripts/main.boo");
 			}
 			catch (util::Error &e) {
-				gui::fatalerror("ERROR", "Program is missing or corrupt!", gui::OK, true);
+				code = launcher_code;
 			}
 			
 			main_program_name = "main.boo";
@@ -1078,6 +1265,44 @@ again:
 	game_lib_destroy_program(prg);
 	destroy_program(prg);
 
+	std::string path = util::get_appdata_dir();
+	std::string text;
+	bool relaunch = false;
+	std::string dir;
+	try {
+		std::string cfg_path = path + "/" + "com.b1stable.launcher.txt";
+		text = util::load_text_from_filesystem(cfg_path);
+
+		util::Tokenizer t(text, '=');
+		std::string key = t.next();
+		dir = t.next();
+		dir = util::trim(dir);
+		dir = booboo::remove_quotes(dir);
+		if (key == "launch") {
+			relaunch = true;
+			FILE *f = fopen(cfg_path.c_str(), "w");
+			fclose(f);
+		}
+	}
+	catch (util::Error &e) {
+	}
+
+	if (relaunch) {
+		pid_t pid = fork();
+		if (pid != -1 && pid != 0) {
+			exit(0);
+		}
+		else if (pid == 0) {
+			char * const args[] = {
+				argv[0],
+				(char *)dir.c_str(),
+				nullptr
+			};
+			execv(argv[0], args);
+			exit(0);
+		}
+	}
+
 	if (reset_game_name != "") {
 		fn = "";
 		goto again;
@@ -1098,3 +1323,4 @@ again:
 
 	return return_code;
 }
+

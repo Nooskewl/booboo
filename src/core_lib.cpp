@@ -36,17 +36,28 @@ bool breaker_return(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	Variable &v1 = prg->s->result;
-	Variable &v2 = as_variable_inline(prg, v[0]);
 
-	if (v2.type == Variable::EXPRESSION) {
+	if (v[0].type == Token::NUMBER) {
 		v1.type = Variable::NUMBER;
-		v1.n = evaluate_expression(prg, v2.e);
+		v1.n = v[0].n;
 	}
-	else if (v2.type == Variable::FISH) {
-		v1 = go_fish(prg, v2.f);
+	else if (v[0].type == Token::STRING) {
+		v1.type = Variable::STRING;
+		v1.s = v[0].s;
 	}
 	else {
-		v1 = v2;
+		Variable &v2 = as_variable_inline(prg, v[0]);
+
+		if (v2.type == Variable::EXPRESSION) {
+			v1.type = Variable::NUMBER;
+			v1.n = evaluate_expression(prg, v2.e);
+		}
+		else if (v2.type == Variable::FISH) {
+			v1 = go_fish(prg, v2.f);
+		}
+		else {
+			v1 = v2;
+		}
 	}
 
 	return false;
@@ -280,7 +291,9 @@ bool corefunc_if(Program *prg, std::vector<Token> &v)
 			unsigned int start = prg->s->pc;
 			unsigned int end_block = as_label_inline(prg, v[i+1]);
 			while (prg->s->pc != end_block) {
-				interpret(prg, 1);
+				if (interpret(prg, 1) == false) {
+					return false;
+				}
 				if (prg->s->pc < start || prg->s->pc > end_block) {
 					return true;
 				}
@@ -296,7 +309,9 @@ bool corefunc_if(Program *prg, std::vector<Token> &v)
 		unsigned int start = prg->s->pc;
 		unsigned int end_block = as_label_inline(prg, v[v.size()-1]);
 		while (prg->s->pc != end_block) {
-			interpret(prg, 1);
+			if (interpret(prg, 1) == false) {
+				return false;
+			}
 			if (prg->s->pc < start || prg->s->pc > end_block) {
 				return true;
 			}
@@ -854,6 +869,8 @@ bool corefunc_list_directory(Program *prg, std::vector<Token> &v)
 
 	std::string fn;
 
+	vec.clear();
+
 	while ((fn = l.next()) != "") {
 		struct stat s;
 		if (stat(fn.c_str(), &s) == 0) {
@@ -1143,8 +1160,8 @@ bool stringfunc_char_at(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &v1 = as_variable_inline(prg, v[0]);
-	std::string s = as_string_inline(prg, v[1]);
+	std::string s = as_string_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
 	int index = as_number_inline(prg, v[2]);
 
 	Uint32 value = util::utf8_char(s, index);
@@ -1163,8 +1180,8 @@ bool stringfunc_length(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable_inline(prg, v[0]);
-	std::string s = as_string_inline(prg, v[1]);
+	std::string s = as_string_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = util::utf8_len(s);
@@ -1199,18 +1216,17 @@ bool stringfunc_substr(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 	int start = as_number_inline(prg, v[1]);
-	int end = -1;
+	int count = -1;
 	
-	if (v.size() >= 3) {
-		end = as_number_inline(prg, v[2]);
-	}
-
-	if (v1.type == Variable::STRING) {
-		v1.s = util::utf8_substr(v1.s, start, end);
-	}
-	else {
+	if (v1.type != Variable::STRING) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
+
+	if (v.size() >= 3) {
+		count = as_number_inline(prg, v[2]);
+	}
+
+	v1.s = util::utf8_substr(v1.s, start, count);
 
 	return true;
 }

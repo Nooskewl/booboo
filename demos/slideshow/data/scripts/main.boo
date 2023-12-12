@@ -17,7 +17,7 @@ number sel
 = sel 0
 
 number font
-font_load font "font.ttf" 16 0
+font_load font "font.ttf" 16 1
 number font_size
 font_height font font_size
 

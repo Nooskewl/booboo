@@ -209,12 +209,12 @@ string_scan
 string_char_at
 	Get the value of character at index in a string
 	This function is UTF8 compliant
-	e.g. string_char_at dest str index
+	e.g. string_char_at str dest index
 
 string_length
 	Get the length of a string
 	This function is UTF8 compliant
-	e.g. string_length dest str
+	e.g. string_length str dest
 
 string_from_number
 	Turns the ascii value into a one character length string

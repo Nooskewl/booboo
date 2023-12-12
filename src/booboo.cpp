@@ -26,7 +26,16 @@ static void skip_whitespace(booboo::Program *prg)
 	}
 }
 
-static std::string remove_quotes(std::string s)
+namespace booboo {
+
+std::string reset_game_name;
+std::string main_program_name;
+int return_code;
+bool quit;
+
+// And this all makes BooBoo work
+
+std::string remove_quotes(std::string s)
 {
        int start = 0;
        int count = s.length();
@@ -42,15 +51,6 @@ static std::string remove_quotes(std::string s)
 
        return s.substr(start, count);
 }
-
-namespace booboo {
-
-std::string reset_game_name;
-std::string main_program_name;
-int return_code;
-bool quit;
-
-// And this all makes BooBoo work
 
 File_Info *file_info(Program *prg)
 {
@@ -630,18 +630,20 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 		}
 		else if (c == '"') {
 			tok.type = Token::STRING;
-			std::string str = "\"";
+			std::string str = "";
 			p++;
 			int prev = -1;
+			int prev_prev = -1;
 			while (p < (int)expr.length()) {
 				char buf[2];
 				buf[0] = expr[p];
 				buf[1] = 0;
 				str += buf;
-				if (buf[0] == '"' && prev != '\\') {
+				if (buf[0] == '"' && (prev != '\\' || prev_prev == '\\')) {
 					p++;
 					break;
 				}
+				prev_prev = prev;
 				prev = buf[0];
 				p++;
 			}
@@ -853,18 +855,20 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 		}
 		else if (c == '"') {
 			tok.type = Token::STRING;
-			std::string str = "\"";
+			std::string str = "";
 			p++;
 			int prev = -1;
+			int prev_prev = -1;
 			while (p < (int)expr.length()) {
 				char buf[2];
 				buf[0] = expr[p];
 				buf[1] = 0;
 				str += buf;
-				if (buf[0] == '"' && prev != '\\') {
+				if (buf[0] == '"' && (prev != '\\' || prev_prev == '\\')) {
 					p++;
 					break;
 				}
+				prev_prev = prev;
 				prev = buf[0];
 				p++;
 			}

@@ -1,6 +1,7 @@
 BooBoo is a mini high-level assembly-like language with game API.
 
-To run the examples, run ./BooBoo <path/to/data/>
+To run the examples, run ./BooBoo <path/to/data/> or just run BooBoo
+to get a launcher.
 
 Your data/ directory can be compressed into data.cpa with compress_dir.
 Just enter data/ and run it, and it will create ../data.cpa. The shaders

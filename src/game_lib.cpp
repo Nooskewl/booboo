@@ -61,23 +61,6 @@ struct JSON_Info {
 	std::map<int, util::JSON *> jsons;
 };
 
-static std::string remove_quotes(std::string s)
-{
-	int start = 0;
-	int count = s.length();
-
-	if (s[0] == '"') {
-		start++;
-		count--;
-	}
-
-	if (s[s.length()-1] == '"') {
-		count--;
-	}
-
-	return s.substr(start, count);
-}
-
 static MML_Info *mml_info(Program *prg)
 {
 	MML_Info *info = (MML_Info *)booboo::get_black_box(prg, "com.b1stable.booboo.mml");
