@@ -9,6 +9,7 @@
 #endif
 
 #include <shim4/shim4.h>
+#include <shim4/internal/gfx.h>
 
 #include "booboo/booboo.h"
 #include "booboo/internal.h"
@@ -1098,6 +1099,23 @@ void set_shim_args(bool initial, bool force_windowed, bool force_fullscreen)
 	}
 }
 
+static std::string save_dir()
+{
+	std::string path;
+
+#ifdef ANDROID
+	path = util::get_standard_path(util::SAVED_GAMES, true);
+#elif defined _WIN32
+	path = util::get_standard_path(util::SAVED_GAMES, true);
+	path += "/" + shim::game_name;
+	util::mkdir(path);
+#else
+	path = util::get_appdata_dir();
+#endif
+
+	return path;
+}
+
 int main(int argc, char **argv)
 {
 	std::string fn;
@@ -1265,7 +1283,7 @@ again:
 	game_lib_destroy_program(prg);
 	destroy_program(prg);
 
-	std::string path = util::get_appdata_dir();
+	std::string path = save_dir();
 	std::string text;
 	bool relaunch = false;
 	std::string dir;
@@ -1280,8 +1298,7 @@ again:
 		dir = booboo::remove_quotes(dir);
 		if (key == "launch") {
 			relaunch = true;
-			FILE *f = fopen(cfg_path.c_str(), "w");
-			fclose(f);
+			remove(cfg_path.c_str());
 		}
 	}
 	catch (util::Error &e) {
@@ -1303,14 +1320,17 @@ again:
 			exit(0);
 		}
 #else
-		STARTUPINFO info={sizeof(info)};
-		PROCESS_INFORMATION processInfo;
+		STARTUPINFO si;
+		PROCESS_INFORMATION pi;
+		ZeroMemory(&si, sizeof(si));
+		si.cb = sizeof(si);
+		ZeroMemory(&pi, sizeof(pi));
 		char cmd[1000];
-		snprintf(cmd, 1000, "%s \"%s\"", argv[0], dir.c_str());
-		if (CreateProcess(NULL, cmd, NULL, NULL, TRUE, 0, NULL, NULL, &info, &processInfo)) {
-			WaitForSingleObject(processInfo.hProcess, INFINITE);
-			CloseHandle(processInfo.hProcess);
-			CloseHandle(processInfo.hThread);
+		sprintf(cmd, "%s \"%s\"", argv[0], dir.c_str());
+		if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &si, &pi)) {
+			//WaitForSingleObject(pi.hProcess, INFINITE);
+			//CloseHandle(pi.hProcess);
+			//CloseHandle(pi.hThread);
 		}
 		exit(0);
 #endif

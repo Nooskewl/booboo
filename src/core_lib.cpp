@@ -10,6 +10,10 @@
 
 #include <sys/stat.h>
 
+#ifdef _WIN32
+#include <shlwapi.h>
+#endif
+
 namespace booboo {
 
 bool breaker_reset(Program *prg, std::vector<Token> &v)
@@ -865,6 +869,17 @@ bool corefunc_list_directory(Program *prg, std::vector<Token> &v)
 	std::vector<Variable> &vec = as_vector_inline(prg, v[0]);
 	std::string glob = as_string_inline(prg, v[1]);
 
+	std::string path_part;
+	int p = glob.length() - 1;
+	if (p >= 0) {
+		while (p >= 0 && glob[p] != '/' && glob[p] != '\\') {
+			p--;
+		}
+		if (p > 0) {
+			path_part = glob.substr(0, p+1);
+		}
+	}
+
 	util::List_Directory l(glob);
 
 	std::string fn;
@@ -875,12 +890,21 @@ bool corefunc_list_directory(Program *prg, std::vector<Token> &v)
 		if (fn == "." || fn == "..") {
 			continue;
 		}
+#ifdef _WIN32
+		//char buf[1000];
+		//GetFullPathName(fn.c_str(), 1000, buf, NULL);
+		//if (PathIsDirectory(buf)) {
+		if (PathIsDirectory((path_part + fn).c_str())) {
+			fn += "/";
+		}
+#else
 		struct stat s;
 		if (stat(fn.c_str(), &s) == 0) {
 			if (S_ISDIR(s.st_mode)) {
 				fn += "/";
 			}
 		}
+#endif
 		Variable v;
 		v.type = Variable::STRING;
 		v.name = "-constant-";
