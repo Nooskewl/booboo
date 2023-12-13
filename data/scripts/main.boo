@@ -132,11 +132,14 @@ function draw
 
 	filled_rectangle bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 0 (+ (* num fh) 5) 640 (- 360 (+ (* num fh) 5))
 	string str
-	= str "[A/Z/LMB] Navigate       [B/X/RMB] Launch Here"
-	number w
-	font_width font w str
-	/ w 2
-	font_draw font fg_r fg_g fg_b 255 str (- 320 w) (+ (* num fh) 10)
+	string found_text
+	if (== go_ok 1) show_found not_found
+		= found_text "Likely App Found! Launch: B/Space/RMB"
+:show_found
+		= found_text ""
+:not_found
+	string_format str "Navigate: A/Return/LMB     %" found_text
+	font_draw font fg_r fg_g fg_b 255 str 10 (+ (* num fh) 10)
 
 	for i top (&& (< i sz) (< i (+ top num))) 1 loop
 		string s
@@ -232,6 +235,13 @@ function run
 	vector_size filenames sz
 
 	include "poll_joystick.inc"
+
+	number kret kspace
+	key_get kret KEY_RETURN
+	key_get kspace KEY_SPACE
+
+	= joy_a (|| joy_a kret)
+	= joy_b (|| joy_b kspace)
 
 	if (&& (== joy_u 1) (== old_u 0)) do_up (&& (== joy_d 1) (== old_d 0)) do_down
 		call sel_up
