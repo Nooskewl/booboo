@@ -1307,10 +1307,10 @@ again:
 	if (relaunch) {
 #ifdef __linux__
 		pid_t pid = fork();
-		if (pid != -1 && pid != 0) {
+		/*if (pid != -1 && pid != 0) {
 			exit(0);
 		}
-		else if (pid == 0) {
+		else*/ if (pid == 0) {
 			char * const args[] = {
 				argv[0],
 				(char *)dir.c_str(),
@@ -1333,7 +1333,7 @@ again:
 			//CloseHandle(pi.hProcess);
 			//CloseHandle(pi.hThread);
 		}
-		exit(0);
+		//exit(0);
 #endif
 	}
 
@@ -1354,14 +1354,23 @@ again:
 	catch (Error &e) {
 		gui::fatalerror("ERROR", e.error_message.c_str(), gui::OK, true);
 	}
-	
-	if (util::bool_arg(false, orig_argc, orig_argv, "+beepboop")) {
+
+	bool beepboop = false;
+
+	for (int i = 0; i < orig_argc; i++) {
+		if (std::string(orig_argv[i]) == "+beepboop") {
+			beepboop = true;
+			break;
+		}
+	}
+
+	if (beepboop) {
 #ifdef __linux__
 		pid_t pid = fork();
-		if (pid != -1 && pid != 0) {
+		/*if (pid != -1 && pid != 0) {
 			exit(0);
 		}
-		else if (pid == 0) {
+		else*/ if (pid == 0) {
 			char * const args[] = {
 				argv[0],
 				nullptr
@@ -1382,7 +1391,7 @@ again:
 			//CloseHandle(pi.hProcess);
 			//CloseHandle(pi.hThread);
 		}
-		exit(0);
+		//exit(0);
 #endif
 	}
 
