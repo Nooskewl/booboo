@@ -1,6 +1,9 @@
 number font
 font_load font "font.ttf" 20 1
 
+number go_ok
+= go_ok 0
+
 number num
 = num 360
 / num 20
@@ -23,16 +26,6 @@ vector filenames
 string dir
 
 call list_dir "."
-
-function list_dir name
-{
-	= dir name
-	+ name "/*"
-	list_directory filenames name
-	vector_insert filenames 0 "../"
-	= selected 0
-	= top 0
-}
 
 function chop_dir s
 {
@@ -58,6 +51,42 @@ function chop_dir s
 	return s
 }
 
+function list_dir name
+{
+	= dir name
+	+ name "/*"
+	list_directory filenames name
+	vector_insert filenames 0 "../"
+	= selected 0
+	= top 0
+	= go_ok 0
+	number sz
+	vector_size filenames sz
+	number i
+	for i 0 (< i sz) 1 loop
+		string s
+		= s [filenames i]
+		call_result s chop_dir s
+		if (== s "data.cpa") is_cpa
+			= go_ok 1
+			goto done_list
+:is_cpa
+		if (== s "data/") is_data_dir
+			string orig
+			= orig [filenames i]
+			+ orig "scripts/main.boo"
+			number f
+			file_open f orig "r"
+			if (!= -1 f) is_booboo_app
+				file_close f
+				= go_ok 1
+				goto done_list
+:is_booboo_app
+:is_data_dir
+:loop
+:done_list
+}
+
 function draw
 {
 	number sz
@@ -66,13 +95,31 @@ function draw
 	number y
 	= y 0
 
-	filled_rectangle 255 0 216 255 255 0 216 255 255 0 216 255 255 0 216 255 0 (+ (* num 20) 5) 640 (- 360 (+ (* num 20) 5))
+	number bg_r bg_g bg_b fg_r fg_g fg_b
+
+	if (== go_ok 1) highlight default
+		= bg_r 255
+		= bg_g 0
+		= bg_b 216
+		= fg_r 255
+		= fg_g 216
+		= fg_b 0
+:highlight
+		= bg_r 64
+		= bg_g 64
+		= bg_b 64
+		= fg_r 128
+		= fg_g 128
+		= fg_b 128
+:default
+
+	filled_rectangle bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 0 (+ (* num 20) 5) 640 (- 360 (+ (* num 20) 5))
 	string str
 	= str "[A/Z/LMB] Navigate       [B/X/RMB] Launch Here"
 	number w
 	font_width font w str
 	/ w 2
-	font_draw font 255 216 0 255 str (- 320 w) (+ (* num 20) 10)
+	font_draw font fg_r fg_g fg_b 255 str (- 320 w) (+ (* num 20) 10)
 
 	for i top (&& (< i sz) (< i (+ top num))) 1 loop
 		string s
@@ -133,6 +180,9 @@ function navigate
 
 function launch
 {
+	if (== go_ok 0) cant
+		return
+:cant
 	number cfg
 	cfg_load cfg "com.b1stable.launcher.reload"
 	cfg_set_string cfg "launch" dir
