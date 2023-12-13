@@ -77,6 +77,7 @@ set_logic_rate
 
 clear
 	clear the screen
+	The screen is cleared to black (RGB 0, 0, 0) before draw is called.
 	e.g. clear r g b
 
 flip
