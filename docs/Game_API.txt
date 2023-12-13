@@ -8,6 +8,7 @@ At startup, global code is run. Then the above mentioned callbacks get called
 at intervals or shutdown.
 
 The screen is 640x360 by default, stretched to the window size appropriately.
+F11 toggles between fullscreen/windowed mode.
 
 There are loads of command line switches you can use which come from Shim.
 A switch starting with + enables and a - disables things, but here are a
