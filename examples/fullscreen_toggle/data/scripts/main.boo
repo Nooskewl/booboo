@@ -1,5 +1,5 @@
 number font
-font_load font "vga.ttf" 16 1
+font_load font "font.ttf" 16 1
 
 number old
 = old 0
