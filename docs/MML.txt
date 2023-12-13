@@ -3,6 +3,10 @@ Here is the documentation of the MML syntax:
 Special definitions start with a @. Everything else belongs in a channel and every channel needs a name
 from A to Z which should be the first thing on the line unless it's @ or a blank line.
 
+Note: envelopes split the note into segments depending on the number of
+elements in the envelope. If you have 2 elements in the envelope, each
+value applies to half the note, for 3 it's a third and so on.
+
 The definitions and effects you can use are:
 
 @S - Define a sample
