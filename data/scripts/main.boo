@@ -123,7 +123,7 @@ function draw
 	string found_text
 	number found_r found_g found_b
 	if (== go_ok 1) show_found not_found
-		= found_text "Likely app found! Launch: B/Space/RMB"
+		= found_text "BooBoo app detected! Launch: B/Space/RMB"
 		= found_r 255
 		= found_g 216
 		= found_b 0
