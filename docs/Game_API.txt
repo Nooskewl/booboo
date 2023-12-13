@@ -81,6 +81,8 @@ clear
 
 flip
 	flip the backbuffer to the screen
+	Normally you don't need this, as a flip is done after draw returns,
+	but there are some situations where it's useful.
 	e.g. flip
 
 resize
