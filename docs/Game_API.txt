@@ -24,6 +24,10 @@ few of them:
 Some of the demo games will auto-play by an AI if a joystick isn't connected.
 I'll leave it as an exercise if you want to play them with keyboard.
 
+Lots of the demos and examples use a simple Z/X key to A/B button mapping,
+so the keys are Z/X and arrows if you're using a keyboard. Most but not all
+included examples support the keyboard as well as joysticks.
+
 The file shim4.json can be put in your data/ directory to supply some extra
 parameters and info such as window title and other things.
 
