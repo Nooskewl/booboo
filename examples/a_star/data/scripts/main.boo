@@ -56,8 +56,8 @@ function draw
 
 function run
 {
-	number b1 b2 b3
-	mouse_get_buttons b1 b2 b3
+	number b1 b2 b3 wheel
+	mouse_get_buttons b1 b2 b3 wheel
 
 	if (&& (== b1 1) (== is_clicked 0)) click (&& (== b1 0) (== is_clicked 1)) unclick
 	= is_clicked 1

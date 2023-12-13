@@ -37,6 +37,10 @@ std::string launcher_code =
 "= old_a 0\n" \
 "= old_b 0\n" \
 "\n" \
+"number old_b1 old_b3\n" \
+"= old_b1 0\n" \
+"= old_b3 0\n" \
+"\n" \
 "number selected\n" \
 "number top\n" \
 "vector filenames\n" \
@@ -88,7 +92,7 @@ std::string launcher_code =
 "\n" \
 "	filled_rectangle 255 0 216 255 255 0 216 255 255 0 216 255 255 0 216 255 0 (+ (* num 20) 5) 640 (- 360 (+ (* num 20) 5))\n" \
 "	string str\n" \
-"	= str \"[A/Z] Navigate, [B/X] Launch Here\"\n" \
+"	= str \"[A/Z/LMB] Navigate       [B/X/RMB] Launch Here\"\n" \
 "	number w\n" \
 "	font_width font w str\n" \
 "	/ w 2\n" \
@@ -108,9 +112,79 @@ std::string launcher_code =
 "		+ y 20\n" \
 ":loop\n" \
 "}\n" \
+"function sel_up\n" \
+"{\n" \
+"	- selected 1\n" \
+"	if (< selected 0) zero\n" \
+"		= selected 0\n" \
+":zero\n" \
+"	if (< selected top) dec_top\n" \
+"		= top selected\n" \
+":dec_top\n" \
+"}\n" \
+"\n" \
+"function sel_down\n" \
+"{\n" \
+"	number sz\n" \
+"	vector_size filenames sz\n" \
+"	+ selected 1\n" \
+"	if (>= selected sz) fix\n" \
+"		= selected (- sz 1)\n" \
+":fix\n" \
+"	if (<= (+ top num) selected) adjust\n" \
+"		= top (- selected (- num 1))\n" \
+":adjust\n" \
+"}\n" \
+"\n" \
+"function navigate\n" \
+"{\n" \
+"	string s\n" \
+"	= s [filenames selected]\n" \
+"	call_result s chop_dir s\n" \
+"	number len\n" \
+"	string_length s len\n" \
+"	number c\n" \
+"	string_char_at s c (- len 1)\n" \
+"	string cs\n" \
+"	string_from_number cs c\n" \
+"	if (|| (== cs \"/\") (== cs \"\\\\\")) go_dir\n" \
+"		string d\n" \
+"		= d dir\n" \
+"		+ d \"/\" s\n" \
+"		call list_dir d\n" \
+":go_dir\n" \
+"}\n" \
+"\n" \
+"function launch\n" \
+"{\n" \
+"	number cfg\n" \
+"	cfg_load cfg \"com.b1stable.launcher\"\n" \
+"	cfg_set_string cfg \"launch\" dir\n" \
+"	number success\n" \
+"	cfg_save cfg success \"com.b1stable.launcher\"\n" \
+"	exit 0\n" \
+"}\n" \
 "\n" \
 "function run\n" \
 "{\n" \
+"	number b1 b2 b3 wheel\n" \
+"	mouse_get_buttons b1 b2 b3 wheel\n"
+"\n" \
+"	if (== wheel 1) wheel_up (== wheel -1) wheel_down\n" \
+"		call sel_up\n" \
+":wheel_up\n" \
+"		call sel_down\n" \
+":wheel_down\n" \
+"\n" \
+"	if (&& (== b1 1) (== old_b1 0)) mouse_b1 (&& (== b3 1) (== old_b3 0)) mouse_b3\n" \
+"		call navigate\n" \
+":mouse_b1\n" \
+"		call launch\n" \
+":mouse_b3\n" \
+"\n" \
+"	= old_b1 b1\n" \
+"	= old_b3 b3\n" \
+"\n" \
 "	number sz\n" \
 "	vector_size filenames sz\n" \
 "\n" \
@@ -157,48 +231,17 @@ std::string launcher_code =
 "	= joy_back (|| (== _key_back 1) (== joy_back 1))\n" \
 "\n" \
 "	if (&& (== joy_u 1) (== old_u 0)) do_up (&& (== joy_d 1) (== old_d 0)) do_down\n" \
-"		- selected 1\n" \
-"		if (< selected 0) zero\n" \
-"			= selected 0\n" \
-":zero\n" \
-"		if (< selected top) dec_top\n" \
-"			= top selected\n" \
-":dec_top\n" \
+"		call sel_up\n" \
 ":do_up\n" \
-"		+ selected 1\n" \
-"		if (>= selected sz) fix\n" \
-"			= selected (- sz 1)\n" \
-":fix\n" \
-"		if (<= (+ top num) selected) adjust\n" \
-"			= top (- selected (- num 1))\n" \
-":adjust\n" \
+"		call sel_down\n" \
 ":do_down\n" \
 "\n" \
 "	if (&& (== joy_a 1) (== old_a 0)) dig\n" \
-"		string s\n" \
-"		= s [filenames selected]\n" \
-"		call_result s chop_dir s\n" \
-"		number len\n" \
-"		string_length s len\n" \
-"		number c\n" \
-"		string_char_at s c (- len 1)\n" \
-"		string cs\n" \
-"		string_from_number cs c\n" \
-"		if (|| (== cs \"/\") (== cs \"\\\\\")) go_dir\n" \
-"			string d\n" \
-"			= d dir\n" \
-"			+ d \"/\" s\n" \
-"			call list_dir d\n" \
-":go_dir\n" \
+"		call navigate\n" \
 ":dig\n" \
 "\n" \
 "	if (&& (== joy_b 1) (== old_b 0)) go\n" \
-"		number cfg\n" \
-"		cfg_load cfg \"com.b1stable.launcher\"\n" \
-"		cfg_set_string cfg \"launch\" dir\n" \
-"		number success\n" \
-"		cfg_save cfg success \"com.b1stable.launcher\"\n" \
-"		exit 0\n" \
+"		call launch\n" \
 ":go\n" \
 "\n" \
 "	= old_u joy_u\n" \
@@ -563,6 +606,7 @@ static util::Point<int> mouse_pos;
 static bool mouse_b1;
 static bool mouse_b2;
 static bool mouse_b3;
+static int mouse_wheel_y;
 
 static bool mousefunc_get_position(Program *prg, std::vector<Token> &v)
 {
@@ -583,19 +627,21 @@ static bool mousefunc_get_position(Program *prg, std::vector<Token> &v)
 
 static bool mousefunc_get_buttons(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(4)
 
 	Variable &v1 = as_variable(prg, v[0]);
 	Variable &v2 = as_variable(prg, v[1]);
 	Variable &v3 = as_variable(prg, v[2]);
+	Variable &v4 = as_variable(prg, v[3]);
 	
-	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER || v3.type != Variable::NUMBER) {
+	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER || v3.type != Variable::NUMBER || v4.type != Variable::NUMBER) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
 	v1.n = mouse_b1;
 	v2.n = mouse_b2;
 	v3.n = mouse_b3;
+	v4.n = mouse_wheel_y;
 
 	return true;
 }
@@ -635,6 +681,7 @@ bool start()
 	mouse_b1 = false;
 	mouse_b2 = false;
 	mouse_b3 = false;
+	mouse_wheel_y = 0;
 
 	// This is basically 16:9 only, with a tiny bit of leeway
 	gfx::set_min_aspect_ratio(1.776f);
@@ -778,6 +825,14 @@ void handle_event(TGUI_Event *event)
 			case 3:
 				mouse_b3 = false;
 				break;
+		}
+	}
+	else if (event->type == TGUI_MOUSE_WHEEL) {
+		if (event->mouse.y < 0) {
+			mouse_wheel_y = -1;
+		}
+		else if (event->mouse.y > 0) {
+			mouse_wheel_y = 1;
 		}
 	}
 	else if (event->type == TGUI_KEY_DOWN && !event->keyboard.is_repeat) {
@@ -959,6 +1014,8 @@ static void loop()
 			std::vector<Token> tmp;
 			call_void_function(prg, "run", tmp);
 #endif
+
+			mouse_wheel_y = 0;
 
 			if (reset_game_name != "") {
 				quit = true;
