@@ -8,6 +8,10 @@
 #define LUA_BENCH_ANY
 #endif
 
+#include <unistd.h>
+#include <climits>
+#include <sys/stat.h>
+
 #include <shim4/shim4.h>
 #include <shim4/internal/gfx.h>
 
@@ -16,14 +20,6 @@
 #include "booboo/game_lib.h"
 
 using namespace booboo;
-
-//#if defined __linux__ || defined __LP64__
-#include <unistd.h>
-//#endif
-
-#include <climits>
-
-#include <sys/stat.h>
 
 std::string launcher_code =
 "number font\n" \
@@ -1118,6 +1114,9 @@ static std::string save_dir()
 
 int main(int argc, char **argv)
 {
+	char cwd_buf[1000];
+	std::string start_cwd = getcwd(cwd_buf, 1000);
+
 	std::string fn;
 
 	for (int i = 1; i < argc; i++) {
@@ -1301,6 +1300,8 @@ again:
 		gui::fatalerror("ERROR", e.error_message.c_str(), gui::OK, true);
 	}
 
+	chdir(start_cwd.c_str());
+
 	std::string path = save_dir();
 	std::string text;
 	bool relaunch = false;
@@ -1351,10 +1352,7 @@ again:
 		ZeroMemory(&si, sizeof(si));
 		si.cb = sizeof(si);
 		ZeroMemory(&pi, sizeof(pi));
-		//char cmd[1000];
-		//sprintf(cmd, "\"%s\"", argv[0]);
-		//if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &si, &pi)) {
-		if (CreateProcess(argv[0], NULL, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &si, &pi)) {
+		if (CreateProcess(NULL, argv[0], NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
 			//WaitForSingleObject(pi.hProcess, INFINITE);
 			//CloseHandle(pi.hProcess);
 			//CloseHandle(pi.hThread);
@@ -1386,7 +1384,7 @@ again:
 		ZeroMemory(&pi, sizeof(pi));
 		char cmd[1000];
 		sprintf(cmd, "\"%s\" \"%s\" +beepboop", argv[0], dir.c_str());
-		if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &si, &pi)) {
+		if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
 			//WaitForSingleObject(pi.hProcess, INFINITE);
 			//CloseHandle(pi.hProcess);
 			//CloseHandle(pi.hThread);
