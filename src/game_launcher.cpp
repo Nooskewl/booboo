@@ -1322,39 +1322,6 @@ again:
 	catch (util::Error &e) {
 	}
 
-	if (relaunch) {
-#ifdef __linux__
-		pid_t pid = fork();
-		/*if (pid != -1 && pid != 0) {
-			exit(0);
-		}
-		else*/ if (pid == 0) {
-			char * const args[] = {
-				argv[0],
-				(char *)dir.c_str(),
-				"+beepboop",
-				nullptr
-			};
-			execv(argv[0], args);
-			exit(0);
-		}
-#else
-		STARTUPINFO si;
-		PROCESS_INFORMATION pi;
-		ZeroMemory(&si, sizeof(si));
-		si.cb = sizeof(si);
-		ZeroMemory(&pi, sizeof(pi));
-		char cmd[1000];
-		sprintf(cmd, "\"%s\" \"%s\" +beepboop", argv[0], dir.c_str());
-		if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &si, &pi)) {
-			//WaitForSingleObject(pi.hProcess, INFINITE);
-			//CloseHandle(pi.hProcess);
-			//CloseHandle(pi.hThread);
-		}
-		//exit(0);
-#endif
-	}
-
 	bool beepboop = false;
 
 	for (int i = 0; i < orig_argc; i++) {
@@ -1388,6 +1355,38 @@ again:
 		//sprintf(cmd, "\"%s\"", argv[0]);
 		//if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &si, &pi)) {
 		if (CreateProcess(argv[0], NULL, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &si, &pi)) {
+			//WaitForSingleObject(pi.hProcess, INFINITE);
+			//CloseHandle(pi.hProcess);
+			//CloseHandle(pi.hThread);
+		}
+		//exit(0);
+#endif
+	}
+	else if (relaunch) {
+#ifdef __linux__
+		pid_t pid = fork();
+		/*if (pid != -1 && pid != 0) {
+			exit(0);
+		}
+		else*/ if (pid == 0) {
+			char * const args[] = {
+				argv[0],
+				(char *)dir.c_str(),
+				"+beepboop",
+				nullptr
+			};
+			execv(argv[0], args);
+			exit(0);
+		}
+#else
+		STARTUPINFO si;
+		PROCESS_INFORMATION pi;
+		ZeroMemory(&si, sizeof(si));
+		si.cb = sizeof(si);
+		ZeroMemory(&pi, sizeof(pi));
+		char cmd[1000];
+		sprintf(cmd, "\"%s\" \"%s\" +beepboop", argv[0], dir.c_str());
+		if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &si, &pi)) {
 			//WaitForSingleObject(pi.hProcess, INFINITE);
 			//CloseHandle(pi.hProcess);
 			//CloseHandle(pi.hThread);
