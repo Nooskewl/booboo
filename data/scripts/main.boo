@@ -27,6 +27,9 @@ number old_b1 old_b3
 = old_b1 0
 = old_b3 0
 
+number old_esc
+= old_esc 0
+
 number selected
 number top
 vector filenames
@@ -113,33 +116,28 @@ function draw
 	= y 0
 
 	number bg_r bg_g bg_b fg_r fg_g fg_b
+	= bg_r 255
+	= bg_g 0
+	= bg_b 216
 
-	if (== go_ok 1) highlight default
-		= bg_r 255
-		= bg_g 0
-		= bg_b 216
-		= fg_r 255
-		= fg_g 216
-		= fg_b 0
-:highlight
-		= bg_r 64
-		= bg_g 64
-		= bg_b 64
-		= fg_r 128
-		= fg_g 128
-		= fg_b 128
-:default
-
-	filled_rectangle bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 0 (+ (* num fh) 5) 640 (- 360 (+ (* num fh) 5))
-	string str
+	filled_rectangle 0 0 0 255 0 0 0 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 0 (+ (* num fh) 5) 640 (- 360 (+ (* num fh) 5))
 	string found_text
+	number found_r found_g found_b
 	if (== go_ok 1) show_found not_found
-		= found_text "Likely App Found! Launch: B/Space/RMB"
+		= found_text "Likely app found! Launch: B/Space/RMB"
+		= found_r 255
+		= found_g 216
+		= found_b 0
 :show_found
-		= found_text ""
+		= found_text "No BooBoo app detected here..."
+		= found_r 255
+		= found_g 255
+		= found_b 255
 :not_found
-	string_format str "Navigate: A/Return/LMB     %" found_text
-	font_draw font fg_r fg_g fg_b 255 str 10 (+ (* num fh) 10)
+	font_draw font 255 255 255 255 "Enter Directory: A/Return/LMB" 10 (+ (* num fh) 10)
+	number w
+	font_width font w found_text
+	font_draw font found_r found_g found_b 255 found_text (- (- 640 w) 11) (+ (* num fh) 10)
 
 	for i top (&& (< i sz) (< i (+ top num))) 1 loop
 		string s
@@ -149,7 +147,8 @@ function draw
 		= c 128
 		if (== i selected) draw_bg
 			= c 255
-			filled_rectangle 0 216 255 255 0 216 255 255 0 216 255 255 0 216 255 255 0 y 640 fh 
+			filled_rectangle 0 0 0 255 0 0 0 255 0 216 255 255 0 216 255 255 0 y 640 (/ fh 2)
+			filled_rectangle 0 216 255 255 0 216 255 255 0 0 0 255 0 0 0 255 0 (+ y (/ fh 2)) 640 (/ fh 2)
 :draw_bg
 		font_draw font c c c 255 s 5 y
 		+ y fh
@@ -242,6 +241,15 @@ function run
 
 	= joy_a (|| joy_a kret)
 	= joy_b (|| joy_b kspace)
+
+	number kesc
+	key_get kesc KEY_ESCAPE
+	if (&& (== kesc 1) (== old_esc 0)) quick_up
+		= selected 0
+		call navigate
+:quick_up
+
+	= old_esc kesc
 
 	if (&& (== joy_u 1) (== old_u 0)) do_up (&& (== joy_d 1) (== old_d 0)) do_down
 		call sel_up
