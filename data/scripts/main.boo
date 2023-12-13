@@ -8,10 +8,9 @@ number go_ok
 = go_ok 0
 
 number num
-= num 360
+= num 330
 / num fh
 floor num
-- num 1
 
 number old_u old_d old_a old_b
 = old_u 0
@@ -120,7 +119,7 @@ function draw
 	= bg_g 0
 	= bg_b 216
 
-	filled_rectangle 0 0 0 255 0 0 0 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 0 (+ (* num fh) 5) 640 (- 360 (+ (* num fh) 5))
+	filled_rectangle 0 0 0 255 0 0 0 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 0 330 640 30
 	string found_text
 	number found_r found_g found_b
 	if (== go_ok 1) show_found not_found
@@ -134,10 +133,10 @@ function draw
 		= found_g 255
 		= found_b 255
 :not_found
-	font_draw font 255 255 255 255 "Enter Directory: A/Return/LMB" 10 (+ (* num fh) 10)
+	font_draw font 255 255 255 255 "Enter Directory: A/Return/LMB" 10 335
 	number w
 	font_width font w found_text
-	font_draw font found_r found_g found_b 255 found_text (- (- 640 w) 11) (+ (* num fh) 10)
+	font_draw font found_r found_g found_b 255 found_text (- (- 640 w) 11) 335
 
 	for i top (&& (< i sz) (< i (+ top num))) 1 loop
 		string s
