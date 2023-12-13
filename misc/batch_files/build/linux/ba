@@ -10,7 +10,7 @@ cd tgui6/build
 make -j$NPROC
 cd ../../shim4/build
 make -j$NPROC
-cd ../../BooBoo/build
-rm "BooBoo"
+cd ../../booboo/build
+rm "booboo"
 make -j$NPROC
 cd $CWD
