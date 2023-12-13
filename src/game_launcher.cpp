@@ -1283,6 +1283,24 @@ again:
 	game_lib_destroy_program(prg);
 	destroy_program(prg);
 
+	if (reset_game_name != "") {
+		fn = "";
+		goto again;
+	}
+
+	end_lib_game();
+	booboo::end();
+
+	::end();
+
+	}
+	catch (util::Error &e) {
+		gui::fatalerror("ERROR", e.error_message.c_str(), gui::OK, true);
+	}
+	catch (Error &e) {
+		gui::fatalerror("ERROR", e.error_message.c_str(), gui::OK, true);
+	}
+
 	std::string path = save_dir();
 	std::string text;
 	bool relaunch = false;
@@ -1337,24 +1355,6 @@ again:
 #endif
 	}
 
-	if (reset_game_name != "") {
-		fn = "";
-		goto again;
-	}
-
-	end_lib_game();
-	booboo::end();
-
-	::end();
-
-	}
-	catch (util::Error &e) {
-		gui::fatalerror("ERROR", e.error_message.c_str(), gui::OK, true);
-	}
-	catch (Error &e) {
-		gui::fatalerror("ERROR", e.error_message.c_str(), gui::OK, true);
-	}
-
 	bool beepboop = false;
 
 	for (int i = 0; i < orig_argc; i++) {
@@ -1384,9 +1384,10 @@ again:
 		ZeroMemory(&si, sizeof(si));
 		si.cb = sizeof(si);
 		ZeroMemory(&pi, sizeof(pi));
-		char cmd[1000];
-		sprintf(cmd, "\"%s\"", argv[0]);
-		if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &si, &pi)) {
+		//char cmd[1000];
+		//sprintf(cmd, "\"%s\"", argv[0]);
+		//if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &si, &pi)) {
+		if (CreateProcess(argv[0], NULL, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &si, &pi)) {
 			//WaitForSingleObject(pi.hProcess, INFINITE);
 			//CloseHandle(pi.hProcess);
 			//CloseHandle(pi.hThread);
