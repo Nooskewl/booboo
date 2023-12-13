@@ -37,30 +37,30 @@ bool breaker_exit(Program *prg, std::vector<Token> &v)
 
 bool breaker_return(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
-
 	Variable &v1 = prg->s->result;
 
-	if (v[0].type == Token::NUMBER) {
-		v1.type = Variable::NUMBER;
-		v1.n = v[0].n;
-	}
-	else if (v[0].type == Token::STRING) {
-		v1.type = Variable::STRING;
-		v1.s = v[0].s;
-	}
-	else {
-		Variable &v2 = as_variable_inline(prg, v[0]);
-
-		if (v2.type == Variable::EXPRESSION) {
+	if (v.size() > 0) {
+		if (v[0].type == Token::NUMBER) {
 			v1.type = Variable::NUMBER;
-			v1.n = evaluate_expression(prg, v2.e);
+			v1.n = v[0].n;
 		}
-		else if (v2.type == Variable::FISH) {
-			v1 = go_fish(prg, v2.f);
+		else if (v[0].type == Token::STRING) {
+			v1.type = Variable::STRING;
+			v1.s = v[0].s;
 		}
 		else {
-			v1 = v2;
+			Variable &v2 = as_variable_inline(prg, v[0]);
+
+			if (v2.type == Variable::EXPRESSION) {
+				v1.type = Variable::NUMBER;
+				v1.n = evaluate_expression(prg, v2.e);
+			}
+			else if (v2.type == Variable::FISH) {
+				v1 = go_fish(prg, v2.f);
+			}
+			else {
+				v1 = v2;
+			}
 		}
 	}
 
