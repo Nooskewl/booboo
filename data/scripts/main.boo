@@ -1,20 +1,27 @@
 number font
-font_load font "font.ttf" 20 1
+font_load font "font.ttf" 16 1
+
+number fh
+font_height font fh
 
 number go_ok
 = go_ok 0
 
 number num
 = num 360
-/ num 20
+/ num fh
 floor num
-- num 2
+- num 1
 
 number old_u old_d old_a old_b
 = old_u 0
 = old_d 0
 = old_a 0
 = old_b 0
+
+number u_time d_time
+= u_time 0
+= d_time 0
 
 number old_b1 old_b3
 = old_b1 0
@@ -123,13 +130,13 @@ function draw
 		= fg_b 128
 :default
 
-	filled_rectangle bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 0 (+ (* num 20) 5) 640 (- 360 (+ (* num 20) 5))
+	filled_rectangle bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 0 (+ (* num fh) 5) 640 (- 360 (+ (* num fh) 5))
 	string str
 	= str "[A/Z/LMB] Navigate       [B/X/RMB] Launch Here"
 	number w
 	font_width font w str
 	/ w 2
-	font_draw font fg_r fg_g fg_b 255 str (- 320 w) (+ (* num 20) 10)
+	font_draw font fg_r fg_g fg_b 255 str (- 320 w) (+ (* num fh) 10)
 
 	for i top (&& (< i sz) (< i (+ top num))) 1 loop
 		string s
@@ -139,10 +146,10 @@ function draw
 		= c 128
 		if (== i selected) draw_bg
 			= c 255
-			filled_rectangle 0 216 255 255 0 216 255 255 0 216 255 255 0 216 255 255 0 y 640 20
+			filled_rectangle 0 216 255 255 0 216 255 255 0 216 255 255 0 216 255 255 0 y 640 fh 
 :draw_bg
 		font_draw font c c c 255 s 5 y
-		+ y 20
+		+ y fh
 :loop
 }
 function sel_up
@@ -239,6 +246,26 @@ function run
 	if (&& (== joy_b 1) (== old_b 0)) go
 		call launch
 :go
+
+	if (== joy_u 1) check_u_repeat zero_u_repeat
+		+ u_time 1
+		if (> u_time 10) repeat_u
+			= u_time 0
+			call sel_up
+:repeat_u
+:check_u_repeat
+		= u_time 0
+:zero_u_repeat
+
+	if (== joy_d 1) check_d_repeat zero_d_repeat
+		+ d_time 1
+		if (> d_time 10) repeat_d
+			= d_time 0
+			call sel_down
+:repeat_d
+:check_d_repeat
+		= d_time 0
+:zero_d_repeat
 
 	= old_u joy_u
 	= old_d joy_d
