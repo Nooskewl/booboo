@@ -158,10 +158,10 @@ std::string launcher_code =
 "function launch\n" \
 "{\n" \
 "	number cfg\n" \
-"	cfg_load cfg \"com.b1stable.launcher\"\n" \
+"	cfg_load cfg \"com.b1stable.launcher.reload\"\n" \
 "	cfg_set_string cfg \"launch\" dir\n" \
 "	number success\n" \
-"	cfg_save cfg success \"com.b1stable.launcher\"\n" \
+"	cfg_save cfg success \"com.b1stable.launcher.reload\"\n" \
 "	exit 0\n" \
 "}\n" \
 "\n" \
@@ -262,6 +262,9 @@ char **orig_argv;
 
 std::string extra_args;
 std::string extra_args_orig;
+
+bool toggle_fullscreen;
+bool invert_mouse_wheel;
 
 #if defined LUA_BENCH_ANY
 extern "C" {
@@ -683,6 +686,9 @@ bool start()
 	mouse_b3 = false;
 	mouse_wheel_y = 0;
 
+	toggle_fullscreen = false;
+	invert_mouse_wheel = false;
+
 	// This is basically 16:9 only, with a tiny bit of leeway
 	gfx::set_min_aspect_ratio(1.776f);
 	gfx::set_max_aspect_ratio(1.778f);
@@ -833,6 +839,9 @@ void handle_event(TGUI_Event *event)
 		}
 		else if (event->mouse.y > 0) {
 			mouse_wheel_y = 1;
+		}
+		if (invert_mouse_wheel) {
+			mouse_wheel_y *= -1;
 		}
 	}
 	else if (event->type == TGUI_KEY_DOWN && !event->keyboard.is_repeat) {
@@ -1152,6 +1161,16 @@ void set_shim_args(bool initial, bool force_windowed, bool force_fullscreen)
 	}
 }
 
+static void gen_f11()
+{
+	TGUI_Event event;
+	event.type = TGUI_KEY_DOWN;
+	event.keyboard.is_repeat = false;
+	event.keyboard.code = TGUIK_F11;
+	event.keyboard.simulated = true;
+	shim::push_event(event);
+}
+
 static std::string save_dir()
 {
 	std::string path;
@@ -1272,6 +1291,30 @@ int main(int argc, char **argv)
 	add_instruction("mouse_get_buttons", mousefunc_get_buttons);
 	add_instruction("key_get", keyfunc_get);
 
+	try {
+		std::string path = save_dir();
+		std::string cfg_text = util::load_text_from_filesystem(path + "/com.b1stable.booboo.launcher.txt");
+		util::Tokenizer t(cfg_text, '\n');
+		std::string line;
+		while ((line = t.next()) != "") {
+			util::Tokenizer t2(line, '=');
+			std::string key = t2.next();
+			std::string value = t2.next();
+			if (key == "fullscreen") {
+				toggle_fullscreen = atoi(value.c_str());
+			}
+			else if (key == "invert_mouse_wheel") {
+				invert_mouse_wheel = atoi(value.c_str());
+			}
+		}
+	}
+	catch (util::Error &e) {
+	}
+
+	if (toggle_fullscreen) {
+		gen_f11();
+	}
+
 again:
 	quit = false;
 	bool was_reset = false;
@@ -1336,6 +1379,12 @@ again:
 	std::vector<Token> tmp;
 	call_void_function(prg, "end", tmp);
 
+	std::string out_path = save_dir() + "/com.b1stable.booboo.launcher.txt";
+	FILE *f = fopen(out_path.c_str(), "w");
+	fprintf(f, "fullscreen=%d\n", gfx::is_fullscreen_window());
+	fprintf(f, "invert_mouse_wheel=%d\n", invert_mouse_wheel);
+	fclose(f);
+
 	game_lib_destroy_program(prg);
 	destroy_program(prg);
 
@@ -1364,7 +1413,7 @@ again:
 	bool relaunch = false;
 	std::string dir;
 	try {
-		std::string cfg_path = path + "/" + "com.b1stable.launcher.txt";
+		std::string cfg_path = path + "/" + "com.b1stable.launcher.reload.txt";
 		text = util::load_text_from_filesystem(cfg_path);
 
 		util::Tokenizer t(text, '=');
