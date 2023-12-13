@@ -5,13 +5,10 @@ to get a launcher (point the launcher to where there is a data/
 directory from a BooBoo game or a data.cpa from one.)
 
 Your data/ directory can be compressed into data.cpa with compress_dir.
-Just enter data/ and run it, and it will create ../data.cpa. The shaders
-you'll find in the examples' data/ directories are all or partly required
-to make BooBoo work.
+Just enter data/ and run it, and it will create ../data.cpa.
 
 Note: the examples and demos came about as the language evolved, so a
 lot of "old" style and syntax may be found in some of them.
 
-BooBoo is free to download, use and redistribute, but donations are
-appreciated. Send PayPal donations to: skinmarquee@gmail.com
+Your purchase allows you to distribute BooBoo with all your creations.
 
