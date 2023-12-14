@@ -505,7 +505,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 	}
 	p++; // skip (
 	std::string name;
-	while (!isspace(expr[p]) && p < (int)expr.length()) {
+	while (p < (int)expr.length() && !isspace(expr[p]) && expr[p] != '(' && expr[p] != '[') {
 		char buf[2];
 		buf[0] = expr[p];
 		buf[1] = 0;
