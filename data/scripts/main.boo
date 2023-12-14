@@ -1,3 +1,8 @@
+number W H
+= W 640
+= H 360
+;resize W H
+
 number font
 font_load font "font.ttf" 16 1
 
@@ -8,7 +13,7 @@ number go_ok
 = go_ok 0
 
 number num
-= num 330
+= num (- H (* fh 1.5))
 / num fh
 floor num
 
@@ -119,7 +124,7 @@ function draw
 	= bg_g 0
 	= bg_b 216
 
-	filled_rectangle 0 0 0 255 0 0 0 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 0 330 640 30
+	filled_rectangle 0 0 0 255 0 0 0 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 0 (- H (* fh 1.5)) W (* fh 1.5)
 	string found_text
 	number found_r found_g found_b
 	if (== go_ok 1) show_found not_found
@@ -133,10 +138,10 @@ function draw
 		= found_g 255
 		= found_b 255
 :not_found
-	font_draw font 255 255 255 255 "Enter Directory: A/Return/LMB" 10 335
+	font_draw font 255 255 255 255 "Enter Directory: A/Return/LMB" 10 (+ 5 (- H (* fh 1.5)))
 	number w
 	font_width font w found_text
-	font_draw font found_r found_g found_b 255 found_text (- (- 640 w) 11) 335
+	font_draw font found_r found_g found_b 255 found_text (- (- W w) 11) (+ 5 (- H (* fh 1.5)))
 
 	for i top (&& (< i sz) (< i (+ top num))) 1 loop
 		string s
@@ -146,8 +151,8 @@ function draw
 		= c 128
 		if (== i selected) draw_bg
 			= c 255
-			filled_rectangle 0 0 0 255 0 0 0 255 0 216 255 255 0 216 255 255 0 y 640 (/ fh 2)
-			filled_rectangle 0 216 255 255 0 216 255 255 0 0 0 255 0 0 0 255 0 (+ y (/ fh 2)) 640 (/ fh 2)
+			filled_rectangle 0 0 0 255 0 0 0 255 0 216 255 255 0 216 255 255 0 y W (/ fh 2)
+			filled_rectangle 0 216 255 255 0 216 255 255 0 0 0 255 0 0 0 255 0 (+ y (/ fh 2)) W (/ fh 2)
 :draw_bg
 		font_draw font c c c 255 s 5 y
 		+ y fh
