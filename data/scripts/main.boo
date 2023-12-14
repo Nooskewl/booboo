@@ -13,7 +13,7 @@ number go_ok
 = go_ok 0
 
 number num
-= num (- H (* fh 1.5))
+= num (- (- H (* fh 2.5)) 20)
 / num fh
 floor num
 
@@ -117,14 +117,14 @@ function draw
 	vector_size filenames sz
 	number i
 	number y
-	= y 0
+	= y 20
 
 	number bg_r bg_g bg_b fg_r fg_g fg_b
 	= bg_r 255
 	= bg_g 0
 	= bg_b 216
 
-	filled_rectangle 0 0 0 255 0 0 0 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 0 (- H (* fh 1.5)) W (* fh 1.5)
+	filled_rectangle 0 0 0 255 0 0 0 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 0 (- H (* fh 2.5)) W (* fh 2.5)
 	string found_text
 	number found_r found_g found_b
 	if (== go_ok 1) show_found not_found
@@ -138,10 +138,10 @@ function draw
 		= found_g 255
 		= found_b 255
 :not_found
-	font_draw font 255 255 255 255 "Enter Directory: A/Return/LMB" 10 (+ 5 (- H (* fh 1.5)))
+	font_draw font 255 255 255 255 "Enter Directory: A/Return/LMB" 20 (+ 5 (- H (* fh 2.5)))
 	number w
 	font_width font w found_text
-	font_draw font found_r found_g found_b 255 found_text (- (- W w) 11) (+ 5 (- H (* fh 1.5)))
+	font_draw font found_r found_g found_b 255 found_text (- (- W w) 21) (+ 5 (- H (* fh 2.5)))
 
 	for i top (&& (< i sz) (< i (+ top num))) 1 loop
 		string s
@@ -154,7 +154,7 @@ function draw
 			filled_rectangle 0 0 0 255 0 0 0 255 0 216 255 255 0 216 255 255 0 y W (/ fh 2)
 			filled_rectangle 0 216 255 255 0 216 255 255 0 0 0 255 0 0 0 255 0 (+ y (/ fh 2)) W (/ fh 2)
 :draw_bg
-		font_draw font c c c 255 s 5 y
+		font_draw font c c c 255 s 25 y
 		+ y fh
 :loop
 }
