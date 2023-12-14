@@ -158,7 +158,7 @@ function draw
 	font_width font w found_text
 	font_draw font found_r found_g found_b 255 found_text (- (- W w) 21) (+ 5 (- H (* fh 2.5)))
 
-	for i top (&&(< i sz)(< i(+ top num))) 1 loop
+	for i top (&& (< i sz) (< i (+ top num))) 1 loop
 		string s
 		= s [filenames i]
 		call_result s chop_dir s
