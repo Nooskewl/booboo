@@ -1229,7 +1229,9 @@ again:
 		ZeroMemory(&si, sizeof(si));
 		si.cb = sizeof(si);
 		ZeroMemory(&pi, sizeof(pi));
-		if (CreateProcess(NULL, argv[0], NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
+		char cmd[1000];
+		sprintf(cmd, "\"%s\"", argv[0]);
+		if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
 			//WaitForSingleObject(pi.hProcess, INFINITE);
 			//CloseHandle(pi.hProcess);
 			//CloseHandle(pi.hThread);
