@@ -1,3 +1,7 @@
+number scanline_skip scanline_alpha
+= scanline_skip 2
+= scanline_alpha 48
+
 number W H
 = W 640
 = H 360
@@ -162,6 +166,15 @@ function draw
 		font_draw font c c c 255 s 25 y
 		+ y fh
 :loop
+
+	start_primitives
+
+	number i
+	for i 0 (< i H) scanline_skip do_scanline
+		line 0 0 0 scanline_alpha 0 i W i 1
+	:do_scanline
+
+	end_primitives
 }
 function sel_up
 {
