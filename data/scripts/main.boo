@@ -43,6 +43,12 @@ number old_b1 old_b3
 number old_esc
 = old_esc 0
 
+number old_pgup old_pgdn old_home old_end
+= old_pgup 0
+= old_pgdn 0
+= old_home 0
+= old_end 0
+
 number selected
 number top
 vector filenames
@@ -57,7 +63,7 @@ function chop_dir s
 	- p 2
 	if (< p 0) none
 		return s
-:none
+	:none
 	number i
 	for i p (>= i 0) -1 loop
 		number c
@@ -68,8 +74,8 @@ function chop_dir s
 			+ i 1
 			string_substr s i
 			return s
-:found
-:loop
+		:found
+	:loop
 
 	return s
 }
@@ -93,7 +99,7 @@ function list_dir name
 		if (== s "data.cpa") is_cpa
 			= go_ok 1
 			goto done_list
-:is_cpa
+		:is_cpa
 		if (== s "data/") is_data_dir
 			string orig
 			= orig [filenames i]
@@ -104,9 +110,9 @@ function list_dir name
 				file_close f
 				= go_ok 1
 				goto done_list
-:is_booboo_app
-:is_data_dir
-:loop_good
+			:is_booboo_app
+		:is_data_dir
+	:loop_good
 :done_list
 	for i 0 (< i sz) 1 loop_bad
 		string s
@@ -115,8 +121,8 @@ function list_dir name
 		if (|| (== s "BooBoo.exe") (== s "BooBoo")) dont_relaunch
 			= go_ok 0
 			goto really_done_list
-:dont_relaunch
-:loop_bad
+		:dont_relaunch
+	:loop_bad
 :really_done_list
 }
 
@@ -141,12 +147,12 @@ function draw
 		= found_r 255
 		= found_g 216
 		= found_b 0
-:show_found
+	:show_found
 		= found_text "No BooBoo app detected here..."
 		= found_r 255
 		= found_g 255
 		= found_b 255
-:not_found
+	:not_found
 	font_draw font 255 255 255 255 "Enter Directory: A/Return/LMB" 20 (+ 5 (- H (* fh 2.5)))
 	number w
 	font_width font w found_text
@@ -162,44 +168,48 @@ function draw
 			= c 255
 			filled_rectangle 0 0 0 255 0 0 0 255 0 216 255 255 0 216 255 255 0 y W (/ fh 2)
 			filled_rectangle 0 216 255 255 0 216 255 255 0 0 0 255 0 0 0 255 0 (+ y (/ fh 2)) W (/ fh 2)
-:draw_bg
+		:draw_bg
 		font_draw font c c c 255 s 25 y
 		+ y fh
-:loop
+	:loop
 
 	start_primitives
 
 	number i
 	for i 0 (< i H) scanline_skip do_scanline
-		line 0 0 0 scanline_alpha 0 i W i 1
+		line 0 0 0 scanline_alpha 0 (+ i 0.5) W (+ i 0.5) 1
 	:do_scanline
 
 	end_primitives
 }
-function sel_up
+function sel_up sound
 {
-	mml_play widget 1 0
+	if (== sound 1) play
+		mml_play widget 1 0
+	:play
 	- selected 1
 	if (< selected 0) zero
 		= selected 0
-:zero
+	:zero
 	if (< selected top) dec_top
 		= top selected
-:dec_top
+	:dec_top
 }
 
-function sel_down
+function sel_down sound
 {
-	mml_play widget 1 0
+	if (== sound 1) play
+		mml_play widget 1 0
+	:play
 	number sz
 	vector_size filenames sz
 	+ selected 1
 	if (>= selected sz) fix
 		= selected (- sz 1)
-:fix
+	:fix
 	if (<= (+ top num) selected) adjust
 		= top (- selected (- num 1))
-:adjust
+	:adjust
 }
 
 function navigate
@@ -219,7 +229,7 @@ function navigate
 		= d dir
 		+ d "/" s
 		call list_dir d
-:go_dir
+	:go_dir
 }
 
 function launch
@@ -227,7 +237,7 @@ function launch
 	mml_play button 1 0
 	if (== go_ok 0) cant
 		return
-:cant
+	:cant
 	number cfg
 	cfg_load cfg "com.b1stable.launcher.reload"
 	cfg_set_string cfg "launch" dir
@@ -242,16 +252,16 @@ function run
 	mouse_get_buttons b1 b2 b3 wheel
 
 	if (== wheel 1) wheel_up (== wheel -1) wheel_down
-		call sel_up
-:wheel_up
-		call sel_down
-:wheel_down
+		call sel_up 1
+	:wheel_up
+		call sel_down 1
+	:wheel_down
 
 	if (&& (== b1 1) (== old_b1 0)) mouse_b1 (&& (== b3 1) (== old_b3 0)) mouse_b3
 		call navigate
-:mouse_b1
+	:mouse_b1
 		call launch
-:mouse_b3
+	:mouse_b3
 
 	= old_b1 b1
 	= old_b3 b3
@@ -273,43 +283,85 @@ function run
 	if (&& (== kesc 1) (== old_esc 0)) quick_up
 		= selected 0
 		call navigate
-:quick_up
+	:quick_up
 
 	= old_esc kesc
 
+	number pgup pgdn home _end
+	key_get pgup KEY_PAGEUP
+	key_get pgdn KEY_PAGEDOWN
+	key_get home KEY_HOME
+	key_get _end KEY_END
+
+	if (&& (== pgup 1) (== old_pgup 0)) do_pgup (&& (== pgdn 1) (== old_pgdn 0)) do_pgdn
+		number i
+		mml_play widget 1 0
+		for i 0 (< i num) 1 pgup_slowly
+			call sel_up 0
+		:pgup_slowly
+	:do_pgup
+		number i
+		mml_play widget 1 0
+		for i 0 (< i num) 1 pgdn_slowly
+			call sel_down 0
+		:pgdn_slowly
+	:do_pgdn
+
+	= old_pgup pgup
+	= old_pgdn pgdn
+
+	number sz
+	vector_size filenames sz
+	number i
+
+	if (&& (== home 1) (== old_home 0)) do_home (&& (== _end 1) (== old_end 0)) do_end
+		mml_play widget 1 0
+		for i 0 (< i sz) 1 home_slowly
+			call sel_up 0
+		:home_slowly
+	:do_home
+		mml_play widget 1 0
+		for i 0 (< i sz) 1 end_slowly
+			call sel_down 0
+		:end_slowly
+	:do_end
+
+	= old_home home
+	= old_end _end
+
 	if (&& (== joy_u 1) (== old_u 0)) do_up (&& (== joy_d 1) (== old_d 0)) do_down
-		call sel_up
-:do_up
-		call sel_down
-:do_down
+		call sel_up 1
+	:do_up
+		call sel_down 1
+	:do_down
 
 	if (&& (== joy_a 1) (== old_a 0)) dig
 		call navigate
-:dig
+	:dig
 
 	if (&& (== joy_b 1) (== old_b 0)) go
 		call launch
-:go
+	:go
 
 	if (== joy_u 1) check_u_repeat zero_u_repeat
 		+ u_time 1
 		if (> u_time 10) repeat_u
 			= u_time 0
-			call sel_up
-:repeat_u
-:check_u_repeat
+			call sel_up 1
+		:repeat_u
+	:check_u_repeat
 		= u_time 0
-:zero_u_repeat
+	:zero_u_repeat
 
 	if (== joy_d 1) check_d_repeat zero_d_repeat
 		+ d_time 1
 		if (> d_time 10) repeat_d
 			= d_time 0
-			call sel_down
-:repeat_d
-:check_d_repeat
+			call sel_down 1
+		:repeat_d
+	:check_d_repeat
 		= d_time 0
-:zero_d_repeat
+	:zero_d_repeat
 
 	= old_u joy_u
 	= old_d joy_d
