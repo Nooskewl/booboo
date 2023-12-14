@@ -6,6 +6,11 @@ number W H
 number font
 font_load font "font.ttf" 16 1
 
+number widget
+mml_load widget "sfx/widget.mml"
+number button
+mml_load button "sfx/button.mml"
+
 number fh
 font_height font fh
 
@@ -160,6 +165,7 @@ function draw
 }
 function sel_up
 {
+	mml_play widget 1 0
 	- selected 1
 	if (< selected 0) zero
 		= selected 0
@@ -171,6 +177,7 @@ function sel_up
 
 function sel_down
 {
+	mml_play widget 1 0
 	number sz
 	vector_size filenames sz
 	+ selected 1
@@ -184,6 +191,7 @@ function sel_down
 
 function navigate
 {
+	mml_play button 1 0
 	string s
 	= s [filenames selected]
 	call_result s chop_dir s
@@ -203,6 +211,7 @@ function navigate
 
 function launch
 {
+	mml_play button 1 0
 	if (== go_ok 0) cant
 		return
 :cant
