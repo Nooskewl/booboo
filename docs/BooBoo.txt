@@ -199,13 +199,6 @@ string_format
 	printf-equivalent formating options are available with %(...) for
 	example %(3.16g)
 
-string_scan
-	Kind of like sscanf, it can parse out a little bit of info from text
-	e.g., string_scan num_result_gotten "%:%:%" time_string hours minutes
-	seconds That would read hours/minutes/seconds from a time in the
-	format "23:59:00" Formatting parameters in () are not currently
-	supported for this function
-
 string_char_at
 	Get the value of character at index in a string
 	This function is UTF8 compliant
@@ -239,6 +232,18 @@ string_lowercase
 string_trim
 	Trim leading and trailing whitespace from a string
 	e.g. string_trim s
+
+string_replace
+	regex replacement
+	e.g. string_replace out str regex replacement
+
+string_match
+	Extract sub-strings from a string
+	e.g. string_match out_vector str regex
+
+string_matches
+	Check if a string matches a regex
+	e.g. string_matches yesno str regex
 
 -- Math Functions ------------------------------------------------------------
 

@@ -2,6 +2,7 @@
 #include <cstring>
 #include <iostream>
 #include <fstream>
+#include <regex>
 
 #include "booboo/booboo.h"
 #include "booboo/internal.h"
@@ -1082,107 +1083,6 @@ bool stringfunc_format(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool stringfunc_scan(Program *prg, std::vector<Token> &v)
-{
-	MIN_ARGS(4)
-
-	Variable &v1 = as_variable_inline(prg, v[0]);
-	if (v1.type == Variable::POINTER) {
-		v1 = *v1.p;
-	}
-	if (v1.type != Variable::NUMBER) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Expected number at " + get_error_info(prg));
-	}
-	std::string fmt = as_string_inline(prg, v[1]);
-	std::string scan_str = as_string_inline(prg, v[2]);
-	int _tok = 3;
-	int p = 0;
-	int scanned = 0;
-	int gotten = 0;
-
-	while (p < (int)fmt.length()) {
-		int start = p;
-		// scan up till %
-		while (p < (int)fmt.length() && fmt[p] != '%') {
-			p++;
-		}
-		if (p < (int)fmt.length()-1 && fmt[p+1] == '%') {
-			p += 2;
-			continue;
-		}
-		int scan_till = p >= (int)fmt.length()-1 ? -1 : fmt[p+1];
-		if (p-start > 0) {
-			std::string const_str = fmt.substr(start, p-start);
-			bool all_whitespace = true;
-			for (size_t i = 0; i < const_str.length(); i++) {
-				if (!isspace(const_str[i])) {
-					all_whitespace = false;
-					break;
-				}
-			}
-			if (all_whitespace) {
-				while (scanned < (int)scan_str.length() && isspace(scan_str[scanned])) {
-					scanned++;
-				}
-			}
-			else {
-				if (const_str != scan_str.substr(scanned, const_str.length())) {
-					break;
-				}
-				scanned += const_str.length();
-			}
-		}
-
-		Variable &var = as_variable_inline(prg, v[_tok]);
-		if (var.type == Variable::POINTER) {
-			var = *var.p;
-		}
-
-		int scan_start = scanned;
-
-		while (true) {
-			if (scanned >= (int)scan_str.length()) {
-				break;
-			}
-			if (isspace(scan_till)) {
-				if (isspace(scan_str[scanned])) {
-					break;
-				}
-			}
-			else {
-				if (scan_str[scanned] == scan_till) {
-					break;
-				}
-			}
-			scanned++;
-		}
-
-		std::string got = scan_str.substr(scan_start, scanned-scan_start);
-
-		if (var.type == Variable::NUMBER) {
-			var.n = atof(got.c_str());
-		}
-		else if (var.type == Variable::STRING) {
-			var.s = got;
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Expected string or number at " + get_error_info(prg));
-		}
-
-		gotten++;
-		_tok++;
-		p++;
-
-		if (_tok >= (int)v.size()) {
-			break;
-		}
-	}
-
-	v1.n = gotten;
-
-	return true;
-}
-
 bool stringfunc_char_at(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
@@ -1301,6 +1201,69 @@ bool stringfunc_trim(Program *prg, std::vector<Token> &v)
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
+bool stringfunc_replace(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	
+	if (v1.type != Variable::STRING) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	std::string str = as_string_inline(prg, v[1]);
+	std::string regex = as_string_inline(prg, v[2]);
+	std::string fmt = as_string_inline(prg, v[3]);
+
+	v1.s = std::regex_replace(str.c_str(), std::regex(regex), fmt.c_str());
+
+	return true;
+}
+
+bool stringfunc_match(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	std::vector<Variable> &v1 = as_vector_inline(prg, v[0]);
+	std::string str = as_string_inline(prg, v[1]);
+	std::string regex = as_string_inline(prg, v[2]);
+
+	v1.clear();
+
+	std::smatch match;
+
+	if (std::regex_match(str, match, std::regex(regex))) {
+		for (size_t i = 1; i < match.size(); i++) {
+			std::ssub_match sub = match[i];
+			Variable v;
+			v.type = Variable::STRING;
+			v.name = "-constant-";
+			v.s = sub.str();
+			v1.push_back(v);
+		}
+	}
+
+	return true;
+}
+
+bool stringfunc_matches(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string str = as_string_inline(prg, v[1]);
+	std::string regex = as_string_inline(prg, v[2]);
+
+	if (v1.type == Variable::NUMBER) {
+		v1.n = std::regex_search(str, std::regex(regex));
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 	}
 
 	return true;
@@ -2598,7 +2561,6 @@ void start_lib_core()
 	add_instruction("get_system_language", corefunc_get_system_language);
 
 	add_instruction("string_format", stringfunc_format);
-	add_instruction("string_scan", stringfunc_scan);
 	add_instruction("string_char_at", stringfunc_char_at);
 	add_instruction("string_length", stringfunc_length);
 	add_instruction("string_from_number", stringfunc_from_number);
@@ -2606,6 +2568,9 @@ void start_lib_core()
 	add_instruction("string_uppercase", stringfunc_uppercase);
 	add_instruction("string_lowercase", stringfunc_lowercase);
 	add_instruction("string_trim", stringfunc_trim);
+	add_instruction("string_replace", stringfunc_replace);
+	add_instruction("string_match", stringfunc_match);
+	add_instruction("string_matches", stringfunc_matches);
 
 	add_instruction("sin", mathfunc_sin);
 	add_instruction("cos", mathfunc_cos);
