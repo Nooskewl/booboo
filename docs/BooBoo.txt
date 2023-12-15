@@ -90,6 +90,10 @@ typeof
 	You can use multiple indexes
 	e.g. [v 3 2 1 0] is like v[3][2][1][0] in C.
 
+#
+	Start a hexadecimal number
+	e.g. #FF is equivalent to 255
+
 -- Flow Control --------------------------------------------------------------
 
 goto

@@ -1,9 +1,11 @@
-#include <shim4/shim4.h>
+#include <climits>
+
+#include <fstream>
+#include <sstream>
 
 #include <sys/stat.h>
 
-#include <climits>
-#include <fstream>
+#include <shim4/shim4.h>
 
 #include <libutil/libutil.h>
 using namespace noo;
@@ -292,6 +294,31 @@ static std::string tokenfunc_rightshift(Program *prg)
 	}
 	prg->s->p++;
 	return ">>";
+}
+
+static std::string tokenfunc_hex(Program *prg)
+{
+	prg->s->p++;
+
+	std::string num;
+
+	while (prg->s->p < prg->s->code.length() && ((prg->s->code[prg->s->p] >= 'A' && prg->s->code[prg->s->p] <= 'F') || (prg->s->code[prg->s->p] >= 'a' && prg->s->code[prg->s->p] <= 'f') || (prg->s->code[prg->s->p] >= '0' && prg->s->code[prg->s->p] <= '9'))) {
+		char buf[2];
+		buf[1] = 0;
+		buf[0] = prg->s->code[prg->s->p];
+		num += buf;
+		prg->s->p++;
+	}
+
+	int n;
+	std::stringstream ss;
+	ss << std::hex << num;
+	ss >> n;
+
+	char buf[1000];
+	snprintf(buf, 1000, "%d", n);
+
+	return buf;
 }
 
 static std::string token(Program *prg, Token::Token_Type &ret_type)
@@ -2687,6 +2714,7 @@ static void init_token_map()
 	add_token_handler('&', tokenfunc_and);
 	add_token_handler('<', tokenfunc_leftshift);
 	add_token_handler('>', tokenfunc_rightshift);
+	add_token_handler('#', tokenfunc_hex);
 }
 
 void start()
