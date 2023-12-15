@@ -7,6 +7,9 @@ number W H
 = H 360
 ;resize W H
 
+number TOP
+= TOP 20
+
 number font
 font_load font "font.ttf" 16 1
 
@@ -132,7 +135,7 @@ function draw
 	vector_size filenames sz
 	number i
 	number y
-	= y 20
+	= y TOP
 
 	number bg_r bg_g bg_b fg_r fg_g fg_b
 	= bg_r 255
@@ -248,8 +251,9 @@ function launch
 
 function run
 {
-	number b1 b2 b3 wheel
+	number b1 b2 b3 wheel mx my
 	mouse_get_buttons b1 b2 b3 wheel
+	mouse_get_position mx my
 
 	if (== wheel 1) wheel_up (== wheel -1) wheel_down
 		call sel_up 1
@@ -258,7 +262,21 @@ function run
 	:wheel_down
 
 	if (&& (== b1 1) (== old_b1 0)) mouse_b1 (&& (== b3 1) (== old_b3 0)) mouse_b3
-		call navigate
+		if (&& (>= my TOP) (< my (+ TOP (* num fh)))) check_click
+			number sel
+			= sel (+ top (/ (- my TOP) fh))
+			floor sel
+			number sz
+			vector_size filenames sz
+			if (&& (>= sel 0) (< sel sz)) check_click2
+				mml_play button 1 0
+				if (== sel selected) nav select
+					call navigate
+				:nav
+					= selected sel
+				:select
+			:check_click2
+		:check_click
 	:mouse_b1
 		call launch
 	:mouse_b3
