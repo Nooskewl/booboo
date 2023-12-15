@@ -867,6 +867,29 @@ bool corefunc_get_system_language(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+bool corefunc_get_full_path(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string path = as_string_inline(prg, v[1]);
+
+	if (v1.type != Variable::STRING) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+#ifdef _WIN32
+	char buf[MAX_PATH];
+	GetFullPathName(path.c_str(), MAX_PATH, buf, NULL);
+	v1.s = buf;
+#else
+	char buf[PATH_MAX];
+	v1.s = realpath(path.c_str(), buf);
+#endif
+
+	return true;
+}
+
 bool corefunc_list_directory(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -2563,6 +2586,7 @@ void start_lib_core()
 	add_instruction("input", corefunc_input);
 	add_instruction("mkdir", corefunc_mkdir);
 	add_instruction("get_system_language", corefunc_get_system_language);
+	add_instruction("get_full_path", corefunc_get_full_path);
 
 	add_instruction("string_format", stringfunc_format);
 	add_instruction("string_char_at", stringfunc_char_at);

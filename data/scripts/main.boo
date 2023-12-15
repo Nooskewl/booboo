@@ -12,6 +12,8 @@ number TOP
 
 number font
 font_load font "font.ttf" 16 1
+number small_font
+font_load small_font "font.ttf" 12 1
 
 number widget
 mml_load widget "sfx/widget.mml"
@@ -25,7 +27,7 @@ number go_ok
 = go_ok 0
 
 number num
-= num (- (- H (* fh 2.5)) 20)
+= num (- (- H (* fh 3.5)) 20)
 / num fh
 floor num
 
@@ -70,7 +72,6 @@ for i 0 (< i sz) 1 check_arg
 	if (&& (== arg "+dir") (< i (- sz 1))) list_other
 		string s
 		= s [argv (+ i 1)]
-		inspect s
 		call list_dir [argv (+ i 1)]
 		= found 1
 		goto done_args
@@ -114,12 +115,10 @@ function list_dir name
 	= sub name
 	string_substr sub (- len 3)
 	if (&& (== sub "../") (>= len 6)) check_collapse
-		inspect 6
 		string sub
 		= sub name
 		string_substr sub (- len 6)
 		if (&& (!= sub "../../") (!= sub "..\\../")) collapse
-			inspect 7
 			number count
 			= count 0
 			number p
@@ -129,15 +128,11 @@ function list_dir name
 				string ch
 				string_from_number ch c
 				if (|| (== ch "/") (== ch "\\")) found_slash
-					inspect 8
 					+ count 1
 					if (== count 3) really_collapse
-						inspect 9
 						string sub
 						= sub name
 						string_substr sub 0 (+ p 1)
-						inspect sub
-						inspect 10
 						= name sub
 						goto done_collapse
 					:really_collapse
@@ -204,7 +199,7 @@ function draw
 	= bg_g 0
 	= bg_b 216
 
-	filled_rectangle 0 0 0 255 0 0 0 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 0 (- H (* fh 2.5)) W (* fh 2.5)
+	filled_rectangle 0 0 0 255 0 0 0 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 0 (- H (* fh 3.5)) W (* fh 3.5)
 	string found_text
 	number found_r found_g found_b
 	if (== go_ok 1) show_found not_found
@@ -218,10 +213,20 @@ function draw
 		= found_g 255
 		= found_b 255
 	:not_found
-	font_draw font 255 255 255 255 "Enter Directory: A/Return/LMB" 20 (+ 5 (- H (* fh 2.5)))
+	font_draw font 255 255 255 255 "Enter Directory: A/Return/LMB" 25 (+ 5 (- H (* fh 3.5)))
 	number w
 	font_width font w found_text
-	font_draw font found_r found_g found_b 255 found_text (- (- W w) 21) (+ 5 (- H (* fh 2.5)))
+	font_draw font found_r found_g found_b 255 found_text (- (- W w) 26) (+ 5 (- H (* fh 3.5)))
+
+	string fulldir
+	get_full_path fulldir dir
+	number w
+	font_width small_font w fulldir
+	/ w 2
+	number sfh
+	font_height small_font sfh
+	filled_rectangle 255 0 216 255 255 0 216 255 255 0 216 255 255 0 216 255 (- (/ W 2) w 5) (+ 10 fh (- H (* fh 3.5))) (+ 10 (* w 2)) (+ sfh 4)
+	font_draw small_font 0 0 0 255 fulldir (- (/ W 2) w) (+ 12 fh (- H (* fh 3.5)))
 
 	for i top (&& (< i sz) (< i (+ top num))) 1 loop
 		string s
@@ -247,6 +252,7 @@ function draw
 
 	end_primitives
 }
+
 function sel_up sound
 {
 	if (== sound 1) play
