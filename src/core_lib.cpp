@@ -4,16 +4,20 @@
 #include <fstream>
 #include <regex>
 
-#include "booboo/booboo.h"
-#include "booboo/internal.h"
-
-#include <shim4/shim4.h>
-
-#include <sys/stat.h>
-
 #ifdef _WIN32
 #include <shlwapi.h>
 #endif
+
+#include <libutil/libutil.h>
+#include <libutil/utf8.h>
+using namespace noo;
+
+#include "booboo/booboo.h"
+#include "booboo/internal.h"
+
+#include <sys/stat.h>
+
+template <typename T> T sign(T v) { return (T(0) < v) - (v < T(0)); }
 
 namespace booboo {
 
@@ -1091,7 +1095,7 @@ bool stringfunc_char_at(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable_inline(prg, v[1]);
 	int index = as_number_inline(prg, v[2]);
 
-	Uint32 value = util::utf8_char(s, index);
+	uint32_t value = util::utf8_char(s, index);
 
 	if (v1.type == Variable::NUMBER) {
 		v1.n = value;
@@ -1125,7 +1129,7 @@ bool stringfunc_from_number(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
-	Uint32 n = as_number_inline(prg, v[1]);
+	uint32_t n = as_number_inline(prg, v[1]);
 
 	if (v1.type == Variable::STRING) {
 		v1.s = util::utf8_char_to_string(n);
@@ -1436,7 +1440,7 @@ bool mathfunc_sign(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	if (v1.type == Variable::NUMBER) {
-		v1.n = util::sign(v1.n);
+		v1.n = sign(v1.n);
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));

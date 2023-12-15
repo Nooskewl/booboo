@@ -282,6 +282,8 @@ inline std::map<std::string, Variable> &as_map_inline(Program *prg, Token &t)
 
 std::string remove_quotes(std::string s);
 
+extern std::string (*load_text)(std::string filename);
+
 } // End namespace booboo
 
 #endif // BOOBOO_INTERNAL_H

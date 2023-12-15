@@ -6,7 +6,11 @@
 
 #include <sys/stat.h>
 
+#include <libutil/libutil.h>
+using namespace noo;
+
 #include "booboo/booboo.h"
+#include "booboo/internal.h"
 
 booboo::Program *prg;
 
@@ -47,6 +51,8 @@ static std::string load_text_from_filesystem(std::string filename)
 
 int main(int argc, char **argv)
 {
+	booboo::load_text = util::load_text_from_filesystem;
+
 	std::string fn = argc >= 2 ? argv[1] : "";
 
 	if (fn != "") {

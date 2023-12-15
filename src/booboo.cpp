@@ -5,6 +5,9 @@
 #include <climits>
 #include <fstream>
 
+#include <libutil/libutil.h>
+using namespace noo;
+
 #include "booboo/booboo.h"
 #include "booboo/internal.h"
 
@@ -32,6 +35,7 @@ std::string reset_game_name;
 std::string main_program_name;
 int return_code;
 bool quit;
+std::string (*load_text)(std::string filename);
 
 // And this all makes BooBoo work
 
@@ -416,7 +420,7 @@ bool process_includes(Program *prg)
 			std::string new_code;
 			std::string fn;
 			fn = name;
-			new_code = util::load_text("scripts/" + name);
+			new_code = booboo::load_text("scripts/" + name);
 
 			new_code = util::trim(new_code);
 

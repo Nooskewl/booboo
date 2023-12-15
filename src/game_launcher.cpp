@@ -15,6 +15,9 @@
 #include <shim4/shim4.h>
 #include <shim4/internal/gfx.h>
 
+#include <libutil/libutil.h>
+using namespace noo;
+
 #include "booboo/booboo.h"
 #include "booboo/internal.h"
 #include "booboo/game_lib.h"
@@ -961,6 +964,8 @@ static std::string save_dir()
 
 int main(int argc, char **argv)
 {
+	booboo::load_text = util::load_text;
+
 	char cwd_buf[1000];
 	std::string start_cwd = getcwd(cwd_buf, 1000);
 
