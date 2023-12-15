@@ -123,3 +123,4 @@ m - mix volume 0 to 255
 y - Change dutycycle of channel. Applies only to @TYPE0 (pulse.)
 
 s - toggle sample stretching or not. By default (s0) samples are played back without stretching to note length
+

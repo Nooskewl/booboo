@@ -23,7 +23,7 @@
 using namespace noo;
 
 #include "booboo/booboo.h"
-#include "booboo/core_lib.h"
+#include "booboo/standard_lib.h"
 #include "booboo/game_lib.h"
 using namespace booboo;
 
@@ -1072,7 +1072,7 @@ int main(int argc, char **argv)
 	}
 
 	booboo::start();
-	start_lib_core();
+	start_lib_standard();
 	start_lib_game();
 
 	add_instruction("mouse_get_position", mousefunc_get_position);
@@ -1174,7 +1174,7 @@ again:
 	fclose(f);
 
 	game_lib_destroy_program(prg);
-	core_lib_destroy_program(prg);
+	standard_lib_destroy_program(prg);
 	destroy_program(prg);
 
 	if (reset_game_name != "") {
@@ -1183,7 +1183,7 @@ again:
 	}
 
 	end_lib_game();
-	end_lib_core();
+	end_lib_standard();
 	booboo::end();
 
 	::end();

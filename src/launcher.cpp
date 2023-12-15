@@ -10,7 +10,7 @@
 using namespace noo;
 
 #include "booboo/booboo.h"
-#include "booboo/core_lib.h"
+#include "booboo/standard_lib.h"
 
 booboo::Program *prg;
 
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
 	try {
 
 	booboo::start();
-	start_lib_core();
+	start_lib_standard();
 
 again:
 	booboo::quit = false;
@@ -139,7 +139,7 @@ again:
 	while (booboo::interpret(prg, INT_MAX)) {
 	}
 
-	core_lib_destroy_program(prg);
+	standard_lib_destroy_program(prg);
 	booboo::destroy_program(prg);
 
 	if (booboo::reset_game_name != "") {
@@ -147,7 +147,7 @@ again:
 		goto again;
 	}
 
-	end_lib_core();
+	end_lib_standard();
 	booboo::end();
 
 	}

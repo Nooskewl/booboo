@@ -785,3 +785,4 @@ The following keyboard constants are used with key_get:
 	KEY_KBDILLUMUP
 	KEY_EJECT
 	KEY_SLEEP
+

@@ -1647,7 +1647,7 @@ bool bitfunc_rightshift(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-void start_lib_core()
+void start_lib_standard()
 {
 	add_instruction("getenv", corefunc_getenv);
 	add_instruction("list_directory", corefunc_list_directory);
@@ -1710,11 +1710,11 @@ void start_lib_core()
 	add_instruction(">>", bitfunc_rightshift);
 }
 
-void end_lib_core()
+void end_lib_standard()
 {
 }
 
-void core_lib_destroy_program(Program *prg)
+void standard_lib_destroy_program(Program *prg)
 {
 	File_Info *file_i = file_info(prg);
 	for (size_t i = 0; i < file_i->files.size(); i++) {
