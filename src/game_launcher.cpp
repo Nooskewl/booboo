@@ -23,9 +23,8 @@
 using namespace noo;
 
 #include "booboo/booboo.h"
-#include "booboo/internal.h"
+#include "booboo/core_lib.h"
 #include "booboo/game_lib.h"
-
 using namespace booboo;
 
 #ifdef CPP_BENCH
@@ -1073,7 +1072,9 @@ int main(int argc, char **argv)
 	}
 
 	booboo::start();
+	start_lib_core();
 	start_lib_game();
+
 	add_instruction("mouse_get_position", mousefunc_get_position);
 	add_instruction("mouse_get_buttons", mousefunc_get_buttons);
 	add_instruction("key_get", keyfunc_get);
@@ -1173,6 +1174,7 @@ again:
 	fclose(f);
 
 	game_lib_destroy_program(prg);
+	core_lib_destroy_program(prg);
 	destroy_program(prg);
 
 	if (reset_game_name != "") {
@@ -1181,6 +1183,7 @@ again:
 	}
 
 	end_lib_game();
+	end_lib_core();
 	booboo::end();
 
 	::end();
@@ -1207,7 +1210,7 @@ again:
 		std::string key = t.next();
 		dir = t.next();
 		dir = util::trim(dir);
-		dir = booboo::remove_quotes(dir);
+		dir = util::remove_quotes(dir);
 		if (key == "launch") {
 			relaunch = true;
 			remove(cfg_path.c_str());

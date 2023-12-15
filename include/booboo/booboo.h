@@ -118,6 +118,9 @@ double as_number(Program *prg, Token &t);
 std::string as_string(Program *prg, Token &t);
 int as_label(Program *prg, Token &t);
 int as_function(Program *prg, Token &t);
+Variable &as_pointer(Program *prg, Token &t);
+std::vector<Variable> &as_vector(Program *prg, Token &t);
+std::map<std::string, Variable> &as_map(Program *prg, Token &t);
 
 // The black box allows you to store anything you want
 void *get_black_box(Program *prg, std::string id);
@@ -126,11 +129,15 @@ void set_black_box(Program *prg, std::string id, void *data);
 // If you have a variable of type SYMBOL then 'i' is the index you pass here to retrive the variable
 Variable &get_variable(Program *prg, int index);
 
+double evaluate_expression(Program *prg, Variable::Expression &e);
+Variable &go_fish(Program *prg, Variable::Fish &f);
+
 // This stuff can be used but it's used by the BooBoo interpreter
 extern std::string reset_game_name;
 extern std::string main_program_name;
 extern int return_code;
 extern bool quit;
+extern std::string (*load_text)(std::string filename); // must be set
 
 } // End namespace booboo
 

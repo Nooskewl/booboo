@@ -39,34 +39,6 @@ std::string (*load_text)(std::string filename);
 
 // And this all makes BooBoo work
 
-std::string remove_quotes(std::string s)
-{
-       int start = 0;
-       int count = s.length();
-
-       if (s[0] == '"') {
-               start++;
-               count--;
-       }
-
-       if (s[s.length()-1] == '"') {
-               count--;
-       }
-
-       return s.substr(start, count);
-}
-
-File_Info *file_info(Program *prg)
-{
-	File_Info *info = (File_Info *)get_black_box(prg, "com.b1stable.booboo.files");
-	if (info == nullptr) {
-		info = new File_Info;
-		info->file_id = 0;
-		set_black_box(prg, "com.b1stable.booboo.files", info);
-	}
-	return info;
-}
-
 std::string get_file_name(Program *prg)
 {
 	if (prg->line_numbers.size() <= prg->s->pc) {
@@ -413,7 +385,7 @@ bool process_includes(Program *prg)
 				throw Error(std::string(__FUNCTION__) + ": " + "Invalid include name at " + get_error_info(prg));
 			}
 
-			name = remove_quotes(util::unescape_string(name));
+			name = util::remove_quotes(util::unescape_string(name));
 
 			code += prg->s->code.substr(start, prev-start);
 
@@ -651,7 +623,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 				prev = buf[0];
 				p++;
 			}
-			str = remove_quotes(util::unescape_string(str));
+			str = util::remove_quotes(util::unescape_string(str));
 			tok.token = str;
 			tok.s = str;
 		}
@@ -876,7 +848,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 				prev = buf[0];
 				p++;
 			}
-			str = remove_quotes(util::unescape_string(str));
+			str = util::remove_quotes(util::unescape_string(str));
 			tok.token = str;
 			tok.s = str;
 		}
@@ -1424,10 +1396,10 @@ func_top:
 					t.type = tt;
 					switch (tt) {
 						case Token::STRING:
-							t.s = remove_quotes(util::unescape_string(tok));
+							t.s = util::remove_quotes(util::unescape_string(tok));
 							break;
 						case Token::SYMBOL:
-							t.s = remove_quotes(util::unescape_string(tok));
+							t.s = util::remove_quotes(util::unescape_string(tok));
 							if (pass == PASS2 && prg->variables_map.find(t.s) == prg->variables_map.end()) {
 								func.line_numbers.push_back(prg->s->line); // can help give better line number
 								throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok + " at " + get_error_info(&func));
@@ -1617,10 +1589,10 @@ func_top:
 			t.type = tt;
 			switch (tt) {
 				case Token::STRING:
-					t.s = remove_quotes(util::unescape_string(tok));
+					t.s = util::remove_quotes(util::unescape_string(tok));
 					break;
 				case Token::SYMBOL:
-					t.s = remove_quotes(util::unescape_string(tok));
+					t.s = util::remove_quotes(util::unescape_string(tok));
 					if (pass == PASS2 && prg->variables_map.find(t.s) == prg->variables_map.end()) {
 						throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok + " at " + get_error_info(prg));
 					}
@@ -1734,14 +1706,6 @@ void destroy_program(Program *prg)
 	prg->variables.clear();
 	prg->functions.clear();
 
-	File_Info *file_i = file_info(prg);
-	for (size_t i = 0; i < file_i->files.size(); i++) {
-		file_i->files[i]->close();
-		delete file_i->files[i];
-	}
-	delete file_i;
-
-	set_black_box(prg, "com.b1stable.booboo.files", nullptr);
 	for (size_t i = 0; i < prg->functions.size(); i++) {
 		delete prg->functions[i].s;
 	}
@@ -1765,6 +1729,941 @@ void add_expression_handler(std::string name, expression_func func)
 {
 	expression_map[name] = expression_handlers.size();
 	expression_handlers.push_back(func);
+}
+
+bool breaker_reset(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	reset_game_name = as_string_inline(prg, v[0]);
+
+	return false;
+}
+
+bool breaker_exit(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	return_code = as_number_inline(prg, v[0]);
+	reset_game_name = "";
+	quit = true;
+	return false;
+}
+
+bool breaker_return(Program *prg, std::vector<Token> &v)
+{
+	Variable &v1 = prg->s->result;
+
+	if (v.size() > 0) {
+		if (v[0].type == Token::NUMBER) {
+			v1.type = Variable::NUMBER;
+			v1.n = v[0].n;
+		}
+		else if (v[0].type == Token::STRING) {
+			v1.type = Variable::STRING;
+			v1.s = v[0].s;
+		}
+		else {
+			Variable &v2 = as_variable_inline(prg, v[0]);
+
+			if (v2.type == Variable::EXPRESSION) {
+				v1.type = Variable::NUMBER;
+				v1.n = evaluate_expression(prg, v2.e);
+			}
+			else if (v2.type == Variable::FISH) {
+				v1 = go_fish(prg, v2.f);
+			}
+			else {
+				v1 = v2;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool corefunc_number(Program *prg, std::vector<Token> &v)
+{
+	MIN_ARGS(1)
+	return true;
+}
+
+bool corefunc_string(Program *prg, std::vector<Token> &v)
+{
+	MIN_ARGS(1)
+	return true;
+}
+
+bool corefunc_vector(Program *prg, std::vector<Token> &v)
+{
+	MIN_ARGS(1)
+	
+	for (size_t i = 0; i < v.size(); i++) {
+		prg->variables[v[i].i].v.clear();
+	}
+
+	return true;
+}
+
+bool corefunc_map(Program *prg, std::vector<Token> &v)
+{
+	MIN_ARGS(1)
+	
+	for (size_t i = 0; i < v.size(); i++) {
+		prg->variables[v[i].i].m.clear();
+	}
+	return true;
+}
+
+bool corefunc_pointer(Program *prg, std::vector<Token> &v)
+{
+	MIN_ARGS(1)
+	return true;
+}
+
+bool corefunc_set(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	if (v1.type == Variable::NUMBER) {
+		v1.n = as_number_inline(prg, v[1]);
+	}
+	else if (v1.type == Variable::STRING) {
+		v1.s = as_string_inline(prg, v[1]);
+	}
+	else if (v1.type == Variable::VECTOR) {
+		Variable &v2 = as_variable_inline(prg, v[1]);
+		if (v2.type == Variable::VECTOR) {
+			v1.v = v2.v;
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+		}
+	}
+	else if (v1.type == Variable::MAP) {
+		Variable &v2 = as_variable_inline(prg, v[1]);
+		if (v2.type == Variable::MAP) {
+			v1.m = v2.m;
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+		}
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
+bool corefunc_add(Program *prg, std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		if (v1.type == Variable::NUMBER) {
+			v1.n += as_number_inline(prg, v[i]);
+		}
+		else if (v1.type == Variable::STRING) {
+			v1.s += as_string_inline(prg, v[i]);
+		}
+		else if (v1.type == Variable::VECTOR) {
+			Variable &v2 = as_variable_inline(prg, v[i]);
+			if (v2.type != Variable::VECTOR) {
+				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+			}
+			else {
+				v1.v.insert(v1.v.end(), v2.v.begin(), v2.v.end());
+			}
+		}
+		else if (v1.type == Variable::MAP) {
+			Variable &v2 = as_variable_inline(prg, v[i]);
+			if (v2.type != Variable::MAP) {
+				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+			}
+			else {
+				v1.m.insert(v2.m.begin(), v2.m.end());
+			}
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+		}
+	}
+
+	return true;
+}
+
+bool corefunc_subtract(Program *prg, std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		if (v1.type == Variable::NUMBER) {
+			v1.n -= as_number_inline(prg, v[i]);
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
+	}
+
+	return true;
+}
+
+bool corefunc_multiply(Program *prg, std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		if (v1.type == Variable::NUMBER) {
+			v1.n *= as_number_inline(prg, v[i]);
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
+	}
+
+	return true;
+}
+
+bool corefunc_divide(Program *prg, std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		if (v1.type == Variable::NUMBER) {
+			v1.n /= as_number_inline(prg, v[i]);
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
+	}
+
+	return true;
+}
+
+bool corefunc_label(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	return true;
+}
+
+bool corefunc_goto(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	prg->s->pc = as_label_inline(prg, v[0]);
+
+	return true;
+}
+
+bool corefunc_compare(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	bool is_num = false;
+	double n;
+
+	if (v[0].type == Token::SYMBOL) {
+		Variable &var = as_variable_inline(prg, v[0]);
+		if (var.type == Variable::NUMBER) {
+			is_num = true;
+			n = var.n;
+		}
+	}
+	else if (v[0].type == Token::NUMBER) {
+		is_num = true;
+		n = v[0].n;
+	}
+
+	if (is_num) {
+		double n2 = as_number_inline(prg, v[1]);
+		if (n < n2) {
+			prg->compare_flag = -1;
+		}
+		else if (n == n2) {
+			prg->compare_flag = 0;
+		}
+		else {
+			prg->compare_flag = 1;
+		}
+	}
+	else {
+		bool a_string = false;
+		bool b_string = false;
+		std::string s1;
+		std::string s2;
+
+		if (v[0].type == Token::STRING) {
+			a_string = true;
+			s1 = v[0].s;
+		}
+		else if (v[0].type == Token::SYMBOL) {
+			Variable &var = as_variable_inline(prg, v[0]);
+			if (var.type == Variable::STRING) {
+				a_string = true;
+				s1 = var.s;
+			}
+		}
+		
+		if (v[1].type == Token::STRING) {
+			b_string = true;
+			s2 = v[1].s;
+		}
+		else if (v[1].type == Token::SYMBOL) {
+			Variable &var = as_variable_inline(prg, v[1]);
+			if (var.type == Variable::STRING) {
+				b_string = true;
+				s2 = var.s;
+			}
+		}
+		
+		if (a_string && b_string) {
+			prg->compare_flag = strcmp(s1.c_str(), s2.c_str());
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		}
+	}
+
+	return true;
+}
+
+bool corefunc_je(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	if (prg->compare_flag == 0) {
+		prg->s->pc = as_label_inline(prg, v[0]);
+	}
+
+	return true;
+}
+
+bool corefunc_jne(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	if (prg->compare_flag != 0) {
+		prg->s->pc = as_label_inline(prg, v[0]);
+	}
+
+	return true;
+}
+
+bool corefunc_jl(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	if (prg->compare_flag < 0) {
+		prg->s->pc = as_label_inline(prg, v[0]);
+	}
+
+	return true;
+}
+
+bool corefunc_jle(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	if (prg->compare_flag <= 0) {
+		prg->s->pc = as_label_inline(prg, v[0]);
+	}
+
+	return true;
+}
+
+bool corefunc_jg(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	if (prg->compare_flag > 0) {
+		prg->s->pc = as_label_inline(prg, v[0]);
+	}
+
+	return true;
+}
+
+bool corefunc_jge(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	if (prg->compare_flag >= 0) {
+		prg->s->pc = as_label_inline(prg, v[0]);
+	}
+
+	return true;
+}
+
+bool corefunc_call(Program *prg, std::vector<Token> &v)
+{
+	MIN_ARGS(1)
+
+	int function = as_function_inline(prg, v[0]);
+
+	call_void_function(prg, function, v, 1);
+
+	return true;
+}
+
+bool corefunc_call_result(Program *prg, std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	Variable &result = prg->variables[v[0].i];
+	int function = as_function_inline(prg, v[1]);
+
+	call_function(prg, function, v, result, 2);
+
+	return true;
+}
+
+static std::string typeof_var(Variable &v1)
+{
+	std::string res;
+	if (v1.type == Variable::NUMBER) {
+		res = "number";
+	}
+	else if (v1.type == Variable::STRING) {
+		res = "string";
+	}
+	else if (v1.type == Variable::VECTOR) {
+		res = "vector";
+	}
+	else if (v1.type == Variable::MAP) {
+		res = "map";
+	}
+	else if (v1.type == Variable::POINTER) {
+		res = "pointer";
+	}
+	else if (v1.type == Variable::FUNCTION) {
+		res = "function";
+	}
+	else if (v1.type == Variable::LABEL) {
+		res = "label";
+	}
+	else {
+		res = "unknown";
+	}
+
+	return res;
+}
+
+bool corefunc_typeof(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	std::string res;
+
+	if (v[1].type != Token::SYMBOL) {
+		if (v[1].type == Token::NUMBER) {
+			res = "number";
+		}
+		else if (v[1].type == Token::STRING) {
+			res = "string";
+		}
+		else {
+			res = "unknown";
+		}
+	}
+	else {
+		Variable &v1 = prg->variables[v[1].i];
+
+		if (v1.type == Variable::VECTOR) {
+			if (v.size() > 2) {
+				std::vector<Variable> *p;
+				p = &v1.v;
+				int index = 0;
+				for (size_t i = 2; i < v.size(); i++) {
+					index = as_number(prg, v[i]);
+					if (i < v.size()-1) {
+						p = &(*p)[index].v;
+					}
+				}
+				Variable &v2 = (*p)[index];
+				res = typeof_var(v2);
+			}
+			else {
+				res = "vector";
+			}
+		}
+		else if (v1.type == Variable::MAP) {
+			if (v.size() > 2) {
+				std::map<std::string, Variable> *p;
+				p = &v1.m;
+				std::string key = "";
+				for (size_t i = 2; i < v.size(); i++) {
+					key = as_string(prg, v[i]);
+					if (i < v.size()-1) {
+						p = &(*p)[key].m;
+					}
+				}
+				Variable &v2 = (*p)[key];
+				res = typeof_var(v2);
+			}
+			else {
+				res = "map";
+			}
+		}
+		else {
+			res = typeof_var(v1);
+		}
+	}
+
+	Variable &v2 = as_variable(prg, v[0]);
+
+	if (v2.type != Variable::STRING) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v2.s = res;
+
+	return true;
+}
+
+bool corefunc_address(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	if (v[0].type != Token::SYMBOL || v[1].type != Token::SYMBOL) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+	}
+
+	Variable &v1 = prg->variables[v[0].i];
+	Variable &v2 = prg->variables[v[1].i];
+
+	v1.p = &v2;
+
+	return true;
+}
+
+bool corefunc_for(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(5)
+
+	Variable &count = as_variable(prg, v[0]);
+	if (count.type == Variable::POINTER) {
+		count = (*count.p);
+	}
+	if (count.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	count.n = as_number(prg, v[1]);
+	Variable &expr = as_variable(prg, v[2]);
+	int increment = as_number(prg, v[3]);
+	unsigned int end_label = as_label(prg, v[4]);
+
+	if (expr.type != Variable::EXPRESSION) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	if (evaluate_expression(prg, expr.e) == 0) {
+		prg->s->pc = end_label;
+		return true;
+	}
+
+	prg->s->pc++;
+
+	unsigned int start = prg->s->pc;
+
+	while (true) {
+		if (interpret(prg, 1) == false) {
+			return false;
+		}
+		if (prg->s->pc < start || prg->s->pc > end_label) {
+			break;
+		}
+		if (prg->s->pc == end_label) {
+			count.n += increment;
+			if (evaluate_expression(prg, expr.e) == 0) {
+				prg->s->pc++;
+				break;
+			}
+			prg->s->pc = start;
+		}
+	}
+
+	return true;
+}
+
+bool corefunc_if(Program *prg, std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	int end = v.size();
+	end -= (end % 2);
+	int prev = -1;
+
+	for (int i = 0; i < end; i += 2) {
+		bool b = as_number(prg, v[i]);
+		if (b) {
+			if (prev == -1) {
+				prg->s->pc++;
+			}
+			else {
+				prg->s->pc = prev;
+			}
+			unsigned int start = prg->s->pc;
+			unsigned int end_block = as_label(prg, v[i+1]);
+			while (prg->s->pc != end_block) {
+				if (interpret(prg, 1) == false) {
+					return false;
+				}
+				if (prg->s->pc < start || prg->s->pc > end_block) {
+					return true;
+				}
+			}
+			prg->s->pc = as_label(prg, v[v.size()-1]);
+			return true;
+		}
+		prev = as_label(prg, v[i+1]);
+	}
+
+	if (v.size() <= 2 || v.size() % 2 == 1) {
+		prg->s->pc = prev;
+		unsigned int start = prg->s->pc;
+		unsigned int end_block = as_label(prg, v[v.size()-1]);
+		while (prg->s->pc != end_block) {
+			if (interpret(prg, 1) == false) {
+				return false;
+			}
+			if (prg->s->pc < start || prg->s->pc > end_block) {
+				return true;
+			}
+		}
+		prg->s->pc++;
+	}
+	else {
+		unsigned int end_block = as_label(prg, v[v.size()-1]);
+		prg->s->pc = end_block;
+	}
+
+	return true;
+}
+
+double exprfunc_add(Program *prg, std::vector<Token> &v)
+{
+	double n = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n += as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_subtract(Program *prg, std::vector<Token> &v)
+{
+	double n = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n -= as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_multiply(Program *prg, std::vector<Token> &v)
+{
+	double n = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n *= as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_divide(Program *prg, std::vector<Token> &v)
+{
+	double n = as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n /= as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_modulus(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	return (int)as_number_inline(prg, v[0]) % (int)as_number_inline(prg, v[1]);
+}
+
+double exprfunc_and(Program *prg, std::vector<Token> &v)
+{
+	bool b = (bool)as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		b = b && (bool)as_number_inline(prg, v[i]);
+	}
+
+	return b;
+}
+
+double exprfunc_or(Program *prg, std::vector<Token> &v)
+{
+	bool b = (bool)as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		b = b || (bool)as_number_inline(prg, v[i]);
+	}
+
+	return b;
+}
+
+double exprfunc_greater(Program *prg, std::vector<Token> &v)
+{
+	bool b = true;
+
+	bool string = v[0].type == Token::STRING ? true : false;
+
+	if (string == false && v[0].type == Token::SYMBOL) {
+		Variable &var = as_variable_inline(prg, v[0]);
+		if (var.type == Variable::STRING) {
+			string = true;
+		}
+	}
+
+	if (string) {
+		std::string s = as_string_inline(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && s > as_string_inline(prg, v[i]);
+		}
+	}
+	else {
+		double n = as_number_inline(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && n > as_number_inline(prg, v[i]);
+		}
+	}
+
+	return b;
+}
+
+double exprfunc_less(Program *prg, std::vector<Token> &v)
+{
+	bool b = true;
+	
+	bool string = v[0].type == Token::STRING ? true : false;
+
+	if (string == false && v[0].type == Token::SYMBOL) {
+		Variable &var = as_variable_inline(prg, v[0]);
+		if (var.type == Variable::STRING) {
+			string = true;
+		}
+	}
+
+	if (string) {
+		std::string s = as_string_inline(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && s < as_string_inline(prg, v[i]);
+		}
+	}
+	else {
+		double n = as_number_inline(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && n < as_number_inline(prg, v[i]);
+		}
+	}
+
+	return b;
+}
+
+double exprfunc_greaterequal(Program *prg, std::vector<Token> &v)
+{
+	bool b = true;
+	
+	bool string = v[0].type == Token::STRING ? true : false;
+
+	if (string == false && v[0].type == Token::SYMBOL) {
+		Variable &var = as_variable_inline(prg, v[0]);
+		if (var.type == Variable::STRING) {
+			string = true;
+		}
+	}
+
+	if (string) {
+		std::string s = as_string_inline(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && s >= as_string_inline(prg, v[i]);
+		}
+	}
+	else {
+		double n = as_number_inline(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && n >= as_number_inline(prg, v[i]);
+		}
+	}
+
+	return b;
+}
+
+double exprfunc_lessequal(Program *prg, std::vector<Token> &v)
+{
+	bool b = true;
+	
+	bool string = v[0].type == Token::STRING ? true : false;
+
+	if (string == false && v[0].type == Token::SYMBOL) {
+		Variable &var = as_variable_inline(prg, v[0]);
+		if (var.type == Variable::STRING) {
+			string = true;
+		}
+	}
+
+	if (string) {
+		std::string s = as_string_inline(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && s <= as_string_inline(prg, v[i]);
+		}
+	}
+	else {
+		double n = as_number_inline(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && n <= as_number_inline(prg, v[i]);
+		}
+	}
+
+	return b;
+}
+
+double exprfunc_equal(Program *prg, std::vector<Token> &v)
+{
+	bool b = true;
+
+	bool string = v[0].type == Token::STRING ? true : false;
+
+	if (string == false && v[0].type == Token::SYMBOL) {
+		Variable &var = as_variable_inline(prg, v[0]);
+		if (var.type == Variable::STRING) {
+			string = true;
+		}
+	}
+
+	if (string) {
+		std::string s = as_string_inline(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && s == as_string_inline(prg, v[i]);
+		}
+	}
+	else {
+		double n = as_number_inline(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && n == as_number_inline(prg, v[i]);
+		}
+	}
+
+	return b;
+}
+
+double exprfunc_notequal(Program *prg, std::vector<Token> &v)
+{
+	bool b = true;
+
+	bool string = v[0].type == Token::STRING ? true : false;
+
+	if (string == false && v[0].type == Token::SYMBOL) {
+		Variable &var = as_variable_inline(prg, v[0]);
+		if (var.type == Variable::STRING) {
+			string = true;
+		}
+	}
+
+	if (string) {
+		std::string s = as_string_inline(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && s != as_string_inline(prg, v[i]);
+		}
+	}
+	else {
+		double n = as_number_inline(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && n != as_number_inline(prg, v[i]);
+		}
+	}
+
+	return b;
+}
+
+double exprfunc_bitor(Program *prg, std::vector<Token> &v)
+{
+	int n = (int)as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n |= (int)as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_xor(Program *prg, std::vector<Token> &v)
+{
+	int n = (int)as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n ^= (int)as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_bitand(Program *prg, std::vector<Token> &v)
+{
+	int n = (int)as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n &= (int)as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_leftshift(Program *prg, std::vector<Token> &v)
+{
+	int n = (int)as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n <<= (int)as_number_inline(prg, v[i]);
+	}
+
+	return n;
+}
+
+double exprfunc_rightshift(Program *prg, std::vector<Token> &v)
+{
+	int n = (int)as_number_inline(prg, v[0]);
+
+	for (size_t i = 1; i < v.size(); i++) {
+		n >>= (int)as_number_inline(prg, v[i]);
+	}
+
+	return n;
 }
 
 static void init_token_map()
@@ -1794,7 +2693,58 @@ void start()
 {
 	init_token_map();
 	
-	start_lib_core();
+	add_expression_handler("+", exprfunc_add);
+	add_expression_handler("-", exprfunc_subtract);
+	add_expression_handler("*", exprfunc_multiply);
+	add_expression_handler("/", exprfunc_divide);
+	add_expression_handler("%", exprfunc_modulus);
+	add_expression_handler("&&", exprfunc_and);
+	add_expression_handler("||", exprfunc_or);
+	add_expression_handler(">", exprfunc_greater);
+	add_expression_handler("<", exprfunc_less);
+	add_expression_handler(">=", exprfunc_greaterequal);
+	add_expression_handler("<=", exprfunc_lessequal);
+	add_expression_handler("==", exprfunc_equal);
+	add_expression_handler("!=", exprfunc_notequal);
+	add_expression_handler("|", exprfunc_bitor);
+	add_expression_handler("^", exprfunc_xor);
+	add_expression_handler("&", exprfunc_bitand);
+	add_expression_handler("<<", exprfunc_leftshift);
+	add_expression_handler(">>", exprfunc_rightshift);
+
+	add_instruction("reset", breaker_reset);
+	add_instruction("exit", breaker_exit);
+	add_instruction("return", breaker_return);
+
+	add_instruction("number", corefunc_number);
+	add_instruction("string", corefunc_string);
+	add_instruction("vector", corefunc_vector);
+	add_instruction("map", corefunc_map);
+	add_instruction("pointer", corefunc_pointer);
+	
+	add_instruction("=", corefunc_set);
+	add_instruction("+", corefunc_add);
+	add_instruction("-", corefunc_subtract);
+	add_instruction("*", corefunc_multiply);
+	add_instruction("/", corefunc_divide);
+	
+	add_instruction(":", corefunc_label);
+	add_instruction("goto", corefunc_goto);
+	add_instruction("?", corefunc_compare);
+	add_instruction("je", corefunc_je);
+	add_instruction("jne", corefunc_jne);
+	add_instruction("jl", corefunc_jl);
+	add_instruction("jle", corefunc_jle);
+	add_instruction("jg", corefunc_jg);
+	add_instruction("jge", corefunc_jge);
+	add_instruction("call", corefunc_call);
+	add_instruction("call_result", corefunc_call_result);
+	
+	add_instruction("typeof", corefunc_typeof);
+	add_instruction("address", corefunc_address);
+	
+	add_instruction("for", corefunc_for);
+	add_instruction("if", corefunc_if);
 	
 	return_code = 0;
 }
@@ -1936,6 +2886,21 @@ int as_label(Program *prg, Token &t)
 int as_function(Program *prg, Token &t)
 {
 	return as_function_inline(prg, t);
+}
+
+Variable &as_pointer(Program *prg, Token &t)
+{
+	return as_pointer_inline(prg, t);
+}
+
+std::vector<Variable> &as_vector(Program *prg, Token &t)
+{
+	return as_vector_inline(prg, t);
+}
+
+std::map<std::string, Variable> &as_map(Program *prg, Token &t)
+{
+	return as_map_inline(prg, t);
 }
 
 // Error class

@@ -56,20 +56,7 @@ struct Program {
 	std::map<std::string, void *> black_box;
 };
 
-struct File_Info {
-	int file_id;
-	std::map<int, std::fstream *> files;
-};
-
-File_Info *file_info(Program *prg);
-
 std::string itos(int i);
-
-double evaluate_expression(Program *prg, Variable::Expression &e);
-Variable &go_fish(Program *prg, Variable::Fish &f);
-
-// This automatically gets called when you call booboo::start
-void start_lib_core();
 
 inline Variable &as_variable_inline(Program *prg, Token &t)
 {
@@ -279,10 +266,6 @@ inline std::map<std::string, Variable> &as_map_inline(Program *prg, Token &t)
 	}
 	return v->m;
 }
-
-std::string remove_quotes(std::string s);
-
-extern std::string (*load_text)(std::string filename);
 
 } // End namespace booboo
 
