@@ -434,3 +434,10 @@ get_system_language
 	e.g. get_system_language lang
 	lang will be in Steam format e.g. "french", "brazilian" etc
 
+list_drives
+	Get a list of active drive letters in a vector (e.g. "A", "C", ...)
+	e.g. list_drives v
+
+get_full_path
+	Convert a pathname to a fully qualified pathname
+	e.g. get_full_path full filename
