@@ -23,7 +23,9 @@
 			"notification_fade_duration": 500,
 			"tile_size": 16,
 			"vsync": true,
-			"show_fps": false
+			"show_fps": false,
+			"cursor_hotspot.x": 0,
+			"cursor_hotspot.y": 0
 		},
 		"misc": {
 			"window_title": "BooBoo",
