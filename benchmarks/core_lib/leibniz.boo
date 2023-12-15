@@ -12,7 +12,7 @@ number pi
 = pi 1
 number i
 
-for i 3 rounds 2 loop_end
+for i 3 (< i rounds) 2 loop_end
 neg x
 + pi (/ x i)
 :loop_end
