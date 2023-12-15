@@ -2185,7 +2185,7 @@ bool corefunc_typeof(Program *prg, std::vector<Token> &v)
 				p = &v1.v;
 				int index = 0;
 				for (size_t i = 2; i < v.size(); i++) {
-					index = as_number(prg, v[i]);
+					index = as_number_inline(prg, v[i]);
 					if (i < v.size()-1) {
 						p = &(*p)[index].v;
 					}
@@ -2203,7 +2203,7 @@ bool corefunc_typeof(Program *prg, std::vector<Token> &v)
 				p = &v1.m;
 				std::string key = "";
 				for (size_t i = 2; i < v.size(); i++) {
-					key = as_string(prg, v[i]);
+					key = as_string_inline(prg, v[i]);
 					if (i < v.size()-1) {
 						p = &(*p)[key].m;
 					}
@@ -2220,7 +2220,7 @@ bool corefunc_typeof(Program *prg, std::vector<Token> &v)
 		}
 	}
 
-	Variable &v2 = as_variable(prg, v[0]);
+	Variable &v2 = as_variable_inline(prg, v[0]);
 
 	if (v2.type != Variable::STRING) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -2251,7 +2251,7 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(5)
 
-	Variable &count = as_variable(prg, v[0]);
+	Variable &count = as_variable_inline(prg, v[0]);
 	if (count.type == Variable::POINTER) {
 		count = (*count.p);
 	}
@@ -2259,10 +2259,10 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
-	count.n = as_number(prg, v[1]);
-	Variable &expr = as_variable(prg, v[2]);
-	int increment = as_number(prg, v[3]);
-	unsigned int end_label = as_label(prg, v[4]);
+	count.n = as_number_inline(prg, v[1]);
+	Variable &expr = as_variable_inline(prg, v[2]);
+	int increment = as_number_inline(prg, v[3]);
+	unsigned int end_label = as_label_inline(prg, v[4]);
 
 	if (expr.type != Variable::EXPRESSION) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -2306,7 +2306,7 @@ bool corefunc_if(Program *prg, std::vector<Token> &v)
 	int prev = -1;
 
 	for (int i = 0; i < end; i += 2) {
-		bool b = as_number(prg, v[i]);
+		bool b = as_number_inline(prg, v[i]);
 		if (b) {
 			if (prev == -1) {
 				prg->s->pc++;
@@ -2315,7 +2315,7 @@ bool corefunc_if(Program *prg, std::vector<Token> &v)
 				prg->s->pc = prev;
 			}
 			unsigned int start = prg->s->pc;
-			unsigned int end_block = as_label(prg, v[i+1]);
+			unsigned int end_block = as_label_inline(prg, v[i+1]);
 			while (prg->s->pc != end_block) {
 				if (interpret(prg, 1) == false) {
 					return false;
@@ -2324,16 +2324,16 @@ bool corefunc_if(Program *prg, std::vector<Token> &v)
 					return true;
 				}
 			}
-			prg->s->pc = as_label(prg, v[v.size()-1]);
+			prg->s->pc = as_label_inline(prg, v[v.size()-1]);
 			return true;
 		}
-		prev = as_label(prg, v[i+1]);
+		prev = as_label_inline(prg, v[i+1]);
 	}
 
 	if (v.size() <= 2 || v.size() % 2 == 1) {
 		prg->s->pc = prev;
 		unsigned int start = prg->s->pc;
-		unsigned int end_block = as_label(prg, v[v.size()-1]);
+		unsigned int end_block = as_label_inline(prg, v[v.size()-1]);
 		while (prg->s->pc != end_block) {
 			if (interpret(prg, 1) == false) {
 				return false;
@@ -2345,7 +2345,7 @@ bool corefunc_if(Program *prg, std::vector<Token> &v)
 		prg->s->pc++;
 	}
 	else {
-		unsigned int end_block = as_label(prg, v[v.size()-1]);
+		unsigned int end_block = as_label_inline(prg, v[v.size()-1]);
 		prg->s->pc = end_block;
 	}
 
@@ -2400,15 +2400,15 @@ double exprfunc_modulus(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	return (int)as_number_inline(prg, v[0]) % (int)as_number_inline(prg, v[1]);
+	return (int)as_number(prg, v[0]) % (int)as_number(prg, v[1]);
 }
 
 double exprfunc_and(Program *prg, std::vector<Token> &v)
 {
-	bool b = (bool)as_number_inline(prg, v[0]);
+	bool b = (bool)as_number(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		b = b && (bool)as_number_inline(prg, v[i]);
+		b = b && (bool)as_number(prg, v[i]);
 	}
 
 	return b;
@@ -2416,10 +2416,10 @@ double exprfunc_and(Program *prg, std::vector<Token> &v)
 
 double exprfunc_or(Program *prg, std::vector<Token> &v)
 {
-	bool b = (bool)as_number_inline(prg, v[0]);
+	bool b = (bool)as_number(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		b = b || (bool)as_number_inline(prg, v[i]);
+		b = b || (bool)as_number(prg, v[i]);
 	}
 
 	return b;
@@ -2613,10 +2613,10 @@ double exprfunc_notequal(Program *prg, std::vector<Token> &v)
 
 double exprfunc_bitor(Program *prg, std::vector<Token> &v)
 {
-	int n = (int)as_number_inline(prg, v[0]);
+	int n = (int)as_number(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		n |= (int)as_number_inline(prg, v[i]);
+		n |= (int)as_number(prg, v[i]);
 	}
 
 	return n;
@@ -2624,10 +2624,10 @@ double exprfunc_bitor(Program *prg, std::vector<Token> &v)
 
 double exprfunc_xor(Program *prg, std::vector<Token> &v)
 {
-	int n = (int)as_number_inline(prg, v[0]);
+	int n = (int)as_number(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		n ^= (int)as_number_inline(prg, v[i]);
+		n ^= (int)as_number(prg, v[i]);
 	}
 
 	return n;
@@ -2635,10 +2635,10 @@ double exprfunc_xor(Program *prg, std::vector<Token> &v)
 
 double exprfunc_bitand(Program *prg, std::vector<Token> &v)
 {
-	int n = (int)as_number_inline(prg, v[0]);
+	int n = (int)as_number(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		n &= (int)as_number_inline(prg, v[i]);
+		n &= (int)as_number(prg, v[i]);
 	}
 
 	return n;
@@ -2646,10 +2646,10 @@ double exprfunc_bitand(Program *prg, std::vector<Token> &v)
 
 double exprfunc_leftshift(Program *prg, std::vector<Token> &v)
 {
-	int n = (int)as_number_inline(prg, v[0]);
+	int n = (int)as_number(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		n <<= (int)as_number_inline(prg, v[i]);
+		n <<= (int)as_number(prg, v[i]);
 	}
 
 	return n;
@@ -2657,10 +2657,10 @@ double exprfunc_leftshift(Program *prg, std::vector<Token> &v)
 
 double exprfunc_rightshift(Program *prg, std::vector<Token> &v)
 {
-	int n = (int)as_number_inline(prg, v[0]);
+	int n = (int)as_number(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		n >>= (int)as_number_inline(prg, v[i]);
+		n >>= (int)as_number(prg, v[i]);
 	}
 
 	return n;
