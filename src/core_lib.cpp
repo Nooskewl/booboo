@@ -890,6 +890,33 @@ bool corefunc_get_full_path(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+bool corefunc_list_drives(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	std::vector<Variable> &vec = as_vector_inline(prg, v[0]);
+
+	vec.clear();
+
+#ifdef _WIN32
+	DWORD d = GetLogicalDrives();
+	for (int i = 0; i < 32; i++) {
+		bool set = d & (1 << i);
+		if (set) {
+			Variable s;
+			s.type = Variable::STRING;
+			s.name = "-constant-";
+			char buf[10];
+			snprintf(buf, 10, "%c", 'A' + i);
+			s.s = buf;
+			vec.push_back(s);
+		}
+	}
+#endif
+
+	return true;
+}
+
 bool corefunc_list_directory(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -2587,6 +2614,7 @@ void start_lib_core()
 	add_instruction("mkdir", corefunc_mkdir);
 	add_instruction("get_system_language", corefunc_get_system_language);
 	add_instruction("get_full_path", corefunc_get_full_path);
+	add_instruction("list_drives", corefunc_list_drives);
 
 	add_instruction("string_format", stringfunc_format);
 	add_instruction("string_char_at", stringfunc_char_at);

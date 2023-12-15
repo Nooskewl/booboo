@@ -107,8 +107,18 @@ function chop_dir s
 	return s
 }
 
+function matches s regex
+{
+	number m
+	string_matches m s regex
+	return m
+}
+
 function list_dir name
 {
+	get_full_path name name
+	string_replace name name "[\\\\]" "/"
+
 	number len
 	string_length len name
 	string sub
@@ -145,7 +155,33 @@ function list_dir name
 	= dir name
 	+ name "*"
 	list_directory filenames name
-	vector_insert filenames 0 "../"
+
+	if (|| (matches dir "^.:[/\\\\]$") (matches dir "^/$")) no_up has_up
+		vector drives
+		list_drives drives
+		number sz
+		vector_size drives sz
+		number i
+		number place
+		= place 0
+		for i 0 (< i sz) 1 add_drive
+			string drive
+			= drive [drives i]
+			+ drive ":/"
+			string sub
+			= sub dir
+			string_substr sub 0 1
+			string tmp
+			= tmp [drives i]
+			if (!= sub [drives i]) really_add_drive
+				vector_insert filenames place drive
+				+ place 1
+			:really_add_drive
+		:add_drive
+	:no_up
+		vector_insert filenames 0 "../"
+	:has_up
+
 	= selected 0
 	= top 0
 	= go_ok 0
@@ -218,15 +254,13 @@ function draw
 	font_width font w found_text
 	font_draw font found_r found_g found_b 255 found_text (- (- W w) 26) (+ 5 (- H (* fh 3.5)))
 
-	string fulldir
-	get_full_path fulldir dir
 	number w
-	font_width small_font w fulldir
+	font_width small_font w dir
 	/ w 2
 	number sfh
 	font_height small_font sfh
 	filled_rectangle 255 0 216 255 255 0 216 255 255 0 216 255 255 0 216 255 (- (/ W 2) w 5) (+ 10 fh (- H (* fh 3.5))) (+ 10 (* w 2)) (+ sfh 4)
-	font_draw small_font 0 0 0 255 fulldir (- (/ W 2) w) (+ 12 fh (- H (* fh 3.5)))
+	font_draw small_font 0 0 0 255 dir (- (/ W 2) w) (+ 12 fh (- H (* fh 3.5)))
 
 	for i top (&& (< i sz) (< i (+ top num))) 1 loop
 		string s
@@ -297,8 +331,12 @@ function navigate
 	string_from_number cs c
 	if (|| (== cs "/") (== cs "\\\\")) go_dir
 		string d
-		= d dir
-		+ d s
+		if (matches s "^.:[/\\\\]$") is_root_windows not_root
+			= d s
+		:is_root_windows
+			= d dir
+			+ d s
+		:not_root
 		call list_dir d
 	:go_dir
 }

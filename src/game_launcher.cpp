@@ -12,6 +12,10 @@
 #include <climits>
 #include <sys/stat.h>
 
+#ifdef _WIN32
+#include <shlwapi.h>
+#endif
+
 #include <shim4/shim4.h>
 #include <shim4/internal/gfx.h>
 
@@ -982,8 +986,12 @@ int main(int argc, char **argv)
 	}
 
 	if (fn != "") {
+#ifdef _WIN32
+		if (PathIsDirectory(fn.c_str())) {
+#else
 		struct stat s;
-		if (stat(fn.c_str(), &s) == 0 && (s.st_mode & S_IFMT) == S_IFDIR) {
+		if (stat(fn.c_str(), &s) && S_ISDIR(s.st_mode)) {
+#endif
 			chdir(fn.c_str());
 			fn = "";
 		}
@@ -1225,7 +1233,7 @@ again:
 		}
 		else*/ if (pid == 0) {
 			char * const args[] = {
-				argv[0],
+				orig_argv[0],
 				"+dir",
 				(char *)set_dir.c_str(),
 				nullptr
@@ -1240,7 +1248,8 @@ again:
 		si.cb = sizeof(si);
 		ZeroMemory(&pi, sizeof(pi));
 		char cmd[1000];
-		sprintf(cmd, "\"%s\" +dir \"%s\"", argv[0], set_dir.c_str());
+		snprintf(cmd, 1000, "\"%s\" +dir \"%s\"", orig_argv[0], set_dir.c_str());
+		//if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
 		if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
 			//WaitForSingleObject(pi.hProcess, INFINITE);
 			//CloseHandle(pi.hProcess);
@@ -1257,7 +1266,7 @@ again:
 		}
 		else*/ if (pid == 0) {
 			char * const args[] = {
-				argv[0],
+				orig_argv[0],
 				(char *)dir.c_str(),
 				"+beepboop",
 				"+set-dir",
@@ -1274,7 +1283,8 @@ again:
 		si.cb = sizeof(si);
 		ZeroMemory(&pi, sizeof(pi));
 		char cmd[1000];
-		sprintf(cmd, "\"%s\" \"%s\" +beepboop +set-dir \"%s\"", argv[0], dir.c_str(), dir.c_str());
+		snprintf(cmd, 1000, "\"%s\" \"%s\" +beepboop +set-dir \"%s\"", orig_argv[0], dir.c_str(), dir.c_str());
+		//if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
 		if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
 			//WaitForSingleObject(pi.hProcess, INFINITE);
 			//CloseHandle(pi.hProcess);
