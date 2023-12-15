@@ -57,12 +57,35 @@ number top
 vector filenames
 string dir
 
-call list_dir "."
+vector argv
+args argv
+number i
+number sz
+vector_size argv sz
+number found
+= found 0
+for i 0 (< i sz) 1 check_arg
+	string arg
+	= arg [argv i]
+	if (&& (== arg "+dir") (< i (- sz 1))) list_other
+		string s
+		= s [argv (+ i 1)]
+		inspect s
+		call list_dir [argv (+ i 1)]
+		= found 1
+		goto done_args
+	:list_other
+:check_arg
+:done_args
+
+if (== found 0) list_current
+	call list_dir "./"
+:list_current
 
 function chop_dir s
 {
 	number p
-	string_length s p
+	string_length p s
 	- p 2
 	if (< p 0) none
 		return s
@@ -70,7 +93,7 @@ function chop_dir s
 	number i
 	for i p (>= i 0) -1 loop
 		number c
-		string_char_at s c i
+		string_char_at c s i
 		string cs
 		string_from_number cs c
 		if (|| (== cs "/") (== cs "\\\\")) found
@@ -85,8 +108,47 @@ function chop_dir s
 
 function list_dir name
 {
+	number len
+	string_length len name
+	string sub
+	= sub name
+	string_substr sub (- len 3)
+	if (&& (== sub "../") (>= len 6)) check_collapse
+		inspect 6
+		string sub
+		= sub name
+		string_substr sub (- len 6)
+		if (&& (!= sub "../../") (!= sub "..\\../")) collapse
+			inspect 7
+			number count
+			= count 0
+			number p
+			for p (- len 1) (>= p 0) -1 scan
+				number c
+				string_char_at c name p
+				string ch
+				string_from_number ch c
+				if (|| (== ch "/") (== ch "\\")) found_slash
+					inspect 8
+					+ count 1
+					if (== count 3) really_collapse
+						inspect 9
+						string sub
+						= sub name
+						string_substr sub 0 (+ p 1)
+						inspect sub
+						inspect 10
+						= name sub
+						goto done_collapse
+					:really_collapse
+				:found_slash
+			:scan
+		:collapse
+	:check_collapse
+	:done_collapse
+
 	= dir name
-	+ name "/*"
+	+ name "*"
 	list_directory filenames name
 	vector_insert filenames 0 "../"
 	= selected 0
@@ -222,15 +284,15 @@ function navigate
 	= s [filenames selected]
 	call_result s chop_dir s
 	number len
-	string_length s len
+	string_length len s
 	number c
-	string_char_at s c (- len 1)
+	string_char_at c s (- len 1)
 	string cs
 	string_from_number cs c
 	if (|| (== cs "/") (== cs "\\\\")) go_dir
 		string d
 		= d dir
-		+ d "/" s
+		+ d s
 		call list_dir d
 	:go_dir
 }

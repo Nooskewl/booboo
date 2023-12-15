@@ -970,11 +970,14 @@ int main(int argc, char **argv)
 	std::string start_cwd = getcwd(cwd_buf, 1000);
 
 	std::string fn;
+	std::string set_dir;
 
 	for (int i = 1; i < argc; i++) {
-		if (argv[i][0] != '+' && argv[i][0] != '-') {
+		if (argv[i][0] != '+' && argv[i][0] != '-' && fn == "" && std::string(argv[i-1]) != "+set-dir" && std::string(argv[i-1]) != "+dir") {
 			fn = argv[i];
-			break;
+		}
+		else if (std::string(argv[i]) == "+set-dir" && i < (argc-1)) {
+			set_dir = argv[i+1];
 		}
 	}
 
@@ -1223,6 +1226,8 @@ again:
 		else*/ if (pid == 0) {
 			char * const args[] = {
 				argv[0],
+				"+dir",
+				(char *)set_dir.c_str(),
 				nullptr
 			};
 			execv(argv[0], args);
@@ -1235,7 +1240,7 @@ again:
 		si.cb = sizeof(si);
 		ZeroMemory(&pi, sizeof(pi));
 		char cmd[1000];
-		sprintf(cmd, "\"%s\"", argv[0]);
+		sprintf(cmd, "\"%s\" +dir \"%s\"", argv[0], set_dir.c_str());
 		if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
 			//WaitForSingleObject(pi.hProcess, INFINITE);
 			//CloseHandle(pi.hProcess);
@@ -1255,6 +1260,8 @@ again:
 				argv[0],
 				(char *)dir.c_str(),
 				"+beepboop",
+				"+set-dir",
+				(char *)dir.c_str(),
 				nullptr
 			};
 			execv(argv[0], args);
@@ -1267,7 +1274,7 @@ again:
 		si.cb = sizeof(si);
 		ZeroMemory(&pi, sizeof(pi));
 		char cmd[1000];
-		sprintf(cmd, "\"%s\" \"%s\" +beepboop", argv[0], dir.c_str());
+		sprintf(cmd, "\"%s\" \"%s\" +beepboop +set-dir \"%s\"", argv[0], dir.c_str(), dir.c_str());
 		if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
 			//WaitForSingleObject(pi.hProcess, INFINITE);
 			//CloseHandle(pi.hProcess);

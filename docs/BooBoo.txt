@@ -202,12 +202,12 @@ string_format
 string_char_at
 	Get the value of character at index in a string
 	This function is UTF8 compliant
-	e.g. string_char_at str dest index
+	e.g. string_char_at dest str index
 
 string_length
 	Get the length of a string
 	This function is UTF8 compliant
-	e.g. string_length str dest
+	e.g. string_length dest str
 
 string_from_number
 	Turns the ascii value into a one character length string
@@ -216,7 +216,7 @@ string_from_number
 
 string_substr
 	Create a substring of a string
-	e.g. substr s start end
+	e.g. string_substr s start end
 	End is optional, if not specified it will cut from start till the
 	end of the string.
 	This is UTF8 compliant
