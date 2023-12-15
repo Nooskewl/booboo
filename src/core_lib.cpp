@@ -6,6 +6,8 @@
 
 #ifdef _WIN32
 #include <shlwapi.h>
+#else
+#include <limits.h>
 #endif
 
 #include <libutil/libutil.h>
@@ -885,6 +887,14 @@ bool corefunc_get_full_path(Program *prg, std::vector<Token> &v)
 #else
 	char buf[PATH_MAX];
 	v1.s = realpath(path.c_str(), buf);
+	if (v1.s != "/") {
+		struct stat s;
+		if (stat(v1.s.c_str(), &s) == 0) {
+			if (S_ISDIR(s.st_mode)) {
+				v1.s += "/";
+			}
+		}
+	}
 #endif
 
 	return true;
