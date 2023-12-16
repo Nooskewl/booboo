@@ -515,7 +515,7 @@ cfg_load
 
 cfg_save
 	save a config file
-	e.g. cfg_save cfg "com.b1stable.example"
+	e.g. cfg_save cfg ret_bool_success "com.b1stable.example"
 
 cfg_get_number
 	read a number from config. Doesn't touch dest if the named value doesn't exist
