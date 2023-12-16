@@ -36,8 +36,8 @@ while [ "${1-}" ] ; do
 	shift
 done
 if [ $PI -eq 0 ]; then
-	if uname -a | grep raspberry > /dev/null ; then
-		FLAGS="$FLAGS -DRASPBERRYPI_NORMAL=on"
+	if uname -a | grep rpi > /dev/null ; then
+		FLAGS="$FLAGS -DRASPBERRYPI=on"
 	fi
 fi
 
@@ -57,7 +57,7 @@ cd ../../shim4
 rm -rf build
 mkdir build
 cd build
-cmake .. -DUSER_INCLUDE_PATH="$USER_INCLUDE_PATH;/usr/include/freetype2;/code/shim4/external/SDL2_ttf-2.0.14;~/code/tgui6/include" -DUSER_LIBRARY_PATH="~/code/tgui6/build" $SHIM_FLAGS
+cmake .. -DUSER_INCLUDE_PATH="$USER_INCLUDE_PATH;/usr/include/freetype2;/code/shim4/external/SDL2_ttf-2.0.14;~/code/tgui6/include" -DUSER_LIBRARY_PATH="~/code/tgui6/build;~/code/shim4/build" $SHIM_FLAGS
 cd ../../booboo
 rm -rf build
 mkdir build
