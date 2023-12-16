@@ -1,9 +1,9 @@
 vector frame
 
 number w
-= w 320
+= w 160
 number h
-= h 180
+= h 90
 
 resize w h
 
