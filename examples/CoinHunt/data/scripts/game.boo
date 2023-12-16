@@ -624,8 +624,6 @@ function draw_time
 
 function draw
 {
-	clear 0 0 0
-
 	call calc_offset
 
 	; Draw stars
@@ -643,7 +641,9 @@ function draw
 	- star_x ox
 	- star_y oy
 	+ star_y 16
-	filled_rectangle 255 255 255 255 255 255 255 255 255 255 255 255 255 255 255 255 star_x star_y 1 1
+	if (&& (>= star_x 0) (>= star_y 0) (< star_x 640) (< star_y 360)) draw_it
+		filled_rectangle 255 255 255 255 255 255 255 255 255 255 255 255 255 255 255 255 star_x star_y 1 1
+	:draw_it
 	+ i 1
 	? i num_stars
 	jl draw_next_star
@@ -729,8 +729,10 @@ function draw
 	- xx ox
 	= yy y
 	- yy oy
-	+ yy 16
-	image_draw_rotated_scaled enemy_img 255 255 255 255 12 12 xx yy e_angle 1 1 0 0
+	if (&& (>= xx -10) (>= yy -10) (< xx 650) (< yy 370)) draw_the_enemy
+		+ yy 16
+		image_draw_rotated_scaled enemy_img 255 255 255 255 12 12 xx yy e_angle 1 1 0 0
+	:draw_the_enemy
 :done_draw_enemy
 	+ i 1
 	? i num_enemies
