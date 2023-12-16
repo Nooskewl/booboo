@@ -520,8 +520,8 @@ bool start()
 		win_h = 1080;
 	}
 #else
-	int win_w = 800;
-	int win_h = 450;
+	int win_w = 960;
+	int win_h = 540;
 #endif
 
 	//if (shim::start_all(0, 0, false, desktop_resolution.w, desktop_resolution.h) == false) {
