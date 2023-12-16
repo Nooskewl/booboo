@@ -6,7 +6,7 @@ TTH_FLAGS=""
 PI=0
 
 if uname -a | grep raspberry > /dev/null ; then
-	USER_INCLUDE_PATH="~/code/shim4/external"
+	USER_INCLUDE_PATH="~/code/shim4/external;/usr/include/SDL2"
 else
 	USER_INCLUDE_PATH="~/code/steamworks/public;~/code/shim4/external;/usr/include/SDL2"
 fi
