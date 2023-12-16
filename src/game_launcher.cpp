@@ -507,6 +507,7 @@ bool start()
 	}
 #endif
 
+#ifndef RASPBERRYPI
 	int win_w = 1280;
 	int win_h = 720;
 
@@ -518,6 +519,10 @@ bool start()
 		win_w = 1920;
 		win_h = 1080;
 	}
+#else
+	int win_w = 800;
+	int win_h = 450;
+#endif
 
 	//if (shim::start_all(0, 0, false, desktop_resolution.w, desktop_resolution.h) == false) {
 	if (shim::start_all(640, 360, false, win_w, win_h) == false) {
