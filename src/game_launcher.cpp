@@ -975,11 +975,12 @@ int main(int argc, char **argv)
 	std::string fn;
 	std::string set_dir;
 
-	for (int i = 1; i < argc; i++) {
-		if (argv[i][0] != '+' && argv[i][0] != '-' && fn == "" && std::string(argv[i-1]) != "+set-dir" && std::string(argv[i-1]) != "+dir") {
-			fn = argv[i];
-		}
-		else if (std::string(argv[i]) == "+set-dir" && i < (argc-1)) {
+	if (argc > 1 && argv[1][0] != '+' && argv[1][0] != '-') {
+		fn = argv[1];
+	}
+
+	for (int i = 2; i < argc; i++) {
+		if (std::string(argv[i]) == "+set-dir" && i < (argc-1)) {
 			set_dir = argv[i+1];
 		}
 	}
