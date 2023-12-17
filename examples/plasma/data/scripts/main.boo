@@ -1,6 +1,16 @@
 number TSZ
 = TSZ 16 ; should be a power of 2
 
+number font
+font_load font "vga.ttf" 32 0
+
+clear 0 0 0
+number fw fh
+font_width font fw "Please wait..."
+font_height font fh
+font_draw font 255 255 255 255 "Please wait..." (- 320 (/ fw 2)) (- 180 (/ fh 2))
+flip
+
 vector palette
 number i
 
