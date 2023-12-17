@@ -759,8 +759,10 @@ function draw
 	vector_get b by 1
 	- bx ox
 	- by oy
-	+ by 16
-	image_draw_rotated_scaled bullet_img 255 255 255 255 4 4 bx by 0 1 1 0 0
+	if (&& (>= bx -5) (>= by -5) (< bx 645) (< by 365)) draw_the_bullet
+		+ by 16
+		image_draw_rotated_scaled bullet_img 255 255 255 255 4 4 bx by 0 1 1 0 0
+	:draw_the_bullet
 	+ i 1
 	? i num_bullets
 	jl draw_next_bullet
@@ -1282,14 +1284,12 @@ function run
 :move_next_bullet
 	number was_erased
 	= was_erased 0
-	vector b
-	vector_get bullets b i
 	number bx
 	number by
 	number ba
-	vector_get b bx 0
-	vector_get b by 1
-	vector_get b ba 2
+	= bx [b 0]
+	= by [b 1]
+	= ba [b 2]
 	number c
 	= c ba
 	cos c
@@ -1297,17 +1297,19 @@ function run
 	= s ba
 	sin s
 	number speed
-	= speed 16
+	= speed 15
+	number step
+	= step 5
 :next_step
-	+ bx c
-	+ by s
+	+ bx (* c step)
+	+ by (* s step)
 	number hit_something
 	call_result hit_something bullet_collide bx by
 	? hit_something 0
 	je hit_nothing
 	goto erase_it
 :hit_nothing
-	- speed 1
+	- speed step
 	? speed 0
 	jg next_step
 :done_steps
