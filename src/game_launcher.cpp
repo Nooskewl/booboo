@@ -507,7 +507,6 @@ bool start()
 	}
 #endif
 
-#ifndef RASPBERRYPI
 	int win_w = 1280;
 	int win_h = 720;
 
@@ -519,10 +518,6 @@ bool start()
 		win_w = 1920;
 		win_h = 1080;
 	}
-#else
-	int win_w = 854;
-	int win_h = 480;
-#endif
 
 	//if (shim::start_all(0, 0, false, desktop_resolution.w, desktop_resolution.h) == false) {
 	if (shim::start_all(640, 360, false, win_w, win_h) == false) {
@@ -576,7 +571,7 @@ void handle_event(TGUI_Event *event)
 	if (event->type == TGUI_UNKNOWN) {
 		return;
 	}
-	else if (event->type == TGUI_QUIT) {
+	else if (event->type == TGUI_QUIT || (event->type == TGUI_KEY_DOWN && event->keyboard.code == TGUIK_F12)) {
 		quit = true;
 	}
 	else if (event->type == TGUI_MOUSE_AXIS) {
