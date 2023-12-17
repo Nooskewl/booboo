@@ -1002,6 +1002,12 @@ int main(int argc, char **argv)
 		}
 		else {
 			int pos = fn.length()-1;
+	
+			if (pos >= 0 && fn[pos] != '/' && fn[pos] != '\\') {
+				fn += "/";
+				pos++;
+			}
+
 #ifdef _WIN32
 			while (pos > 0 && (fn[pos] != '/' && fn[pos] != '\\')) {
 #else
