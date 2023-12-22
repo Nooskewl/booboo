@@ -12,6 +12,6 @@ Note: the examples and demos came about as the language evolved, so a
 lot of "old" style and syntax may be found in some of them.
 
 Your purchase allows you to distribute BooBoo with all your creations.
-Please purchase a license from nooskewl.com if you plan to
+Please purchase a license from cmykilluminati.net if you plan to
 redistribute BooBoo or use it commercially.
 
