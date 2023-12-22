@@ -136,7 +136,7 @@ bool corefunc_print(Program *prg, std::vector<Token> &v)
 			else if (v1.type == Variable::EXPRESSION) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
-				snprintf(buf, 1000, ("%" + format).c_str(), evaluate_expression(prg, v1.e));
+				snprintf(buf, 1000, ("%" + format).c_str(), evaluate_expression(prg, v1.e).n);
 				val = buf;
 			}
 			else if (v1.type == Variable::FISH) {
@@ -296,9 +296,13 @@ bool corefunc_list_drives(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	std::vector<Variable> &vec = as_vector(prg, v[0]);
+	Variable &vec = as_variable(prg, v[0]);
+	
+	if (vec.type != Variable::VECTOR) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
 
-	vec.clear();
+	vec.v.clear();
 
 #ifdef _WIN32
 	DWORD d = GetLogicalDrives();
@@ -311,7 +315,7 @@ bool corefunc_list_drives(Program *prg, std::vector<Token> &v)
 			char buf[10];
 			snprintf(buf, 10, "%c", 'A' + i);
 			s.s = buf;
-			vec.push_back(s);
+			vec.v.push_back(s);
 		}
 	}
 #endif
@@ -323,7 +327,12 @@ bool corefunc_list_directory(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	std::vector<Variable> &vec = as_vector(prg, v[0]);
+	Variable &vec = as_variable(prg, v[0]);
+
+	if (vec.type != Variable::VECTOR) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
 	std::string glob = as_string(prg, v[1]);
 
 	std::string path_part;
@@ -341,7 +350,7 @@ bool corefunc_list_directory(Program *prg, std::vector<Token> &v)
 
 	std::string fn;
 
-	vec.clear();
+	vec.v.clear();
 
 	while ((fn = l.next()) != "") {
 		if (fn == "." || fn == "..") {
@@ -366,7 +375,7 @@ bool corefunc_list_directory(Program *prg, std::vector<Token> &v)
 		v.type = Variable::STRING;
 		v.name = "-constant-";
 		v.s = fn;
-		vec.push_back(v);
+		vec.v.push_back(v);
 	}
 
 	return true;
@@ -459,7 +468,7 @@ bool stringfunc_format(Program *prg, std::vector<Token> &v)
 			else if (v1.type == Variable::EXPRESSION) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
-				snprintf(buf, 1000, ("%" + format).c_str(), evaluate_expression(prg, v1.e));
+				snprintf(buf, 1000, ("%" + format).c_str(), evaluate_expression(prg, v1.e).n);
 				val = buf;
 			}
 			else if (v1.type == Variable::FISH) {
@@ -685,11 +694,16 @@ bool stringfunc_match(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	std::vector<Variable> &v1 = as_vector(prg, v[0]);
+	Variable &v1 = as_variable(prg, v[0]);
+	
+	if (v1.type != Variable::VECTOR) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
 	std::string str = as_string(prg, v[1]);
 	std::string regex = as_string(prg, v[2]);
 
-	v1.clear();
+	v1.v.clear();
 
 	std::smatch match;
 
@@ -700,7 +714,7 @@ bool stringfunc_match(Program *prg, std::vector<Token> &v)
 			v.type = Variable::STRING;
 			v.name = "-constant-";
 			v.s = sub.str();
-			v1.push_back(v);
+			v1.v.push_back(v);
 		}
 	}
 
@@ -925,9 +939,7 @@ static bool vectorfunc_add(Program *prg, std::vector<Token> &v)
 				var = go_fish(prg, var.f);
 			}
 			else if (var.type == Variable::EXPRESSION) {
-				var.n = evaluate_expression(prg, var.e);
-				var.type = Variable::NUMBER;
-				var.name = "-calculated-";
+				var = evaluate_expression(prg, var.e);
 			}
 		}
 	}
@@ -1165,9 +1177,7 @@ static bool mapfunc_set(Program *prg, std::vector<Token> &v)
 				var = go_fish(prg, var.f);
 			}
 			else if (var.type == Variable::EXPRESSION) {
-				var.n = evaluate_expression(prg, var.e);
-				var.type = Variable::NUMBER;
-				var.name = "-calculated-";
+				var = evaluate_expression(prg, var.e);
 			}
 		}
 	}
@@ -1256,8 +1266,12 @@ static bool mapfunc_keys(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	std::map<std::string, Variable> &m = as_map(prg, v[0]);
+	Variable &m = as_variable(prg, v[0]);
 	Variable &vec_var = as_variable(prg, v[1]);
+
+	if (m.type != Variable::MAP) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected a map at " + get_error_info(prg));
+	}
 
 	if (vec_var.type != Variable::VECTOR) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Expected a vector at " + get_error_info(prg));
@@ -1267,7 +1281,7 @@ static bool mapfunc_keys(Program *prg, std::vector<Token> &v)
 
 	std::map<std::string, Variable>::iterator it;
 
-	for (it = m.begin(); it != m.end(); it++) {
+	for (it = m.m.begin(); it != m.m.end(); it++) {
 		std::pair<std::string, Variable> p = *it;
 		Variable var;
 		var.type = Variable::STRING;
@@ -1476,7 +1490,7 @@ bool filefunc_print(Program *prg, std::vector<Token> &v)
 			else if (v1.type == Variable::EXPRESSION) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
-				snprintf(buf, 1000, ("%" + format).c_str(), evaluate_expression(prg, v1.e));
+				snprintf(buf, 1000, ("%" + format).c_str(), evaluate_expression(prg, v1.e).n);
 				val = buf;
 			}
 			else if (v1.type == Variable::FISH) {

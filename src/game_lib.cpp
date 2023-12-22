@@ -1784,7 +1784,11 @@ static bool tilemapfunc_get_groups(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	int id = as_number(prg, v[0]);
-	std::vector<Variable> &vec = as_vector(prg, v[1]);
+	Variable &vec = as_variable(prg, v[1]);
+
+	if (vec.type != Variable::VECTOR) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
@@ -1822,7 +1826,7 @@ static bool tilemapfunc_get_groups(Program *prg, std::vector<Token> &v)
 		h.name = "-constant-";
 		h.n = g.h;
 		v.v.push_back(h);
-		vec.push_back(v);
+		vec.v.push_back(v);
 	}
 
 	return true;
@@ -1871,7 +1875,7 @@ static bool tilemapfunc_find_path(Program *prg, std::vector<Token> &v)
 
 	int id = as_number(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
-	std::vector<Variable> &entity_solids = as_vector(prg, v[2]);
+	Variable &entity_solids = as_variable(prg, v[2]);
 	int start_x = (int)as_number(prg, v[3]);
 	int start_y = (int)as_number(prg, v[4]);
 	int end_x = (int)as_number(prg, v[5]);
@@ -1881,14 +1885,18 @@ static bool tilemapfunc_find_path(Program *prg, std::vector<Token> &v)
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
+	if (entity_solids.type != Variable::VECTOR) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
 	Tilemap_Info *info = tilemap_info(prg);
 
 	gfx::Tilemap *tilemap = info->tilemaps[id];
 
 	std::vector< util::Rectangle<int> > entity_rects;
-	for (size_t i = 0; i < entity_solids.size(); i++) {
-		int x = entity_solids[i].v[0].n;
-		int y = entity_solids[i].v[1].n;
+	for (size_t i = 0; i < entity_solids.v.size(); i++) {
+		int x = entity_solids.v[i].v[0].n;
+		int y = entity_solids.v[i].v[1].n;
 		util::Rectangle<int> r;
 		r.pos.x = x;
 		r.pos.y = y;
@@ -2326,8 +2334,12 @@ static bool spritefunc_frame_times(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	int id = as_number(prg, v[0]);
-	std::vector<Variable> &vec = as_vector(prg, v[1]);
+	Variable &vec = as_variable(prg, v[1]);
 	
+	if (vec.type != Variable::VECTOR) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
 	Sprite_Info *info = sprite_info(prg);
 
 	gfx::Sprite *sprite = info->sprites[id];
@@ -2339,7 +2351,7 @@ static bool spritefunc_frame_times(Program *prg, std::vector<Token> &v)
 		v.type = Variable::NUMBER;
 		v.name = "-constant-";
 		v.n = times[i];
-		vec.push_back(v);
+		vec.v.push_back(v);
 	}
 
 	return true;

@@ -74,7 +74,7 @@ struct Variable
 
 typedef bool (*library_func)(Program *prg, std::vector<Token> &v);
 typedef std::string (*token_func)(Program *);
-typedef double (*expression_func)(Program *prg, std::vector<Token> &v);
+typedef Variable (*expression_func)(Program *prg, std::vector<Token> &v);
 
 // Call these before/after using BooBoo
 void start();
@@ -119,8 +119,6 @@ std::string as_string(Program *prg, Token &t);
 int as_label(Program *prg, Token &t);
 int as_function(Program *prg, Token &t);
 Variable &as_pointer(Program *prg, Token &t);
-std::vector<Variable> &as_vector(Program *prg, Token &t);
-std::map<std::string, Variable> &as_map(Program *prg, Token &t);
 
 // The black box allows you to store anything you want
 void *get_black_box(Program *prg, std::string id);
@@ -129,7 +127,7 @@ void set_black_box(Program *prg, std::string id, void *data);
 // If you have a variable of type SYMBOL then 'i' is the index you pass here to retrive the variable
 Variable &get_variable(Program *prg, int index);
 
-double evaluate_expression(Program *prg, Variable::Expression &e);
+Variable evaluate_expression(Program *prg, Variable::Expression &e);
 Variable &go_fish(Program *prg, Variable::Fish &f);
 
 // This stuff can be used but it's used by the BooBoo interpreter
