@@ -1297,9 +1297,9 @@ function run
 	= s ba
 	sin s
 	number speed
-	= speed 15
+	= speed 16
 	number step
-	= step 5
+	= step 8
 :next_step
 	+ bx (* c step)
 	+ by (* s step)
