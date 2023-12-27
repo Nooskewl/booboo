@@ -1,4 +1,4 @@
-The following describe the core inseperable functions of BooBoo.
+The following describe the core inseparable functions of BooBoo.
 
 Sections:
 	Core

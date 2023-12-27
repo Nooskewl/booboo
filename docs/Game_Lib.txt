@@ -318,6 +318,7 @@ sprite_is_started
 
 font_load
 	load a TTF font
+	All of the font functions support UTF8
 	e.g. font_load font "DejaVuSans.ttf" px_size smooth_flag
 
 font_draw
