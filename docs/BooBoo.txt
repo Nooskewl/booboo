@@ -161,25 +161,25 @@ for
 	add
 	e.g. + x 1
 
-	You can supply more than 1 paramter at the end
+	You can supply more than 1 parameter at the end
 
 -
 	subtract
 	e.g. - x 1
 	
-	You can supply more than 1 paramter at the end
+	You can supply more than 1 parameter at the end
 
 *
 	multiply
 	e.g. * x 2
 	
-	You can supply more than 1 paramter at the end
+	You can supply more than 1 parameter at the end
 
 /
 	divide
 	e.g. / x 2
 
-	You can supply more than 1 paramter at the end
+	You can supply more than 1 parameter at the end
 
 %
 	integer modulus
