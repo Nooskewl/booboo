@@ -23,6 +23,9 @@ mml_load button "sfx/button.mml"
 number fh
 font_height font fh
 
+number more_down
+image_load more_down "ui/more_down.png"
+
 number go_ok
 = go_ok 0
 
@@ -276,6 +279,14 @@ function draw
 		font_draw font c c c 255 s 25 y
 		+ y fh
 	:loop
+
+	if (> top 0) draw_more_up
+		image_draw more_down 0 216 255 255 (- 320 7) (- TOP 8) 0 1
+	:draw_more_up
+
+	if (< (+ top num) sz) draw_more_down
+		image_draw more_down 0 216 255 255 (- 320 7) (+ TOP (* fh num)) 0 0
+	:draw_more_down
 
 	start_primitives
 
