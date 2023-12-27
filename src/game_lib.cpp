@@ -1670,6 +1670,25 @@ static bool fontfunc_height(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool fontfunc_add_extra_glyph(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	double id = as_number(prg, v[0]);
+	int glyph_id = as_number(prg, v[1]);
+	int image_id = as_number(prg, v[2]);
+	
+	Font_Info *info = font_info(prg);
+	gfx::TTF *font = info->fonts[id];
+
+	Image_Info *iinfo = image_info(prg);
+	gfx::Image *image = iinfo->images[image_id];
+
+	font->add_extra_glyph(glyph_id, image);
+
+	return true;
+}
+
 static bool tilemapfunc_set_tile_size(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -3068,6 +3087,7 @@ void start_lib_game()
 	add_instruction("font_draw", fontfunc_draw);
 	add_instruction("font_width", fontfunc_width);
 	add_instruction("font_height", fontfunc_height);
+	add_instruction("font_add_extra_glyph", fontfunc_add_extra_glyph);
 	add_instruction("set_tile_size", tilemapfunc_set_tile_size);
 	add_instruction("tilemap_load", tilemapfunc_load);
 	add_instruction("tilemap_draw", tilemapfunc_draw);
