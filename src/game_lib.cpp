@@ -1583,7 +1583,7 @@ static bool fontfunc_load(Program *prg, std::vector<Token> &v)
 
 static bool fontfunc_draw(Program *prg, std::vector<Token> &v)
 {
-	COUNT_ARGS(8)
+	MIN_ARGS(8)
 
 	double id = as_number(prg, v[0]);
 	double r = as_number(prg, v[1]);
@@ -1593,6 +1593,14 @@ static bool fontfunc_draw(Program *prg, std::vector<Token> &v)
 	std::string text = as_string(prg, v[5]);
 	double x = as_number(prg, v[6]);
 	double y = as_number(prg, v[7]);
+	bool rtl;
+
+	if (v.size() > 8) {
+		rtl = as_number(prg, v[8]);
+	}
+	else {
+		rtl = false;
+	}
 
 	Font_Info *info = font_info(prg);
 
@@ -1610,7 +1618,7 @@ static bool fontfunc_draw(Program *prg, std::vector<Token> &v)
 	c.b = b;
 	c.a = a;
 
-	font->draw(c, text, util::Point<float>(x, y));
+	font->draw(c, text, util::Point<float>(x, y), true, false, true, rtl);
 
 	return true;
 }
