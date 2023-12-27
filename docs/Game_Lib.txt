@@ -322,9 +322,10 @@ font_load
 	e.g. font_load font "DejaVuSans.ttf" px_size smooth_flag
 
 font_draw
-	draw text
+	draw text. The optional RTL flag can be used to draw text right to
+	left
 	e.g.
-	font_draw font r g b a "HELLO" x y
+	font_draw font r g b a "HELLO" x y rtl_onoff
 
 font_width
 	get width of a string given a font
