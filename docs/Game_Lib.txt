@@ -323,7 +323,11 @@ font_load
 
 font_draw
 	draw text. The optional RTL flag can be used to draw text right to
-	left
+	left. Colour codes can be used if you supply a
+	data/gfx/palettes/palette.gpl with a GIMP palette. Colour codes
+	use |## where ## is a hex number referencing a palette entry.
+	Up to 256 extra glyphs can be added with font_add_extra_glyph.
+	Those use @##.
 	e.g.
 	font_draw font r g b a "HELLO" x y rtl_onoff
 
@@ -334,6 +338,11 @@ font_width
 font_height
 	get the height of a font
 	e.g. font_height font dest
+
+font_add_extra_glyph
+	You can add up to 256 extra glyphs (0 to 255.) The can be used
+	with @## with font_draw.
+	e.g. font_add_extra_glyph font #00 my_image
 
 -- Tilemap Functions ---------------------------------------------------------
 
