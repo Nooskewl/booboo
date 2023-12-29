@@ -124,3 +124,13 @@ y - Change dutycycle of channel. Applies only to @TYPE0 (pulse.)
 
 s - toggle sample stretching or not. By default (s0) samples are played back without stretching to note length
 
+-----------------------------------------------------------------------------
+
+PetiteMM is a great tool which can convert MIDI to MML. You will need to hand
+edit a bit, like described next but also to add your effects, samples, etc.
+
+PetiteMM spits out a single tempo line, play_mml expects a tempo line per
+channel. Every line that PetiteMM spits out should be prefixed by A, B, C...
+etc. (first, second, third channel...) Prefixing everything with a channel
+and copying the tempo to each channel is the main thing, after that, you can
+add any effects.
