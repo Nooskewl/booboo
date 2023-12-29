@@ -134,3 +134,5 @@ channel. Every line that PetiteMM spits out should be prefixed by A, B, C...
 etc. (first, second, third channel...) Prefixing everything with a channel
 and copying the tempo to each channel is the main thing, after that, you can
 add any effects.
+
+PetiteMM GitHub: https://github.com/loveemu/PetiteMM
