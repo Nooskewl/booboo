@@ -557,6 +557,10 @@ cfg_erase
 
 Note: these values are not read-only (so not technically constant...)
 
+TRUE
+	1
+FALSE
+	0
 PI
 	It's pi
 
