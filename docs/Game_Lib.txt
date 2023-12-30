@@ -360,6 +360,7 @@ tilemap_load
 
 tilemap_draw
 	Draw a selection of tilemap layers
+	This automatically crops (doesn't draw) tiles outside the screen
 	e.g. tilemap_draw tilemap start_layer_inclusive end_layer_inclusive x y
 
 tilemap_num_layers
