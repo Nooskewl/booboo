@@ -941,6 +941,8 @@ static void compile(Program *prg, Pass pass)
 	int fish_i = 0;
 
 	// Constants
+	insert_constant(prg, "TRUE", 1, pass, var_i);
+	insert_constant(prg, "FALSE", 0, pass, var_i);
 	insert_constant(prg, "PI", 3.14159265358979323846, pass, var_i);
 	insert_constant(prg, "KEY_UNKNOWN", 0, pass, var_i);
 	insert_constant(prg, "KEY_RETURN", 13, pass, var_i);
