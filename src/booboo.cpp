@@ -944,6 +944,14 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "TRUE", 1, pass, var_i);
 	insert_constant(prg, "FALSE", 0, pass, var_i);
 	insert_constant(prg, "PI", 3.14159265358979323846, pass, var_i);
+	insert_constant(prg, "BLACK", 0, pass, var_i);
+	insert_constant(prg, "BLUE", 1, pass, var_i);
+	insert_constant(prg, "GREEN", 2, pass, var_i);
+	insert_constant(prg, "CYAN", 3, pass, var_i);
+	insert_constant(prg, "RED", 4, pass, var_i);
+	insert_constant(prg, "PURPLE", 5, pass, var_i);
+	insert_constant(prg, "YELLOW", 6, pass, var_i);
+	insert_constant(prg, "WHITE", 7, pass, var_i);
 	insert_constant(prg, "KEY_UNKNOWN", 0, pass, var_i);
 	insert_constant(prg, "KEY_RETURN", 13, pass, var_i);
 	insert_constant(prg, "KEY_ESCAPE", 27, pass, var_i);

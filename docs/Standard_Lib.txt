@@ -261,3 +261,23 @@ get_full_path
 	Convert a pathname to a fully qualified pathname
 	e.g. get_full_path full filename
 
+text_colour
+	Change the text colour. Colour constants are:
+		BLACK
+		BLUE
+		GREEN
+		CYAN
+		RED
+		PURPLE
+		YELLOW
+		WHITE
+	Each colour has a bright version toggleable by a boolean.
+	e.g. text_colour BLACK 0 WHITE 1 ; fore fore_bright back back_bright
+
+text_reset
+	Reset the text colour
+	e.g. text_reset
+
+getch
+	Input a single character from the terminal, not waiting for newline
+	e.g. getch input_number

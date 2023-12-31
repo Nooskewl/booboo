@@ -15,6 +15,8 @@
 #include <libutil/libutil.h>
 using namespace noo;
 
+#include <twinkle.h>
+
 #include "booboo/booboo.h"
 using namespace booboo;
 
@@ -1661,6 +1663,45 @@ bool bitfunc_rightshift(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+bool twinklefunc_colour(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int fore = as_number(prg, v[0]);
+	int fore_b = as_number(prg, v[1]);
+	int back = as_number(prg, v[2]);
+	int back_b = as_number(prg, v[3]);
+
+	twinkle::set((twinkle::TWINKLE_COLOR)fore, fore_b, (twinkle::TWINKLE_COLOR)back, back_b);
+
+	return true;
+}
+
+bool twinklefunc_reset(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	twinkle::reset();
+
+	return true;
+}
+
+bool twinklefunc_getch(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+	
+	Variable &v1 = as_variable(prg, v[0]);
+
+	if (v1.type == Variable::NUMBER) {
+		v1.n = twinkle::getch();
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
 void start_lib_standard()
 {
 	add_instruction("getenv", corefunc_getenv);
@@ -1722,6 +1763,10 @@ void start_lib_standard()
 	add_instruction("&", bitfunc_and);
 	add_instruction("<<", bitfunc_leftshift);
 	add_instruction(">>", bitfunc_rightshift);
+	
+	add_instruction("text_colour", twinklefunc_colour);
+	add_instruction("text_reset", twinklefunc_reset);
+	add_instruction("getch", twinklefunc_getch);
 }
 
 void end_lib_standard()
