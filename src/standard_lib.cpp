@@ -1702,6 +1702,15 @@ bool twinklefunc_getch(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+bool twinklefunc_clear(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	twinkle::clear();
+
+	return true;
+}
+
 void start_lib_standard()
 {
 	add_instruction("getenv", corefunc_getenv);
@@ -1767,6 +1776,7 @@ void start_lib_standard()
 	add_instruction("text_colour", twinklefunc_colour);
 	add_instruction("text_reset", twinklefunc_reset);
 	add_instruction("getch", twinklefunc_getch);
+	add_instruction("text_clear", twinklefunc_clear);
 }
 
 void end_lib_standard()
