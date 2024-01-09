@@ -10,6 +10,8 @@
 #include <libutil/libutil.h>
 using namespace noo;
 
+#include <twinkle.h>
+
 #include "booboo/booboo.h"
 #include "booboo/internal.h"
 
@@ -2885,6 +2887,8 @@ static void init_token_map()
 
 void start()
 {
+	twinkle::start();
+
 	init_token_map();
 	
 	add_expression_handler("+", exprfunc_add);
