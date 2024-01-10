@@ -278,6 +278,10 @@ text_reset
 	Reset the text colour
 	e.g. text_reset
 
+text_clear
+	Clear the screen
+	e.g. text_clear
+
 getch
 	Input a single character from the terminal, not waiting for newline
 	e.g. getch input_number
