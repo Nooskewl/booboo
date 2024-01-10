@@ -20,6 +20,7 @@ few of them:
 	-vsync
 	+fps
 	+adapter x
+	+volume [0-255]
 
 Some of the demo games will auto-play by an AI if a joystick isn't connected.
 I'll leave it as an exercise if you want to play them with keyboard.
