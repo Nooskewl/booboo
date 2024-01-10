@@ -941,7 +941,7 @@ static bool mmlfunc_play(Program *prg, std::vector<Token> &v)
 
 	audio::MML *mml = info->mmls[id];
 
-	mml->play(volume, loop);
+	mml->play(shim::music_volume*volume, loop);
 
 	return true;
 }

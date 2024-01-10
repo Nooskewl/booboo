@@ -1101,9 +1101,18 @@ int main(int argc, char **argv)
 			else if (key == "invert_mouse_wheel") {
 				invert_mouse_wheel = atoi(value.c_str());
 			}
+			else if (key == "volume") {
+				shim::music_volume = atoi(value.c_str())/255.0f;
+			}
 		}
 	}
 	catch (util::Error &e) {
+	}
+
+	for (int i = 2; i < argc; i++) {
+		if (std::string(argv[i]) == "+volume" && i < (argc-1)) {
+			shim::music_volume = atoi(argv[i+1])/255.0f;
+		}
 	}
 
 	if (toggle_fullscreen) {
@@ -1178,6 +1187,7 @@ again:
 	FILE *f = fopen(out_path.c_str(), "w");
 	fprintf(f, "fullscreen=%d\n", gfx::is_fullscreen_window());
 	fprintf(f, "invert_mouse_wheel=%d\n", invert_mouse_wheel);
+	fprintf(f, "volume=%d\n", int(shim::music_volume*255));
 	fclose(f);
 
 	game_lib_destroy_program(prg);
