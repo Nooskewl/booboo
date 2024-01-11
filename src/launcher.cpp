@@ -1,3 +1,5 @@
+#define SDL_MAIN_HANDLED 1
+
 #if defined __linux__ || defined __LP64__
 #include <unistd.h>
 #endif
