@@ -1008,7 +1008,7 @@ static bool samplefunc_play(Program *prg, std::vector<Token> &v)
 
 	audio::Sample *sample = info->samples[id];
 
-	sample->play(volume, loop);
+	sample->play(shim::music_volume * volume, loop);
 
 	return true;
 }

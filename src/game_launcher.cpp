@@ -1004,7 +1004,7 @@ int main(int argc, char **argv)
 		fn = argv[1];
 	}
 
-	for (int i = 2; i < argc; i++) {
+	for (int i = 1; i < argc; i++) {
 		if (std::string(argv[i]) == "+set-dir" && i < (argc-1)) {
 			set_dir = argv[i+1];
 		}
@@ -1134,7 +1134,7 @@ int main(int argc, char **argv)
 	catch (util::Error &e) {
 	}
 
-	for (int i = 2; i < argc; i++) {
+	for (int i = 1; i < argc; i++) {
 		if (std::string(argv[i]) == "+volume" && i < (argc-1)) {
 			shim::music_volume = atoi(argv[i+1])/255.0f;
 		}
