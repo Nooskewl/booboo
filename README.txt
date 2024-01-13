@@ -11,7 +11,4 @@ Just enter data/ and run it, and it will create ../data.cpa.
 Note: the examples and demos came about as the language evolved, so a
 lot of "old" style and syntax may be found in some of them.
 
-Your purchase allows you to distribute BooBoo with all your creations.
-Please purchase a license from cmykilluminati.net if you plan to
-redistribute BooBoo or use it commercially.
-
+Please visit https://cmykilluminati.net for updates!
