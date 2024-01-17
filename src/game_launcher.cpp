@@ -388,9 +388,6 @@ static bool mouse_b2;
 static bool mouse_b3;
 static int mouse_wheel_y;
 
-static bool b_ls;
-static bool b_rs;
-
 static bool mousefunc_get_position(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -465,9 +462,6 @@ bool start()
 	mouse_b2 = false;
 	mouse_b3 = false;
 	mouse_wheel_y = 0;
-
-	b_ls = false;
-	b_rs = false;
 
 	toggle_fullscreen = false;
 	invert_mouse_wheel = false;
@@ -653,22 +647,8 @@ void handle_event(TGUI_Event *event)
 		}
 	}
 	else if (event->type == TGUI_JOY_DOWN) {
-		if (event->joystick.button == TGUI_B_LS) {
-			b_ls = true;
-		}
-		else if (event->joystick.button == TGUI_B_RS) {
-			b_rs = true;
-		}
-		if (b_ls && b_rs) {
+		if (event->joystick.button == TGUI_B_GUIDE) {
 			quit = true;
-		}
-	}
-	else if (event->type == TGUI_JOY_UP) {
-		if (event->joystick.button == TGUI_B_LS) {
-			b_ls = false;
-		}
-		else if (event->joystick.button == TGUI_B_RS) {
-			b_rs = false;
 		}
 	}
 }
