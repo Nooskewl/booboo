@@ -1,3 +1,5 @@
+Copyright 2022-2024 b1stable
+
 BooBoo is a mini high-level assembly-like language with game API.
 
 To run the examples, run ./BooBoo <path/to/data/> or just run BooBoo
