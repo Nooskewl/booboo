@@ -1052,6 +1052,12 @@ int main(int argc, char **argv)
 	}
 #endif
 
+#ifdef __linux__
+	if (std::string(getenv("XDG_SESSION_TYPE")) == "wayland") {
+		putenv("SDL_VIDEODRIVER=wayland");
+	}
+#endif
+
 	shim::window_title = "BooBoo";
 	shim::organisation_name = "b1stable";
 	shim::game_name = "BooBoo";
