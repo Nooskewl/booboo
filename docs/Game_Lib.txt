@@ -32,6 +32,8 @@ included examples support the keyboard as well as joysticks.
 The file shim4.json can be put in your data/ directory to supply some extra
 parameters and info such as window title and other things.
 
+All colours use premultiplied alpha.
+
 The following sections describe the API:
 	Core Functions
 	Graphics Functions
@@ -323,14 +325,13 @@ font_load
 	e.g. font_load font "DejaVuSans.ttf" px_size smooth_flag
 
 font_draw
-	draw text. The optional RTL flag can be used to draw text right to
-	left. Colour codes can be used if you supply a
+	draw text. Colour codes can be used if you supply a
 	data/gfx/palettes/palette.gpl with a GIMP palette. Colour codes
 	use |## where ## is a hex number referencing a palette entry.
 	Up to 256 extra glyphs can be added with font_add_extra_glyph.
 	Those use @##.
 	e.g.
-	font_draw font r g b a "HELLO" x y rtl_onoff
+	font_draw font r g b a "HELLO" x y
 
 font_width
 	get width of a string given a font
