@@ -416,6 +416,10 @@ bool process_includes(Program *prg)
 
 			name = util::remove_quotes(util::unescape_string(name));
 
+			while (isspace(prg->s->code[prev])) {
+				prev++;
+			}
+
 			code += prg->s->code.substr(start, prev-start);
 
 			std::string new_code;
@@ -423,7 +427,7 @@ bool process_includes(Program *prg)
 			fn = name;
 			new_code = booboo::load_text("scripts/" + name);
 
-			new_code = util::trim(new_code);
+			new_code = new_code;
 
 			int nlines = 1;
 			int i = 0;
@@ -434,7 +438,7 @@ bool process_includes(Program *prg)
 				i++;
 			}
 
-			code += "\n" + new_code;
+			code += new_code;
 			
 			prg->real_line_numbers[start_line-1+total_added] = 1;
 			prg->real_file_names[start_line-1+total_added] = fn;
@@ -2967,8 +2971,8 @@ Program *create_program(std::string code)
 	while (code[i] != 0) {
 		if (code[i] == '\n') {
 			prg->real_line_numbers.push_back(ln++);
+			prg->real_file_names.push_back(main_program_name);
 		}
-		prg->real_file_names.push_back(main_program_name);
 		i++;
 	}
 
@@ -2982,6 +2986,28 @@ Program *create_program(std::string code)
 	prg->complete_pass = PASS0;
 	
 	while(process_includes(prg));
+
+	// This prints the program with all includes inserted, prefixed by line number and filename
+#if 0
+	printf("---\n");
+	for (size_t i = 0; i < prg->real_line_numbers.size(); i++) {
+		int off = 0;
+		std::string line;
+		for (int j = 0; j < i+1; j++) {
+			line = "";
+			while (off < prg->s->code.length() && prg->s->code[off] != '\n') {
+				char buf[2];
+				buf[0] = prg->s->code[off];
+				buf[1] = 0;
+				line += buf;
+				off++;
+			}
+			off++;
+		}
+		printf("%d:%s:%s\n", prg->real_line_numbers[i], prg->real_file_names[i].c_str(), line.c_str());
+	}
+	printf("---\n");
+#endif
 
 	compile(prg, PASS1);
 
