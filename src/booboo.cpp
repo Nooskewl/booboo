@@ -45,46 +45,73 @@ std::string (*load_text)(std::string filename);
 
 std::string get_file_name(Program *prg)
 {
-	if (prg->line_numbers.size() <= prg->s->pc) {
-		return "UNKNOWN";
+	if (prg->complete_pass != PASS2) {
+		if (prg->real_file_names.size() > 0) {
+			return prg->real_file_names[0];
+		}
+		else {
+			return "UNKNOWN";
+		}
 	}
+	else {
+		if (prg->line_numbers.size() <= prg->s->pc) {
+			return "UNKNOWN";
+		}
 
-	int l = prg->line_numbers[prg->s->pc];
+		int l = prg->line_numbers[prg->s->pc];
 
-	if (prg->real_file_names.size() <= (unsigned int)l) {
-		return "UNKNOWN";
+		if (prg->real_file_names.size() <= (unsigned int)l) {
+			return "UNKNOWN";
+		}
+
+		return prg->real_file_names[l];
 	}
-
-	return prg->real_file_names[prg->line_numbers[prg->s->pc]];
 }
 
 int get_line_num(Program *prg)
 {
-	int l;
-
-	l = prg->s->pc;
-
-	if (prg->line_numbers.size() <= (unsigned int)l) {
+	if (prg->complete_pass != PASS2) {
 		if (prg->line_numbers.size() > 0) {
-			return prg->line_numbers[prg->line_numbers.size()-1]+(prg->complete_pass == PASS2 ? prg->s->start_line : 0);
+			if (prg->real_line_numbers.size() > prg->line_numbers[prg->line_numbers.size()-1]) {
+				return prg->real_line_numbers[prg->line_numbers[prg->line_numbers.size()-1]];
+			}
+			else {
+				return prg->line_numbers[prg->line_numbers.size()-1];
+			}
 		}
 		else {
 			return 1;
 		}
 	}
+	else {
+		int l;
 
-	l = prg->line_numbers[l];
+		l = prg->s->pc;
 
-	if (prg->real_line_numbers.size() <= (unsigned int)l) {
-		if (prg->real_line_numbers.size() > 0) {
-			return prg->real_line_numbers[prg->real_line_numbers.size()-1]+(prg->complete_pass == PASS2 ? prg->s->start_line : 0);
+		//printf("--\nprg->s->line=%d prg->line_number.size()=%d\n", prg->s->line, prg->line_numbers.size());
+
+		if (prg->line_numbers.size() <= (unsigned int)l) {
+			if (prg->line_numbers.size() > 0) {
+				return prg->line_numbers[prg->line_numbers.size()-1]+(prg->complete_pass == PASS2 ? prg->s->start_line : 0);
+			}
+			else {
+				return 1;
+			}
 		}
-		else {
-			return 1;
+
+		l = prg->line_numbers[l];
+
+		if (prg->real_line_numbers.size() <= (unsigned int)l) {
+			if (prg->real_line_numbers.size() > 0) {
+				return prg->real_line_numbers[prg->real_line_numbers.size()-1]+(prg->complete_pass == PASS2 ? prg->s->start_line : 0);
+			}
+			else {
+				return 1;
+			}
 		}
+
+		return prg->real_line_numbers[prg->line_numbers[prg->s->pc]]+(prg->complete_pass == PASS2 ? prg->s->start_line : 0);
 	}
-
-	return prg->real_line_numbers[prg->line_numbers[prg->s->pc]]+(prg->complete_pass == PASS2 ? prg->s->start_line : 0);
 }
 
 std::string get_error_info(Program *prg)
@@ -366,7 +393,7 @@ static std::string token(Program *prg, Token::Token_Type &ret_type)
 		return (*it).second(prg);
 	}
 
-	prg->line_numbers.push_back(prg->s->line); // can help give better line number
+	//prg->line_numbers.push_back(prg->s->line); // can help give better line number
 	throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg) + " (pc=" + itos(prg->s->p) + ", tok=\"" + tok + "\")");
 
 	return "";
@@ -1287,18 +1314,23 @@ func_top:
 					Statement s;
 					s.method = library_map[tok];
 					func.s->program.push_back(s);
-					if (pass == PASS2) {
+					//if (pass == PASS2) {
 						//if (func.line_numbers.size() != 0) {
 							//func.s->pc++;
 						//}
-						func.line_numbers.push_back(prg->s->line);
-					}
+						
+						//func.line_numbers.push_back(prg->s->line);
+						prg->line_numbers.push_back(prg->s->line);
+					//}
 					int count = 0;
 					while (true) {
 						std::string tok2 = token(prg, tt);
 						if (tok2 == "" || (count != 0 && (tok2 == ";" || tok2 == "{" || tok2 == "}" || tok2 == ":" || tok2 == "function" || tok2[0] == '(' || tok2[0] == '[' || library_map.find(tok2) != library_map.end()))) {
 							tok = tok2;
 							goto func_top;
+						}
+						if (tok2[0] != '_' && !isalpha(tok2[0])) {
+							throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok2 + " at " + get_error_info(prg));
 						}
 						count++;
 						if (pass == PASS1) {
@@ -1406,12 +1438,14 @@ func_top:
 					Statement s;
 					s.method = library_map[tok];
 					func.s->program.push_back(s);
-					if (pass == PASS2) {
+					//if (pass == PASS2) {
 						//if (func.line_numbers.size() != 0) {
 							//func.s->pc++;
 						//}
-						func.line_numbers.push_back(prg->s->line);
-					}
+						
+						//func.line_numbers.push_back(prg->s->line);
+						prg->line_numbers.push_back(prg->s->line);
+					//}
 				}
 				else if (is_param) {
 					int param_i = var_i++;
@@ -1431,7 +1465,7 @@ func_top:
 				}
 				else {
 					if (func.s->program.size() == 0) {
-						func.line_numbers.push_back(prg->s->line); // can help give better line number
+						//func.line_numbers.push_back(prg->s->line); // can help give better line number
 						throw Error("Expected keyword at " + get_error_info(&func));
 					}
 					Token t;
@@ -1444,8 +1478,8 @@ func_top:
 						case Token::SYMBOL:
 							t.s = util::remove_quotes(util::unescape_string(tok));
 							if (pass == PASS2 && prg->variables_map.find(t.s) == prg->variables_map.end()) {
-								func.line_numbers.push_back(prg->s->line); // can help give better line number
-								throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok + " at " + get_error_info(&func));
+								//func.line_numbers.push_back(prg->s->line); // can help give better line number
+								throw Error(std::string(__FUNCTION__) + ": " + "Invalid symbol name " + tok + " at " + get_error_info(prg));
 							}
 							if (pass == PASS2) {
 								t.i = prg->variables_map[t.s];
@@ -1460,12 +1494,12 @@ func_top:
 			}
 
 			if (is_param == true) {
-				func.line_numbers.push_back(prg->s->line); // can help give better line number
+				//func.line_numbers.push_back(prg->s->line); // can help give better line number
 				throw Error(std::string(__FUNCTION__) + ": " + "Missing { at " + get_error_info(&func));
 			}
 
 			if (finished == false) {
-				func.line_numbers.push_back(prg->s->line); // can help give better line number
+				//func.line_numbers.push_back(prg->s->line); // can help give better line number
 				throw Error(std::string(__FUNCTION__) + ": " + "Missing } at " + get_error_info(&func));
 			}
 
@@ -1510,18 +1544,21 @@ func_top:
 			Statement s;
 			s.method = library_map[tok];
 			prg->s->program.push_back(s);
-			if (pass == PASS2) {
+			//if (pass == PASS2) {
 				//if (prg->line_numbers.size() != 0) {
 					//prg->s->pc++;
 				//}
 				prg->line_numbers.push_back(prg->s->line);
-			}
+			//}
 			int count = 0;
 			while (true) {
 				std::string tok2 = token(prg, tt);
 				if (tok2 == "" || (count != 0 && (tok2 == ";" || tok2 == "{" || tok2 == "}" || tok2 == ":" || tok2 == "function" || tok2[0] == '(' || tok2[0] == '[' || library_map.find(tok2) != library_map.end()))) {
 					tok = tok2;
 					goto top;
+				}
+				if (tok2[0] != '_' && !isalpha(tok2[0])) {
+					throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok2 + " at " + get_error_info(prg));
 				}
 				count++;
 				int var_index = var_i;
@@ -1615,15 +1652,15 @@ func_top:
 			Statement s;
 			s.method = library_map[tok];
 			prg->s->program.push_back(s);
-			if (pass == PASS2) {
+			//if (pass == PASS2) {
 				//if (prg->line_numbers.size() != 0) {
 					//prg->s->pc++;
 				//}
 				prg->line_numbers.push_back(prg->s->line);
-			}
+			//}
 		}
 		else if (prg->s->program.size() == 0) {
-			prg->line_numbers.push_back(prg->s->line); // can help give better line number
+			//prg->line_numbers.push_back(prg->s->line); // can help give better line number
 			throw Error("Expected keyword at " + get_error_info(prg));
 		}
 		else {
@@ -1637,7 +1674,7 @@ func_top:
 				case Token::SYMBOL:
 					t.s = util::remove_quotes(util::unescape_string(tok));
 					if (pass == PASS2 && prg->variables_map.find(t.s) == prg->variables_map.end()) {
-						throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok + " at " + get_error_info(prg));
+						throw Error(std::string(__FUNCTION__) + ": " + "Invalid symbol name " + tok + " at " + get_error_info(prg));
 					}
 					if (pass == PASS2) {
 						t.i = prg->variables_map[t.s];
@@ -3016,6 +3053,7 @@ Program *create_program(std::string code)
 	prg->s->start_line = 0;
 	prg->s->program.clear();
 	prg->functions.clear();
+	prg->line_numbers.clear();
 
 	compile(prg, PASS2);
 
