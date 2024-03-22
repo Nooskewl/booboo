@@ -80,7 +80,12 @@ int get_line_num(Program *prg)
 			}
 		}
 		else {
-			return 1;
+			if (prg->s->line < prg->real_line_numbers.size()) {
+				return prg->real_line_numbers[prg->s->line];
+			}
+			else {
+				return prg->s->line;
+			}
 		}
 	}
 	else {
@@ -394,7 +399,7 @@ static std::string token(Program *prg, Token::Token_Type &ret_type)
 	}
 
 	//prg->line_numbers.push_back(prg->s->line); // can help give better line number
-	throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg) + " (pc=" + itos(prg->s->p) + ", tok=\"" + tok + "\")");
+	throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg));
 
 	return "";
 }
@@ -537,7 +542,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 		p++;
 	}
 	if (p >= (int)expr.length()-1) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid expression at " + get_error_info(func));
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid expression at " + get_error_info(prg));
 	}
 	p++; // skip (
 	std::string name;
@@ -552,7 +557,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 	Variable::Expression e;
 
 	if (expression_map.find(name) == expression_map.end()) {
-		//throw Error(std::string(__FUNCTION__) + ": " + "Unknown expression function at " + get_error_info(func));
+		//throw Error(std::string(__FUNCTION__) + ": " + "Unknown expression function at " + get_error_info(prg));
 		e.i = -1;
 		e.name = name;
 	}
@@ -567,7 +572,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			p++;
 		}
 		if (p >= (int)expr.length()) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid expression at " + get_error_info(func));
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid expression at " + get_error_info(prg));
 		}
 		char c = expr[p];
 		Token tok;
@@ -704,13 +709,13 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 
 			if (pass == PASS2) {
 				if (prg->variables_map.find(sym) == prg->variables_map.end()) {
-					throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(func));
+					throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(prg));
 				}
 				tok.i = prg->variables_map[sym];
 			}
 		}
 		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(func));
+			throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg));
 		}
 
 		e.v.push_back(tok);
@@ -728,7 +733,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 		p++;
 	}
 	if (p >= (int)expr.length()-1) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid fish at " + get_error_info(func));
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid fish at " + get_error_info(prg));
 	}
 	p++; // skip [
 	while (isspace(expr[p]) && p < (int)expr.length()) {
@@ -779,7 +784,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 		}
 		if (pass == PASS2) {
 			if (prg->variables_map.find(name) == prg->variables_map.end()) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Unknown variable at " + get_error_info(func));
+				throw Error(std::string(__FUNCTION__) + ": " + "Unknown variable at " + get_error_info(prg));
 			}
 			e.c_i = prg->variables_map[name];
 		}
@@ -792,7 +797,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			p++;
 		}
 		if (p >= (int)expr.length()) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid fish at " + get_error_info(func));
+			throw Error(std::string(__FUNCTION__) + ": " + "Invalid fish at " + get_error_info(prg));
 		}
 		char c = expr[p];
 		Token tok;
@@ -929,13 +934,13 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 
 			if (pass == PASS2) {
 				if (prg->variables_map.find(sym) == prg->variables_map.end()) {
-					throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(func));
+					throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(prg));
 				}
 				tok.i = prg->variables_map[sym];
 			}
 		}
 		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(func));
+			throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg));
 		}
 
 		e.v.push_back(tok);
@@ -1303,7 +1308,7 @@ func_top:
 					}
 					prg->variables.push_back(v);
 					if (pass == PASS1 && prg->variables_map.find(tok2) != prg->variables_map.end()) {
-						//throw Error(std::string(__FUNCTION__) + ": " + "Duplicate label at " + get_error_info(&func));
+						//throw Error(std::string(__FUNCTION__) + ": " + "Duplicate label at " + get_error_info(prg));
 					}
 					else if (pass == PASS2) {
 						prg->variables_map[tok2] = prg->locals[func_index][tok2];
@@ -1319,8 +1324,8 @@ func_top:
 							//func.s->pc++;
 						//}
 						
-						//func.line_numbers.push_back(prg->s->line);
-						prg->line_numbers.push_back(prg->s->line);
+						func.line_numbers.push_back(prg->s->line);
+						//prg->line_numbers.push_back(prg->s->line);
 					//}
 					int count = 0;
 					while (true) {
@@ -1330,7 +1335,7 @@ func_top:
 							goto func_top;
 						}
 						if (tok2[0] != '_' && !isalpha(tok2[0])) {
-							throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok2 + " at " + get_error_info(prg));
+							throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok2 + " at " + get_error_info(&func));
 						}
 						count++;
 						if (pass == PASS1) {
@@ -1443,8 +1448,8 @@ func_top:
 							//func.s->pc++;
 						//}
 						
-						//func.line_numbers.push_back(prg->s->line);
-						prg->line_numbers.push_back(prg->s->line);
+						func.line_numbers.push_back(prg->s->line);
+						//prg->line_numbers.push_back(prg->s->line);
 					//}
 				}
 				else if (is_param) {
@@ -1479,7 +1484,7 @@ func_top:
 							t.s = util::remove_quotes(util::unescape_string(tok));
 							if (pass == PASS2 && prg->variables_map.find(t.s) == prg->variables_map.end()) {
 								//func.line_numbers.push_back(prg->s->line); // can help give better line number
-								throw Error(std::string(__FUNCTION__) + ": " + "Invalid symbol name " + tok + " at " + get_error_info(prg));
+								throw Error(std::string(__FUNCTION__) + ": " + "Invalid symbol name " + tok + " at " + get_error_info(&func));
 							}
 							if (pass == PASS2) {
 								t.i = prg->variables_map[t.s];
@@ -1495,12 +1500,12 @@ func_top:
 
 			if (is_param == true) {
 				//func.line_numbers.push_back(prg->s->line); // can help give better line number
-				throw Error(std::string(__FUNCTION__) + ": " + "Missing { at " + get_error_info(&func));
+				throw Error(std::string(__FUNCTION__) + ": " + "Missing { at " + get_error_info(prg));
 			}
 
 			if (finished == false) {
 				//func.line_numbers.push_back(prg->s->line); // can help give better line number
-				throw Error(std::string(__FUNCTION__) + ": " + "Missing } at " + get_error_info(&func));
+				throw Error(std::string(__FUNCTION__) + ": " + "Missing } at " + get_error_info(prg));
 			}
 
 			prg->function_name_map[func.s->name] = prg->functions.size();
