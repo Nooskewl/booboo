@@ -30,6 +30,8 @@ struct Function_Swap {
 	Variable result;
 	std::vector<Statement> program;
 	unsigned int pc;
+	
+	std::vector<int> line_numbers;
 };
 
 struct Program {
@@ -47,8 +49,6 @@ struct Program {
 	std::vector<int> params;
 	std::vector< std::map<std::string, int> > locals;
 	std::map<std::string, int> backup;
-
-	std::vector<int> line_numbers;
 
 	std::vector<int> real_line_numbers;
 	std::vector<std::string> real_file_names;

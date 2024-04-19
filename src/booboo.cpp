@@ -54,11 +54,11 @@ std::string get_file_name(Program *prg)
 		}
 	}
 	else {
-		if (prg->line_numbers.size() <= prg->s->pc) {
+		if (prg->s->line_numbers.size() <= prg->s->pc) {
 			return "UNKNOWN";
 		}
 
-		int l = prg->line_numbers[prg->s->pc];
+		int l = prg->s->line_numbers[prg->s->pc];
 
 		if (prg->real_file_names.size() <= (unsigned int)l) {
 			return "UNKNOWN";
@@ -71,12 +71,12 @@ std::string get_file_name(Program *prg)
 int get_line_num(Program *prg)
 {
 	if (prg->complete_pass != PASS2) {
-		if (prg->line_numbers.size() > 0) {
-			if (prg->real_line_numbers.size() > prg->line_numbers[prg->line_numbers.size()-1]) {
-				return prg->real_line_numbers[prg->line_numbers[prg->line_numbers.size()-1]];
+		if (prg->s->line_numbers.size() > 0) {
+			if (prg->real_line_numbers.size() > prg->s->line_numbers[prg->s->line_numbers.size()-1]) {
+				return prg->real_line_numbers[prg->s->line_numbers[prg->s->line_numbers.size()-1]];
 			}
 			else {
-				return prg->line_numbers[prg->line_numbers.size()-1];
+				return prg->s->line_numbers[prg->s->line_numbers.size()-1];
 			}
 		}
 		else {
@@ -93,29 +93,19 @@ int get_line_num(Program *prg)
 
 		l = prg->s->pc;
 
-		//printf("--\nprg->s->line=%d prg->line_number.size()=%d\n", prg->s->line, prg->line_numbers.size());
-
-		if (prg->line_numbers.size() <= (unsigned int)l) {
-			if (prg->line_numbers.size() > 0) {
-				return prg->line_numbers[prg->line_numbers.size()-1]+(prg->complete_pass == PASS2 ? prg->s->start_line : 0);
-			}
-			else {
-				return 1;
-			}
+		if ((unsigned int)l < prg->s->line_numbers.size()) {
+			l = prg->s->line_numbers[l];
+		}
+		else {
+			l = 0;
 		}
 
-		l = prg->line_numbers[l];
-
-		if (prg->real_line_numbers.size() <= (unsigned int)l) {
-			if (prg->real_line_numbers.size() > 0) {
-				return prg->real_line_numbers[prg->real_line_numbers.size()-1]+(prg->complete_pass == PASS2 ? prg->s->start_line : 0);
-			}
-			else {
-				return 1;
-			}
+		if ((unsigned int)l < prg->real_line_numbers.size()) {
+			return prg->real_line_numbers[l];
 		}
-
-		return prg->real_line_numbers[prg->line_numbers[prg->s->pc]]+(prg->complete_pass == PASS2 ? prg->s->start_line : 0);
+		else {
+			return 0;
+		}
 	}
 }
 
@@ -398,7 +388,7 @@ static std::string token(Program *prg, Token::Token_Type &ret_type)
 		return (*it).second(prg);
 	}
 
-	//prg->line_numbers.push_back(prg->s->line); // can help give better line number
+	//prg->s->line_numbers.push_back(prg->s->line); // can help give better line number
 	throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg));
 
 	return "";
@@ -416,7 +406,7 @@ bool process_includes(Program *prg)
 
 	prg->s->p = 0;
 	prg->s->line = 1;
-	prg->line_numbers.clear();
+	prg->s->line_numbers.clear();
 
 	int prev = prg->s->p;
 	int start = 0;
@@ -1295,7 +1285,7 @@ func_top:
 					Statement s;
 					s.method = library_map[tok];
 					func.s->program.push_back(s);
-
+					func.s->line_numbers.push_back(prg->s->line);
 					Token t;
 					t.type = Token::SYMBOL;
 					t.i = var_i;
@@ -1324,8 +1314,8 @@ func_top:
 							//func.s->pc++;
 						//}
 						
-						func.line_numbers.push_back(prg->s->line);
-						//prg->line_numbers.push_back(prg->s->line);
+						func.s->line_numbers.push_back(prg->s->line);
+						//prg->s->line_numbers.push_back(prg->s->line);
 					//}
 					int count = 0;
 					while (true) {
@@ -1448,8 +1438,8 @@ func_top:
 							//func.s->pc++;
 						//}
 						
-						func.line_numbers.push_back(prg->s->line);
-						//prg->line_numbers.push_back(prg->s->line);
+						func.s->line_numbers.push_back(prg->s->line);
+						//prg->s->line_numbers.push_back(prg->s->line);
 					//}
 				}
 				else if (is_param) {
@@ -1509,6 +1499,8 @@ func_top:
 			}
 
 			prg->function_name_map[func.s->name] = prg->functions.size();
+			func.complete_pass = pass;
+
 			prg->functions.push_back(func);
 
 			std::map<std::string, int>::iterator it;
@@ -1538,6 +1530,7 @@ func_top:
 			t.token = tok2;
 			prg->s->program[prg->s->program.size()-1].data.push_back(t);
 
+			prg->s->line_numbers.push_back(prg->s->line);
 			prg->variables.push_back(v);
 			if (pass == PASS1 && prg->variables_map.find(tok2) != prg->variables_map.end()) {
 				//throw Error(std::string(__FUNCTION__) + ": " + "Duplicate label at " + get_error_info(prg));
@@ -1550,10 +1543,10 @@ func_top:
 			s.method = library_map[tok];
 			prg->s->program.push_back(s);
 			//if (pass == PASS2) {
-				//if (prg->line_numbers.size() != 0) {
+				//if (prg->s->line_numbers.size() != 0) {
 					//prg->s->pc++;
 				//}
-				prg->line_numbers.push_back(prg->s->line);
+				prg->s->line_numbers.push_back(prg->s->line);
 			//}
 			int count = 0;
 			while (true) {
@@ -1658,14 +1651,14 @@ func_top:
 			s.method = library_map[tok];
 			prg->s->program.push_back(s);
 			//if (pass == PASS2) {
-				//if (prg->line_numbers.size() != 0) {
+				//if (prg->s->line_numbers.size() != 0) {
 					//prg->s->pc++;
 				//}
-				prg->line_numbers.push_back(prg->s->line);
+				prg->s->line_numbers.push_back(prg->s->line);
 			//}
 		}
 		else if (prg->s->program.size() == 0) {
-			//prg->line_numbers.push_back(prg->s->line); // can help give better line number
+			//prg->s->line_numbers.push_back(prg->s->line); // can help give better line number
 			throw Error("Expected keyword at " + get_error_info(prg));
 		}
 		else {
@@ -1727,10 +1720,16 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 	prg->s = func.s;
 	//prg->s->p = 0;
 	//prg->s->line = 1;
+
+	// To handle recursive calls:
+	int pc_bak = prg->s->pc;
+
 	prg->s->pc = 0;
 
 	while (interpret(prg, INT_MAX)) {
 	}
+
+	prg->s->pc = pc_bak;
 
 	std::string bak = result.name;
 	result = prg->s->result;
@@ -1788,12 +1787,13 @@ bool interpret(Program *prg, int instructions)
 
 void destroy_program(Program *prg)
 {
-	prg->variables.clear();
-	prg->functions.clear();
-
 	for (size_t i = 0; i < prg->functions.size(); i++) {
 		delete prg->functions[i].s;
 	}
+
+	prg->variables.clear();
+	prg->functions.clear();
+
 	delete prg->s;
 	prg->black_box.clear();
 	delete prg;
@@ -3021,7 +3021,7 @@ Program *create_program(std::string code)
 	prg->s->code = code;
 	prg->s->name = "main";
 	prg->s->line = 1;
-	prg->line_numbers.clear();
+	prg->s->line_numbers.clear();
 	prg->s->start_line = 0;
 	prg->s->p = 0;
 	prg->s->pc = 0;
@@ -3058,7 +3058,7 @@ Program *create_program(std::string code)
 	prg->s->start_line = 0;
 	prg->s->program.clear();
 	prg->functions.clear();
-	prg->line_numbers.clear();
+	prg->s->line_numbers.clear();
 
 	compile(prg, PASS2);
 
