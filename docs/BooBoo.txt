@@ -1,3 +1,26 @@
+Note on error messages and line numbers: The parser is lazy, so so sometimes
+the line number in an error message points a line before the error occurs.
+Usually this is easy to spot, but functions are parsed separately, so code
+like:
+
+01:+ x 1
+02:
+03:function foo
+04:{
+05:	...
+06:	...
+07:	...
+08:}
+09:
+10:<a code error here>
+
+The error message may say line 1, and this can be especially daunting when
+there are multiple functions and long functions. It only occurs on the
+first line after a function or functions, but I will try to improve this
+scenario in the future.
+
+------------------------------------------------------------------------------
+
 The following describe the core inseparable functions of BooBoo.
 
 Sections:
