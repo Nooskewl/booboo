@@ -131,8 +131,8 @@ edit a bit, like described next but also to add your effects, samples, etc.
 
 PetiteMM spits out a single tempo line, play_mml expects a tempo line per
 channel. Every line that PetiteMM spits out should be prefixed by A, B, C...
-etc. (first, second, third channel...) Prefixing everything with a channel
-and copying the tempo to each channel is the main thing, after that, you can
-add any effects.
+etc. (first, second, third channel...) Luckily PetiteMM separates each channel
+with a semicolon. Prefixing everything with a channel and copying the tempo to
+each channel is the main thing, after that, you can add any effects.
 
 PetiteMM GitHub: https://github.com/loveemu/PetiteMM
