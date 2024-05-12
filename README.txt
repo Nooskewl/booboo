@@ -1,4 +1,4 @@
-Copyright 2022-2024 ILLUMINATI NORTH
+Copyright 2022-2024 CMYKilluminatiNetwork
 
 BooBoo is a mini high-level assembly-like language with game API.
 
