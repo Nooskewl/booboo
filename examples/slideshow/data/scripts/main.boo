@@ -1,15 +1,22 @@
 include "slideshow_start.inc"
 
 vector programs
-vector_add programs "blip.boo"
-vector_add programs "clock.boo"
-vector_add programs "gameover.boo"
-vector_add programs "pong.boo"
-vector_add programs "robots.boo"
-vector_add programs "secret.boo"
-vector_add programs "sine.boo"
-vector_add programs "sneaky.boo"
-vector_add programs "walk.boo"
+vector files
+file_list files
+number nfiles
+vector_size files nfiles
+number i
+for i 0 (< i nfiles) 1 check_file
+	number matches
+	string_matches matches [files i] "boo$"
+	if (== TRUE matches) add_it
+		string file
+		string_replace file [files i] ".*\\/(.*\\.boo)" "$1"
+		if (!= file "main.boo") really_add_it
+			vector_add programs file
+		:really_add_it
+	:add_it
+:check_file
 number size
 vector_size programs size
 
