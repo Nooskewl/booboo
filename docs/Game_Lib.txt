@@ -81,6 +81,10 @@ set_logic_rate
 	supported.
 	e.g. set_logic_rate 144
 
+file_list
+	Get a list of files in the data/ directory or data.cpa
+	e.g. file_list vec
+
 -- Graphics Functions --------------------------------------------------------
 
 clear

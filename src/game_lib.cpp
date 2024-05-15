@@ -393,6 +393,31 @@ static bool miscfunc_set_logic_rate(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
+static bool miscfunc_file_list(Program *prg, std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &v1 = as_variable(prg, v[0]);
+	
+	if (v1.type != Variable::VECTOR) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	v1.v.clear();
+
+	std::vector<std::string> l = shim::cpa->get_all_filenames();
+
+	for (size_t i = 0; i < l.size(); i++) {
+		Variable var;
+		var.type = Variable::STRING;
+		var.name = "-constant-";
+		var.s = l[i];
+		v1.v.push_back(var);
+	}
+
+	return true;
+}
+
 static bool gfxfunc_set_scissor(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
@@ -2828,6 +2853,7 @@ void start_lib_game()
 	add_instruction("args", miscfunc_args);
 	add_instruction("get_logic_rate", miscfunc_get_logic_rate);
 	add_instruction("set_logic_rate", miscfunc_set_logic_rate);
+	add_instruction("file_list", miscfunc_file_list);
 	add_instruction("clear", gfxfunc_clear);
 	add_instruction("flip", gfxfunc_flip);
 	add_instruction("resize", gfxfunc_resize);
