@@ -46,8 +46,11 @@ std::string (*load_text)(std::string filename);
 std::string get_file_name(Program *prg)
 {
 	if (prg->complete_pass != PASS2) {
-		if (prg->real_file_names.size() > 0) {
-			return prg->real_file_names[0];
+		if (prg->s->line_numbers.size() > 0 && prg->real_file_names.size() > prg->s->line_numbers[prg->s->line_numbers.size()-1]) {
+			return prg->real_file_names[prg->s->line_numbers[prg->s->line_numbers.size()-1]];
+		}
+		else if (prg->s->line < prg->real_file_names.size()) {
+			return prg->real_file_names[prg->s->line];
 		}
 		else {
 			return "UNKNOWN";

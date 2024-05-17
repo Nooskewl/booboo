@@ -1,23 +1,45 @@
-Note on error messages and line numbers: The parser is lazy, so so sometimes
-the line number in an error message points a line before the error occurs.
-Usually this is easy to spot, but functions are parsed separately, so code
-like:
+Note on error messages and line numbers: I'll explain how the parser works
+a bit so you can understand the problem. It's something unique to BooBoo
+because BooBoo's syntax is virtually non-existant.
 
-01:+ x 1
-02:
-03:function foo
-04:{
-05:	...
-06:	...
-07:	...
-08:}
-09:
-10:<a code error here>
+BooBoo is similar to assembly; an "opcode" and some data with it. It knows
+about a small few keywords, plus all the API including simple things like "+"
+and functions like image_load.
 
-The error message may say line 1, and this can be especially daunting when
+One of those keywords is "number" (also "string", "map" and such.) The parser
+knows about variables once they're declared. But like I said, there isn't
+much syntax... the only thing that separates one instruction and data from
+the next is the next recognizable instruction, so if you typo an instruction
+(which is what I call any function... which even most core API are just
+functions) it checks if it's a variable and if not, you wind up with BooBoo
+looking for the end of an instruction but its tail is far away from its
+head. So the error much points to the latest recorded location... which can
+be one of the two scenarios:
+
+05:+ x 1
+06:
+07:function foo
+08:{
+09:	...
+10:	...
+11:	...
+12:}
+13:
+14:<a code error here>
+
+The error message may say line 5, and this can be especially daunting when
 there are multiple functions and long functions. It only occurs on the
-first line after a function or functions, but I will try to improve this
-scenario in the future.
+first line after a function or functions.
+
+Also:
+
+include "crap.inc"
+<error here>
+
+The error pointer can point to the end of the include file (everything is
+pasted together into one file on load.)
+
+I will try to improve this scenario in the future.
 
 ------------------------------------------------------------------------------
 
