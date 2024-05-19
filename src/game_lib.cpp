@@ -2668,7 +2668,8 @@ static bool shaderfunc_use(Program *prg, std::vector<Token> &v)
 	Shader_Info *info = shader_info(prg);
 	gfx::Shader *shader = info->shaders[id];
 
-	shader->use();
+	shim::current_shader = shader;
+	shim::current_shader->use();
 	gfx::update_projection();
 
 	return true;
@@ -2678,7 +2679,8 @@ static bool shaderfunc_use_default(Program *prg, std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
-	shim::default_shader->use();
+	shim::current_shader = shim::default_shader;
+	shim::current_shader->use();
 	gfx::update_projection();
 
 	return true;
