@@ -43,7 +43,7 @@ bool corefunc_getenv(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 	std::string get = as_string(prg, v[1]);
 
-	if (v1.type != Variable::STRING) {
+	if (IS_STRING(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -223,7 +223,7 @@ bool corefunc_input(Program *prg, std::vector<Token> &v)
 
 	Variable &var = as_variable(prg, v[0]);
 
-	if (var.type != Variable::STRING) {
+	if (IS_STRING(var) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -254,7 +254,7 @@ bool corefunc_get_system_language(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type != Variable::STRING) {
+	if (IS_STRING(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -270,7 +270,7 @@ bool corefunc_get_full_path(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 	std::string path = as_string(prg, v[1]);
 
-	if (v1.type != Variable::STRING) {
+	if (IS_STRING(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -300,7 +300,7 @@ bool corefunc_list_drives(Program *prg, std::vector<Token> &v)
 
 	Variable &vec = as_variable(prg, v[0]);
 	
-	if (vec.type != Variable::VECTOR) {
+	if (IS_VECTOR(vec) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -331,7 +331,7 @@ bool corefunc_list_directory(Program *prg, std::vector<Token> &v)
 
 	Variable &vec = as_variable(prg, v[0]);
 
-	if (vec.type != Variable::VECTOR) {
+	if (IS_VECTOR(vec) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -612,7 +612,7 @@ bool stringfunc_substr(Program *prg, std::vector<Token> &v)
 	int start = as_number(prg, v[1]);
 	int count = -1;
 	
-	if (v1.type != Variable::STRING) {
+	if (IS_STRING(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -679,7 +679,7 @@ bool stringfunc_replace(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 	
-	if (v1.type != Variable::STRING) {
+	if (IS_STRING(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -698,7 +698,7 @@ bool stringfunc_match(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 	
-	if (v1.type != Variable::VECTOR) {
+	if (IS_VECTOR(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -842,7 +842,7 @@ bool mathfunc_floor(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(1)
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 	}
 
@@ -923,6 +923,10 @@ static bool vectorfunc_add(Program *prg, std::vector<Token> &v)
 
 	Variable &id = as_variable(prg, v[0]);
 
+	if (IS_VECTOR(id) == false) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
 	Variable var;
 
 	if (v[1].type == Token::NUMBER) {
@@ -963,6 +967,10 @@ static bool vectorfunc_size(Program *prg, std::vector<Token> &v)
 	Variable &id = as_variable(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
 
+	if (IS_VECTOR(id) == false) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
 	if (IS_NUMBER(v1)) {
 		v1.n = id.v.size();
 	}
@@ -980,6 +988,10 @@ static bool vectorfunc_set(Program *prg, std::vector<Token> &v)
 	std::vector<int> indices;
 
 	MIN_ARGS(3)
+
+	if (IS_VECTOR(id) == false) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
 
 	for (int i = 1; i < val_index; i++) {
 		indices.push_back(as_number(prg, v[i]));
@@ -1041,6 +1053,10 @@ static bool vectorfunc_insert(Program *prg, std::vector<Token> &v)
 	Variable &id = as_variable(prg, v[0]);
 	double index = as_number(prg, v[1]);
 
+	if (IS_VECTOR(id) == false) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
 	if (index < 0 || index > id.v.size()) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
 	}
@@ -1078,6 +1094,10 @@ static bool vectorfunc_get(Program *prg, std::vector<Token> &v)
 	std::vector<int> indices;
 
 	MIN_ARGS(3)
+
+	if (IS_VECTOR(id) == false) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
 
 	for (size_t i = 2; i < v.size(); i++) {
 		int index = as_number(prg, v[i]);
@@ -1134,6 +1154,10 @@ static bool vectorfunc_erase(Program *prg, std::vector<Token> &v)
 	Variable &id = as_variable(prg, v[0]);
 	double index = as_number(prg, v[1]);
 
+	if (IS_VECTOR(id) == false) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
 	if (index < 0 || index >= id.v.size()) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
 	}
@@ -1149,6 +1173,10 @@ static bool vectorfunc_clear(Program *prg, std::vector<Token> &v)
 
 	Variable &id = as_variable(prg, v[0]);
 
+	if (IS_VECTOR(id) == false) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
 	id.v.clear();
 
 	return true;
@@ -1159,6 +1187,10 @@ static bool mapfunc_set(Program *prg, std::vector<Token> &v)
 	MIN_ARGS(3)
 
 	Variable &id = as_variable(prg, v[0]);
+
+	if (IS_MAP(id) == false) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
 
 	Variable var;
 	int val_index = v.size()-1;
@@ -1210,6 +1242,10 @@ static bool mapfunc_get(Program *prg, std::vector<Token> &v)
 
 	Variable &id = as_variable(prg, v[0]);
 
+	if (IS_MAP(id) == false) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
 	std::map<std::string, Variable> *p = &id.m;
 	std::string key;
 
@@ -1241,6 +1277,10 @@ static bool mapfunc_clear(Program *prg, std::vector<Token> &v)
 
 	Variable &id = as_variable(prg, v[0]);
 
+	if (IS_MAP(id) == false) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
 	id.m.clear();
 
 	return true;
@@ -1252,6 +1292,10 @@ static bool mapfunc_erase(Program *prg, std::vector<Token> &v)
 
 	Variable &id = as_variable(prg, v[0]);
 	std::string key = as_string(prg, v[1]);
+
+	if (IS_MAP(id) == false) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
 
 	std::map<std::string, Variable>::iterator it = id.m.find(key);
 
@@ -1271,11 +1315,11 @@ static bool mapfunc_keys(Program *prg, std::vector<Token> &v)
 	Variable &m = as_variable(prg, v[0]);
 	Variable &vec_var = as_variable(prg, v[1]);
 
-	if (m.type != Variable::MAP) {
+	if (IS_MAP(m) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Expected a map at " + get_error_info(prg));
 	}
 
-	if (vec_var.type != Variable::VECTOR) {
+	if (IS_VECTOR(vec_var) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Expected a vector at " + get_error_info(prg));
 	}
 
@@ -1357,7 +1401,7 @@ static bool filefunc_read(Program *prg, std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Variable &var = as_variable(prg, v[1]);
 
-	if (var.type != Variable::STRING) {
+	if (IS_STRING(var) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Expected string at " + get_error_info(prg));
 	}
 
@@ -1375,7 +1419,7 @@ static bool filefunc_read_line(Program *prg, std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Variable &var = as_variable(prg, v[1]);
 
-	if (var.type != Variable::STRING) {
+	if (IS_STRING(var) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Expected string at " + get_error_info(prg));
 	}
 

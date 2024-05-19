@@ -1979,7 +1979,7 @@ bool corefunc_add(Program *prg, std::vector<Token> &v)
 		}
 		else if (IS_VECTOR(v1)) {
 			Variable &v2 = as_variable_inline(prg, v[i]);
-			if (v2.type != Variable::VECTOR) {
+			if (IS_VECTOR(v2) == false) {
 				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 			}
 			else {
@@ -1988,7 +1988,7 @@ bool corefunc_add(Program *prg, std::vector<Token> &v)
 		}
 		else if (IS_MAP(v1)) {
 			Variable &v2 = as_variable_inline(prg, v[i]);
-			if (v2.type != Variable::MAP) {
+			if (IS_MAP(v2) == false) {
 				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 			}
 			else {
@@ -2009,13 +2009,12 @@ bool corefunc_subtract(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
+	if (IS_NUMBER(v1) == false) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
 	for (size_t i = 1; i < v.size(); i++) {
-		if (IS_NUMBER(v1)) {
-			v1.n -= as_number_inline(prg, v[i]);
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-		}
+		v1.n -= as_number_inline(prg, v[i]);
 	}
 
 	return true;
@@ -2026,14 +2025,13 @@ bool corefunc_multiply(Program *prg, std::vector<Token> &v)
 	MIN_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
+	
+	if (IS_NUMBER(v1) == false) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
 
 	for (size_t i = 1; i < v.size(); i++) {
-		if (IS_NUMBER(v1)) {
-			v1.n *= as_number_inline(prg, v[i]);
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-		}
+		v1.n *= as_number_inline(prg, v[i]);
 	}
 
 	return true;
@@ -2044,14 +2042,13 @@ bool corefunc_divide(Program *prg, std::vector<Token> &v)
 	MIN_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
+	
+	if (IS_NUMBER(v1) == false) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
 
 	for (size_t i = 1; i < v.size(); i++) {
-		if (IS_NUMBER(v1)) {
-			v1.n /= as_number_inline(prg, v[i]);
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-		}
+		v1.n /= as_number_inline(prg, v[i]);
 	}
 
 	return true;
@@ -2328,7 +2325,7 @@ bool corefunc_typeof(Program *prg, std::vector<Token> &v)
 
 	Variable &v2 = as_variable_inline(prg, v[0]);
 
-	if (v2.type != Variable::STRING) {
+	if (IS_STRING(v2) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -2361,7 +2358,7 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 	if (IS_POINTER(count)) {
 		count = (*count.p);
 	}
-	if (count.type != Variable::NUMBER) {
+	if (IS_NUMBER(count) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -2370,7 +2367,7 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 	int increment = as_number_inline(prg, v[3]);
 	unsigned int end_label = as_label_inline(prg, v[4]);
 
-	if (expr.type != Variable::EXPRESSION) {
+	if (IS_EXPRESSION(expr) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -2525,7 +2522,7 @@ Variable exprfunc_add(Program *prg, std::vector<Token> &v)
 
 			for (size_t i = 1; i < v.size(); i++) {
 				Variable v2 = as_variable_inline(prg, v[i]);
-				if (v2.type != Variable::VECTOR) {
+				if (IS_VECTOR(v2) == false) {
 					throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 				}
 				vec.insert(vec.end(), v2.v.begin(), v2.v.end());
@@ -2540,7 +2537,7 @@ Variable exprfunc_add(Program *prg, std::vector<Token> &v)
 
 			for (size_t i = 1; i < v.size(); i++) {
 				Variable v2 = as_variable_inline(prg, v[i]);
-				if (v2.type != Variable::MAP) {
+				if (IS_MAP(v2) == false) {
 					throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 				}
 				m.insert(v2.m.begin(), v2.m.end());

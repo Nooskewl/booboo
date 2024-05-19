@@ -312,7 +312,7 @@ static bool miscfunc_get_ticks(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 	
-	if (v1.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -346,7 +346,7 @@ static bool miscfunc_args(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 	
-	if (v1.type != Variable::VECTOR) {
+	if (IS_VECTOR(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -369,7 +369,7 @@ static bool miscfunc_get_logic_rate(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -399,7 +399,7 @@ static bool miscfunc_file_list(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 	
-	if (v1.type != Variable::VECTOR) {
+	if (IS_VECTOR(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -478,7 +478,7 @@ static bool gfxfunc_get_screen_size(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 	Variable &v2 = as_variable(prg, v[1]);
 	
-	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false || IS_NUMBER(v2) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -495,7 +495,7 @@ static bool gfxfunc_get_buffer_size(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 	Variable &v2 = as_variable(prg, v[1]);
 	
-	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false || IS_NUMBER(v2) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -512,7 +512,7 @@ static bool gfxfunc_get_screen_offset(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 	Variable &v2 = as_variable(prg, v[1]);
 	
-	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false || IS_NUMBER(v2) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -528,7 +528,7 @@ static bool gfxfunc_get_scale(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 	
-	if (v1.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -596,7 +596,7 @@ static bool gfxfunc_is_fullscreen(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -630,7 +630,7 @@ static bool gfxfunc_get_refresh_rate(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -1555,7 +1555,7 @@ static bool tilemapfunc_num_layers(Program *prg, std::vector<Token> &v)
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
-	if (v1.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -1576,7 +1576,7 @@ static bool tilemapfunc_size(Program *prg, std::vector<Token> &v)
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
-	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false || IS_NUMBER(v2) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -1601,7 +1601,7 @@ static bool tilemapfunc_is_solid(Program *prg, std::vector<Token> &v)
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
-	if (v1.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -1619,7 +1619,7 @@ static bool tilemapfunc_get_groups(Program *prg, std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Variable &vec = as_variable(prg, v[1]);
 
-	if (vec.type != Variable::VECTOR) {
+	if (IS_VECTOR(vec) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 	
@@ -1677,7 +1677,7 @@ static bool tilemapfunc_set_animated_tiles(Program *prg, std::vector<Token> &v)
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
-	if (v1.type != Variable::VECTOR) {
+	if (IS_VECTOR(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -1714,11 +1714,11 @@ static bool tilemapfunc_find_path(Program *prg, std::vector<Token> &v)
 	int end_x = (int)as_number(prg, v[5]);
 	int end_y = (int)as_number(prg, v[6]);
 	
-	if (v1.type != Variable::VECTOR) {
+	if (IS_VECTOR(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
-	if (entity_solids.type != Variable::VECTOR) {
+	if (IS_VECTOR(entity_solids) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -1818,7 +1818,7 @@ static bool tilemapfunc_get_tile(Program *prg, std::vector<Token> &v)
 	int x = as_number(prg, v[5]);
 	int y = as_number(prg, v[6]);
 
-	if (vx.type != Variable::NUMBER || vy.type != Variable::NUMBER || vs.type != Variable::NUMBER) {
+	if (IS_NUMBER(vx) == false || IS_NUMBER(vy) == false || IS_NUMBER(vs) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 	
@@ -1912,7 +1912,7 @@ static bool spritefunc_get_animation(Program *prg, std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (v1.type != Variable::STRING) {
+	if (IS_STRING(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -1932,7 +1932,7 @@ static bool spritefunc_get_previous_animation(Program *prg, std::vector<Token> &
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (v1.type != Variable::STRING) {
+	if (IS_STRING(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -1952,7 +1952,7 @@ static bool spritefunc_current_frame(Program *prg, std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (v1.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -1972,7 +1972,7 @@ static bool spritefunc_num_frames(Program *prg, std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (v1.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -1992,7 +1992,7 @@ static bool spritefunc_length(Program *prg, std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (v1.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -2013,7 +2013,7 @@ static bool spritefunc_current_frame_size(Program *prg, std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false || IS_NUMBER(v2) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -2123,7 +2123,7 @@ static bool spritefunc_bounds(Program *prg, std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER || v3.type != Variable::NUMBER || v4.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false || IS_NUMBER(v2) == false || IS_NUMBER(v3) == false || IS_NUMBER(v4) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -2151,7 +2151,7 @@ static bool spritefunc_elapsed(Program *prg, std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (v1.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -2169,7 +2169,7 @@ static bool spritefunc_frame_times(Program *prg, std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Variable &vec = as_variable(prg, v[1]);
 	
-	if (vec.type != Variable::VECTOR) {
+	if (IS_VECTOR(vec) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -2199,7 +2199,7 @@ static bool spritefunc_is_started(Program *prg, std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (v1.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -2454,10 +2454,10 @@ static bool cfgfunc_get_number(Program *prg, std::vector<Token> &v)
 
 	CFG_Info *info = cfg_info(prg);
 
-	if (v1.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
-	if (v2.type != Variable::NUMBER) {
+	if (IS_NUMBER(v2) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -2488,10 +2488,10 @@ static bool cfgfunc_get_string(Program *prg, std::vector<Token> &v)
 
 	CFG_Info *info = cfg_info(prg);
 
-	if (v1.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
-	if (v2.type != Variable::STRING) {
+	if (IS_STRING(v2) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -2547,7 +2547,7 @@ static bool cfgfunc_set_string(Program *prg, std::vector<Token> &v)
 
 	CFG_Info *info = cfg_info(prg);
 
-	if (v1.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
@@ -2605,7 +2605,7 @@ static bool cfgfunc_erase(Program *prg, std::vector<Token> &v)
 
 	CFG_Info *info = cfg_info(prg);
 
-	if (v1.type != Variable::NUMBER) {
+	if (IS_NUMBER(v1) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
