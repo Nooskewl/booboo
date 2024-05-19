@@ -46,10 +46,18 @@ std::string (*load_text)(std::string filename);
 std::string get_file_name(Program *prg)
 {
 	if (prg->complete_pass != PASS2) {
+#if 0
 		if (prg->s->line_numbers.size() > 0 && prg->real_file_names.size() > prg->s->line_numbers[prg->s->line_numbers.size()-1]) {
 			return prg->real_file_names[prg->s->line_numbers[prg->s->line_numbers.size()-1]];
 		}
 		else if (prg->s->line < prg->real_file_names.size()) {
+			return prg->real_file_names[prg->s->line];
+		}
+		else {
+			return "UNKNOWN";
+		}
+#endif
+		if (prg->real_file_names.size() > prg->s->line) {
 			return prg->real_file_names[prg->s->line];
 		}
 		else {
@@ -74,6 +82,14 @@ std::string get_file_name(Program *prg)
 int get_line_num(Program *prg)
 {
 	if (prg->complete_pass != PASS2) {
+		if (prg->real_line_numbers.size() > prg->s->line) {
+			return prg->real_line_numbers[prg->s->line];
+		}
+		else {
+			return -1;
+		}
+#if 0
+		//printf("line=%d rln=%d ln=%d\n", prg->s->line, prg->real_line_numbers[prg->s->line], prg->s->line_numbers[prg->s->line_numbers.size()-1]);
 		if (prg->s->line_numbers.size() > 0) {
 			if (prg->real_line_numbers.size() > prg->s->line_numbers[prg->s->line_numbers.size()-1]) {
 				return prg->real_line_numbers[prg->s->line_numbers[prg->s->line_numbers.size()-1]];
@@ -90,6 +106,7 @@ int get_line_num(Program *prg)
 				return prg->s->line;
 			}
 		}
+#endif
 	}
 	else {
 		int l;
@@ -408,7 +425,7 @@ bool process_includes(Program *prg)
 	std::string tok;
 
 	prg->s->p = 0;
-	prg->s->line = 1;
+	prg->s->line = 0;
 	prg->s->line_numbers.clear();
 
 	int prev = prg->s->p;
@@ -427,9 +444,9 @@ bool process_includes(Program *prg)
 			}
 		}
 		else if (tok == "include") {
-			std::string name = token(prg, tt);
-
 			int start_line = prg->s->line;
+
+			std::string name = token(prg, tt);
 
 			if (name == "") {
 				throw Error(std::string(__FUNCTION__) + ": " + "Expected include parameters at " + get_error_info(prg));
@@ -452,8 +469,6 @@ bool process_includes(Program *prg)
 			fn = name;
 			new_code = booboo::load_text("scripts/" + name);
 
-			new_code = new_code;
-
 			int nlines = 1;
 			int i = 0;
 			while (new_code[i] != 0) {
@@ -464,12 +479,12 @@ bool process_includes(Program *prg)
 			}
 
 			code += new_code;
-			
-			prg->real_line_numbers[start_line-1+total_added] = 1;
-			prg->real_file_names[start_line-1+total_added] = fn;
+		
+			prg->real_line_numbers[start_line+total_added] = 1;	
+			prg->real_file_names[start_line+total_added] = fn;
 			for (int i = 1; i < nlines; i++) {
-				prg->real_line_numbers.insert(prg->real_line_numbers.begin()+start_line+(i-1+total_added), i+1);
-				prg->real_file_names.insert(prg->real_file_names.begin()+start_line+(i-1+total_added), fn);
+				prg->real_line_numbers.insert(prg->real_line_numbers.begin()+start_line+i+total_added, i+1);
+				prg->real_file_names.insert(prg->real_file_names.begin()+start_line+i+total_added, fn);
 			}
 
 			start = prg->s->p;
@@ -488,7 +503,7 @@ bool process_includes(Program *prg)
 
 	prg->s->code = code;
 	prg->s->p = 0;
-	prg->s->line = 1;
+	prg->s->line = 0;
 
 	return ret;
 }
@@ -1254,17 +1269,21 @@ top:
 			func.s = new Function_Swap;
 			func.s->name = func_name;
 			func.s->pc = 0;
+			func.s->line = prg->s->line;
 			func.real_line_numbers = prg->real_line_numbers;
 			func.real_file_names = prg->real_file_names;
+			func.complete_pass = prg->complete_pass;
 			bool is_param = true;
 			bool finished = false;
 			while ((tok = token(prg, tt)) != "") {
 func_top:
+				func.s->line = prg->s->line;
 				if (tok == ";") {
 					while (prg->s->p < prg->s->code.length() && prg->s->code[prg->s->p] != '\n') {
 						prg->s->p++;
 					}
 					prg->s->line++;
+					func.s->line = prg->s->line;
 					if (prg->s->p < prg->s->code.length()) {
 						prg->s->p++;
 					}
@@ -1722,7 +1741,7 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 	Function_Swap *bak2 = prg->s;
 	prg->s = func.s;
 	//prg->s->p = 0;
-	//prg->s->line = 1;
+	//prg->s->line = 0;
 
 	// To handle recursive calls:
 	int pc_bak = prg->s->pc;
@@ -3023,7 +3042,7 @@ Program *create_program(std::string code)
 
 	prg->s->code = code;
 	prg->s->name = "main";
-	prg->s->line = 1;
+	prg->s->line = 0;
 	prg->s->line_numbers.clear();
 	prg->s->start_line = 0;
 	prg->s->p = 0;
@@ -3033,7 +3052,6 @@ Program *create_program(std::string code)
 	while(process_includes(prg));
 
 	// This prints the program with all includes inserted, prefixed by line number and filename
-#if 0
 	printf("---\n");
 	for (size_t i = 0; i < prg->real_line_numbers.size(); i++) {
 		int off = 0;
@@ -3052,12 +3070,11 @@ Program *create_program(std::string code)
 		printf("%d:%s:%s\n", prg->real_line_numbers[i], prg->real_file_names[i].c_str(), line.c_str());
 	}
 	printf("---\n");
-#endif
 
 	compile(prg, PASS1);
 
 	prg->s->p = 0;
-	prg->s->line = 1;
+	prg->s->line = 0;
 	prg->s->start_line = 0;
 	prg->s->program.clear();
 	prg->functions.clear();
@@ -3066,7 +3083,7 @@ Program *create_program(std::string code)
 	compile(prg, PASS2);
 
 	prg->s->p = 0;
-	prg->s->line = 1;
+	prg->s->line = 0;
 	prg->s->start_line = 0;
 	prg->s->pc = 0;
 
