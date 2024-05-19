@@ -517,7 +517,7 @@ static void backup(Program *prg, int func, bool restore_locals = true)
 		if (prg->variables_map.find(pair.first) != prg->variables_map.end()) {
 			prg->backup[pair.first] = prg->variables_map[pair.first];
 		}
-		if (restore_locals || prg->variables[pair.second].type == Variable::LABEL) {
+		if (restore_locals || IS_LABEL(prg->variables[pair.second])) {
 			prg->variables_map[pair.first] = pair.second;
 		}
 	}
@@ -1873,10 +1873,10 @@ bool breaker_return(Program *prg, std::vector<Token> &v)
 		else {
 			Variable &v2 = as_variable_inline(prg, v[0]);
 
-			if (v2.type == Variable::EXPRESSION) {
+			if (IS_EXPRESSION(v2)) {
 				v1 = evaluate_expression(prg, v2.e);
 			}
-			else if (v2.type == Variable::FISH) {
+			else if (IS_FISH(v2)) {
 				v1 = go_fish(prg, v2.f);
 			}
 			else {
@@ -1933,24 +1933,24 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = as_number_inline(prg, v[1]);
 	}
-	else if (v1.type == Variable::STRING) {
+	else if (IS_STRING(v1)) {
 		v1.s = as_string_inline(prg, v[1]);
 	}
-	else if (v1.type == Variable::VECTOR) {
+	else if (IS_VECTOR(v1)) {
 		Variable &v2 = as_variable_inline(prg, v[1]);
-		if (v2.type == Variable::VECTOR) {
+		if (IS_VECTOR(v2)) {
 			v1.v = v2.v;
 		}
 		else {
 			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 		}
 	}
-	else if (v1.type == Variable::MAP) {
+	else if (IS_MAP(v1)) {
 		Variable &v2 = as_variable_inline(prg, v[1]);
-		if (v2.type == Variable::MAP) {
+		if (IS_MAP(v2)) {
 			v1.m = v2.m;
 		}
 		else {
@@ -1971,13 +1971,13 @@ bool corefunc_add(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		if (v1.type == Variable::NUMBER) {
+		if (IS_NUMBER(v1)) {
 			v1.n += as_number_inline(prg, v[i]);
 		}
-		else if (v1.type == Variable::STRING) {
+		else if (IS_STRING(v1)) {
 			v1.s += as_string_inline(prg, v[i]);
 		}
-		else if (v1.type == Variable::VECTOR) {
+		else if (IS_VECTOR(v1)) {
 			Variable &v2 = as_variable_inline(prg, v[i]);
 			if (v2.type != Variable::VECTOR) {
 				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
@@ -1986,7 +1986,7 @@ bool corefunc_add(Program *prg, std::vector<Token> &v)
 				v1.v.insert(v1.v.end(), v2.v.begin(), v2.v.end());
 			}
 		}
-		else if (v1.type == Variable::MAP) {
+		else if (IS_MAP(v1)) {
 			Variable &v2 = as_variable_inline(prg, v[i]);
 			if (v2.type != Variable::MAP) {
 				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
@@ -2010,7 +2010,7 @@ bool corefunc_subtract(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		if (v1.type == Variable::NUMBER) {
+		if (IS_NUMBER(v1)) {
 			v1.n -= as_number_inline(prg, v[i]);
 		}
 		else {
@@ -2028,7 +2028,7 @@ bool corefunc_multiply(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		if (v1.type == Variable::NUMBER) {
+		if (IS_NUMBER(v1)) {
 			v1.n *= as_number_inline(prg, v[i]);
 		}
 		else {
@@ -2046,7 +2046,7 @@ bool corefunc_divide(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		if (v1.type == Variable::NUMBER) {
+		if (IS_NUMBER(v1)) {
 			v1.n /= as_number_inline(prg, v[i]);
 		}
 		else {
@@ -2082,7 +2082,7 @@ bool corefunc_compare(Program *prg, std::vector<Token> &v)
 
 	if (v[0].type == Token::SYMBOL) {
 		Variable &var = as_variable_inline(prg, v[0]);
-		if (var.type == Variable::NUMBER) {
+		if (IS_NUMBER(var)) {
 			is_num = true;
 			n = var.n;
 		}
@@ -2116,7 +2116,7 @@ bool corefunc_compare(Program *prg, std::vector<Token> &v)
 		}
 		else if (v[0].type == Token::SYMBOL) {
 			Variable &var = as_variable_inline(prg, v[0]);
-			if (var.type == Variable::STRING) {
+			if (IS_STRING(var)) {
 				a_string = true;
 				s1 = var.s;
 			}
@@ -2128,7 +2128,7 @@ bool corefunc_compare(Program *prg, std::vector<Token> &v)
 		}
 		else if (v[1].type == Token::SYMBOL) {
 			Variable &var = as_variable_inline(prg, v[1]);
-			if (var.type == Variable::STRING) {
+			if (IS_STRING(var)) {
 				b_string = true;
 				s2 = var.s;
 			}
@@ -2237,25 +2237,25 @@ bool corefunc_call_result(Program *prg, std::vector<Token> &v)
 static std::string typeof_var(Variable &v1)
 {
 	std::string res;
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		res = "number";
 	}
-	else if (v1.type == Variable::STRING) {
+	else if (IS_STRING(v1)) {
 		res = "string";
 	}
-	else if (v1.type == Variable::VECTOR) {
+	else if (IS_VECTOR(v1)) {
 		res = "vector";
 	}
-	else if (v1.type == Variable::MAP) {
+	else if (IS_MAP(v1)) {
 		res = "map";
 	}
-	else if (v1.type == Variable::POINTER) {
+	else if (IS_POINTER(v1)) {
 		res = "pointer";
 	}
-	else if (v1.type == Variable::FUNCTION) {
+	else if (IS_FUNCTION(v1)) {
 		res = "function";
 	}
-	else if (v1.type == Variable::LABEL) {
+	else if (IS_LABEL(v1)) {
 		res = "label";
 	}
 	else {
@@ -2285,7 +2285,7 @@ bool corefunc_typeof(Program *prg, std::vector<Token> &v)
 	else {
 		Variable &v1 = prg->variables[v[1].i];
 
-		if (v1.type == Variable::VECTOR) {
+		if (IS_VECTOR(v1)) {
 			if (v.size() > 2) {
 				std::vector<Variable> *p;
 				p = &v1.v;
@@ -2303,7 +2303,7 @@ bool corefunc_typeof(Program *prg, std::vector<Token> &v)
 				res = "vector";
 			}
 		}
-		else if (v1.type == Variable::MAP) {
+		else if (IS_MAP(v1)) {
 			if (v.size() > 2) {
 				std::map<std::string, Variable> *p;
 				p = &v1.m;
@@ -2358,7 +2358,7 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 	COUNT_ARGS(5)
 
 	Variable &count = as_variable_inline(prg, v[0]);
-	if (count.type == Variable::POINTER) {
+	if (IS_POINTER(count)) {
 		count = (*count.p);
 	}
 	if (count.type != Variable::NUMBER) {
@@ -2491,10 +2491,10 @@ Variable exprfunc_add(Program *prg, std::vector<Token> &v)
 	else {
 		Variable &var = get_variable(prg, v[0].i);
 
-		if (var.type == Variable::EXPRESSION) {
+		if (IS_EXPRESSION(var)) {
 			var = evaluate_expression(prg, var.e);
 		}
-		else if (var.type == Variable::FISH) {
+		else if (IS_FISH(var)) {
 			var = go_fish(prg, var.f);
 		}
 
@@ -2509,7 +2509,7 @@ Variable exprfunc_add(Program *prg, std::vector<Token> &v)
 			ret.n = n;
 			return ret;
 		}
-		else if (var.type == Variable::STRING) {
+		else if (IS_STRING(var)) {
 			std::string s = var.s;
 
 			for (size_t i = 1; i < v.size(); i++) {
@@ -2520,7 +2520,7 @@ Variable exprfunc_add(Program *prg, std::vector<Token> &v)
 			ret.s = s;
 			return ret;
 		}
-		else if (var.type == Variable::VECTOR) {
+		else if (IS_VECTOR(var)) {
 			std::vector<Variable> vec = var.v;
 
 			for (size_t i = 1; i < v.size(); i++) {
@@ -2535,7 +2535,7 @@ Variable exprfunc_add(Program *prg, std::vector<Token> &v)
 			ret.v = vec;
 			return ret;
 		}
-		else if (var.type == Variable::MAP) {
+		else if (IS_MAP(var)) {
 			std::map<std::string, Variable> m = var.m;
 
 			for (size_t i = 1; i < v.size(); i++) {
@@ -2652,7 +2652,7 @@ Variable exprfunc_greater(Program *prg, std::vector<Token> &v)
 
 	if (string == false && v[0].type == Token::SYMBOL) {
 		Variable &var = as_variable_inline(prg, v[0]);
-		if (var.type == Variable::STRING) {
+		if (IS_STRING(var)) {
 			string = true;
 		}
 	}
@@ -2687,7 +2687,7 @@ Variable exprfunc_less(Program *prg, std::vector<Token> &v)
 
 	if (string == false && v[0].type == Token::SYMBOL) {
 		Variable &var = as_variable_inline(prg, v[0]);
-		if (var.type == Variable::STRING) {
+		if (IS_STRING(var)) {
 			string = true;
 		}
 	}
@@ -2722,7 +2722,7 @@ Variable exprfunc_greaterequal(Program *prg, std::vector<Token> &v)
 
 	if (string == false && v[0].type == Token::SYMBOL) {
 		Variable &var = as_variable_inline(prg, v[0]);
-		if (var.type == Variable::STRING) {
+		if (IS_STRING(var)) {
 			string = true;
 		}
 	}
@@ -2757,7 +2757,7 @@ Variable exprfunc_lessequal(Program *prg, std::vector<Token> &v)
 
 	if (string == false && v[0].type == Token::SYMBOL) {
 		Variable &var = as_variable_inline(prg, v[0]);
-		if (var.type == Variable::STRING) {
+		if (IS_STRING(var)) {
 			string = true;
 		}
 	}
@@ -2792,7 +2792,7 @@ Variable exprfunc_equal(Program *prg, std::vector<Token> &v)
 
 	if (string == false && v[0].type == Token::SYMBOL) {
 		Variable &var = as_variable_inline(prg, v[0]);
-		if (var.type == Variable::STRING) {
+		if (IS_STRING(var)) {
 			string = true;
 		}
 	}
@@ -2827,7 +2827,7 @@ Variable exprfunc_notequal(Program *prg, std::vector<Token> &v)
 
 	if (string == false && v[0].type == Token::SYMBOL) {
 		Variable &var = as_variable_inline(prg, v[0]);
-		if (var.type == Variable::STRING) {
+		if (IS_STRING(var)) {
 			string = true;
 		}
 	}

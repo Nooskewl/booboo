@@ -242,7 +242,7 @@ static bool save_cfg(Program *prg, int id, std::string cfg_name)
 	for (it = info->cfgs[id].begin(); it != info->cfgs[id].end(); it++) {
 		std::string name = (*it).first;
 		Config_Value &v = (*it).second;
-		if (v.type == Variable::NUMBER) {
+		if (IS_NUMBER(v)) {
 			fprintf(f, "%s=%g\n", name.c_str(), v.n);
 		}
 		else {
@@ -266,25 +266,25 @@ static bool miscfunc_inspect(Program *prg, std::vector<Token> &v)
 	}
 	else if (v[0].type == Token::SYMBOL) {
 		Variable &var = get_variable(prg, v[0].i);
-		if (var.type == Variable::NUMBER) {
+		if (IS_NUMBER(var)) {
 			snprintf(buf, 1000, "%g", var.n);
 		}
-		else if (var.type == Variable::STRING) {
+		else if (IS_STRING(var)) {
 			snprintf(buf, 1000, "%s", var.s.c_str());
 		}
-		else if (var.type == Variable::VECTOR) {
+		else if (IS_VECTOR(var)) {
 			snprintf(buf, 1000, "-vector-");
 		}
-		else if (var.type == Variable::MAP) {
+		else if (IS_MAP(var)) {
 			snprintf(buf, 1000, "-map-");
 		}
-		else if (var.type == Variable::POINTER) {
+		else if (IS_POINTER(var)) {
 			snprintf(buf, 1000, "-pointer-");
 		}
-		else if (var.type == Variable::FUNCTION) {
+		else if (IS_FUNCTION(var)) {
 			snprintf(buf, 1000, "-function-");
 		}
-		else if (var.type == Variable::LABEL) {
+		else if (IS_LABEL(var)) {
 			snprintf(buf, 1000, "-label-");
 		}
 	}
@@ -330,7 +330,7 @@ static bool miscfunc_rand(Program *prg, std::vector<Token> &v)
 	int min_incl = as_number(prg, v[1]);
 	int max_incl = as_number(prg, v[2]);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = util::rand(min_incl, max_incl);
 	}
 	else {
@@ -909,7 +909,7 @@ static bool mmlfunc_create(Program *prg, std::vector<Token> &v)
 	
 	MML_Info *info = mml_info(prg);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = info->mml_id;
 	}
 	else {
@@ -934,7 +934,7 @@ static bool mmlfunc_load(Program *prg, std::vector<Token> &v)
 
 	MML_Info *info = mml_info(prg);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = info->mml_id;
 	}
 	else {
@@ -1001,7 +1001,7 @@ static bool samplefunc_load(Program *prg, std::vector<Token> &v)
 
 	Sample_Info *info = sample_info(prg);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = info->sample_id;
 	}
 	else {
@@ -1070,7 +1070,7 @@ static bool imagefunc_create(Program *prg, std::vector<Token> &v)
 
 	Image_Info *info = image_info(prg);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = info->image_id;
 	}
 	else {
@@ -1093,7 +1093,7 @@ static bool imagefunc_load(Program *prg, std::vector<Token> &v)
 
 	Image_Info *info = image_info(prg);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = info->image_id;
 	}
 	else {
@@ -1308,13 +1308,13 @@ static bool imagefunc_size(Program *prg, std::vector<Token> &v)
 
 	gfx::Image *img = info->images[id];
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = img->size.w;
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
-	if (v2.type == Variable::NUMBER) {
+	if (IS_NUMBER(v2)) {
 		v2.n = img->size.h;
 	}
 	else {
@@ -1372,7 +1372,7 @@ static bool fontfunc_load(Program *prg, std::vector<Token> &v)
 
 	Font_Info *info = font_info(prg);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = info->font_id;
 	}
 	else {
@@ -1443,7 +1443,7 @@ static bool fontfunc_width(Program *prg, std::vector<Token> &v)
 
 	int w = font->get_text_width(text);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = w;
 	}
 	else {
@@ -1466,7 +1466,7 @@ static bool fontfunc_height(Program *prg, std::vector<Token> &v)
 
 	int h = font->get_height();
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = h;
 	}
 	else {
@@ -1513,7 +1513,7 @@ static bool tilemapfunc_load(Program *prg, std::vector<Token> &v)
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = info->tilemap_id;
 	}
 	else {
@@ -1847,7 +1847,7 @@ static bool spritefunc_load(Program *prg, std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = info->sprite_id;
 	}
 	else {
@@ -2214,7 +2214,7 @@ static void set_string_or_number(Program *prg, int index, double value)
 {
        Variable &v1 = booboo::get_variable(prg, index);
 
-       if (v1.type == Variable::NUMBER) {
+       if (IS_NUMBER(v1)) {
                v1.n = value;
        }
        else {
@@ -2381,7 +2381,7 @@ static bool joyfunc_count(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = input::get_num_joysticks();
 	}
 	else {
@@ -2411,7 +2411,7 @@ static bool cfgfunc_load(Program *prg, std::vector<Token> &v)
 
 	CFG_Info *info = cfg_info(prg);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		std::map<std::string, Config_Value> v = load_cfg(prg, cfg_name);
 		int id = info->cfg_id++;
 		v1.n = id;
@@ -2434,7 +2434,7 @@ static bool cfgfunc_save(Program *prg, std::vector<Token> &v)
 
 	bool success = save_cfg(prg, id, cfg_name);
 	
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = success;
 	}
 	else {
@@ -2586,7 +2586,7 @@ static bool cfgfunc_exists(Program *prg, std::vector<Token> &v)
 
 	bool found = info->cfgs[id].find(name) != info->cfgs[id].end();
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = found;
 	}
 	else {
@@ -2639,7 +2639,7 @@ static bool shaderfunc_load(Program *prg, std::vector<Token> &v)
 	
 	Shader_Info *info = shader_info(prg);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = info->shader_id;
 	}
 	else {
@@ -2786,7 +2786,7 @@ static bool jsonfunc_load(Program *prg, std::vector<Token> &v)
 
 	JSON_Info *info = json_info(prg);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = info->json_id;
 	}
 	else {
@@ -2811,7 +2811,7 @@ static bool jsonfunc_get_string(Program *prg, std::vector<Token> &v)
 	JSON_Info *info = json_info(prg);
 	util::JSON *json = info->jsons[id];
 
-	if (v1.type == Variable::STRING) {
+	if (IS_STRING(v1)) {
 		util::JSON::Node *n = json->get_root()->find(name);
 		v1.s = n->as_string();
 	}
@@ -2833,7 +2833,7 @@ static bool jsonfunc_get_number(Program *prg, std::vector<Token> &v)
 	JSON_Info *info = json_info(prg);
 	util::JSON *json = info->jsons[id];
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		util::JSON::Node *n = json->get_root()->find(name);
 		v1.n = n->as_double();
 	}

@@ -146,5 +146,15 @@ extern std::string (*load_text)(std::string filename); // must be set
 //#define MIN_ARGS(n)
 #define COUNT_ARGS(n) if (v.size() != n) throw Error(std::string(__FUNCTION__) + ": " + "Incorrect number of arguments at " + get_error_info(prg));
 //#define COUNT_ARGS(n)
+		
+#define IS_NUMBER(v) ((v).type == Variable::NUMBER)
+#define IS_STRING(v) ((v).type == Variable::STRING)
+#define IS_VECTOR(v) ((v).type == Variable::VECTOR)
+#define IS_MAP(v) ((v).type == Variable::MAP)
+#define IS_LABEL(v) ((v).type == Variable::LABEL)
+#define IS_FUNCTION(v) ((v).type == Variable::FUNCTION)
+#define IS_POINTER(v) ((v).type == Variable::POINTER)
+#define IS_EXPRESSION(v) ((v).type == Variable::EXPRESSION)
+#define IS_FISH(v) ((v).type == Variable::FISH)
 
 #endif // BOOBOO_H

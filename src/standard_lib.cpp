@@ -123,49 +123,49 @@ bool corefunc_print(Program *prg, std::vector<Token> &v)
 		}
 		else {
 			Variable &v1 = as_variable(prg, v[_tok]);
-			if (v1.type == Variable::NUMBER) {
+			if (IS_NUMBER(v1)) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
 				snprintf(buf, 1000, ("%" + format).c_str(), v1.n);
 				val = buf;
 			}
-			else if (v1.type == Variable::STRING) {
+			else if (IS_STRING(v1)) {
 				format = (format == "") ? "s" : format;
 				char buf[1000];
 				snprintf(buf, 1000, ("%" + format).c_str(), v1.s.c_str());
 				val = buf;
 			}
-			else if (v1.type == Variable::EXPRESSION) {
+			else if (IS_EXPRESSION(v1)) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
 				snprintf(buf, 1000, ("%" + format).c_str(), evaluate_expression(prg, v1.e).n);
 				val = buf;
 			}
-			else if (v1.type == Variable::FISH) {
+			else if (IS_FISH(v1)) {
 				Variable &var = go_fish(prg, v1.f);
-				if (var.type == Variable::NUMBER) {
+				if (IS_NUMBER(var)) {
 					format = (format == "") ? "g" : format;
 					char buf[1000];
 					snprintf(buf, 1000, ("%" + format).c_str(), var.n);
 					val = buf;
 				}
 				else {
-					if (var.type == Variable::STRING) {
+					if (IS_STRING(var)) {
 						val = var.s;
 					}
-					else if (var.type == Variable::VECTOR) {
+					else if (IS_VECTOR(var)) {
 						val = "-vector-";
 					}
-					else if (var.type == Variable::MAP) {
+					else if (IS_MAP(var)) {
 						val = "-map-";
 					}
-					else if (var.type == Variable::POINTER) {
+					else if (IS_POINTER(var)) {
 						val = "-pointer-";
 					}
-					else if (var.type == Variable::FUNCTION) {
+					else if (IS_FUNCTION(var)) {
 						val = "-function-";
 					}
-					else if (var.type == Variable::LABEL) {
+					else if (IS_LABEL(var)) {
 						val = "-label-";
 					}
 					else {
@@ -178,19 +178,19 @@ bool corefunc_print(Program *prg, std::vector<Token> &v)
 				}
 			}
 			else {
-				if (v1.type == Variable::VECTOR) {
+				if (IS_VECTOR(v1)) {
 					val = "-vector-";
 				}
-				else if (v1.type == Variable::MAP) {
+				else if (IS_MAP(v1)) {
 					val = "-map-";
 				}
-				else if (v1.type == Variable::POINTER) {
+				else if (IS_POINTER(v1)) {
 					val = "-pointer-";
 				}
-				else if (v1.type == Variable::FUNCTION) {
+				else if (IS_FUNCTION(v1)) {
 					val = "-function-";
 				}
-				else if (v1.type == Variable::LABEL) {
+				else if (IS_LABEL(v1)) {
 					val = "-label-";
 				}
 				else {
@@ -455,49 +455,49 @@ bool stringfunc_format(Program *prg, std::vector<Token> &v)
 		}
 		else {
 			Variable &v1 = as_variable(prg, v[_tok]);
-			if (v1.type == Variable::NUMBER) {
+			if (IS_NUMBER(v1)) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
 				snprintf(buf, 1000, ("%" + format).c_str(), v1.n);
 				val = buf;
 			}
-			else if (v1.type == Variable::STRING) {
+			else if (IS_STRING(v1)) {
 				format = (format == "") ? "s" : format;
 				char buf[1000];
 				snprintf(buf, 1000, ("%" + format).c_str(), v1.s.c_str());
 				val = buf;
 			}
-			else if (v1.type == Variable::EXPRESSION) {
+			else if (IS_EXPRESSION(v1)) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
 				snprintf(buf, 1000, ("%" + format).c_str(), evaluate_expression(prg, v1.e).n);
 				val = buf;
 			}
-			else if (v1.type == Variable::FISH) {
+			else if (IS_FISH(v1)) {
 				Variable &var = go_fish(prg, v1.f);
-				if (var.type == Variable::NUMBER) {
+				if (IS_NUMBER(var)) {
 					format = (format == "") ? "g" : format;
 					char buf[1000];
 					snprintf(buf, 1000, ("%" + format).c_str(), var.n);
 					val = buf;
 				}
 				else {
-					if (var.type == Variable::STRING) {
+					if (IS_STRING(var)) {
 						val = var.s;
 					}
-					else if (var.type == Variable::VECTOR) {
+					else if (IS_VECTOR(var)) {
 						val = "-vector-";
 					}
-					else if (var.type == Variable::MAP) {
+					else if (IS_MAP(var)) {
 						val = "-map-";
 					}
-					else if (var.type == Variable::POINTER) {
+					else if (IS_POINTER(var)) {
 						val = "-pointer-";
 					}
-					else if (var.type == Variable::FUNCTION) {
+					else if (IS_FUNCTION(var)) {
 						val = "-function-";
 					}
-					else if (var.type == Variable::LABEL) {
+					else if (IS_LABEL(var)) {
 						val = "-label-";
 					}
 					else {
@@ -510,19 +510,19 @@ bool stringfunc_format(Program *prg, std::vector<Token> &v)
 				}
 			}
 			else {
-				if (v1.type == Variable::VECTOR) {
+				if (IS_VECTOR(v1)) {
 					val = "-vector-";
 				}
-				else if (v1.type == Variable::MAP) {
+				else if (IS_MAP(v1)) {
 					val = "-map-";
 				}
-				else if (v1.type == Variable::POINTER) {
+				else if (IS_POINTER(v1)) {
 					val = "-pointer-";
 				}
-				else if (v1.type == Variable::FUNCTION) {
+				else if (IS_FUNCTION(v1)) {
 					val = "-function-";
 				}
-				else if (v1.type == Variable::LABEL) {
+				else if (IS_LABEL(v1)) {
 					val = "-label-";
 				}
 				else {
@@ -560,7 +560,7 @@ bool stringfunc_char_at(Program *prg, std::vector<Token> &v)
 
 	uint32_t value = util::utf8_char(s, index);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = value;
 	}
 	else {
@@ -577,7 +577,7 @@ bool stringfunc_length(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 	std::string s = as_string(prg, v[1]);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = util::utf8_len(s);
 	}
 	else {
@@ -594,7 +594,7 @@ bool stringfunc_from_number(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 	uint32_t n = as_number(prg, v[1]);
 
-	if (v1.type == Variable::STRING) {
+	if (IS_STRING(v1)) {
 		v1.s = util::utf8_char_to_string(n);
 	}
 	else {
@@ -631,7 +631,7 @@ bool stringfunc_uppercase(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type == Variable::STRING) {
+	if (IS_STRING(v1)) {
 		v1.s = util::uppercase(v1.s);
 	}
 	else {
@@ -647,7 +647,7 @@ bool stringfunc_lowercase(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type == Variable::STRING) {
+	if (IS_STRING(v1)) {
 		v1.s = util::lowercase(v1.s);
 	}
 	else {
@@ -663,7 +663,7 @@ bool stringfunc_trim(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type == Variable::STRING) {
+	if (IS_STRING(v1)) {
 		v1.s = util::trim(v1.s);
 	}
 	else {
@@ -731,7 +731,7 @@ bool stringfunc_matches(Program *prg, std::vector<Token> &v)
 	std::string str = as_string(prg, v[1]);
 	std::string regex = as_string(prg, v[2]);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = std::regex_search(str, std::regex(regex));
 	}
 	else {
@@ -747,7 +747,7 @@ bool mathfunc_sin(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = sin(v1.n);
 	}
 	else {
@@ -763,7 +763,7 @@ bool mathfunc_cos(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = cos(v1.n);
 	}
 	else {
@@ -779,7 +779,7 @@ bool mathfunc_atan2(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = atan2(v1.n, as_number(prg, v[1]));
 	}
 	else {
@@ -795,7 +795,7 @@ bool mathfunc_abs(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = fabs(v1.n);
 	}
 	else {
@@ -811,7 +811,7 @@ bool mathfunc_pow(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = pow(v1.n, as_number(prg, v[1]));
 	}
 	else {
@@ -827,7 +827,7 @@ bool mathfunc_sqrt(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = sqrt(v1.n);
 	}
 	else {
@@ -857,7 +857,7 @@ bool mathfunc_neg(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = -v1.n;
 	}
 	else {
@@ -874,7 +874,7 @@ bool mathfunc_intmod(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 	int d = as_number(prg, v[1]);
 	
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = int(v1.n) % int(d);
 	}
 	else {
@@ -891,7 +891,7 @@ bool mathfunc_fmod(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 	double d = as_number(prg, v[1]);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = fmod(v1.n, d);
 	}
 	else {
@@ -907,7 +907,7 @@ bool mathfunc_sign(Program *prg, std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = sign(v1.n);
 	}
 	else {
@@ -932,15 +932,15 @@ static bool vectorfunc_add(Program *prg, std::vector<Token> &v)
 	}
 	else if (v[1].type == Token::SYMBOL) {
 		Variable &tmp = get_variable(prg, v[1].i);
-		if (tmp.type == Variable::POINTER) {
+		if (IS_POINTER(tmp)) {
 			var = tmp;
 		}
 		else {
 			var = as_variable(prg, v[1]);
-			if (var.type == Variable::FISH) {
+			if (IS_FISH(var)) {
 				var = go_fish(prg, var.f);
 			}
-			else if (var.type == Variable::EXPRESSION) {
+			else if (IS_EXPRESSION(var)) {
 				var = evaluate_expression(prg, var.e);
 			}
 		}
@@ -963,7 +963,7 @@ static bool vectorfunc_size(Program *prg, std::vector<Token> &v)
 	Variable &id = as_variable(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = id.v.size();
 	}
 	else {
@@ -994,7 +994,7 @@ static bool vectorfunc_set(Program *prg, std::vector<Token> &v)
 	}
 	else if (v[val_index].type == Token::SYMBOL) {
 		Variable &tmp = get_variable(prg, v[val_index].i);
-		if (tmp.type == Variable::POINTER) {
+		if (IS_POINTER(tmp)) {
 			var = tmp;
 		}
 		else {
@@ -1054,7 +1054,7 @@ static bool vectorfunc_insert(Program *prg, std::vector<Token> &v)
 	}
 	else if (v[2].type == Token::SYMBOL) {
 		Variable &tmp = get_variable(prg, v[2].i);
-		if (tmp.type == Variable::POINTER) {
+		if (IS_POINTER(tmp)) {
 			var = tmp;
 		}
 		else {
@@ -1096,7 +1096,7 @@ static bool vectorfunc_get(Program *prg, std::vector<Token> &v)
 				throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
 			}
 			Variable &tmp = get_variable(prg, v[1].i);
-			if (tmp.type == Variable::POINTER) {
+			if (IS_POINTER(tmp)) {
 				Variable &v1 = tmp;
 				v1.p = (*p)[index].p;
 			}
@@ -1170,15 +1170,15 @@ static bool mapfunc_set(Program *prg, std::vector<Token> &v)
 	}
 	else if (v[val_index].type == Token::SYMBOL) {
 		Variable &tmp = get_variable(prg, v[val_index].i);
-		if (tmp.type == Variable::POINTER) {
+		if (IS_POINTER(tmp)) {
 			var = tmp;
 		}
 		else {
 			var = as_variable(prg, v[val_index]);
-			if (var.type == Variable::FISH) {
+			if (IS_FISH(var)) {
 				var = go_fish(prg, var.f);
 			}
-			else if (var.type == Variable::EXPRESSION) {
+			else if (IS_EXPRESSION(var)) {
 				var = evaluate_expression(prg, var.e);
 			}
 		}
@@ -1221,7 +1221,7 @@ static bool mapfunc_get(Program *prg, std::vector<Token> &v)
 	}
 
 	Variable &tmp = get_variable(prg, v[1].i);
-	if (tmp.type == Variable::POINTER) {
+	if (IS_POINTER(tmp)) {
 		Variable &v1 = tmp;
 		v1.p = (*p)[key].p;
 	}
@@ -1305,7 +1305,7 @@ static bool filefunc_open(Program *prg, std::vector<Token> &v)
 	
 	File_Info *info = file_info(prg);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = info->file_id;
 	}
 	else {
@@ -1477,49 +1477,49 @@ bool filefunc_print(Program *prg, std::vector<Token> &v)
 		}
 		else {
 			Variable &v1 = as_variable(prg, v[_tok]);
-			if (v1.type == Variable::NUMBER) {
+			if (IS_NUMBER(v1)) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
 				snprintf(buf, 1000, ("%" + format).c_str(), v1.n);
 				val = buf;
 			}
-			else if (v1.type == Variable::STRING) {
+			else if (IS_STRING(v1)) {
 				format = (format == "") ? "s" : format;
 				char buf[1000];
 				snprintf(buf, 1000, ("%" + format).c_str(), v1.s.c_str());
 				val = buf;
 			}
-			else if (v1.type == Variable::EXPRESSION) {
+			else if (IS_EXPRESSION(v1)) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
 				snprintf(buf, 1000, ("%" + format).c_str(), evaluate_expression(prg, v1.e).n);
 				val = buf;
 			}
-			else if (v1.type == Variable::FISH) {
+			else if (IS_FISH(v1)) {
 				Variable &var = go_fish(prg, v1.f);
-				if (var.type == Variable::NUMBER) {
+				if (IS_NUMBER(var)) {
 					format = (format == "") ? "g" : format;
 					char buf[1000];
 					snprintf(buf, 1000, ("%" + format).c_str(), var.n);
 					val = buf;
 				}
 				else {
-					if (var.type == Variable::STRING) {
+					if (IS_STRING(var)) {
 						val = var.s;
 					}
-					else if (var.type == Variable::VECTOR) {
+					else if (IS_VECTOR(var)) {
 						val = "-vector-";
 					}
-					else if (var.type == Variable::MAP) {
+					else if (IS_MAP(var)) {
 						val = "-map-";
 					}
-					else if (var.type == Variable::POINTER) {
+					else if (IS_POINTER(var)) {
 						val = "-pointer-";
 					}
-					else if (var.type == Variable::FUNCTION) {
+					else if (IS_FUNCTION(var)) {
 						val = "-function-";
 					}
-					else if (var.type == Variable::LABEL) {
+					else if (IS_LABEL(var)) {
 						val = "-label-";
 					}
 					else {
@@ -1532,19 +1532,19 @@ bool filefunc_print(Program *prg, std::vector<Token> &v)
 				}
 			}
 			else {
-				if (v1.type == Variable::VECTOR) {
+				if (IS_VECTOR(v1)) {
 					val = "-vector-";
 				}
-				else if (v1.type == Variable::MAP) {
+				else if (IS_MAP(v1)) {
 					val = "-map-";
 				}
-				else if (v1.type == Variable::POINTER) {
+				else if (IS_POINTER(v1)) {
 					val = "-pointer-";
 				}
-				else if (v1.type == Variable::FUNCTION) {
+				else if (IS_FUNCTION(v1)) {
 					val = "-function-";
 				}
-				else if (v1.type == Variable::LABEL) {
+				else if (IS_LABEL(v1)) {
 					val = "-label-";
 				}
 				else {
@@ -1580,7 +1580,7 @@ bool bitfunc_or(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		if (v1.type == Variable::NUMBER) {
+		if (IS_NUMBER(v1)) {
 			v1.n = (int)v1.n | (int)as_number(prg, v[i]);
 		}
 		else {
@@ -1598,7 +1598,7 @@ bool bitfunc_xor(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		if (v1.type == Variable::NUMBER) {
+		if (IS_NUMBER(v1)) {
 			v1.n = (int)v1.n ^ (int)as_number(prg, v[i]);
 		}
 		else {
@@ -1616,7 +1616,7 @@ bool bitfunc_and(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		if (v1.type == Variable::NUMBER) {
+		if (IS_NUMBER(v1)) {
 			v1.n = (int)v1.n & (int)as_number(prg, v[i]);
 		}
 		else {
@@ -1634,7 +1634,7 @@ bool bitfunc_leftshift(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		if (v1.type == Variable::NUMBER) {
+		if (IS_NUMBER(v1)) {
 			v1.n = (int)v1.n << (int)as_number(prg, v[i]);
 		}
 		else {
@@ -1652,7 +1652,7 @@ bool bitfunc_rightshift(Program *prg, std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		if (v1.type == Variable::NUMBER) {
+		if (IS_NUMBER(v1)) {
 			v1.n = (int)v1.n >> (int)as_number(prg, v[i]);
 		}
 		else {
@@ -1692,7 +1692,7 @@ bool twinklefunc_getch(Program *prg, std::vector<Token> &v)
 	
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (v1.type == Variable::NUMBER) {
+	if (IS_NUMBER(v1)) {
 		v1.n = twinkle::getch();
 	}
 	else {
