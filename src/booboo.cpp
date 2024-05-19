@@ -3052,6 +3052,7 @@ Program *create_program(std::string code)
 	while(process_includes(prg));
 
 	// This prints the program with all includes inserted, prefixed by line number and filename
+#if 0
 	printf("---\n");
 	for (size_t i = 0; i < prg->real_line_numbers.size(); i++) {
 		int off = 0;
@@ -3070,6 +3071,7 @@ Program *create_program(std::string code)
 		printf("%d:%s:%s\n", prg->real_line_numbers[i], prg->real_file_names[i].c_str(), line.c_str());
 	}
 	printf("---\n");
+#endif
 
 	compile(prg, PASS1);
 
