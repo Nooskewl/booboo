@@ -79,16 +79,16 @@ inline double as_number_inline(Program *prg, const Token &t)
 	}
 	else if (t.type == Token::SYMBOL) {
 		Variable *v;
+		if (prg->variables[t.i].type == Variable::NUMBER) {
+			return prg->variables[t.i].n;
+		}
 		if (prg->variables[t.i].type == Variable::POINTER) {
 			v = prg->variables[t.i].p;
 		}
 		else {
 		      v	= &prg->variables[t.i];
 		}
-		if (v->type == Variable::NUMBER) {
-			return v->n;
-		}
-		else if (v->type == Variable::EXPRESSION) {
+		if (v->type == Variable::EXPRESSION) {
 			Variable var = evaluate_expression(prg, v->e);
 			if (var.type == Variable::NUMBER) {
 				return var.n;
@@ -136,16 +136,16 @@ inline std::string as_string_inline(Program *prg, const Token &t)
 	}
 	else if (t.type == Token::SYMBOL) {
 		Variable *v;
+		if (prg->variables[t.i].type == Variable::STRING) {
+			return prg->variables[t.i].s;
+		}
 		if (prg->variables[t.i].type == Variable::POINTER) {
 			v = prg->variables[t.i].p;
 		}
 		else {
 		      v	= &prg->variables[t.i];
 		}
-		if (v->type == Variable::STRING) {
-			return v->s;
-		}
-		else if (v->type == Variable::NUMBER) {
+		if (v->type == Variable::NUMBER) {
 			char buf[1000];
 			snprintf(buf, 1000, "%g", v->n);
 			return buf;
