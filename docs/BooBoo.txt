@@ -30,10 +30,6 @@ map
 	declare a map or maps
 	e.g. map m
 
-pointer
-	declare a pointer or pointers
-	e.g. pointer p1 p2 p3
-
 reset
 	load a different BooBoo script
 	e.g. reset "next_slide.boo"
@@ -66,13 +62,6 @@ include
 function
 	define a function
 	e.g. function foo param1 param2 { ... }
-
-address
-	store an address in a pointer
-	Works with variables, functions and labels
-	Note: Some variables and labels are local to a function and
-	it doesn't make sense to use them after it returns
-	e.g. address p var_or_function
 
 typeof
 	Returns a string respresentation of the type of the second parameter

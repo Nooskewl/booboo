@@ -1327,7 +1327,7 @@ func_top:
 					}
 					var_i++;
 				}
-				else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map" || tok == "pointer") {
+				else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map") {
 					Statement s;
 					s.method = library_map[tok];
 					func.s->program.push_back(s);
@@ -1368,11 +1368,8 @@ func_top:
 						else if (tok == "vector") {
 							v.type = Variable::VECTOR;
 						}
-						else if (tok == "map") {
+						else { // map
 							v.type = Variable::MAP;
-						}
-						else {
-							v.type = Variable::POINTER;
 						}
 						std::map<std::string, int>::iterator it;
 						it = prg->variables_map.find(tok2);
@@ -1560,7 +1557,7 @@ func_top:
 			prg->variables_map[tok2] = var_i;
 			var_i++;
 		}
-		else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map" || tok == "pointer") {
+		else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map") {
 			Statement s;
 			s.method = library_map[tok];
 			prg->s->program.push_back(s);
@@ -1597,11 +1594,8 @@ func_top:
 				else if (tok == "vector") {
 					v.type = Variable::VECTOR;
 				}
-				else if (tok == "map") {
+				else { // map
 					v.type = Variable::MAP;
-				}
-				else {
-					v.type = Variable::POINTER;
 				}
 				if (pass == PASS1) {
 					prg->variables.push_back(v);
@@ -1897,12 +1891,6 @@ bool corefunc_map(Program *prg, const std::vector<Token> &v)
 	for (size_t i = 0; i < v.size(); i++) {
 		prg->variables[v[i].i].m.clear();
 	}
-	return true;
-}
-
-bool corefunc_pointer(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(1)
 	return true;
 }
 
@@ -2225,9 +2213,6 @@ static std::string typeof_var(Variable &v1)
 	else if (IS_MAP(v1)) {
 		res = "map";
 	}
-	else if (IS_POINTER(v1)) {
-		res = "pointer";
-	}
 	else if (IS_FUNCTION(v1)) {
 		res = "function";
 	}
@@ -2313,30 +2298,11 @@ bool corefunc_typeof(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_address(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(2)
-
-	if (v[0].type != Token::SYMBOL || v[1].type != Token::SYMBOL) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
-
-	Variable &v1 = prg->variables[v[0].i];
-	Variable &v2 = prg->variables[v[1].i];
-
-	v1.p = &v2;
-
-	return true;
-}
-
 bool corefunc_for(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(5)
 
 	Variable &count = as_variable_inline(prg, v[0]);
-	if (IS_POINTER(count)) {
-		count = (*count.p);
-	}
 	if (IS_NUMBER(count) == false) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
@@ -2962,7 +2928,6 @@ void start()
 	add_instruction("string", corefunc_string);
 	add_instruction("vector", corefunc_vector);
 	add_instruction("map", corefunc_map);
-	add_instruction("pointer", corefunc_pointer);
 	
 	add_instruction("=", corefunc_set);
 	add_instruction("+", corefunc_add);
@@ -2983,7 +2948,6 @@ void start()
 	add_instruction("call_result", corefunc_call_result);
 	
 	add_instruction("typeof", corefunc_typeof);
-	add_instruction("address", corefunc_address);
 	
 	add_instruction("for", corefunc_for);
 	add_instruction("if", corefunc_if);
@@ -3105,11 +3069,6 @@ std::vector<Variable> get_vector(Variable &v)
 	return v.v;
 }
 
-Variable *get_pointer(Variable &v)
-{
-	return v.p;
-}
-
 void *get_black_box(Program *prg, std::string id)
 {
 	if (prg->black_box.find(id) == prg->black_box.end()) {
@@ -3151,11 +3110,6 @@ int as_label(Program *prg, const Token &t)
 int as_function(Program *prg, const Token &t)
 {
 	return as_function_inline(prg, t);
-}
-
-Variable &as_pointer(Program *prg, const Token &t)
-{
-	return as_pointer_inline(prg, t);
 }
 
 // Error class

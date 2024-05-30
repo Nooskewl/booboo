@@ -45,7 +45,6 @@ struct Variable
 		MAP,
 		LABEL,
 		FUNCTION,
-		POINTER,
 		EXPRESSION,
 		FISH
 	} type;
@@ -122,7 +121,6 @@ double as_number(Program *prg, const Token &t);
 std::string as_string(Program *prg, const Token &t);
 int as_label(Program *prg, const Token &t);
 int as_function(Program *prg, const Token &t);
-Variable &as_pointer(Program *prg, const Token &t);
 
 // The black box allows you to store anything you want
 void *get_black_box(Program *prg, std::string id);
@@ -157,7 +155,6 @@ extern std::string (*load_text)(std::string filename); // must be set
 #define IS_MAP(v) ((v).type == Variable::MAP)
 #define IS_LABEL(v) ((v).type == Variable::LABEL)
 #define IS_FUNCTION(v) ((v).type == Variable::FUNCTION)
-#define IS_POINTER(v) ((v).type == Variable::POINTER)
 #define IS_EXPRESSION(v) ((v).type == Variable::EXPRESSION)
 #define IS_FISH(v) ((v).type == Variable::FISH)
 

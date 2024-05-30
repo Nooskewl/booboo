@@ -32,13 +32,9 @@ function triangle
 }
 
 vector v
-pointer p
-address p circle
-vector_add v p
-address p square
-vector_add v p
-address p triangle
-vector_add v p
+vector_add v circle
+vector_add v square
+vector_add v triangle
 
 vector shapes
 
@@ -51,9 +47,7 @@ number r
 call_result r genrand
 fmod r 3
 floor r
-pointer p
-vector_get v p r
-map_set m "draw" p
+map_set m "draw" [v r]
 vector_add shapes m
 + i 1
 ? i 10
@@ -64,9 +58,7 @@ number i
 :next_loop2
 map m
 vector_get shapes m i
-pointer p
-map_get m p "draw"
-call p
+call [m "draw"]
 + i 1
 ? i 10
 jl next_loop2

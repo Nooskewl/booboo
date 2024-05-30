@@ -278,9 +278,6 @@ static bool miscfunc_inspect(Program *prg, const std::vector<Token> &v)
 		else if (IS_MAP(var)) {
 			snprintf(buf, 1000, "-map-");
 		}
-		else if (IS_POINTER(var)) {
-			snprintf(buf, 1000, "-pointer-");
-		}
 		else if (IS_FUNCTION(var)) {
 			snprintf(buf, 1000, "-function-");
 		}

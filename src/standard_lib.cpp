@@ -159,9 +159,6 @@ bool corefunc_print(Program *prg, const std::vector<Token> &v)
 					else if (IS_MAP(var)) {
 						val = "-map-";
 					}
-					else if (IS_POINTER(var)) {
-						val = "-pointer-";
-					}
 					else if (IS_FUNCTION(var)) {
 						val = "-function-";
 					}
@@ -183,9 +180,6 @@ bool corefunc_print(Program *prg, const std::vector<Token> &v)
 				}
 				else if (IS_MAP(v1)) {
 					val = "-map-";
-				}
-				else if (IS_POINTER(v1)) {
-					val = "-pointer-";
 				}
 				else if (IS_FUNCTION(v1)) {
 					val = "-function-";
@@ -491,9 +485,6 @@ bool stringfunc_format(Program *prg, const std::vector<Token> &v)
 					else if (IS_MAP(var)) {
 						val = "-map-";
 					}
-					else if (IS_POINTER(var)) {
-						val = "-pointer-";
-					}
 					else if (IS_FUNCTION(var)) {
 						val = "-function-";
 					}
@@ -515,9 +506,6 @@ bool stringfunc_format(Program *prg, const std::vector<Token> &v)
 				}
 				else if (IS_MAP(v1)) {
 					val = "-map-";
-				}
-				else if (IS_POINTER(v1)) {
-					val = "-pointer-";
 				}
 				else if (IS_FUNCTION(v1)) {
 					val = "-function-";
@@ -935,18 +923,12 @@ static bool vectorfunc_add(Program *prg, const std::vector<Token> &v)
 		var.n = v[1].n;
 	}
 	else if (v[1].type == Token::SYMBOL) {
-		Variable &tmp = get_variable(prg, v[1].i);
-		if (IS_POINTER(tmp)) {
-			var = tmp;
+		var = as_variable(prg, v[1]);
+		if (IS_FISH(var)) {
+			var = go_fish(prg, var.f);
 		}
-		else {
-			var = as_variable(prg, v[1]);
-			if (IS_FISH(var)) {
-				var = go_fish(prg, var.f);
-			}
-			else if (IS_EXPRESSION(var)) {
-				var = evaluate_expression(prg, var.e);
-			}
+		else if (IS_EXPRESSION(var)) {
+			var = evaluate_expression(prg, var.e);
 		}
 	}
 	else {
@@ -1005,13 +987,7 @@ static bool vectorfunc_set(Program *prg, const std::vector<Token> &v)
 		var.n = v[val_index].n;
 	}
 	else if (v[val_index].type == Token::SYMBOL) {
-		Variable &tmp = get_variable(prg, v[val_index].i);
-		if (IS_POINTER(tmp)) {
-			var = tmp;
-		}
-		else {
-			var = as_variable(prg, v[val_index]);
-		}
+		var = as_variable(prg, v[val_index]);
 	}
 	else {
 		var.type = Variable::STRING;
@@ -1069,13 +1045,7 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 		var.n = v[2].n;
 	}
 	else if (v[2].type == Token::SYMBOL) {
-		Variable &tmp = get_variable(prg, v[2].i);
-		if (IS_POINTER(tmp)) {
-			var = tmp;
-		}
-		else {
-			var = as_variable(prg, v[2]);
-		}
+		var = as_variable(prg, v[2]);
 	}
 	else {
 		var.type = Variable::STRING;
@@ -1115,17 +1085,10 @@ static bool vectorfunc_get(Program *prg, const std::vector<Token> &v)
 			if (index < 0 || index >= (int)(*p).size()) {
 				throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
 			}
-			Variable &tmp = get_variable(prg, v[1].i);
-			if (IS_POINTER(tmp)) {
-				Variable &v1 = tmp;
-				v1.p = (*p)[index].p;
-			}
-			else {
-				Variable &v1 = as_variable(prg, v[1]);
-				std::string bak = v1.name;
-				v1 = (*p)[index];
-				v1.name = bak;
-			}
+			Variable &v1 = as_variable(prg, v[1]);
+			std::string bak = v1.name;
+			v1 = (*p)[index];
+			v1.name = bak;
 		}
 		else {
 			if (p == nullptr) {
@@ -1201,18 +1164,12 @@ static bool mapfunc_set(Program *prg, const std::vector<Token> &v)
 		var.n = v[val_index].n;
 	}
 	else if (v[val_index].type == Token::SYMBOL) {
-		Variable &tmp = get_variable(prg, v[val_index].i);
-		if (IS_POINTER(tmp)) {
-			var = tmp;
+		var = as_variable(prg, v[val_index]);
+		if (IS_FISH(var)) {
+			var = go_fish(prg, var.f);
 		}
-		else {
-			var = as_variable(prg, v[val_index]);
-			if (IS_FISH(var)) {
-				var = go_fish(prg, var.f);
-			}
-			else if (IS_EXPRESSION(var)) {
-				var = evaluate_expression(prg, var.e);
-			}
+		else if (IS_EXPRESSION(var)) {
+			var = evaluate_expression(prg, var.e);
 		}
 	}
 	else {
@@ -1256,17 +1213,10 @@ static bool mapfunc_get(Program *prg, const std::vector<Token> &v)
 		}
 	}
 
-	Variable &tmp = get_variable(prg, v[1].i);
-	if (IS_POINTER(tmp)) {
-		Variable &v1 = tmp;
-		v1.p = (*p)[key].p;
-	}
-	else {
-		Variable &v1 = as_variable(prg, v[1]);
-		std::string bak = v1.name;
-		v1 = (*p)[key];
-		v1.name = bak;
-	}
+	Variable &v1 = as_variable(prg, v[1]);
+	std::string bak = v1.name;
+	v1 = (*p)[key];
+	v1.name = bak;
 
 	return true;
 }
@@ -1557,9 +1507,6 @@ bool filefunc_print(Program *prg, const std::vector<Token> &v)
 					else if (IS_MAP(var)) {
 						val = "-map-";
 					}
-					else if (IS_POINTER(var)) {
-						val = "-pointer-";
-					}
 					else if (IS_FUNCTION(var)) {
 						val = "-function-";
 					}
@@ -1581,9 +1528,6 @@ bool filefunc_print(Program *prg, const std::vector<Token> &v)
 				}
 				else if (IS_MAP(v1)) {
 					val = "-map-";
-				}
-				else if (IS_POINTER(v1)) {
-					val = "-pointer-";
 				}
 				else if (IS_FUNCTION(v1)) {
 					val = "-function-";
