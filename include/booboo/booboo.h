@@ -72,9 +72,9 @@ struct Variable
 	Fish f;
 };
 
-typedef bool (*library_func)(Program *prg, std::vector<Token> &v);
+typedef bool (*library_func)(Program *prg, const std::vector<Token> &v);
 typedef std::string (*token_func)(Program *);
-typedef Variable (*expression_func)(Program *prg, std::vector<Token> &v);
+typedef Variable (*expression_func)(Program *prg, const std::vector<Token> &v);
 
 // Call these before/after using BooBoo
 void start();
@@ -86,10 +86,10 @@ void destroy_program(Program *prg);
 bool interpret(Program *prg, int instructions);
 
 // Functions calling
-void call_function(Program *prg, int function, std::vector<Token> &params, Variable &result, int ignore_params = 0);
-void call_function(Program *prg, std::string function, std::vector<Token> &params, Variable &result, int ignore_params = 0);
-void call_void_function(Program *prg, int function, std::vector<Token> &params, int ignore_params = 0);
-void call_void_function(Program *prg, std::string function, std::vector<Token> &params, int ignore_params = 0);
+void call_function(Program *prg, int function, const std::vector<Token> &params, Variable &result, int ignore_params = 0);
+void call_function(Program *prg, std::string function, const std::vector<Token> &params, Variable &result, int ignore_params = 0);
+void call_void_function(Program *prg, int function, const std::vector<Token> &params, int ignore_params = 0);
+void call_void_function(Program *prg, std::string function, const std::vector<Token> &params, int ignore_params = 0);
 
 // To create token vectors for calling functions
 Token token_number(std::string token, double n);
@@ -113,12 +113,12 @@ std::string get_file_name(Program *prg);
 std::string get_error_info(Program *prg);
 
 // These are helpful within your own library functions
-Variable &as_variable(Program *prg, Token &t);
-double as_number(Program *prg, Token &t);
-std::string as_string(Program *prg, Token &t);
-int as_label(Program *prg, Token &t);
-int as_function(Program *prg, Token &t);
-Variable &as_pointer(Program *prg, Token &t);
+Variable &as_variable(Program *prg, const Token &t);
+double as_number(Program *prg, const Token &t);
+std::string as_string(Program *prg, const Token &t);
+int as_label(Program *prg, const Token &t);
+int as_function(Program *prg, const Token &t);
+Variable &as_pointer(Program *prg, const Token &t);
 
 // The black box allows you to store anything you want
 void *get_black_box(Program *prg, std::string id);

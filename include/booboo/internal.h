@@ -58,7 +58,7 @@ struct Program {
 
 std::string itos(int i);
 
-inline Variable &as_variable_inline(Program *prg, Token &t)
+inline Variable &as_variable_inline(Program *prg, const Token &t)
 {
 	if (t.type != Token::SYMBOL) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -72,7 +72,7 @@ inline Variable &as_variable_inline(Program *prg, Token &t)
 	return prg->variables[t.i];
 }
 
-inline double as_number_inline(Program *prg, Token &t)
+inline double as_number_inline(Program *prg, const Token &t)
 {
 	if (t.type == Token::NUMBER) {
 		return t.n;
@@ -127,7 +127,7 @@ inline double as_number_inline(Program *prg, Token &t)
 	}
 }
 
-inline std::string as_string_inline(Program *prg, Token &t)
+inline std::string as_string_inline(Program *prg, const Token &t)
 {
 	if (t.type == Token::NUMBER) {
 		char buf[1000];
@@ -176,7 +176,7 @@ inline std::string as_string_inline(Program *prg, Token &t)
 	}
 }
 
-inline int as_label_inline(Program *prg, Token &t)
+inline int as_label_inline(Program *prg, const Token &t)
 {
 	if (t.type != Token::SYMBOL) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -201,7 +201,7 @@ inline int as_label_inline(Program *prg, Token &t)
 	return v->n;
 }
 
-inline int as_function_inline(Program *prg, Token &t)
+inline int as_function_inline(Program *prg, const Token &t)
 {
 	if (t.type != Token::SYMBOL) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -226,7 +226,7 @@ inline int as_function_inline(Program *prg, Token &t)
 	return v->n;
 }
 
-inline Variable &as_pointer_inline(Program *prg, Token &t)
+inline Variable &as_pointer_inline(Program *prg, const Token &t)
 {
 	if (t.type != Token::SYMBOL) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));

@@ -38,7 +38,7 @@ File_Info *file_info(Program *prg)
 	return info;
 }
 
-bool corefunc_getenv(Program *prg, std::vector<Token> &v)
+bool corefunc_getenv(Program *prg, const std::vector<Token> &v)
 {
 	Variable &v1 = as_variable(prg, v[0]);
 	std::string get = as_string(prg, v[1]);
@@ -52,7 +52,7 @@ bool corefunc_getenv(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_print(Program *prg, std::vector<Token> &v)
+bool corefunc_print(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 
@@ -217,7 +217,7 @@ bool corefunc_print(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_input(Program *prg, std::vector<Token> &v)
+bool corefunc_input(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -237,7 +237,7 @@ bool corefunc_input(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_mkdir(Program *prg, std::vector<Token> &v)
+bool corefunc_mkdir(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -248,7 +248,7 @@ bool corefunc_mkdir(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_get_system_language(Program *prg, std::vector<Token> &v)
+bool corefunc_get_system_language(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -263,7 +263,7 @@ bool corefunc_get_system_language(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_get_full_path(Program *prg, std::vector<Token> &v)
+bool corefunc_get_full_path(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -294,7 +294,7 @@ bool corefunc_get_full_path(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_list_drives(Program *prg, std::vector<Token> &v)
+bool corefunc_list_drives(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -325,7 +325,7 @@ bool corefunc_list_drives(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_list_directory(Program *prg, std::vector<Token> &v)
+bool corefunc_list_directory(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -383,7 +383,7 @@ bool corefunc_list_directory(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool stringfunc_format(Program *prg, std::vector<Token> &v)
+bool stringfunc_format(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -550,7 +550,7 @@ bool stringfunc_format(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool stringfunc_char_at(Program *prg, std::vector<Token> &v)
+bool stringfunc_char_at(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -570,7 +570,7 @@ bool stringfunc_char_at(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool stringfunc_length(Program *prg, std::vector<Token> &v)
+bool stringfunc_length(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -587,7 +587,7 @@ bool stringfunc_length(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool stringfunc_from_number(Program *prg, std::vector<Token> &v)
+bool stringfunc_from_number(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -604,7 +604,7 @@ bool stringfunc_from_number(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool stringfunc_substr(Program *prg, std::vector<Token> &v)
+bool stringfunc_substr(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -625,7 +625,7 @@ bool stringfunc_substr(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool stringfunc_uppercase(Program *prg, std::vector<Token> &v)
+bool stringfunc_uppercase(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -641,7 +641,7 @@ bool stringfunc_uppercase(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool stringfunc_lowercase(Program *prg, std::vector<Token> &v)
+bool stringfunc_lowercase(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -657,7 +657,7 @@ bool stringfunc_lowercase(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool stringfunc_trim(Program *prg, std::vector<Token> &v)
+bool stringfunc_trim(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -673,7 +673,7 @@ bool stringfunc_trim(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool stringfunc_replace(Program *prg, std::vector<Token> &v)
+bool stringfunc_replace(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
@@ -692,7 +692,7 @@ bool stringfunc_replace(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool stringfunc_match(Program *prg, std::vector<Token> &v)
+bool stringfunc_match(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -723,7 +723,7 @@ bool stringfunc_match(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool stringfunc_matches(Program *prg, std::vector<Token> &v)
+bool stringfunc_matches(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -741,7 +741,7 @@ bool stringfunc_matches(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool mathfunc_sin(Program *prg, std::vector<Token> &v)
+bool mathfunc_sin(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -757,7 +757,7 @@ bool mathfunc_sin(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool mathfunc_cos(Program *prg, std::vector<Token> &v)
+bool mathfunc_cos(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -773,7 +773,7 @@ bool mathfunc_cos(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool mathfunc_atan2(Program *prg, std::vector<Token> &v)
+bool mathfunc_atan2(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -789,7 +789,7 @@ bool mathfunc_atan2(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool mathfunc_abs(Program *prg, std::vector<Token> &v)
+bool mathfunc_abs(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -805,7 +805,7 @@ bool mathfunc_abs(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool mathfunc_pow(Program *prg, std::vector<Token> &v)
+bool mathfunc_pow(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -821,7 +821,7 @@ bool mathfunc_pow(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool mathfunc_sqrt(Program *prg, std::vector<Token> &v)
+bool mathfunc_sqrt(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -837,7 +837,7 @@ bool mathfunc_sqrt(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool mathfunc_floor(Program *prg, std::vector<Token> &v)
+bool mathfunc_floor(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 	Variable &v1 = as_variable(prg, v[0]);
@@ -851,7 +851,7 @@ bool mathfunc_floor(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool mathfunc_neg(Program *prg, std::vector<Token> &v)
+bool mathfunc_neg(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -867,7 +867,7 @@ bool mathfunc_neg(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool mathfunc_intmod(Program *prg, std::vector<Token> &v)
+bool mathfunc_intmod(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -884,7 +884,7 @@ bool mathfunc_intmod(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool mathfunc_fmod(Program *prg, std::vector<Token> &v)
+bool mathfunc_fmod(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -901,7 +901,7 @@ bool mathfunc_fmod(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool mathfunc_sign(Program *prg, std::vector<Token> &v)
+bool mathfunc_sign(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -917,7 +917,7 @@ bool mathfunc_sign(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool vectorfunc_add(Program *prg, std::vector<Token> &v)
+static bool vectorfunc_add(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -960,7 +960,7 @@ static bool vectorfunc_add(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool vectorfunc_size(Program *prg, std::vector<Token> &v)
+static bool vectorfunc_size(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -981,7 +981,7 @@ static bool vectorfunc_size(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool vectorfunc_set(Program *prg, std::vector<Token> &v)
+static bool vectorfunc_set(Program *prg, const std::vector<Token> &v)
 {
 	Variable &id = as_variable(prg, v[0]);
 	int val_index = v.size() - 1;
@@ -1046,7 +1046,7 @@ static bool vectorfunc_set(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool vectorfunc_insert(Program *prg, std::vector<Token> &v)
+static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -1088,7 +1088,7 @@ static bool vectorfunc_insert(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool vectorfunc_get(Program *prg, std::vector<Token> &v)
+static bool vectorfunc_get(Program *prg, const std::vector<Token> &v)
 {
 	Variable &id = as_variable(prg, v[0]);
 	std::vector<int> indices;
@@ -1146,7 +1146,7 @@ static bool vectorfunc_get(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool vectorfunc_erase(Program *prg, std::vector<Token> &v)
+static bool vectorfunc_erase(Program *prg, const std::vector<Token> &v)
 {
 
 	COUNT_ARGS(2)
@@ -1167,7 +1167,7 @@ static bool vectorfunc_erase(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool vectorfunc_clear(Program *prg, std::vector<Token> &v)
+static bool vectorfunc_clear(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -1182,7 +1182,7 @@ static bool vectorfunc_clear(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool mapfunc_set(Program *prg, std::vector<Token> &v)
+static bool mapfunc_set(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(3)
 
@@ -1236,7 +1236,7 @@ static bool mapfunc_set(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool mapfunc_get(Program *prg, std::vector<Token> &v)
+static bool mapfunc_get(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(3)
 
@@ -1271,7 +1271,7 @@ static bool mapfunc_get(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool mapfunc_clear(Program *prg, std::vector<Token> &v)
+static bool mapfunc_clear(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -1286,7 +1286,7 @@ static bool mapfunc_clear(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool mapfunc_erase(Program *prg, std::vector<Token> &v)
+static bool mapfunc_erase(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1308,7 +1308,7 @@ static bool mapfunc_erase(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool mapfunc_keys(Program *prg, std::vector<Token> &v)
+static bool mapfunc_keys(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1339,7 +1339,7 @@ static bool mapfunc_keys(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool filefunc_open(Program *prg, std::vector<Token> &v)
+static bool filefunc_open(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -1381,7 +1381,7 @@ static bool filefunc_open(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool filefunc_close(Program *prg, std::vector<Token> &v)
+static bool filefunc_close(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -1394,7 +1394,7 @@ static bool filefunc_close(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool filefunc_read(Program *prg, std::vector<Token> &v)
+static bool filefunc_read(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1412,7 +1412,7 @@ static bool filefunc_read(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool filefunc_read_line(Program *prg, std::vector<Token> &v)
+static bool filefunc_read_line(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1435,7 +1435,7 @@ static bool filefunc_read_line(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool filefunc_write(Program *prg, std::vector<Token> &v)
+static bool filefunc_write(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1449,7 +1449,7 @@ static bool filefunc_write(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool filefunc_print(Program *prg, std::vector<Token> &v)
+bool filefunc_print(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -1617,7 +1617,7 @@ bool filefunc_print(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool bitfunc_or(Program *prg, std::vector<Token> &v)
+bool bitfunc_or(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -1635,7 +1635,7 @@ bool bitfunc_or(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool bitfunc_xor(Program *prg, std::vector<Token> &v)
+bool bitfunc_xor(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -1653,7 +1653,7 @@ bool bitfunc_xor(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool bitfunc_and(Program *prg, std::vector<Token> &v)
+bool bitfunc_and(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -1671,7 +1671,7 @@ bool bitfunc_and(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool bitfunc_leftshift(Program *prg, std::vector<Token> &v)
+bool bitfunc_leftshift(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -1689,7 +1689,7 @@ bool bitfunc_leftshift(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool bitfunc_rightshift(Program *prg, std::vector<Token> &v)
+bool bitfunc_rightshift(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -1707,7 +1707,7 @@ bool bitfunc_rightshift(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool twinklefunc_colour(Program *prg, std::vector<Token> &v)
+bool twinklefunc_colour(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
@@ -1721,7 +1721,7 @@ bool twinklefunc_colour(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool twinklefunc_reset(Program *prg, std::vector<Token> &v)
+bool twinklefunc_reset(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
@@ -1730,7 +1730,7 @@ bool twinklefunc_reset(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool twinklefunc_getch(Program *prg, std::vector<Token> &v)
+bool twinklefunc_getch(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 	
@@ -1746,7 +1746,7 @@ bool twinklefunc_getch(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool twinklefunc_clear(Program *prg, std::vector<Token> &v)
+bool twinklefunc_clear(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 

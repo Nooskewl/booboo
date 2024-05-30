@@ -388,7 +388,7 @@ static bool mouse_b2;
 static bool mouse_b3;
 static int mouse_wheel_y;
 
-static bool mousefunc_get_position(Program *prg, std::vector<Token> &v)
+static bool mousefunc_get_position(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -405,7 +405,7 @@ static bool mousefunc_get_position(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool mousefunc_get_buttons(Program *prg, std::vector<Token> &v)
+static bool mousefunc_get_buttons(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
@@ -428,7 +428,7 @@ static bool mousefunc_get_buttons(Program *prg, std::vector<Token> &v)
 
 std::list<int> keys_pressed;
 
-static bool keyfunc_get(Program *prg, std::vector<Token> &v)
+static bool keyfunc_get(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 

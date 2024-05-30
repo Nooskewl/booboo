@@ -255,7 +255,7 @@ static bool save_cfg(Program *prg, int id, std::string cfg_name)
 	return true;
 }
 
-static bool miscfunc_inspect(Program *prg, std::vector<Token> &v)
+static bool miscfunc_inspect(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -297,7 +297,7 @@ static bool miscfunc_inspect(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool miscfunc_delay(Program *prg, std::vector<Token> &v)
+static bool miscfunc_delay(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -306,7 +306,7 @@ static bool miscfunc_delay(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool miscfunc_get_ticks(Program *prg, std::vector<Token> &v)
+static bool miscfunc_get_ticks(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -321,7 +321,7 @@ static bool miscfunc_get_ticks(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool miscfunc_rand(Program *prg, std::vector<Token> &v)
+static bool miscfunc_rand(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -340,7 +340,7 @@ static bool miscfunc_rand(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool miscfunc_args(Program *prg, std::vector<Token> &v)
+static bool miscfunc_args(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -363,7 +363,7 @@ static bool miscfunc_args(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool miscfunc_get_logic_rate(Program *prg, std::vector<Token> &v)
+static bool miscfunc_get_logic_rate(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -378,7 +378,7 @@ static bool miscfunc_get_logic_rate(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool miscfunc_set_logic_rate(Program *prg, std::vector<Token> &v)
+static bool miscfunc_set_logic_rate(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -393,7 +393,7 @@ static bool miscfunc_set_logic_rate(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool miscfunc_file_list(Program *prg, std::vector<Token> &v)
+static bool miscfunc_file_list(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -418,7 +418,7 @@ static bool miscfunc_file_list(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_set_scissor(Program *prg, std::vector<Token> &v)
+static bool gfxfunc_set_scissor(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
@@ -432,7 +432,7 @@ static bool gfxfunc_set_scissor(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_clear(Program *prg, std::vector<Token> &v)
+static bool gfxfunc_clear(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -447,7 +447,7 @@ static bool gfxfunc_clear(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_flip(Program *prg, std::vector<Token> &v)
+static bool gfxfunc_flip(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
@@ -456,7 +456,7 @@ static bool gfxfunc_flip(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_resize(Program *prg, std::vector<Token> &v)
+static bool gfxfunc_resize(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 	
@@ -471,7 +471,7 @@ static bool gfxfunc_resize(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_get_screen_size(Program *prg, std::vector<Token> &v)
+static bool gfxfunc_get_screen_size(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -488,7 +488,7 @@ static bool gfxfunc_get_screen_size(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_get_buffer_size(Program *prg, std::vector<Token> &v)
+static bool gfxfunc_get_buffer_size(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -505,7 +505,7 @@ static bool gfxfunc_get_buffer_size(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_get_screen_offset(Program *prg, std::vector<Token> &v)
+static bool gfxfunc_get_screen_offset(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -522,7 +522,7 @@ static bool gfxfunc_get_screen_offset(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_get_scale(Program *prg, std::vector<Token> &v)
+static bool gfxfunc_get_scale(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -537,7 +537,7 @@ static bool gfxfunc_get_scale(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_set_target(Program *prg, std::vector<Token> &v)
+static bool gfxfunc_set_target(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -558,7 +558,7 @@ static bool gfxfunc_set_target(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_set_target_backbuffer(Program *prg, std::vector<Token> &v)
+static bool gfxfunc_set_target_backbuffer(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
@@ -567,7 +567,7 @@ static bool gfxfunc_set_target_backbuffer(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_screen_shake(Program *prg, std::vector<Token> &v)
+static bool gfxfunc_screen_shake(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -579,7 +579,7 @@ static bool gfxfunc_screen_shake(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_add_notification(Program *prg, std::vector<Token> &v)
+static bool gfxfunc_add_notification(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -590,7 +590,7 @@ static bool gfxfunc_add_notification(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_is_fullscreen(Program *prg, std::vector<Token> &v)
+static bool gfxfunc_is_fullscreen(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -615,7 +615,7 @@ static void gen_f11()
 	shim::push_event(event);
 }
 
-static bool gfxfunc_toggle_fullscreen(Program *prg, std::vector<Token> &v)
+static bool gfxfunc_toggle_fullscreen(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
@@ -624,7 +624,7 @@ static bool gfxfunc_toggle_fullscreen(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_get_refresh_rate(Program *prg, std::vector<Token> &v)
+static bool gfxfunc_get_refresh_rate(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -639,7 +639,7 @@ static bool gfxfunc_get_refresh_rate(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_unset_scissor(Program *prg, std::vector<Token> &v)
+static bool gfxfunc_unset_scissor(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
@@ -648,7 +648,7 @@ static bool gfxfunc_unset_scissor(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool primfunc_start_primitives(Program *prg, std::vector<Token> &v)
+static bool primfunc_start_primitives(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
@@ -657,7 +657,7 @@ static bool primfunc_start_primitives(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool primfunc_end_primitives(Program *prg, std::vector<Token> &v)
+static bool primfunc_end_primitives(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
@@ -666,7 +666,7 @@ static bool primfunc_end_primitives(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool primfunc_line(Program *prg, std::vector<Token> &v)
+static bool primfunc_line(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(9)
 
@@ -690,7 +690,7 @@ static bool primfunc_line(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool primfunc_triangle(Program *prg, std::vector<Token> &v)
+static bool primfunc_triangle(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(11)
 
@@ -712,7 +712,7 @@ static bool primfunc_triangle(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool primfunc_filled_triangle(Program *prg, std::vector<Token> &v)
+static bool primfunc_filled_triangle(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(18)
 
@@ -744,7 +744,7 @@ static bool primfunc_filled_triangle(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool primfunc_rectangle(Program *prg, std::vector<Token> &v)
+static bool primfunc_rectangle(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(9)
 
@@ -769,7 +769,7 @@ static bool primfunc_rectangle(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool primfunc_filled_rectangle(Program *prg, std::vector<Token> &v)
+static bool primfunc_filled_rectangle(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(20)
 
@@ -806,7 +806,7 @@ static bool primfunc_filled_rectangle(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool primfunc_ellipse(Program *prg, std::vector<Token> &v)
+static bool primfunc_ellipse(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(10)
 
@@ -831,7 +831,7 @@ static bool primfunc_ellipse(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool primfunc_filled_ellipse(Program *prg, std::vector<Token> &v)
+static bool primfunc_filled_ellipse(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(9)
 
@@ -855,7 +855,7 @@ static bool primfunc_filled_ellipse(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool primfunc_circle(Program *prg, std::vector<Token> &v)
+static bool primfunc_circle(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(9)
 
@@ -878,7 +878,7 @@ static bool primfunc_circle(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool primfunc_filled_circle(Program *prg, std::vector<Token> &v)
+static bool primfunc_filled_circle(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(8)
 
@@ -900,7 +900,7 @@ static bool primfunc_filled_circle(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool mmlfunc_create(Program *prg, std::vector<Token> &v)
+static bool mmlfunc_create(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -925,7 +925,7 @@ static bool mmlfunc_create(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool mmlfunc_load(Program *prg, std::vector<Token> &v)
+static bool mmlfunc_load(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -948,7 +948,7 @@ static bool mmlfunc_load(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool mmlfunc_play(Program *prg, std::vector<Token> &v)
+static bool mmlfunc_play(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -971,7 +971,7 @@ static bool mmlfunc_play(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool mmlfunc_stop(Program *prg, std::vector<Token> &v)
+static bool mmlfunc_stop(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -992,7 +992,7 @@ static bool mmlfunc_stop(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool samplefunc_load(Program *prg, std::vector<Token> &v)
+static bool samplefunc_load(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1015,7 +1015,7 @@ static bool samplefunc_load(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool samplefunc_play(Program *prg, std::vector<Token> &v)
+static bool samplefunc_play(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -1038,7 +1038,7 @@ static bool samplefunc_play(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool samplefunc_stop(Program *prg, std::vector<Token> &v)
+static bool samplefunc_stop(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -1059,7 +1059,7 @@ static bool samplefunc_stop(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool imagefunc_create(Program *prg, std::vector<Token> &v)
+static bool imagefunc_create(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -1084,7 +1084,7 @@ static bool imagefunc_create(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool imagefunc_load(Program *prg, std::vector<Token> &v)
+static bool imagefunc_load(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1107,7 +1107,7 @@ static bool imagefunc_load(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool imagefunc_draw(Program *prg, std::vector<Token> &v)
+static bool imagefunc_draw(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(9)
 
@@ -1150,7 +1150,7 @@ static bool imagefunc_draw(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool imagefunc_stretch_region(Program *prg, std::vector<Token> &v)
+static bool imagefunc_stretch_region(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(15)
 
@@ -1199,7 +1199,7 @@ static bool imagefunc_stretch_region(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool imagefunc_draw_rotated_scaled(Program *prg, std::vector<Token> &v)
+static bool imagefunc_draw_rotated_scaled(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(14)
 
@@ -1247,7 +1247,7 @@ static bool imagefunc_draw_rotated_scaled(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool imagefunc_start(Program *prg, std::vector<Token> &v)
+static bool imagefunc_start(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -1268,7 +1268,7 @@ static bool imagefunc_start(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool imagefunc_end(Program *prg, std::vector<Token> &v)
+static bool imagefunc_end(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -1289,7 +1289,7 @@ static bool imagefunc_end(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool imagefunc_size(Program *prg, std::vector<Token> &v)
+static bool imagefunc_size(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -1324,7 +1324,7 @@ static bool imagefunc_size(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool imagefunc_draw_9patch(Program *prg, std::vector<Token> &v)
+static bool imagefunc_draw_9patch(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(9)
 
@@ -1360,7 +1360,7 @@ static bool imagefunc_draw_9patch(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool fontfunc_load(Program *prg, std::vector<Token> &v)
+static bool fontfunc_load(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
@@ -1387,7 +1387,7 @@ static bool fontfunc_load(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool fontfunc_draw(Program *prg, std::vector<Token> &v)
+static bool fontfunc_draw(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(8)
 
@@ -1429,7 +1429,7 @@ static bool fontfunc_draw(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool fontfunc_width(Program *prg, std::vector<Token> &v)
+static bool fontfunc_width(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -1453,7 +1453,7 @@ static bool fontfunc_width(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool fontfunc_height(Program *prg, std::vector<Token> &v)
+static bool fontfunc_height(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1476,7 +1476,7 @@ static bool fontfunc_height(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool fontfunc_add_extra_glyph(Program *prg, std::vector<Token> &v)
+static bool fontfunc_add_extra_glyph(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -1495,7 +1495,7 @@ static bool fontfunc_add_extra_glyph(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool tilemapfunc_set_tile_size(Program *prg, std::vector<Token> &v)
+static bool tilemapfunc_set_tile_size(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -1504,7 +1504,7 @@ static bool tilemapfunc_set_tile_size(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool tilemapfunc_load(Program *prg, std::vector<Token> &v)
+static bool tilemapfunc_load(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1527,7 +1527,7 @@ static bool tilemapfunc_load(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool tilemapfunc_draw(Program *prg, std::vector<Token> &v)
+static bool tilemapfunc_draw(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(5)
 
@@ -1546,7 +1546,7 @@ static bool tilemapfunc_draw(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool tilemapfunc_num_layers(Program *prg, std::vector<Token> &v)
+static bool tilemapfunc_num_layers(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1566,7 +1566,7 @@ static bool tilemapfunc_num_layers(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool tilemapfunc_size(Program *prg, std::vector<Token> &v)
+static bool tilemapfunc_size(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -1590,7 +1590,7 @@ static bool tilemapfunc_size(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool tilemapfunc_is_solid(Program *prg, std::vector<Token> &v)
+static bool tilemapfunc_is_solid(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
@@ -1612,7 +1612,7 @@ static bool tilemapfunc_is_solid(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool tilemapfunc_get_groups(Program *prg, std::vector<Token> &v)
+static bool tilemapfunc_get_groups(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1665,7 +1665,7 @@ static bool tilemapfunc_get_groups(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool tilemapfunc_set_animated_tiles(Program *prg, std::vector<Token> &v)
+static bool tilemapfunc_set_animated_tiles(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(5)
 
@@ -1702,7 +1702,7 @@ static bool tilemapfunc_set_animated_tiles(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool tilemapfunc_find_path(Program *prg, std::vector<Token> &v)
+static bool tilemapfunc_find_path(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(7)
 
@@ -1767,7 +1767,7 @@ static bool tilemapfunc_find_path(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool tilemapfunc_set_solid(Program *prg, std::vector<Token> &v)
+static bool tilemapfunc_set_solid(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
@@ -1785,7 +1785,7 @@ static bool tilemapfunc_set_solid(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool tilemapfunc_set_tile(Program *prg, std::vector<Token> &v)
+static bool tilemapfunc_set_tile(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(7)
 
@@ -1806,7 +1806,7 @@ static bool tilemapfunc_set_tile(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool tilemapfunc_get_tile(Program *prg, std::vector<Token> &v)
+static bool tilemapfunc_get_tile(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(7)
 
@@ -1838,7 +1838,7 @@ static bool tilemapfunc_get_tile(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_load(Program *prg, std::vector<Token> &v)
+static bool spritefunc_load(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1880,7 +1880,7 @@ static void sprite_callback(void *data)
 	delete d;
 }
 
-static bool spritefunc_set_animation(Program *prg, std::vector<Token> &v)
+static bool spritefunc_set_animation(Program *prg, const std::vector<Token> &v)
 {
 	int id = as_number(prg, v[0]);
 	std::string anim = as_string(prg, v[1]);
@@ -1903,7 +1903,7 @@ static bool spritefunc_set_animation(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_get_animation(Program *prg, std::vector<Token> &v)
+static bool spritefunc_get_animation(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1923,7 +1923,7 @@ static bool spritefunc_get_animation(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_get_previous_animation(Program *prg, std::vector<Token> &v)
+static bool spritefunc_get_previous_animation(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1943,7 +1943,7 @@ static bool spritefunc_get_previous_animation(Program *prg, std::vector<Token> &
 	return true;
 }
 
-static bool spritefunc_current_frame(Program *prg, std::vector<Token> &v)
+static bool spritefunc_current_frame(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1963,7 +1963,7 @@ static bool spritefunc_current_frame(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_num_frames(Program *prg, std::vector<Token> &v)
+static bool spritefunc_num_frames(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1983,7 +1983,7 @@ static bool spritefunc_num_frames(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_length(Program *prg, std::vector<Token> &v)
+static bool spritefunc_length(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -2003,7 +2003,7 @@ static bool spritefunc_length(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_current_frame_size(Program *prg, std::vector<Token> &v)
+static bool spritefunc_current_frame_size(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -2027,7 +2027,7 @@ static bool spritefunc_current_frame_size(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_draw(Program *prg, std::vector<Token> &v)
+static bool spritefunc_draw(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(9)
 
@@ -2066,7 +2066,7 @@ static bool spritefunc_draw(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_start(Program *prg, std::vector<Token> &v)
+static bool spritefunc_start(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
@@ -2081,7 +2081,7 @@ static bool spritefunc_start(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_stop(Program *prg, std::vector<Token> &v)
+static bool spritefunc_stop(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
@@ -2096,7 +2096,7 @@ static bool spritefunc_stop(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_reset(Program *prg, std::vector<Token> &v)
+static bool spritefunc_reset(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
@@ -2111,7 +2111,7 @@ static bool spritefunc_reset(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_bounds(Program *prg, std::vector<Token> &v)
+static bool spritefunc_bounds(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(5)
 
@@ -2142,7 +2142,7 @@ static bool spritefunc_bounds(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_elapsed(Program *prg, std::vector<Token> &v)
+static bool spritefunc_elapsed(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -2162,7 +2162,7 @@ static bool spritefunc_elapsed(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_frame_times(Program *prg, std::vector<Token> &v)
+static bool spritefunc_frame_times(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -2190,7 +2190,7 @@ static bool spritefunc_frame_times(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_is_started(Program *prg, std::vector<Token> &v)
+static bool spritefunc_is_started(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -2222,7 +2222,7 @@ static void set_string_or_number(Program *prg, int index, double value)
        }
 }
 
-static bool joyfunc_poll(Program *prg, std::vector<Token> &v)
+static bool joyfunc_poll(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(21)
 
@@ -2375,7 +2375,7 @@ static bool joyfunc_poll(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool joyfunc_count(Program *prg, std::vector<Token> &v)
+static bool joyfunc_count(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2391,7 +2391,7 @@ static bool joyfunc_count(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool joyfunc_rumble(Program *prg, std::vector<Token> &v)
+static bool joyfunc_rumble(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2402,7 +2402,7 @@ static bool joyfunc_rumble(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool cfgfunc_load(Program *prg, std::vector<Token> &v)
+static bool cfgfunc_load(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -2424,7 +2424,7 @@ static bool cfgfunc_load(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool cfgfunc_save(Program *prg, std::vector<Token> &v)
+static bool cfgfunc_save(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -2444,7 +2444,7 @@ static bool cfgfunc_save(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool cfgfunc_get_number(Program *prg, std::vector<Token> &v)
+static bool cfgfunc_get_number(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -2478,7 +2478,7 @@ static bool cfgfunc_get_number(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool cfgfunc_get_string(Program *prg, std::vector<Token> &v)
+static bool cfgfunc_get_string(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -2512,7 +2512,7 @@ static bool cfgfunc_get_string(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool cfgfunc_set_number(Program *prg, std::vector<Token> &v)
+static bool cfgfunc_set_number(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -2537,7 +2537,7 @@ static bool cfgfunc_set_number(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool cfgfunc_set_string(Program *prg, std::vector<Token> &v)
+static bool cfgfunc_set_string(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -2568,7 +2568,7 @@ static bool cfgfunc_set_string(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool cfgfunc_exists(Program *prg, std::vector<Token> &v)
+static bool cfgfunc_exists(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -2596,7 +2596,7 @@ static bool cfgfunc_exists(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool cfgfunc_erase(Program *prg, std::vector<Token> &v)
+static bool cfgfunc_erase(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -2626,7 +2626,7 @@ static bool cfgfunc_erase(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool shaderfunc_load(Program *prg, std::vector<Token> &v)
+static bool shaderfunc_load(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -2659,7 +2659,7 @@ static bool shaderfunc_load(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool shaderfunc_use(Program *prg, std::vector<Token> &v)
+static bool shaderfunc_use(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2675,7 +2675,7 @@ static bool shaderfunc_use(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool shaderfunc_use_default(Program *prg, std::vector<Token> &v)
+static bool shaderfunc_use_default(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
@@ -2686,7 +2686,7 @@ static bool shaderfunc_use_default(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool shaderfunc_set_bool(Program *prg, std::vector<Token> &v)
+static bool shaderfunc_set_bool(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -2702,7 +2702,7 @@ static bool shaderfunc_set_bool(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool shaderfunc_set_int(Program *prg, std::vector<Token> &v)
+static bool shaderfunc_set_int(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -2718,7 +2718,7 @@ static bool shaderfunc_set_int(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool shaderfunc_set_float(Program *prg, std::vector<Token> &v)
+static bool shaderfunc_set_float(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -2734,7 +2734,7 @@ static bool shaderfunc_set_float(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool shaderfunc_set_texture(Program *prg, std::vector<Token> &v)
+static bool shaderfunc_set_texture(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -2753,7 +2753,7 @@ static bool shaderfunc_set_texture(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool shaderfunc_set_colour(Program *prg, std::vector<Token> &v)
+static bool shaderfunc_set_colour(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(6)
 
@@ -2778,7 +2778,7 @@ static bool shaderfunc_set_colour(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool jsonfunc_load(Program *prg, std::vector<Token> &v)
+static bool jsonfunc_load(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -2802,7 +2802,7 @@ static bool jsonfunc_load(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool jsonfunc_get_string(Program *prg, std::vector<Token> &v)
+static bool jsonfunc_get_string(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -2824,7 +2824,7 @@ static bool jsonfunc_get_string(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-static bool jsonfunc_get_number(Program *prg, std::vector<Token> &v)
+static bool jsonfunc_get_number(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 

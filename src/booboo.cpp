@@ -1714,12 +1714,12 @@ func_top:
 	prg->complete_pass = pass;
 }
 
-void call_function(Program *prg, int function, std::vector<Token> &params, Variable &result, int ignore_params)
+void call_function(Program *prg, int function, const std::vector<Token> &params, Variable &result, int ignore_params)
 {
 	Program &func = prg->functions[function];
 
 	for (size_t j = 0; j < func.params.size(); j++) {
-		Token &param = params[j+ignore_params];
+		const Token &param = params[j+ignore_params];
 		
 		Variable &var = prg->variables[func.params[j]];
 
@@ -1760,7 +1760,7 @@ void call_function(Program *prg, int function, std::vector<Token> &params, Varia
 	prg->s = bak2;
 }
 
-void call_function(Program *prg, std::string function_name, std::vector<Token> &params, Variable &result, int ignore_params)
+void call_function(Program *prg, std::string function_name, const std::vector<Token> &params, Variable &result, int ignore_params)
 {
 	std::map<std::string, int>::iterator it = prg->function_name_map.find(function_name);
 	if (it == prg->function_name_map.end()) {
@@ -1769,13 +1769,13 @@ void call_function(Program *prg, std::string function_name, std::vector<Token> &
 	call_function(prg, (*it).second, params, result, ignore_params);
 }
 
-void call_void_function(Program *prg, int function, std::vector<Token> &params, int ignore_params)
+void call_void_function(Program *prg, int function, const std::vector<Token> &params, int ignore_params)
 {
 	static Variable tmp;
 	call_function(prg, function, params, tmp, ignore_params);
 }
 
-void call_void_function(Program *prg, std::string function_name, std::vector<Token> &params, int ignore_params)
+void call_void_function(Program *prg, std::string function_name, const std::vector<Token> &params, int ignore_params)
 {
 	static Variable tmp;
 	call_function(prg, function_name, params, tmp, ignore_params);
@@ -1838,7 +1838,7 @@ void add_expression_handler(std::string name, expression_func func)
 	expression_handlers.push_back(func);
 }
 
-bool breaker_reset(Program *prg, std::vector<Token> &v)
+bool breaker_reset(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -1847,7 +1847,7 @@ bool breaker_reset(Program *prg, std::vector<Token> &v)
 	return false;
 }
 
-bool breaker_exit(Program *prg, std::vector<Token> &v)
+bool breaker_exit(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -1857,7 +1857,7 @@ bool breaker_exit(Program *prg, std::vector<Token> &v)
 	return false;
 }
 
-bool breaker_return(Program *prg, std::vector<Token> &v)
+bool breaker_return(Program *prg, const std::vector<Token> &v)
 {
 	Variable &v1 = prg->s->result;
 
@@ -1888,19 +1888,19 @@ bool breaker_return(Program *prg, std::vector<Token> &v)
 	return false;
 }
 
-bool corefunc_number(Program *prg, std::vector<Token> &v)
+bool corefunc_number(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 	return true;
 }
 
-bool corefunc_string(Program *prg, std::vector<Token> &v)
+bool corefunc_string(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 	return true;
 }
 
-bool corefunc_vector(Program *prg, std::vector<Token> &v)
+bool corefunc_vector(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 	
@@ -1911,7 +1911,7 @@ bool corefunc_vector(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_map(Program *prg, std::vector<Token> &v)
+bool corefunc_map(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 	
@@ -1921,13 +1921,13 @@ bool corefunc_map(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_pointer(Program *prg, std::vector<Token> &v)
+bool corefunc_pointer(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 	return true;
 }
 
-bool corefunc_set(Program *prg, std::vector<Token> &v)
+bool corefunc_set(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1964,7 +1964,7 @@ bool corefunc_set(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_add(Program *prg, std::vector<Token> &v)
+bool corefunc_add(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -2003,7 +2003,7 @@ bool corefunc_add(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_subtract(Program *prg, std::vector<Token> &v)
+bool corefunc_subtract(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -2020,7 +2020,7 @@ bool corefunc_subtract(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_multiply(Program *prg, std::vector<Token> &v)
+bool corefunc_multiply(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -2037,7 +2037,7 @@ bool corefunc_multiply(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_divide(Program *prg, std::vector<Token> &v)
+bool corefunc_divide(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -2054,14 +2054,14 @@ bool corefunc_divide(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_label(Program *prg, std::vector<Token> &v)
+bool corefunc_label(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
 	return true;
 }
 
-bool corefunc_goto(Program *prg, std::vector<Token> &v)
+bool corefunc_goto(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2070,7 +2070,7 @@ bool corefunc_goto(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_compare(Program *prg, std::vector<Token> &v)
+bool corefunc_compare(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -2142,7 +2142,7 @@ bool corefunc_compare(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_je(Program *prg, std::vector<Token> &v)
+bool corefunc_je(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2153,7 +2153,7 @@ bool corefunc_je(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_jne(Program *prg, std::vector<Token> &v)
+bool corefunc_jne(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2164,7 +2164,7 @@ bool corefunc_jne(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_jl(Program *prg, std::vector<Token> &v)
+bool corefunc_jl(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2175,7 +2175,7 @@ bool corefunc_jl(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_jle(Program *prg, std::vector<Token> &v)
+bool corefunc_jle(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2186,7 +2186,7 @@ bool corefunc_jle(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_jg(Program *prg, std::vector<Token> &v)
+bool corefunc_jg(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2197,7 +2197,7 @@ bool corefunc_jg(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_jge(Program *prg, std::vector<Token> &v)
+bool corefunc_jge(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2208,7 +2208,7 @@ bool corefunc_jge(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_call(Program *prg, std::vector<Token> &v)
+bool corefunc_call(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 
@@ -2219,7 +2219,7 @@ bool corefunc_call(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_call_result(Program *prg, std::vector<Token> &v)
+bool corefunc_call_result(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -2262,7 +2262,7 @@ static std::string typeof_var(Variable &v1)
 	return res;
 }
 
-bool corefunc_typeof(Program *prg, std::vector<Token> &v)
+bool corefunc_typeof(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -2334,7 +2334,7 @@ bool corefunc_typeof(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_address(Program *prg, std::vector<Token> &v)
+bool corefunc_address(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -2350,7 +2350,7 @@ bool corefunc_address(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_for(Program *prg, std::vector<Token> &v)
+bool corefunc_for(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(5)
 
@@ -2403,7 +2403,7 @@ bool corefunc_for(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_if(Program *prg, std::vector<Token> &v)
+bool corefunc_if(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -2458,7 +2458,7 @@ bool corefunc_if(Program *prg, std::vector<Token> &v)
 	return true;
 }
 
-Variable exprfunc_add(Program *prg, std::vector<Token> &v)
+Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 {
 	Variable ret;
 	ret.name = "-constant-";
@@ -2555,7 +2555,7 @@ Variable exprfunc_add(Program *prg, std::vector<Token> &v)
 	return ret;
 }
 
-Variable exprfunc_subtract(Program *prg, std::vector<Token> &v)
+Variable exprfunc_subtract(Program *prg, const std::vector<Token> &v)
 {
 	double n = as_number_inline(prg, v[0]);
 
@@ -2570,7 +2570,7 @@ Variable exprfunc_subtract(Program *prg, std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_multiply(Program *prg, std::vector<Token> &v)
+Variable exprfunc_multiply(Program *prg, const std::vector<Token> &v)
 {
 	double n = as_number_inline(prg, v[0]);
 
@@ -2585,7 +2585,7 @@ Variable exprfunc_multiply(Program *prg, std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_divide(Program *prg, std::vector<Token> &v)
+Variable exprfunc_divide(Program *prg, const std::vector<Token> &v)
 {
 	double n = as_number_inline(prg, v[0]);
 
@@ -2600,7 +2600,7 @@ Variable exprfunc_divide(Program *prg, std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_modulus(Program *prg, std::vector<Token> &v)
+Variable exprfunc_modulus(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -2611,7 +2611,7 @@ Variable exprfunc_modulus(Program *prg, std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_and(Program *prg, std::vector<Token> &v)
+Variable exprfunc_and(Program *prg, const std::vector<Token> &v)
 {
 	bool b = (bool)as_number(prg, v[0]);
 
@@ -2626,7 +2626,7 @@ Variable exprfunc_and(Program *prg, std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_or(Program *prg, std::vector<Token> &v)
+Variable exprfunc_or(Program *prg, const std::vector<Token> &v)
 {
 	bool b = (bool)as_number(prg, v[0]);
 
@@ -2641,7 +2641,7 @@ Variable exprfunc_or(Program *prg, std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_greater(Program *prg, std::vector<Token> &v)
+Variable exprfunc_greater(Program *prg, const std::vector<Token> &v)
 {
 	bool b = true;
 
@@ -2676,7 +2676,7 @@ Variable exprfunc_greater(Program *prg, std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_less(Program *prg, std::vector<Token> &v)
+Variable exprfunc_less(Program *prg, const std::vector<Token> &v)
 {
 	bool b = true;
 	
@@ -2711,7 +2711,7 @@ Variable exprfunc_less(Program *prg, std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_greaterequal(Program *prg, std::vector<Token> &v)
+Variable exprfunc_greaterequal(Program *prg, const std::vector<Token> &v)
 {
 	bool b = true;
 	
@@ -2746,7 +2746,7 @@ Variable exprfunc_greaterequal(Program *prg, std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_lessequal(Program *prg, std::vector<Token> &v)
+Variable exprfunc_lessequal(Program *prg, const std::vector<Token> &v)
 {
 	bool b = true;
 	
@@ -2781,7 +2781,7 @@ Variable exprfunc_lessequal(Program *prg, std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_equal(Program *prg, std::vector<Token> &v)
+Variable exprfunc_equal(Program *prg, const std::vector<Token> &v)
 {
 	bool b = true;
 
@@ -2816,7 +2816,7 @@ Variable exprfunc_equal(Program *prg, std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_notequal(Program *prg, std::vector<Token> &v)
+Variable exprfunc_notequal(Program *prg, const std::vector<Token> &v)
 {
 	bool b = true;
 
@@ -2851,7 +2851,7 @@ Variable exprfunc_notequal(Program *prg, std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_bitor(Program *prg, std::vector<Token> &v)
+Variable exprfunc_bitor(Program *prg, const std::vector<Token> &v)
 {
 	int n = (int)as_number(prg, v[0]);
 
@@ -2866,7 +2866,7 @@ Variable exprfunc_bitor(Program *prg, std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_xor(Program *prg, std::vector<Token> &v)
+Variable exprfunc_xor(Program *prg, const std::vector<Token> &v)
 {
 	int n = (int)as_number(prg, v[0]);
 
@@ -2881,7 +2881,7 @@ Variable exprfunc_xor(Program *prg, std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_bitand(Program *prg, std::vector<Token> &v)
+Variable exprfunc_bitand(Program *prg, const std::vector<Token> &v)
 {
 	int n = (int)as_number(prg, v[0]);
 
@@ -2896,7 +2896,7 @@ Variable exprfunc_bitand(Program *prg, std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_leftshift(Program *prg, std::vector<Token> &v)
+Variable exprfunc_leftshift(Program *prg, const std::vector<Token> &v)
 {
 	int n = (int)as_number(prg, v[0]);
 
@@ -2911,7 +2911,7 @@ Variable exprfunc_leftshift(Program *prg, std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_rightshift(Program *prg, std::vector<Token> &v)
+Variable exprfunc_rightshift(Program *prg, const std::vector<Token> &v)
 {
 	int n = (int)as_number(prg, v[0]);
 
@@ -3149,32 +3149,32 @@ Variable &get_variable(Program *prg, int index)
 	return prg->variables[index];
 }
 
-Variable &as_variable(Program *prg, Token &t)
+Variable &as_variable(Program *prg, const Token &t)
 {
 	return as_variable_inline(prg, t);
 }
 
-double as_number(Program *prg, Token &t)
+double as_number(Program *prg, const Token &t)
 {
 	return as_number_inline(prg, t);
 }
 
-std::string as_string(Program *prg, Token &t)
+std::string as_string(Program *prg, const Token &t)
 {
 	return as_string_inline(prg, t);
 }
 
-int as_label(Program *prg, Token &t)
+int as_label(Program *prg, const Token &t)
 {
 	return as_label_inline(prg, t);
 }
 
-int as_function(Program *prg, Token &t)
+int as_function(Program *prg, const Token &t)
 {
 	return as_function_inline(prg, t);
 }
 
-Variable &as_pointer(Program *prg, Token &t)
+Variable &as_pointer(Program *prg, const Token &t)
 {
 	return as_pointer_inline(prg, t);
 }
