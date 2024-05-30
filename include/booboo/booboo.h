@@ -83,7 +83,7 @@ void end();
 // These are the how you create, destroy and run programs
 Program *create_program(std::string code);
 void destroy_program(Program *prg);
-bool interpret(Program *prg, int instructions);
+bool interpret(Program *prg);
 
 // Functions calling
 void call_function(Program *prg, int function, const std::vector<Token> &params, Variable &result, int ignore_params = 0);

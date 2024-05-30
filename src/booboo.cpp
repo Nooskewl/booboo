@@ -16,7 +16,6 @@ using namespace noo;
 #include "booboo/internal.h"
 
 static std::map<std::string, int> library_map;
-static std::vector<booboo::library_func> library;
 static std::map<char, booboo::token_func> token_map;
 static std::map<std::string, int> expression_map;
 static std::vector<booboo::expression_func> expression_handlers;
@@ -40,6 +39,7 @@ std::string main_program_name;
 int return_code;
 bool quit;
 std::string (*load_text)(std::string filename);
+std::vector<booboo::library_func> library;
 
 // And this all makes BooBoo work
 
@@ -1748,7 +1748,7 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 
 	prg->s->pc = 0;
 
-	while (interpret(prg, INT_MAX)) {
+	while (interpret_inline(prg)) {
 	}
 
 	prg->s->pc = pc_bak;
@@ -1781,30 +1781,9 @@ void call_void_function(Program *prg, std::string function_name, const std::vect
 	call_function(prg, function_name, params, tmp, ignore_params);
 }
 
-bool interpret(Program *prg, int instructions)
+bool interpret(Program *prg)
 {
-	for (int i = 0; i < instructions; i++) {
-		if (prg->s->pc >= prg->s->program.size()) {
-			return false;
-		}
-
-		Statement &s = prg->s->program[prg->s->pc];
-
-		unsigned int pc_bak = prg->s->pc;
-
-		library_func func = library[s.method];
-		bool ret = func(prg, s.data);
-
-		if (pc_bak == prg->s->pc) {
-			prg->s->pc++;
-		}
-
-		if (ret == false) {
-			return false;
-		}
-	}
-
-	return true;
+	return interpret_inline(prg);
 }
 
 void destroy_program(Program *prg)
@@ -2383,7 +2362,7 @@ bool corefunc_for(Program *prg, const std::vector<Token> &v)
 	unsigned int start = prg->s->pc;
 
 	while (true) {
-		if (interpret(prg, 1) == false) {
+		if (interpret_inline(prg) == false) {
 			return false;
 		}
 		if (prg->s->pc < start || prg->s->pc > end_label) {
@@ -2423,7 +2402,7 @@ bool corefunc_if(Program *prg, const std::vector<Token> &v)
 			unsigned int start = prg->s->pc;
 			unsigned int end_block = as_label_inline(prg, v[i+1]);
 			while (prg->s->pc != end_block) {
-				if (interpret(prg, 1) == false) {
+				if (interpret_inline(prg) == false) {
 					return false;
 				}
 				if (prg->s->pc < start || prg->s->pc > end_block) {
@@ -2441,7 +2420,7 @@ bool corefunc_if(Program *prg, const std::vector<Token> &v)
 		unsigned int start = prg->s->pc;
 		unsigned int end_block = as_label_inline(prg, v[v.size()-1]);
 		while (prg->s->pc != end_block) {
-			if (interpret(prg, 1) == false) {
+			if (interpret_inline(prg) == false) {
 				return false;
 			}
 			if (prg->s->pc < start || prg->s->pc > end_block) {

@@ -138,7 +138,7 @@ again:
 
 	prg = booboo::create_program(code);
 
-	while (booboo::interpret(prg, INT_MAX)) {
+	while (booboo::interpret(prg)) {
 	}
 
 	standard_lib_destroy_program(prg);

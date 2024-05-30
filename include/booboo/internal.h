@@ -245,6 +245,28 @@ inline Variable &as_pointer_inline(Program *prg, const Token &t)
 	return *v;
 }
 
+extern std::vector<booboo::library_func> library;
+
+inline bool interpret_inline(Program *prg)
+{
+	if (prg->s->pc >= prg->s->program.size()) {
+		return false;
+	}
+
+	Statement &s = prg->s->program[prg->s->pc];
+
+	unsigned int pc_bak = prg->s->pc;
+
+	library_func func = library[s.method];
+	bool ret = func(prg, s.data);
+
+	if (pc_bak == prg->s->pc) {
+		prg->s->pc++;
+	}
+
+	return ret;
+}
+
 } // End namespace booboo
 
 #endif // BOOBOO_INTERNAL_H

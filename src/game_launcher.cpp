@@ -1177,7 +1177,7 @@ again:
 
 	prg = create_program(code);
 
-	while (interpret(prg, INT_MAX)) {
+	while (interpret(prg)) {
 	}
 
 #if defined LUA_BENCH_ANY
