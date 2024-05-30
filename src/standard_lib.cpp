@@ -313,7 +313,7 @@ bool corefunc_list_drives(Program *prg, const std::vector<Token> &v)
 		if (set) {
 			Variable s;
 			s.type = Variable::STRING;
-			s.name = "-constant-";
+			//s.name = "-constant-";
 			char buf[10];
 			snprintf(buf, 10, "%c", 'A' + i);
 			s.s = buf;
@@ -375,7 +375,7 @@ bool corefunc_list_directory(Program *prg, const std::vector<Token> &v)
 #endif
 		Variable v;
 		v.type = Variable::STRING;
-		v.name = "-constant-";
+		//v.name = "-constant-";
 		v.s = fn;
 		vec.v.push_back(v);
 	}
@@ -714,7 +714,7 @@ bool stringfunc_match(Program *prg, const std::vector<Token> &v)
 			std::ssub_match sub = match[i];
 			Variable v;
 			v.type = Variable::STRING;
-			v.name = "-constant-";
+			//v.name = "-constant-";
 			v.s = sub.str();
 			v1.v.push_back(v);
 		}
@@ -931,7 +931,7 @@ static bool vectorfunc_add(Program *prg, const std::vector<Token> &v)
 
 	if (v[1].type == Token::NUMBER) {
 		var.type = Variable::NUMBER;
-		var.name = "-constant-";
+		//var.name = "-constant-";
 		var.n = v[1].n;
 	}
 	else if (v[1].type == Token::SYMBOL) {
@@ -951,7 +951,7 @@ static bool vectorfunc_add(Program *prg, const std::vector<Token> &v)
 	}
 	else {
 		var.type = Variable::STRING;
-		var.name = "-constant-";
+		//var.name = "-constant-";
 		var.s = v[1].s;
 	}
 
@@ -1001,7 +1001,7 @@ static bool vectorfunc_set(Program *prg, const std::vector<Token> &v)
 
 	if (v[val_index].type == Token::NUMBER) {
 		var.type = Variable::NUMBER;
-		var.name = "-constant-";
+		//var.name = "-constant-";
 		var.n = v[val_index].n;
 	}
 	else if (v[val_index].type == Token::SYMBOL) {
@@ -1015,7 +1015,7 @@ static bool vectorfunc_set(Program *prg, const std::vector<Token> &v)
 	}
 	else {
 		var.type = Variable::STRING;
-		var.name = "-constant-";
+		//var.name = "-constant-";
 		var.s = v[2].s;
 	}
 
@@ -1065,7 +1065,7 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 
 	if (v[2].type == Token::NUMBER) {
 		var.type = Variable::NUMBER;
-		var.name = "-constant-";
+		//var.name = "-constant-";
 		var.n = v[2].n;
 	}
 	else if (v[2].type == Token::SYMBOL) {
@@ -1079,7 +1079,7 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 	}
 	else {
 		var.type = Variable::STRING;
-		var.name = "-constant-";
+		//var.name = "-constant-";
 		var.s = v[2].s;
 	}
 
@@ -1197,7 +1197,7 @@ static bool mapfunc_set(Program *prg, const std::vector<Token> &v)
 
 	if (v[val_index].type == Token::NUMBER) {
 		var.type = Variable::NUMBER;
-		var.name = "-constant-";
+		//var.name = "-constant-";
 		var.n = v[val_index].n;
 	}
 	else if (v[val_index].type == Token::SYMBOL) {
@@ -1217,7 +1217,7 @@ static bool mapfunc_set(Program *prg, const std::vector<Token> &v)
 	}
 	else {
 		var.type = Variable::STRING;
-		var.name = "-constant-";
+		//var.name = "-constant-";
 		var.s = v[val_index].s;
 	}
 
@@ -1331,7 +1331,7 @@ static bool mapfunc_keys(Program *prg, const std::vector<Token> &v)
 		std::pair<std::string, Variable> p = *it;
 		Variable var;
 		var.type = Variable::STRING;
-		var.name = "-constant-";
+		//var.name = "-constant-";
 		var.s = p.first;
 		vec_var.v.push_back(var);
 	}

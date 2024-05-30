@@ -2440,7 +2440,7 @@ bool corefunc_if(Program *prg, const std::vector<Token> &v)
 Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 {
 	Variable ret;
-	ret.name = "-constant-";
+	//ret.name = "-constant-";
 
 	if (v[0].type == Token::NUMBER) {
 		double n = as_number_inline(prg, v[0]);
@@ -2544,7 +2544,7 @@ Variable exprfunc_subtract(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-constant-";
+	//var.name = "-constant-";
 	var.n = n;
 	return var;
 }
@@ -2559,7 +2559,7 @@ Variable exprfunc_multiply(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-constant-";
+	//var.name = "-constant-";
 	var.n = n;
 	return var;
 }
@@ -2574,7 +2574,7 @@ Variable exprfunc_divide(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-constant-";
+	//var.name = "-constant-";
 	var.n = n;
 	return var;
 }
@@ -2585,7 +2585,7 @@ Variable exprfunc_modulus(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-constant-";
+	//var.name = "-constant-";
 	var.n = (int)as_number_inline(prg, v[0]) % (int)as_number_inline(prg, v[1]);
 	return var;
 }
@@ -2600,7 +2600,7 @@ Variable exprfunc_and(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-constant-";
+	//var.name = "-constant-";
 	var.n = b;
 	return var;
 }
@@ -2615,7 +2615,7 @@ Variable exprfunc_or(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-constant-";
+	//var.name = "-constant-";
 	var.n = b;
 	return var;
 }
@@ -2650,7 +2650,7 @@ Variable exprfunc_greater(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-constant-";
+	//var.name = "-constant-";
 	var.n = b;
 	return var;
 }
@@ -2685,7 +2685,7 @@ Variable exprfunc_less(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-constant-";
+	//var.name = "-constant-";
 	var.n = b;
 	return var;
 }
@@ -2720,7 +2720,7 @@ Variable exprfunc_greaterequal(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-constant-";
+	//var.name = "-constant-";
 	var.n = b;
 	return var;
 }
@@ -2755,7 +2755,7 @@ Variable exprfunc_lessequal(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-constant-";
+	//var.name = "-constant-";
 	var.n = b;
 	return var;
 }
@@ -2790,7 +2790,7 @@ Variable exprfunc_equal(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-constant-";
+	//var.name = "-constant-";
 	var.n = b;
 	return var;
 }
@@ -2825,7 +2825,7 @@ Variable exprfunc_notequal(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-constant-";
+	//var.name = "-constant-";
 	var.n = b;
 	return var;
 }
@@ -2840,7 +2840,7 @@ Variable exprfunc_bitor(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-constant-";
+	//var.name = "-constant-";
 	var.n = n;
 	return var;
 }
@@ -2855,7 +2855,7 @@ Variable exprfunc_xor(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-constant-";
+	//var.name = "-constant-";
 	var.n = n;
 	return var;
 }
@@ -2870,7 +2870,7 @@ Variable exprfunc_bitand(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-constant-";
+	//var.name = "-constant-";
 	var.n = n;
 	return var;
 }
@@ -2885,7 +2885,7 @@ Variable exprfunc_leftshift(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-constant-";
+	//var.name = "-constant-";
 	var.n = n;
 	return var;
 }
@@ -2900,7 +2900,7 @@ Variable exprfunc_rightshift(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-constant-";
+	//var.name = "-constant-";
 	var.n = n;
 	return var;
 }
