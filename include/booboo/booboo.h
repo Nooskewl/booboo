@@ -28,8 +28,10 @@ struct Token {
 	Token_Type type;
 
 	std::string s;
-	double n;
-	int i;
+	union {
+		double n;
+		int i;
+	};
 
 	std::string token;
 };
@@ -63,11 +65,13 @@ struct Variable
 
 	std::string name;
 
-	double n;
+	union {
+		double n;
+		Variable *p;
+	};
 	std::string s;
 	std::vector<Variable> v;
 	std::map<std::string, Variable> m;
-	Variable *p;
 	Expression e;
 	Fish f;
 };
