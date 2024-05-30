@@ -127,8 +127,8 @@ void set_black_box(Program *prg, std::string id, void *data);
 // If you have a variable of type SYMBOL then 'i' is the index you pass here to retrive the variable
 Variable &get_variable(Program *prg, int index);
 
-Variable evaluate_expression(Program *prg, Variable::Expression &e);
-Variable &go_fish(Program *prg, Variable::Fish &f);
+Variable evaluate_expression(Program *prg, const Variable::Expression &e);
+Variable &go_fish(Program *prg, const Variable::Fish &f);
 
 // This stuff can be used but it's used by the BooBoo interpreter
 extern std::string reset_game_name;

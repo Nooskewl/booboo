@@ -3181,7 +3181,7 @@ std::string itos(int i)
 	return std::string(buf);
 }
 
-Variable evaluate_expression(Program *prg, Variable::Expression &e)
+Variable evaluate_expression(Program *prg, const Variable::Expression &e)
 {
 	if (e.i == -1) {
 		std::map<std::string, int>::iterator it = prg->variables_map.find(e.name);
@@ -3202,7 +3202,7 @@ Variable evaluate_expression(Program *prg, Variable::Expression &e)
 	return expression_handlers[e.i](prg, e.v);
 }
 
-Variable &go_fish(Program *prg, Variable::Fish &f)
+Variable &go_fish(Program *prg, const Variable::Fish &f)
 {
 	Variable *v = &prg->variables[f.c_i];
 	int type = v->type;
