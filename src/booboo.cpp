@@ -989,7 +989,8 @@ static void compile(Program *prg, Pass pass)
 	// Constants
 	insert_constant(prg, "TRUE", 1, pass, var_i);
 	insert_constant(prg, "FALSE", 0, pass, var_i);
-	insert_constant(prg, "PI", 3.14159265358979323846, pass, var_i);
+	insert_constant(prg, "PI", M_PI, pass, var_i);
+	insert_constant(prg, "E", M_E, pass, var_i);
 	insert_constant(prg, "BLACK", 0, pass, var_i);
 	insert_constant(prg, "BLUE", 1, pass, var_i);
 	insert_constant(prg, "GREEN", 2, pass, var_i);

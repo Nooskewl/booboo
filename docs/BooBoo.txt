@@ -249,6 +249,22 @@ cos
 	trigonometry functions
 	e.g. cos n
 
+tan
+	trigonometry functions
+	e.g. tan n
+
+asin
+	trigonometry functions
+	e.g. asin n
+
+acos
+	trigonometry functions
+	e.g. acos n
+
+atan
+	trigonometry functions
+	e.g. atan n
+
 atan2
 	trigonometry functions
 	e.g. atan2 y x
@@ -265,9 +281,17 @@ sqrt
 	square root
 	e.g. sqrt x
 
+hypot
+	Calculate hypotenuse of a and b
+	e.g. hypot a b
+
 floor
 	Drop the fractional part of a number
 	e.g. floor x
+
+ceil
+	Round to the next highest integer
+	e.g. ceil x
 
 neg
 	Invert the sign of a number
@@ -276,6 +300,18 @@ neg
 sign
 	Returns the sign of a number
 	e.g. sign x
+
+exp
+	Calculate the value of e
+	e.g. exp x
+
+log
+	Logarithm function
+	e.g. log x
+
+log10
+	Base 10 logarithm
+	e.g. log10 x
 
 -- Vector Functions ----------------------------------------------------------
 

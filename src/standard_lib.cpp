@@ -761,6 +761,70 @@ bool mathfunc_cos(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+bool mathfunc_tan(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &v1 = as_variable(prg, v[0]);
+
+	if (IS_NUMBER(v1)) {
+		v1.n = tan(v1.n);
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
+bool mathfunc_asin(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &v1 = as_variable(prg, v[0]);
+
+	if (IS_NUMBER(v1)) {
+		v1.n = asin(v1.n);
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
+bool mathfunc_acos(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &v1 = as_variable(prg, v[0]);
+
+	if (IS_NUMBER(v1)) {
+		v1.n = acos(v1.n);
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
+bool mathfunc_atan(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable(prg, v[0]);
+
+	if (IS_NUMBER(v1)) {
+		v1.n = atan(v1.n);
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
 bool mathfunc_atan2(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -834,7 +898,21 @@ bool mathfunc_floor(Program *prg, const std::vector<Token> &v)
 		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 	}
 
-	v1.n = (int)v1.n;
+	v1.n = floor(v1.n);
+
+	return true;
+}
+
+bool mathfunc_ceil(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+	Variable &v1 = as_variable(prg, v[0]);
+
+	if (IS_NUMBER(v1) == false) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+	}
+
+	v1.n = ceil(v1.n);
 
 	return true;
 }
@@ -900,6 +978,70 @@ bool mathfunc_sign(Program *prg, const std::vector<Token> &v)
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
+bool mathfunc_exp(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &v1 = as_variable(prg, v[0]);
+
+	if (IS_NUMBER(v1)) {
+		v1.n = exp(v1.n);
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
+bool mathfunc_hypot(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable(prg, v[0]);
+
+	if (IS_NUMBER(v1)) {
+		v1.n = hypot(v1.n, as_number(prg, v[1]));
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
+bool mathfunc_log(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &v1 = as_variable(prg, v[0]);
+
+	if (IS_NUMBER(v1)) {
+		v1.n = log(v1.n);
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+	}
+
+	return true;
+}
+
+bool mathfunc_log10(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &v1 = as_variable(prg, v[0]);
+
+	if (IS_NUMBER(v1)) {
+		v1.n = log10(v1.n);
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 	}
 
 	return true;
@@ -1724,15 +1866,24 @@ void start_lib_standard()
 
 	add_instruction("sin", mathfunc_sin);
 	add_instruction("cos", mathfunc_cos);
+	add_instruction("tan", mathfunc_tan);
+	add_instruction("asin", mathfunc_asin);
+	add_instruction("acos", mathfunc_acos);
+	add_instruction("atan", mathfunc_atan);
 	add_instruction("atan2", mathfunc_atan2);
 	add_instruction("abs", mathfunc_abs);
 	add_instruction("pow", mathfunc_pow);
 	add_instruction("sqrt", mathfunc_sqrt);
 	add_instruction("floor", mathfunc_floor);
+	add_instruction("ceil", mathfunc_ceil);
 	add_instruction("neg", mathfunc_neg);
 	add_instruction("%", mathfunc_intmod);
 	add_instruction("fmod", mathfunc_fmod);
 	add_instruction("sign", mathfunc_sign);
+	add_instruction("exp", mathfunc_exp);
+	add_instruction("hypot", mathfunc_hypot);
+	add_instruction("log", mathfunc_log);
+	add_instruction("log10", mathfunc_log10);
 
 	add_instruction("vector_add", vectorfunc_add);
 	add_instruction("vector_size", vectorfunc_size);

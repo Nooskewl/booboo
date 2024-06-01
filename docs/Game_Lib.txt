@@ -570,6 +570,9 @@ FALSE
 PI
 	It's pi
 
+E
+	It's e
+
 The following keyboard constants are used with key_get:
 	KEY_UNKNOWN
 	KEY_RETURN
