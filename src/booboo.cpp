@@ -1720,12 +1720,12 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 		if (param.type == Token::NUMBER) {
 			var.type = Variable::NUMBER;
 			var.n = param.n;
-			var.name = param.token;
+			//var.name = param.token;
 		}
 		else if (param.type == Token::STRING) {
 			var.type = Variable::STRING;
 			var.s = param.s;
-			var.name = param.token;
+			//var.name = param.token;
 		}
 		else {
 			var = prg->variables[param.i];
