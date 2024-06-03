@@ -1,6 +1,6 @@
 Copyright 2022-2024 ILLUMINATI NORTH
 
-BooBoo is a mini high-level assembly-like language with game API.
+BooBoo is a mini language with a simple, but powerful game API.
 
 To run the examples, run ./BooBoo <path/to/data/> or just run BooBoo
 to get a launcher (point the launcher to where there is a data/
