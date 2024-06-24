@@ -10,7 +10,7 @@ Everything starts with an opcode (function) followed by parameters. The
 only syntax identifying the end of one statement and the start of another
 is the presence of another API function:
 
-<func> <param1> <param2> <func2> <param1> <param2> <param3> <func3> <func4>
+&lt;func&gt; &lt;param1&gt; &lt;param2&gt; &lt;func2&gt; &lt;param1&gt; &lt;param2&gt; &lt;param3&gt; &lt;func3&gt; &lt;func4&gt;
 
 Everything between functions is slurped up and passed to the preceding
 function.
@@ -18,7 +18,7 @@ function.
 Return values are by convention passed back into the first parameter after
 the function call:
 
-<func> <ret> <param1> <param2>
+&lt;func&gt; &lt;ret&gt; &lt;param1&gt; &lt;param2&gt;
 
 Functions can be defined:
 
@@ -65,12 +65,12 @@ Loops:
 You can do loops with the branch functions (je, jge, etc) but more commonly
 you can use a for loop:
 
-for <var> <start value> <expression> <label>
+for &lt;var&gt; &lt;start value&gt; &lt;expression&gt; &lt;label&gt;
 
 for example to loop to 10:
 
 number i
-for i 0 (< i 10) again
+for i 0 (&lt; i 10) again
 	print "%\n" i
 :again
 
@@ -78,7 +78,7 @@ for i 0 (< i 10) again
 
 Conditionals:
 
-if <expression> <label> <elseif-expression> <label> <else label>
+if &lt;expression&gt; &lt;label&gt; &lt;elseif-expression&gt; &lt;label&gt; &lt;else label&gt;
 
 for example:
 
@@ -96,10 +96,10 @@ You can define your own expression sub handlers. For example (== i 10) is an
 expression that evaluates to TRUE if i equals 10. You can define operators like
 ==:
 
-function sin x
+function esin x
 {
 	sin x
 	return x
 }
 ...
-= foo (sin 3.14159)
+= foo (esin 3.14159)
