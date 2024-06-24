@@ -103,3 +103,16 @@ function esin x
 }
 ...
 = foo (esin 3.14159)
+
+--
+
+Vectors and maps:
+
+The docs have more info, but you can access vectors and maps with fishes.
+You can fish into a vector:
+
+[v x y z] - this will dig into a few vectors to pull a value out
+
+Or a map:
+
+[m "foo" "bar" "baz"] - this will dig into a few maps to pull out "baz"
