@@ -113,6 +113,12 @@ You can fish into a vector:
 
 [v x y z] - this will dig into a few vectors to pull a value out
 
+It's equivalent in C++ to:
+
+v[x][y][z]
+
 Or a map:
 
 [m "foo" "bar" "baz"] - this will dig into a few maps to pull out "baz"
+
+Which is equivalent to m["foo"]["bar"]["baz"] in C++.
