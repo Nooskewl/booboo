@@ -122,3 +122,5 @@ Or a map:
 [m "foo" "bar" "baz"] - this will dig into a few maps to pull out "baz"
 
 Which is equivalent to m["foo"]["bar"]["baz"] in C++.
+
+These can be used anywhere a variable can be used.
