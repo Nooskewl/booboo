@@ -65,12 +65,12 @@ Loops:
 You can do loops with the branch functions (je, jge, etc) but more commonly
 you can use a for loop:
 
-for <var> <start value> <expression> <label>
+for <var> <start value> <expression> <increment> <label>
 
 for example to loop to 10:
 
 number i
-for i 0 (< i 10) again
+for i 0 (< i 10) 1 again
 	print "%\n" i
 :again
 
