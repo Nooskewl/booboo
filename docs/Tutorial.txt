@@ -1,0 +1,105 @@
+This tutorial assumes you have some prior programming experience.
+
+BooBoo is extremely easy to learn, and I'm not going to cover any API here,
+but only basic syntax. Refer to the docs for API.
+
+--
+
+BooBoo could be considered similar to a high-level assembly language.
+Everything starts with an opcode (function) followed by parameters. The
+only syntax identifying the end of one statement and the start of another
+is the presence of another API function:
+
+<func> <param1> <param2> <func2> <param1> <param2> <param3> <func3> <func4>
+
+Everything between functions is slurped up and passed to the preceding
+function.
+
+Return values are by convention passed back into the first parameter after
+the function call:
+
+<func> <ret> <param1> <param2>
+
+Functions can be defined:
+
+function derp
+{
+	call do_something()
+}
+
+And can return values:
+
+function derp2 a b c
+{
+	return (+ a b c)
+}
+...
+number result
+call_result result derp2 32984 438 13
+
+--
+
+Expressions also use Polish notation (operation first) format. A C expression
+like:
+
+x = (x * (x + y))
+
+Can be written as:
+
+= x (* x (+ x y))
+
+--
+
+Hello world:
+
+print "Hello, World!\n"
+
+Hello world Game Launcher (red screen):
+
+function draw { clear 255 0 0 }
+
+--
+
+Loops:
+
+You can do loops with the branch functions (je, jge, etc) but more commonly
+you can use a for loop:
+
+for <var> <start value> <expression> <label>
+
+for example to loop to 10:
+
+number i
+for i 0 (< i 10) again
+	print "%\n" i
+:again
+
+--
+
+Conditionals:
+
+if <expression> <label> <elseif-expression> <label> <else label>
+
+for example:
+
+if (== i 10) ten (== i 9) nine below
+	print "TEN!\n"
+:ten
+	print "NINE!\n"
+:nine
+	print "BELOW NINE!\n"
+:below
+
+--
+
+You can define your own expression sub handlers. For example (== i 10) is an
+expression that evaluates to TRUE if i equals 10. You can define operators like
+==:
+
+function sin x
+{
+	sin x
+	return x
+}
+...
+= foo (sin 3.14159)
