@@ -123,4 +123,10 @@ Or a map:
 
 Which is equivalent to m["foo"]["bar"]["baz"] in C++.
 
+You can nest them:
+
+[v x y [m "foo" "bar" [v2 z]]]
+
+In C++ that would be v[x][y][m["foo"]["bar"][v2[z]]];
+
 These can be used anywhere a variable can be used.
