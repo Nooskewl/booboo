@@ -129,4 +129,8 @@ You can nest them:
 
 In C++ that would be v[x][y][m["foo"]["bar"][v2[z]]];
 
+Or you can mix them with expressions:
+
+[v x y (+ z 1)]
+
 These can be used anywhere a variable can be used.
