@@ -341,9 +341,6 @@ bool corefunc_list_directory(Program *prg, const std::vector<Token> &v)
 			continue;
 		}
 #ifdef _WIN32
-		//char buf[1000];
-		//GetFullPathName(fn.c_str(), 1000, buf, NULL);
-		//if (PathIsDirectory(buf)) {
 		if (PathIsDirectory((path_part + fn).c_str())) {
 			fn += "/";
 		}

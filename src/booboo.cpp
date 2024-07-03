@@ -46,17 +46,6 @@ std::vector<booboo::library_func> library;
 std::string get_file_name(Program *prg)
 {
 	if (prg->complete_pass != PASS2) {
-#if 0
-		if (prg->s->line_numbers.size() > 0 && prg->real_file_names.size() > prg->s->line_numbers[prg->s->line_numbers.size()-1]) {
-			return prg->real_file_names[prg->s->line_numbers[prg->s->line_numbers.size()-1]];
-		}
-		else if (prg->s->line < prg->real_file_names.size()) {
-			return prg->real_file_names[prg->s->line];
-		}
-		else {
-			return "UNKNOWN";
-		}
-#endif
 		if (prg->real_file_names.size() > prg->s->line) {
 			return prg->real_file_names[prg->s->line];
 		}
@@ -88,25 +77,6 @@ int get_line_num(Program *prg)
 		else {
 			return -1;
 		}
-#if 0
-		//printf("line=%d rln=%d ln=%d\n", prg->s->line, prg->real_line_numbers[prg->s->line], prg->s->line_numbers[prg->s->line_numbers.size()-1]);
-		if (prg->s->line_numbers.size() > 0) {
-			if (prg->real_line_numbers.size() > prg->s->line_numbers[prg->s->line_numbers.size()-1]) {
-				return prg->real_line_numbers[prg->s->line_numbers[prg->s->line_numbers.size()-1]];
-			}
-			else {
-				return prg->s->line_numbers[prg->s->line_numbers.size()-1];
-			}
-		}
-		else {
-			if (prg->s->line < prg->real_line_numbers.size()) {
-				return prg->real_line_numbers[prg->s->line];
-			}
-			else {
-				return prg->s->line;
-			}
-		}
-#endif
 	}
 	else {
 		int l;
@@ -408,7 +378,6 @@ static std::string token(Program *prg, Token::Token_Type &ret_type)
 		return (*it).second(prg);
 	}
 
-	//prg->s->line_numbers.push_back(prg->s->line); // can help give better line number
 	throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg));
 
 	return "";
@@ -565,7 +534,6 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 	Variable::Expression e;
 
 	if (expression_map.find(name) == expression_map.end()) {
-		//throw Error(std::string(__FUNCTION__) + ": " + "Unknown expression function at " + get_error_info(prg));
 		e.i = -1;
 		e.name = name;
 	}
@@ -619,8 +587,6 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			}
 
 			prg->variables[tok.i].e = parse_expression(prg, func, new_expr, var_i, expression_i, fish_i, pass);
-
-			//func->s->program[func->s->program.size()-1].data.push_back(tok);
 		}
 		else if (c == ')') {
 			done = true;
@@ -661,8 +627,6 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			}
 
 			prg->variables[tok.i].f = parse_fish(prg, func, new_expr, var_i, expression_i, fish_i, pass);
-
-			//func->s->program[func->s->program.size()-1].data.push_back(tok);
 		}
 		else if (isdigit(c) || c == '-' || c == '.') {
 			tok.type = Token::NUMBER;
@@ -844,8 +808,6 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			}
 
 			prg->variables[tok.i].e = parse_expression(prg, func, new_expr, var_i, expression_i, fish_i, pass);
-
-			//func->s->program[func->s->program.size()-1].data.push_back(tok);
 		}
 		else if (c == '[') {
 			tok.type = Token::SYMBOL;
@@ -882,8 +844,6 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			}
 
 			prg->variables[tok.i].f = parse_fish(prg, func, new_expr, var_i, expression_i, fish_i, pass);
-
-			//func->s->program[func->s->program.size()-1].data.push_back(tok);
 		}
 		else if (c == ']') {
 			done = true;
@@ -1320,10 +1280,7 @@ func_top:
 						prg->locals[func_index][tok2] = var_i;
 					}
 					prg->variables.push_back(v);
-					if (pass == PASS1 && prg->variables_map.find(tok2) != prg->variables_map.end()) {
-						//throw Error(std::string(__FUNCTION__) + ": " + "Duplicate label at " + get_error_info(prg));
-					}
-					else if (pass == PASS2) {
+					if (pass == PASS2) {
 						prg->variables_map[tok2] = prg->locals[func_index][tok2];
 					}
 					var_i++;
@@ -1332,14 +1289,7 @@ func_top:
 					Statement s;
 					s.method = library_map[tok];
 					func.s->program.push_back(s);
-					//if (pass == PASS2) {
-						//if (func.line_numbers.size() != 0) {
-							//func.s->pc++;
-						//}
-						
-						func.s->line_numbers.push_back(prg->s->line);
-						//prg->s->line_numbers.push_back(prg->s->line);
-					//}
+					func.s->line_numbers.push_back(prg->s->line);
 					int count = 0;
 					while (true) {
 						std::string tok2 = token(prg, tt);
@@ -1453,14 +1403,7 @@ func_top:
 					Statement s;
 					s.method = library_map[tok];
 					func.s->program.push_back(s);
-					//if (pass == PASS2) {
-						//if (func.line_numbers.size() != 0) {
-							//func.s->pc++;
-						//}
-						
-						func.s->line_numbers.push_back(prg->s->line);
-						//prg->s->line_numbers.push_back(prg->s->line);
-					//}
+					func.s->line_numbers.push_back(prg->s->line);
 				}
 				else if (is_param) {
 					int param_i = var_i++;
@@ -1480,7 +1423,6 @@ func_top:
 				}
 				else {
 					if (func.s->program.size() == 0) {
-						//func.line_numbers.push_back(prg->s->line); // can help give better line number
 						throw Error("Expected keyword at " + get_error_info(&func));
 					}
 					Token t;
@@ -1493,7 +1435,6 @@ func_top:
 						case Token::SYMBOL:
 							t.s = util::remove_quotes(util::unescape_string(tok));
 							if (pass == PASS2 && prg->variables_map.find(t.s) == prg->variables_map.end()) {
-								//func.line_numbers.push_back(prg->s->line); // can help give better line number
 								throw Error(std::string(__FUNCTION__) + ": " + "Invalid symbol name " + tok + " at " + get_error_info(&func));
 							}
 							if (pass == PASS2) {
@@ -1509,12 +1450,10 @@ func_top:
 			}
 
 			if (is_param == true) {
-				//func.line_numbers.push_back(prg->s->line); // can help give better line number
 				throw Error(std::string(__FUNCTION__) + ": " + "Missing { at " + get_error_info(prg));
 			}
 
 			if (finished == false) {
-				//func.line_numbers.push_back(prg->s->line); // can help give better line number
 				throw Error(std::string(__FUNCTION__) + ": " + "Missing } at " + get_error_info(prg));
 			}
 
@@ -1552,9 +1491,6 @@ func_top:
 
 			prg->s->line_numbers.push_back(prg->s->line);
 			prg->variables.push_back(v);
-			if (pass == PASS1 && prg->variables_map.find(tok2) != prg->variables_map.end()) {
-				//throw Error(std::string(__FUNCTION__) + ": " + "Duplicate label at " + get_error_info(prg));
-			}
 			prg->variables_map[tok2] = var_i;
 			var_i++;
 		}
@@ -1562,12 +1498,7 @@ func_top:
 			Statement s;
 			s.method = library_map[tok];
 			prg->s->program.push_back(s);
-			//if (pass == PASS2) {
-				//if (prg->s->line_numbers.size() != 0) {
-					//prg->s->pc++;
-				//}
-				prg->s->line_numbers.push_back(prg->s->line);
-			//}
+			prg->s->line_numbers.push_back(prg->s->line);
 			int count = 0;
 			while (true) {
 				std::string tok2 = token(prg, tt);
@@ -1667,15 +1598,9 @@ func_top:
 			Statement s;
 			s.method = library_map[tok];
 			prg->s->program.push_back(s);
-			//if (pass == PASS2) {
-				//if (prg->s->line_numbers.size() != 0) {
-					//prg->s->pc++;
-				//}
-				prg->s->line_numbers.push_back(prg->s->line);
-			//}
+			prg->s->line_numbers.push_back(prg->s->line);
 		}
 		else if (prg->s->program.size() == 0) {
-			//prg->s->line_numbers.push_back(prg->s->line); // can help give better line number
 			throw Error("Expected keyword at " + get_error_info(prg));
 		}
 		else {
@@ -1735,8 +1660,6 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 
 	Function_Swap *bak2 = prg->s;
 	prg->s = func.s;
-	//prg->s->p = 0;
-	//prg->s->line = 0;
 
 	// To handle recursive calls:
 	int pc_bak = prg->s->pc;

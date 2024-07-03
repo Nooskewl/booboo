@@ -1,13 +1,3 @@
-//#define LUA_BENCH
-//#define LUA_BENCH2
-//#define LUA_BENCH3
-//#define CPP_BENCH
-//#define CPP_BENCH2
-
-#if defined LUA_BENCH || defined LUA_BENCH2 || defined LUA_BENCH3
-#define LUA_BENCH_ANY
-#endif
-
 #include <unistd.h>
 #include <climits>
 #include <sys/stat.h>
@@ -27,11 +17,6 @@ using namespace noo;
 #include "booboo/game_lib.h"
 using namespace booboo;
 
-#ifdef CPP_BENCH
-gfx::Image *grass;
-gfx::Image *robot;
-#endif
-
 Program *prg;
 
 int orig_argc;
@@ -42,345 +27,6 @@ std::string extra_args_orig;
 
 bool toggle_fullscreen;
 bool invert_mouse_wheel;
-
-#if defined LUA_BENCH_ANY
-extern "C" {
-#include <lua5.4/lua.h>
-#include <lua5.4/lauxlib.h>
-#include <lua5.4/lualib.h>
-}
-
-lua_State *lua_state;
-std::vector<gfx::Image *> lua_images;
-
-void dump_lua_stack(lua_State *l)
-{
-        int i;
-        int top = lua_gettop(l);
-	char buf[1000];
-
-        snprintf(buf, 1000, "--- stack ---\n");
-	printf("%s", buf);
-        snprintf(buf, 1000, "top=%u   ...   ", top);
-	printf("%s", buf);
-
-        for (i = 1; i <= top; i++) {  /* repeat for each level */
-                int t = lua_type(l, i);
-                switch (t) {
-
-                case LUA_TSTRING:  /* strings */
-                        snprintf(buf, 1000, "`%s'", lua_tostring(l, i));
-			printf("%s", buf);
-                        break;
-
-                case LUA_TBOOLEAN:  /* booleans */
-                        snprintf(buf, 1000, lua_toboolean(l, i) ? "true" : "false");
-			printf("%s", buf);
-                        break;
-
-                case LUA_TNUMBER:  /* numbers */
-                        snprintf(buf, 1000, "%g", lua_tonumber(l, i));
-			printf("%s", buf);
-                        break;
-
-                case LUA_TTABLE:   /* table */
-                        snprintf(buf, 1000, "table");
-			printf("%s", buf);
-                        break;
-
-                default:  /* other values */
-                        snprintf(buf, 1000, "%s", lua_typename(l, t));
-			printf("%s", buf);
-                        break;
-
-                }
-                snprintf(buf, 1000, "  ");  /* put a separator */
-        }
-        snprintf(buf, 1000, "\n");  /* end the listing */
-	printf("%s", buf);
-
-        snprintf(buf, 1000, "-------------\n");
-	printf("%s", buf);
-}
-
-
-/*
- * Call a Lua function, leaving the results on the stack.
- */
-void call_lua(lua_State* lua_state, const char *func, const char *sig, ...)
-{
-	va_list vl;
-	int narg, nres;  /* number of arguments and results */
-
-	va_start(vl, sig);
-	lua_getglobal(lua_state, func);  /* get function */
-
-	if (!lua_isfunction(lua_state, -1)) {
-		lua_pop(lua_state, 1);
-		return;
-	}
-
-	/* push arguments */
-	narg = 0;
-	while (*sig) {  /* push arguments */
-		switch (*sig++) {
-			case 'd':  /* double argument */
-				lua_pushnumber(lua_state, va_arg(vl, double));
-				break;
-			case 'b':  /* boolean (int) argument */
-				lua_pushboolean(lua_state, va_arg(vl, int));
-				break;
-			case 'i':  /* int argument */
-				lua_pushnumber(lua_state, va_arg(vl, int));
-				break;
-
-			case 's':  /* string argument */
-				lua_pushstring(lua_state, va_arg(vl, char *));
-				break;
-			case 'u':  /* userdata argument */
-				lua_pushlightuserdata(lua_state, va_arg(vl, void *));
-				break;
-			case '>':
-				goto endwhile;
-			default:
-				break;
-		}
-		narg++;
-		luaL_checkstack(lua_state, 1, "too many arguments");
-	}
-endwhile:
-
-	/* do the call */
-	nres = strlen(sig);  /* number of expected results */
-	if (lua_pcall(lua_state, narg, nres, 0) != 0) {
-		dump_lua_stack(lua_state);
-	}
-
-	va_end(vl);
-}
-
-extern "C" {
-
-static int c_start_primitives(lua_State *stack)
-{
-	gfx::draw_primitives_start();
-	return 0;
-}
-
-static int c_end_primitives(lua_State *stack)
-{
-	gfx::draw_primitives_end();
-	return 0;
-}
-
-static int c_filled_circle(lua_State *stack)
-{
-	int r = lua_tonumber(stack, 1);
-	int g = lua_tonumber(stack, 2);
-	int b = lua_tonumber(stack, 3);
-	int a = lua_tonumber(stack, 4);
-	float x = lua_tonumber(stack, 5);
-	float y = lua_tonumber(stack, 6);
-	float radius = lua_tonumber(stack, 7);
-	int sections = lua_tonumber(stack, 8);
-
-	SDL_Color c;
-	c.r = r;
-	c.g = g;
-	c.b = b;
-	c.a = a;
-
-	util::Point<float> p(x, y);
-
-	gfx::draw_filled_circle(c, p, radius, sections);
-
-	return 0;
-}
-
-static int c_filled_rectangle(lua_State *stack)
-{
-	int r = lua_tonumber(stack, 1);
-	int g = lua_tonumber(stack, 2);
-	int b = lua_tonumber(stack, 3);
-	int a = lua_tonumber(stack, 4);
-	int r2 = lua_tonumber(stack, 5);
-	int g2 = lua_tonumber(stack, 6);
-	int b2 = lua_tonumber(stack, 7);
-	int a2 = lua_tonumber(stack, 8);
-	int r3 = lua_tonumber(stack, 9);
-	int g3 = lua_tonumber(stack, 10);
-	int b3 = lua_tonumber(stack, 11);
-	int a3 = lua_tonumber(stack, 12);
-	int r4 = lua_tonumber(stack, 13);
-	int g4 = lua_tonumber(stack, 14);
-	int b4 = lua_tonumber(stack, 15);
-	int a4 = lua_tonumber(stack, 16);
-	float x = lua_tonumber(stack, 17);
-	float y = lua_tonumber(stack, 18);
-	float w = lua_tonumber(stack, 19);
-	float h = lua_tonumber(stack, 20);
-
-	SDL_Color c[4];
-	c[0].r = r;
-	c[0].g = g;
-	c[0].b = b;
-	c[0].a = a;
-	c[1].r = r2;
-	c[1].g = g2;
-	c[1].b = b2;
-	c[1].a = a2;
-	c[2].r = r3;
-	c[2].g = g3;
-	c[2].b = b3;
-	c[2].a = a3;
-	c[3].r = r4;
-	c[3].g = g4;
-	c[3].b = b4;
-	c[3].a = a4;
-
-	gfx::draw_filled_rectangle(c, util::Point<float>(x, y), util::Size<float>(w, h));
-
-	return 0;
-}
-
-static int c_clear(lua_State *stack)
-{
-	int r = lua_tonumber(stack, 1);
-	int g = lua_tonumber(stack, 2);
-	int b = lua_tonumber(stack, 3);
-
-	SDL_Color c;
-	c.r = r;
-	c.g = g;
-	c.b = b;
-	c.a = 255;
-
-	gfx::clear(c);
-
-	return 0;
-}
-
-static int c_load_image(lua_State *stack)
-{
-	const char *name = lua_tostring(stack, 1);
-
-	int n = lua_images.size();
-
-	lua_images.push_back(new gfx::Image(name));
-
-	lua_pushnumber(stack, n);
-
-	return 1;
-}
-
-static int c_image_size(lua_State *stack)
-{
-	int n = lua_tonumber(stack, 1);
-
-	lua_pushnumber(stack, lua_images[n]->size.w);
-	lua_pushnumber(stack, lua_images[n]->size.h);
-
-	return 2;
-}
-
-static int c_image_draw(lua_State *stack)
-{
-	int n = lua_tonumber(stack, 1);
-	int tint_r = lua_tonumber(stack, 2);
-	int tint_g = lua_tonumber(stack, 3);
-	int tint_b = lua_tonumber(stack, 4);
-	int tint_a = lua_tonumber(stack, 5);
-	int x = lua_tonumber(stack, 6);
-	int y = lua_tonumber(stack, 7);
-	int flip_h = lua_tonumber(stack, 8);
-	int flip_v = lua_tonumber(stack, 9);
-
-	SDL_Colour c;
-	c.r = tint_r;
-	c.g = tint_g;
-	c.b = tint_b;
-	c.a = tint_a;
-
-	int flip = 0;
-	if (flip_h) {
-		flip |= gfx::Image::FLIP_H;
-	}
-	if (flip_v) {
-		flip |= gfx::Image::FLIP_V;
-	}
-
-	lua_images[n]->draw_tinted(c, util::Point<float>(x, y), flip);
-
-	return 0;
-}
-
-static int c_image_start(lua_State *stack)
-{
-	int n = lua_tonumber(stack, 1);
-
-	lua_images[n]->start_batch();
-
-	return 0;
-}
-
-static int c_image_end(lua_State *stack)
-{
-	int n = lua_tonumber(stack, 1);
-
-	lua_images[n]->end_batch();
-
-	return 0;
-}
-
-static int c_rand(lua_State *stack)
-{
-	int min_incl = lua_tonumber(stack, 1);
-	int max_incl = lua_tonumber(stack, 2);
-
-	lua_pushnumber(stack, util::rand(min_incl, max_incl));
-
-	return 1;
-}
-
-}
-
-void init_lua()
-{
-	lua_state = luaL_newstate();
-
-	luaL_openlibs(lua_state);
-
-	#define REGISTER_FUNCTION(name) \
-		lua_pushcfunction(lua_state, c_ ## name); \
-		lua_setglobal(lua_state, #name);
-
-	REGISTER_FUNCTION(clear);
-	REGISTER_FUNCTION(start_primitives);
-	REGISTER_FUNCTION(end_primitives);
-	REGISTER_FUNCTION(filled_circle);
-	REGISTER_FUNCTION(filled_rectangle);
-	REGISTER_FUNCTION(load_image);
-	REGISTER_FUNCTION(image_size);
-	REGISTER_FUNCTION(image_draw);
-	REGISTER_FUNCTION(image_start);
-	REGISTER_FUNCTION(image_end);
-	REGISTER_FUNCTION(rand);
-
-	#undef REGISTER_FUNCION
-
-#ifdef LUA_BENCH
-	std::string program = util::load_text_from_filesystem("robots.lua");
-#elif defined LUA_BENCH2
-	std::string program = util::load_text_from_filesystem("sine.lua");
-#else
-	std::string program = util::load_text_from_filesystem("plasma.lua");
-#endif
-	luaL_loadstring(lua_state, program.c_str());
-	if (lua_pcall(lua_state, 0, 0, 0) != 0) {
-		dump_lua_stack(lua_state);
-	}
-}
-#endif
 
 static util::Point<int> mouse_pos;
 static bool mouse_b1;
@@ -495,7 +141,6 @@ bool start()
 
 	gfx::set_minimum_window_size(util::Size<int>(640, 360));
 	util::Size<int> desktop_resolution = gfx::get_desktop_resolution();
-	//gfx::set_maximum_window_size(desktop_resolution);
 
 #if !defined IOS && !defined ANDROID
 	const int min_supp_w = 1280;
@@ -519,7 +164,6 @@ bool start()
 		win_h = 1080;
 	}
 
-	//if (shim::start_all(0, 0, false, desktop_resolution.w, desktop_resolution.h) == false) {
 	if (shim::start_all(640, 360, false, win_w, win_h) == false) {
 		gui::fatalerror("ERROR", "Initialization failed", gui::OK, true);
 		return false;
@@ -528,13 +172,6 @@ bool start()
 #ifdef _WIN32
 	gfx::enable_press_and_hold(false);
 #endif
-
-	/*
-	if (shim::font == 0) {
-		gui::fatalerror("Fatal Error", "Font not found! Aborting.", gui::OK, false);
-		return false;
-	}
-	*/
 
 	if (util::bool_arg(false, shim::argc, shim::argv, "dump-images")) {
 		std::vector<std::string> filenames = shim::cpa->get_all_filenames();
@@ -559,9 +196,6 @@ bool start()
 	}
 
 	TGUI::set_focus_sloppiness(0);
-
-	//gfx::register_lost_device_callbacks(lost_device, found_device);
-	//shim::joystick_disconnect_callback = joystick_disconnected;
 
 	return true;
 }
@@ -659,45 +293,8 @@ void draw_all()
 
 	gfx::set_cull_mode(gfx::NO_FACE);
 	
-#if defined LUA_BENCH_ANY
-	call_lua(lua_state, "draw", "");
-#elif defined CPP_BENCH2
-	SDL_Colour c;
-	c.r = 0;
-	c.g = 255;
-	c.b = 0;
-	c.a = 25;
-	for (int x = 0; x < 640; x+=2) {
-		float y = sin(x/640.0f*M_PI*2)*90;
-		gfx::draw_filled_circle(c, util::Point<float>(x, y+180), 8);
-	}
-	Uint32 now = SDL_GetTicks();
-	now /= 16;
-	now *= 5;
-	now %= 640;
-	float y = sin(now/640.0f*M_PI*2)*90;
-	c.r = 128;
-	c.b = 128;
-	gfx::draw_filled_circle(c, util::Point<float>(now, y+180), 32);
-#elif defined CPP_BENCH
-	int w = 640 / grass->size.w;
-	int h = 360 / grass->size.h;
-	grass->start_batch();
-	for (int y = 0; y < h; y++) {
-		for (int x = 0; x < w; x++) {
-			grass->draw(util::Point<float>(x*grass->size.w, y*grass->size.h));
-		}
-	}
-	grass->end_batch();
-	for (int i = 0; i < 17; i++) {
-		int x = util::rand(0, w-1);
-		int y = util::rand(0, h-1);
-		robot->draw(util::Point<float>(x*robot->size.w, y*robot->size.h));
-	}
-#else
 	std::vector<Token> tmp;
 	call_void_function(prg, "draw", tmp);
-#endif
 
 	gfx::draw_guis();
 	gfx::draw_notifications();
@@ -746,9 +343,6 @@ static void loop()
 						quit = true;
 						break;
 					}
-				}
-				else if (sdl_event.type == SDL_KEYDOWN && sdl_event.key.keysym.sym == SDLK_F12) {
-					//load_translation();
 				}
 			}
 
@@ -799,12 +393,8 @@ static void loop()
 			TGUI_Event *event = shim::handle_event(&sdl_event);
 			handle_event(event);
 
-#if defined LUA_BENCH_ANY
-			call_lua(lua_state, "run", "");
-#else
 			std::vector<Token> tmp;
 			call_void_function(prg, "run", tmp);
-#endif
 
 			mouse_wheel_y = 0;
 
@@ -1069,7 +659,6 @@ int main(int argc, char **argv)
 	shim::argc = orig_argc;
 	shim::argv = orig_argv;
 
-	//set_shim_args(true, false, true);
 	set_shim_args(true, true, false);
 	
 	shim::use_cwd = true;
@@ -1180,13 +769,6 @@ again:
 	while (interpret(prg)) {
 	}
 
-#if defined LUA_BENCH_ANY
-	init_lua();
-#elif defined CPP_BENCH
-	grass = new gfx::Image("misc/grass.tga");
-	robot = new gfx::Image("misc/robot.tga");
-#endif
-
 	if (reset_game_name == "") {
 		go();
 	}
@@ -1259,10 +841,7 @@ again:
 	if (beepboop) {
 #ifdef __linux__
 		pid_t pid = fork();
-		/*if (pid != -1 && pid != 0) {
-			exit(0);
-		}
-		else*/ if (pid == 0) {
+		if (pid == 0) {
 			char * const args[] = {
 				orig_argv[0],
 				"+dir",
@@ -1280,22 +859,14 @@ again:
 		ZeroMemory(&pi, sizeof(pi));
 		char cmd[1000];
 		snprintf(cmd, 1000, "\"%s\" +dir \"%s\"", orig_argv[0], set_dir.c_str());
-		//if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
 		if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
-			//WaitForSingleObject(pi.hProcess, INFINITE);
-			//CloseHandle(pi.hProcess);
-			//CloseHandle(pi.hThread);
 		}
-		//exit(0);
 #endif
 	}
 	else if (relaunch) {
 #ifdef __linux__
 		pid_t pid = fork();
-		/*if (pid != -1 && pid != 0) {
-			exit(0);
-		}
-		else*/ if (pid == 0) {
+		if (pid == 0) {
 			char * const args[] = {
 				orig_argv[0],
 				(char *)dir.c_str(),
@@ -1315,16 +886,10 @@ again:
 		ZeroMemory(&pi, sizeof(pi));
 		char cmd[1000];
 		snprintf(cmd, 1000, "\"%s\" \"%s\" +beepboop +set-dir \"%s\"", orig_argv[0], dir.c_str(), dir.c_str());
-		//if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
 		if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
-			//WaitForSingleObject(pi.hProcess, INFINITE);
-			//CloseHandle(pi.hProcess);
-			//CloseHandle(pi.hThread);
 		}
-		//exit(0);
 #endif
 	}
 
 	return return_code;
 }
-
