@@ -142,12 +142,8 @@ extern std::string (*load_text)(std::string filename); // must be set
 } // End namespace booboo
 
 // You can use this at the start of your library functions to ensure correct number of arguments
-// You can comment out the first line and uncomment the second to skip error
-// checking and get a small speed improvement
 #define MIN_ARGS(n) if (v.size() < n) throw Error(std::string(__FUNCTION__) + ": " + "Incorrect number of arguments at " + get_error_info(prg));
-//#define MIN_ARGS(n)
 #define COUNT_ARGS(n) if (v.size() != n) throw Error(std::string(__FUNCTION__) + ": " + "Incorrect number of arguments at " + get_error_info(prg));
-//#define COUNT_ARGS(n)
 		
 #define IS_NUMBER(v) ((v).type == Variable::NUMBER)
 #define IS_STRING(v) ((v).type == Variable::STRING)
@@ -157,5 +153,51 @@ extern std::string (*load_text)(std::string filename); // must be set
 #define IS_FUNCTION(v) ((v).type == Variable::FUNCTION)
 #define IS_EXPRESSION(v) ((v).type == Variable::EXPRESSION)
 #define IS_FISH(v) ((v).type == Variable::FISH)
+
+#define CHECK_NUMBER(v) \
+	if (!IS_NUMBER(v)) { \
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected number at " + get_error_info(prg)); \
+	}
+#define CHECK_STRING(v) \
+	if (!IS_STRING(v)) { \
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected string at " + get_error_info(prg)); \
+	}
+#define CHECK_VECTOR(v) \
+	if (!IS_VECTOR(v)) { \
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected vector at " + get_error_info(prg)); \
+	}
+#define CHECK_MAP(v) \
+	if (!IS_MAP(v)) { \
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected map at " + get_error_info(prg)); \
+	}
+#define CHECK_LABEL(v) \
+	if (!IS_LABEL(v)) { \
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected label at " + get_error_info(prg)); \
+	}
+#define CHECK_FUNCTION(v) \
+	if (!IS_FUNCTION(v)) { \
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected function at " + get_error_info(prg)); \
+	}
+#define CHECK_EXPRESSION(v) \
+	if (!IS_EXPRESSION(v)) { \
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected expression at " + get_error_info(prg)); \
+	}
+#define CHECK_FISH(v) \
+	if (!IS_FISH(v)) { \
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected fish at " + get_error_info(prg)); \
+	}
+
+#if 0
+#define MIN_ARGS(n)
+#define COUNT_ARGS(n)
+#define CHECK_NUMBER(v)
+#define CHECK_STRING(v)
+#define CHECK_VECTOR(v)
+#define CHECK_MAP(v)
+#define CHECK_LABEL(v)
+#define CHECK_FUNCTION(v)
+#define CHECK_EXPRESSION(v)
+#define CHECK_FISH(v)
+#endif
 
 #endif // BOOBOO_H

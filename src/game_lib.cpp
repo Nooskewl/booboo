@@ -308,10 +308,8 @@ static bool miscfunc_get_ticks(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	Variable &v1 = as_variable(prg, v[0]);
-	
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+
+	CHECK_NUMBER(v1)	
 
 	v1.n = SDL_GetTicks();
 
@@ -327,12 +325,9 @@ static bool miscfunc_rand(Program *prg, const std::vector<Token> &v)
 	int min_incl = as_number(prg, v[1]);
 	int max_incl = as_number(prg, v[2]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = util::rand(min_incl, max_incl);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+
+	v1.n = util::rand(min_incl, max_incl);
 
 	return true;
 }
@@ -342,10 +337,8 @@ static bool miscfunc_args(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	Variable &v1 = as_variable(prg, v[0]);
-	
-	if (IS_VECTOR(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+
+	CHECK_VECTOR(v1)	
 
 	v1.v.clear();
 
@@ -366,9 +359,7 @@ static bool miscfunc_get_logic_rate(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
 
 	v1.n = shim::logic_rate;
 
@@ -395,10 +386,8 @@ static bool miscfunc_file_list(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	Variable &v1 = as_variable(prg, v[0]);
-	
-	if (IS_VECTOR(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+
+	CHECK_VECTOR(v1)	
 
 	v1.v.clear();
 
@@ -474,10 +463,9 @@ static bool gfxfunc_get_screen_size(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 	Variable &v2 = as_variable(prg, v[1]);
-	
-	if (IS_NUMBER(v1) == false || IS_NUMBER(v2) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+
+	CHECK_NUMBER(v1)
+	CHECK_NUMBER(v2)	
 
 	v1.n = shim::real_screen_size.w;
 	v2.n = shim::real_screen_size.h;
@@ -491,10 +479,9 @@ static bool gfxfunc_get_buffer_size(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 	Variable &v2 = as_variable(prg, v[1]);
-	
-	if (IS_NUMBER(v1) == false || IS_NUMBER(v2) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+
+	CHECK_NUMBER(v1)
+	CHECK_NUMBER(v2)	
 
 	v1.n = shim::screen_size.w;
 	v2.n = shim::screen_size.h;
@@ -508,10 +495,9 @@ static bool gfxfunc_get_screen_offset(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 	Variable &v2 = as_variable(prg, v[1]);
-	
-	if (IS_NUMBER(v1) == false || IS_NUMBER(v2) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+
+	CHECK_NUMBER(v1)
+	CHECK_NUMBER(v2)	
 
 	v1.n = shim::screen_offset.x;
 	v2.n = shim::screen_offset.y;
@@ -524,10 +510,8 @@ static bool gfxfunc_get_scale(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	Variable &v1 = as_variable(prg, v[0]);
-	
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+
+	CHECK_NUMBER(v1)	
 
 	v1.n = shim::scale;
 
@@ -593,9 +577,7 @@ static bool gfxfunc_is_fullscreen(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
 
 	v1.n = gfx::is_fullscreen();
 
@@ -627,9 +609,7 @@ static bool gfxfunc_get_refresh_rate(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
 
 	v1.n = shim::refresh_rate;
 
@@ -906,12 +886,9 @@ static bool mmlfunc_create(Program *prg, const std::vector<Token> &v)
 	
 	MML_Info *info = mml_info(prg);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = info->mml_id;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	
+	v1.n = info->mml_id;
 
 	Uint8 *bytes = (Uint8 *)str.c_str();
 	SDL_RWops *file = SDL_RWFromMem(bytes, str.length());
@@ -931,12 +908,9 @@ static bool mmlfunc_load(Program *prg, const std::vector<Token> &v)
 
 	MML_Info *info = mml_info(prg);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = info->mml_id;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	
+	v1.n = info->mml_id;
 
 	audio::MML *mml = new audio::MML(name);
 
@@ -998,12 +972,9 @@ static bool samplefunc_load(Program *prg, const std::vector<Token> &v)
 
 	Sample_Info *info = sample_info(prg);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = info->sample_id;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = info->sample_id;
 
 	audio::Sample *sample = new audio::Sample(name);
 
@@ -1067,12 +1038,9 @@ static bool imagefunc_create(Program *prg, const std::vector<Token> &v)
 
 	Image_Info *info = image_info(prg);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = info->image_id;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	
+	v1.n = info->image_id;
 
 	gfx::Image *img = new gfx::Image(util::Size<int>(w, h));
 
@@ -1090,12 +1058,9 @@ static bool imagefunc_load(Program *prg, const std::vector<Token> &v)
 
 	Image_Info *info = image_info(prg);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = info->image_id;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	
+	v1.n = info->image_id;
 
 	gfx::Image *img = new gfx::Image(name);
 
@@ -1305,18 +1270,11 @@ static bool imagefunc_size(Program *prg, const std::vector<Token> &v)
 
 	gfx::Image *img = info->images[id];
 
-	if (IS_NUMBER(v1)) {
-		v1.n = img->size.w;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
-	if (IS_NUMBER(v2)) {
-		v2.n = img->size.h;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	CHECK_NUMBER(v2)
+	
+	v1.n = img->size.w;
+	v2.n = img->size.h;
 
 	return true;
 }
@@ -1369,12 +1327,9 @@ static bool fontfunc_load(Program *prg, const std::vector<Token> &v)
 
 	Font_Info *info = font_info(prg);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = info->font_id;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	
+	v1.n = info->font_id;
 
 	gfx::TTF *font = new gfx::TTF(name, size, 1024);
 	font->set_smooth(smooth);
@@ -1440,12 +1395,9 @@ static bool fontfunc_width(Program *prg, const std::vector<Token> &v)
 
 	int w = font->get_text_width(text);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = w;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	
+	v1.n = w;
 
 	return true;
 }
@@ -1463,12 +1415,9 @@ static bool fontfunc_height(Program *prg, const std::vector<Token> &v)
 
 	int h = font->get_height();
 
-	if (IS_NUMBER(v1)) {
-		v1.n = h;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+
+	v1.n = h;
 
 	return true;
 }
@@ -1510,12 +1459,9 @@ static bool tilemapfunc_load(Program *prg, const std::vector<Token> &v)
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = info->tilemap_id;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	
+	v1.n = info->tilemap_id;
 
 	gfx::Tilemap *tilemap = new gfx::Tilemap(name);
 
@@ -1552,9 +1498,7 @@ static bool tilemapfunc_num_layers(Program *prg, const std::vector<Token> &v)
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
 
 	gfx::Tilemap *tilemap = info->tilemaps[id];
 
@@ -1573,9 +1517,8 @@ static bool tilemapfunc_size(Program *prg, const std::vector<Token> &v)
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
-	if (IS_NUMBER(v1) == false || IS_NUMBER(v2) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	CHECK_NUMBER(v2)
 
 	gfx::Tilemap *tilemap = info->tilemaps[id];
 
@@ -1598,9 +1541,7 @@ static bool tilemapfunc_is_solid(Program *prg, const std::vector<Token> &v)
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
 
 	gfx::Tilemap *tilemap = info->tilemaps[id];
 
@@ -1616,9 +1557,7 @@ static bool tilemapfunc_get_groups(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Variable &vec = as_variable(prg, v[1]);
 
-	if (IS_VECTOR(vec) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_VECTOR(vec)
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
@@ -1674,9 +1613,7 @@ static bool tilemapfunc_set_animated_tiles(Program *prg, const std::vector<Token
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
-	if (IS_VECTOR(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_VECTOR(v1)
 
 	gfx::Tilemap *tilemap = info->tilemaps[id];
 	
@@ -1710,14 +1647,9 @@ static bool tilemapfunc_find_path(Program *prg, const std::vector<Token> &v)
 	int start_y = (int)as_number(prg, v[4]);
 	int end_x = (int)as_number(prg, v[5]);
 	int end_y = (int)as_number(prg, v[6]);
-	
-	if (IS_VECTOR(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
 
-	if (IS_VECTOR(entity_solids) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_VECTOR(v1)
+	CHECK_VECTOR(entity_solids)	
 
 	Tilemap_Info *info = tilemap_info(prg);
 
@@ -1815,9 +1747,9 @@ static bool tilemapfunc_get_tile(Program *prg, const std::vector<Token> &v)
 	int x = as_number(prg, v[5]);
 	int y = as_number(prg, v[6]);
 
-	if (IS_NUMBER(vx) == false || IS_NUMBER(vy) == false || IS_NUMBER(vs) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(vx)
+	CHECK_NUMBER(vy)
+	CHECK_NUMBER(vs)
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
@@ -1844,12 +1776,9 @@ static bool spritefunc_load(Program *prg, const std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = info->sprite_id;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	
+	v1.n = info->sprite_id;
 
 	gfx::Sprite *sprite = new gfx::Sprite(name, name);
 
@@ -1909,9 +1838,7 @@ static bool spritefunc_get_animation(Program *prg, const std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (IS_STRING(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_STRING(v1)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -1929,9 +1856,7 @@ static bool spritefunc_get_previous_animation(Program *prg, const std::vector<To
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (IS_STRING(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_STRING(v1)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -1949,9 +1874,7 @@ static bool spritefunc_current_frame(Program *prg, const std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -1969,9 +1892,7 @@ static bool spritefunc_num_frames(Program *prg, const std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -1989,9 +1910,7 @@ static bool spritefunc_length(Program *prg, const std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -2010,9 +1929,8 @@ static bool spritefunc_current_frame_size(Program *prg, const std::vector<Token>
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (IS_NUMBER(v1) == false || IS_NUMBER(v2) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	CHECK_NUMBER(v2)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -2120,9 +2038,10 @@ static bool spritefunc_bounds(Program *prg, const std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (IS_NUMBER(v1) == false || IS_NUMBER(v2) == false || IS_NUMBER(v3) == false || IS_NUMBER(v4) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	CHECK_NUMBER(v2)
+	CHECK_NUMBER(v3)
+	CHECK_NUMBER(v4)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -2148,9 +2067,7 @@ static bool spritefunc_elapsed(Program *prg, const std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -2165,10 +2082,8 @@ static bool spritefunc_frame_times(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v[0]);
 	Variable &vec = as_variable(prg, v[1]);
-	
-	if (IS_VECTOR(vec) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+
+	CHECK_VECTOR(vec)	
 
 	Sprite_Info *info = sprite_info(prg);
 
@@ -2196,9 +2111,7 @@ static bool spritefunc_is_started(Program *prg, const std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -2209,14 +2122,11 @@ static bool spritefunc_is_started(Program *prg, const std::vector<Token> &v)
 
 static void set_string_or_number(Program *prg, int index, double value)
 {
-       Variable &v1 = booboo::get_variable(prg, index);
+	Variable &v1 = booboo::get_variable(prg, index);
 
-       if (IS_NUMBER(v1)) {
-               v1.n = value;
-       }
-       else {
-               throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-       }
+	CHECK_NUMBER(v1)
+       
+	v1.n = value;
 }
 
 static bool joyfunc_poll(Program *prg, const std::vector<Token> &v)
@@ -2378,12 +2288,9 @@ static bool joyfunc_count(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = input::get_num_joysticks();
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	
+	v1.n = input::get_num_joysticks();
 
 	return true;
 }
@@ -2408,15 +2315,12 @@ static bool cfgfunc_load(Program *prg, const std::vector<Token> &v)
 
 	CFG_Info *info = cfg_info(prg);
 
-	if (IS_NUMBER(v1)) {
-		std::map<std::string, Config_Value> v = load_cfg(prg, cfg_name);
-		int id = info->cfg_id++;
-		v1.n = id;
-		info->cfgs[id] = v;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	
+	std::map<std::string, Config_Value> val = load_cfg(prg, cfg_name);
+	int id = info->cfg_id++;
+	v1.n = id;
+	info->cfgs[id] = val;
 
 	return true;
 }
@@ -2430,13 +2334,10 @@ static bool cfgfunc_save(Program *prg, const std::vector<Token> &v)
 	std::string cfg_name = as_string(prg, v[2]);
 
 	bool success = save_cfg(prg, id, cfg_name);
+
+	CHECK_NUMBER(v1)	
 	
-	if (IS_NUMBER(v1)) {
-		v1.n = success;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	v1.n = success;
 
 	return true;
 }
@@ -2451,12 +2352,8 @@ static bool cfgfunc_get_number(Program *prg, const std::vector<Token> &v)
 
 	CFG_Info *info = cfg_info(prg);
 
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
-	if (IS_NUMBER(v2) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	CHECK_NUMBER(v2)
 
 	int id = v1.n;
 	
@@ -2485,12 +2382,8 @@ static bool cfgfunc_get_string(Program *prg, const std::vector<Token> &v)
 
 	CFG_Info *info = cfg_info(prg);
 
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
-	if (IS_STRING(v2) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	CHECK_NUMBER(v2)
 
 	int id = v1.n;
 	
@@ -2544,9 +2437,7 @@ static bool cfgfunc_set_string(Program *prg, const std::vector<Token> &v)
 
 	CFG_Info *info = cfg_info(prg);
 
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
 
 	int id = v1.n;
 	
@@ -2583,12 +2474,9 @@ static bool cfgfunc_exists(Program *prg, const std::vector<Token> &v)
 
 	bool found = info->cfgs[id].find(name) != info->cfgs[id].end();
 
-	if (IS_NUMBER(v1)) {
-		v1.n = found;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	
+	v1.n = found;
 
 	return true;
 }
@@ -2602,9 +2490,7 @@ static bool cfgfunc_erase(Program *prg, const std::vector<Token> &v)
 
 	CFG_Info *info = cfg_info(prg);
 
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
 
 	int id = v1.n;
 	
@@ -2636,12 +2522,9 @@ static bool shaderfunc_load(Program *prg, const std::vector<Token> &v)
 	
 	Shader_Info *info = shader_info(prg);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = info->shader_id;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	
+	v1.n = info->shader_id;
 
 	std::string vs = DEFAULT_GLSL_VERTEX_SHADER;
 	std::string fs = util::load_text("gfx/shaders/" + fname);
@@ -2785,12 +2668,9 @@ static bool jsonfunc_load(Program *prg, const std::vector<Token> &v)
 
 	JSON_Info *info = json_info(prg);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = info->json_id;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	
+	v1.n = info->json_id;
 
 	util::JSON *json = new util::JSON(name);
 
@@ -2810,13 +2690,10 @@ static bool jsonfunc_get_string(Program *prg, const std::vector<Token> &v)
 	JSON_Info *info = json_info(prg);
 	util::JSON *json = info->jsons[id];
 
-	if (IS_STRING(v1)) {
-		util::JSON::Node *n = json->get_root()->find(name);
-		v1.s = n->as_string();
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_STRING(v1)
+	
+	util::JSON::Node *n = json->get_root()->find(name);
+	v1.s = n->as_string();
 
 	return true;
 }
@@ -2832,13 +2709,10 @@ static bool jsonfunc_get_number(Program *prg, const std::vector<Token> &v)
 	JSON_Info *info = json_info(prg);
 	util::JSON *json = info->jsons[id];
 
-	if (IS_NUMBER(v1)) {
-		util::JSON::Node *n = json->get_root()->find(name);
-		v1.n = n->as_double();
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	
+	util::JSON::Node *n = json->get_root()->find(name);
+	v1.n = n->as_double();
 
 	return true;
 }

@@ -43,9 +43,7 @@ bool corefunc_getenv(Program *prg, const std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 	std::string get = as_string(prg, v[1]);
 
-	if (IS_STRING(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_STRING(v1)
 
 	v1.s = getenv(get.c_str());
 
@@ -217,9 +215,7 @@ bool corefunc_input(Program *prg, const std::vector<Token> &v)
 
 	Variable &var = as_variable(prg, v[0]);
 
-	if (IS_STRING(var) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_STRING(var)
 
 	if (std::cin.eof()) {
 		var.s = "";
@@ -248,9 +244,7 @@ bool corefunc_get_system_language(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_STRING(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_STRING(v1)
 
 	v1.s = util::get_system_language();
 
@@ -264,9 +258,7 @@ bool corefunc_get_full_path(Program *prg, const std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 	std::string path = as_string(prg, v[1]);
 
-	if (IS_STRING(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_STRING(v1)
 
 #ifdef _WIN32
 	char buf[MAX_PATH];
@@ -293,10 +285,8 @@ bool corefunc_list_drives(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	Variable &vec = as_variable(prg, v[0]);
-	
-	if (IS_VECTOR(vec) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+
+	CHECK_VECTOR(vec)	
 
 	vec.v.clear();
 
@@ -325,9 +315,7 @@ bool corefunc_list_directory(Program *prg, const std::vector<Token> &v)
 
 	Variable &vec = as_variable(prg, v[0]);
 
-	if (IS_VECTOR(vec) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_VECTOR(vec)
 
 	std::string glob = as_string(prg, v[1]);
 
@@ -548,12 +536,9 @@ bool stringfunc_char_at(Program *prg, const std::vector<Token> &v)
 
 	uint32_t value = util::utf8_char(s, index);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = value;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	
+	v1.n = value;
 
 	return true;
 }
@@ -565,12 +550,9 @@ bool stringfunc_length(Program *prg, const std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 	std::string s = as_string(prg, v[1]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = util::utf8_len(s);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = util::utf8_len(s);
 
 	return true;
 }
@@ -582,12 +564,9 @@ bool stringfunc_from_number(Program *prg, const std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 	uint32_t n = as_number(prg, v[1]);
 
-	if (IS_STRING(v1)) {
-		v1.s = util::utf8_char_to_string(n);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_STRING(v1)
+	
+	v1.s = util::utf8_char_to_string(n);
 
 	return true;
 }
@@ -599,10 +578,8 @@ bool stringfunc_substr(Program *prg, const std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 	int start = as_number(prg, v[1]);
 	int count = -1;
-	
-	if (IS_STRING(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+
+	CHECK_STRING(v1)	
 
 	if (v.size() >= 3) {
 		count = as_number(prg, v[2]);
@@ -619,12 +596,9 @@ bool stringfunc_uppercase(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_STRING(v1)) {
-		v1.s = util::uppercase(v1.s);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_STRING(v1)
+	
+	v1.s = util::uppercase(v1.s);
 
 	return true;
 }
@@ -635,12 +609,9 @@ bool stringfunc_lowercase(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_STRING(v1)) {
-		v1.s = util::lowercase(v1.s);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_STRING(v1)
+		
+	v1.s = util::lowercase(v1.s);
 
 	return true;
 }
@@ -651,12 +622,9 @@ bool stringfunc_trim(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_STRING(v1)) {
-		v1.s = util::trim(v1.s);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_STRING(v1)
+	
+	v1.s = util::trim(v1.s);
 
 	return true;
 }
@@ -666,10 +634,8 @@ bool stringfunc_replace(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(4)
 
 	Variable &v1 = as_variable(prg, v[0]);
-	
-	if (IS_STRING(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+
+	CHECK_STRING(v1)	
 
 	std::string str = as_string(prg, v[1]);
 	std::string regex = as_string(prg, v[2]);
@@ -685,10 +651,8 @@ bool stringfunc_match(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(3)
 
 	Variable &v1 = as_variable(prg, v[0]);
-	
-	if (IS_VECTOR(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+
+	CHECK_VECTOR(v1)	
 
 	std::string str = as_string(prg, v[1]);
 	std::string regex = as_string(prg, v[2]);
@@ -719,12 +683,9 @@ bool stringfunc_matches(Program *prg, const std::vector<Token> &v)
 	std::string str = as_string(prg, v[1]);
 	std::string regex = as_string(prg, v[2]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = std::regex_search(str, std::regex(regex));
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = std::regex_search(str, std::regex(regex));
 
 	return true;
 }
@@ -735,12 +696,9 @@ bool mathfunc_sin(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = sin(v1.n);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	
+	v1.n = sin(v1.n);
 
 	return true;
 }
@@ -751,12 +709,9 @@ bool mathfunc_cos(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = cos(v1.n);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+
+	v1.n = cos(v1.n);
 
 	return true;
 }
@@ -767,12 +722,9 @@ bool mathfunc_tan(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = tan(v1.n);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = tan(v1.n);
 
 	return true;
 }
@@ -783,12 +735,9 @@ bool mathfunc_asin(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = asin(v1.n);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = asin(v1.n);
 
 	return true;
 }
@@ -799,12 +748,10 @@ bool mathfunc_acos(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = acos(v1.n);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+
+		
+	v1.n = acos(v1.n);
 
 	return true;
 }
@@ -815,12 +762,9 @@ bool mathfunc_atan(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = atan(v1.n);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = atan(v1.n);
 
 	return true;
 }
@@ -831,12 +775,9 @@ bool mathfunc_atan2(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = atan2(v1.n, as_number(prg, v[1]));
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = atan2(v1.n, as_number(prg, v[1]));
 
 	return true;
 }
@@ -847,12 +788,9 @@ bool mathfunc_abs(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = fabs(v1.n);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = fabs(v1.n);
 
 	return true;
 }
@@ -863,12 +801,9 @@ bool mathfunc_pow(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = pow(v1.n, as_number(prg, v[1]));
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = pow(v1.n, as_number(prg, v[1]));
 
 	return true;
 }
@@ -879,12 +814,9 @@ bool mathfunc_sqrt(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = sqrt(v1.n);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = sqrt(v1.n);
 
 	return true;
 }
@@ -894,9 +826,7 @@ bool mathfunc_floor(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(1)
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
 
 	v1.n = floor(v1.n);
 
@@ -908,9 +838,7 @@ bool mathfunc_ceil(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(1)
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
 
 	v1.n = ceil(v1.n);
 
@@ -923,12 +851,9 @@ bool mathfunc_neg(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = -v1.n;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = -v1.n;
 
 	return true;
 }
@@ -939,13 +864,10 @@ bool mathfunc_intmod(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 	int d = as_number(prg, v[1]);
-	
-	if (IS_NUMBER(v1)) {
-		v1.n = int(v1.n) % int(d);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+
+	CHECK_NUMBER(v1)
+		
+	v1.n = int(v1.n) % int(d);
 
 	return true;
 }
@@ -957,12 +879,9 @@ bool mathfunc_fmod(Program *prg, const std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 	double d = as_number(prg, v[1]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = fmod(v1.n, d);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = fmod(v1.n, d);
 
 	return true;
 }
@@ -973,12 +892,9 @@ bool mathfunc_sign(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = sign(v1.n);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = sign(v1.n);
 
 	return true;
 }
@@ -989,12 +905,9 @@ bool mathfunc_exp(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = exp(v1.n);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = exp(v1.n);
 
 	return true;
 }
@@ -1005,12 +918,9 @@ bool mathfunc_hypot(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = hypot(v1.n, as_number(prg, v[1]));
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = hypot(v1.n, as_number(prg, v[1]));
 
 	return true;
 }
@@ -1021,12 +931,9 @@ bool mathfunc_log(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = log(v1.n);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = log(v1.n);
 
 	return true;
 }
@@ -1037,12 +944,9 @@ bool mathfunc_log10(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = log10(v1.n);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = log10(v1.n);
 
 	return true;
 }
@@ -1053,9 +957,7 @@ static bool vectorfunc_add(Program *prg, const std::vector<Token> &v)
 
 	Variable &id = as_variable(prg, v[0]);
 
-	if (IS_VECTOR(id) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_VECTOR(id)
 
 	Variable var;
 
@@ -1091,16 +993,10 @@ static bool vectorfunc_size(Program *prg, const std::vector<Token> &v)
 	Variable &id = as_variable(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
 
-	if (IS_VECTOR(id) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
-
-	if (IS_NUMBER(v1)) {
-		v1.n = id.v.size();
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_VECTOR(id)
+	CHECK_NUMBER(v1)
+		
+	v1.n = id.v.size();
 
 	return true;
 }
@@ -1113,9 +1009,7 @@ static bool vectorfunc_set(Program *prg, const std::vector<Token> &v)
 
 	MIN_ARGS(3)
 
-	if (IS_VECTOR(id) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_VECTOR(id)
 
 	for (int i = 1; i < val_index; i++) {
 		indices.push_back(as_number(prg, v[i]));
@@ -1171,9 +1065,7 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 	Variable &id = as_variable(prg, v[0]);
 	double index = as_number(prg, v[1]);
 
-	if (IS_VECTOR(id) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_VECTOR(id)
 
 	if (index < 0 || index > id.v.size()) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
@@ -1207,9 +1099,7 @@ static bool vectorfunc_get(Program *prg, const std::vector<Token> &v)
 
 	MIN_ARGS(3)
 
-	if (IS_VECTOR(id) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_VECTOR(id)
 
 	for (size_t i = 2; i < v.size(); i++) {
 		int index = as_number(prg, v[i]);
@@ -1259,9 +1149,7 @@ static bool vectorfunc_erase(Program *prg, const std::vector<Token> &v)
 	Variable &id = as_variable(prg, v[0]);
 	double index = as_number(prg, v[1]);
 
-	if (IS_VECTOR(id) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_VECTOR(id)
 
 	if (index < 0 || index >= id.v.size()) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
@@ -1278,9 +1166,7 @@ static bool vectorfunc_clear(Program *prg, const std::vector<Token> &v)
 
 	Variable &id = as_variable(prg, v[0]);
 
-	if (IS_VECTOR(id) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_VECTOR(id)
 
 	id.v.clear();
 
@@ -1293,9 +1179,7 @@ static bool mapfunc_set(Program *prg, const std::vector<Token> &v)
 
 	Variable &id = as_variable(prg, v[0]);
 
-	if (IS_MAP(id) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_MAP(id)
 
 	Variable var;
 	int val_index = v.size()-1;
@@ -1341,9 +1225,7 @@ static bool mapfunc_get(Program *prg, const std::vector<Token> &v)
 
 	Variable &id = as_variable(prg, v[0]);
 
-	if (IS_MAP(id) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_MAP(id)
 
 	std::map<std::string, Variable> *p = &id.m;
 	std::string key;
@@ -1369,9 +1251,7 @@ static bool mapfunc_clear(Program *prg, const std::vector<Token> &v)
 
 	Variable &id = as_variable(prg, v[0]);
 
-	if (IS_MAP(id) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_MAP(id)
 
 	id.m.clear();
 
@@ -1385,9 +1265,7 @@ static bool mapfunc_erase(Program *prg, const std::vector<Token> &v)
 	Variable &id = as_variable(prg, v[0]);
 	std::string key = as_string(prg, v[1]);
 
-	if (IS_MAP(id) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_MAP(id)
 
 	std::map<std::string, Variable>::iterator it = id.m.find(key);
 
@@ -1407,13 +1285,8 @@ static bool mapfunc_keys(Program *prg, const std::vector<Token> &v)
 	Variable &m = as_variable(prg, v[0]);
 	Variable &vec_var = as_variable(prg, v[1]);
 
-	if (IS_MAP(m) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Expected a map at " + get_error_info(prg));
-	}
-
-	if (IS_VECTOR(vec_var) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Expected a vector at " + get_error_info(prg));
-	}
+	CHECK_MAP(m)
+	CHECK_VECTOR(vec_var)
 
 	vec_var.v.clear();
 
@@ -1441,12 +1314,9 @@ static bool filefunc_open(Program *prg, const std::vector<Token> &v)
 	
 	File_Info *info = file_info(prg);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = info->file_id;
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+		
+	v1.n = info->file_id;
 
 	std::fstream *f = new std::fstream;
 
@@ -1493,9 +1363,7 @@ static bool filefunc_read(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Variable &var = as_variable(prg, v[1]);
 
-	if (IS_STRING(var) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Expected string at " + get_error_info(prg));
-	}
+	CHECK_STRING(var)
 
 	File_Info *info = file_info(prg);
 
@@ -1511,9 +1379,7 @@ static bool filefunc_read_line(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Variable &var = as_variable(prg, v[1]);
 
-	if (IS_STRING(var) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Expected string at " + get_error_info(prg));
-	}
+	CHECK_STRING(var)
 
 	File_Info *info = file_info(prg);
 
@@ -1709,13 +1575,10 @@ bool bitfunc_or(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
+	CHECK_NUMBER(v1)
+
 	for (size_t i = 1; i < v.size(); i++) {
-		if (IS_NUMBER(v1)) {
-			v1.n = (int)v1.n | (int)as_number(prg, v[i]);
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-		}
+		v1.n = (int)v1.n | (int)as_number(prg, v[i]);
 	}
 
 	return true;
@@ -1727,13 +1590,10 @@ bool bitfunc_xor(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
+	CHECK_NUMBER(v1)
+
 	for (size_t i = 1; i < v.size(); i++) {
-		if (IS_NUMBER(v1)) {
-			v1.n = (int)v1.n ^ (int)as_number(prg, v[i]);
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-		}
+		v1.n = (int)v1.n ^ (int)as_number(prg, v[i]);
 	}
 
 	return true;
@@ -1745,13 +1605,10 @@ bool bitfunc_and(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
+	CHECK_NUMBER(v1)
+
 	for (size_t i = 1; i < v.size(); i++) {
-		if (IS_NUMBER(v1)) {
-			v1.n = (int)v1.n & (int)as_number(prg, v[i]);
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-		}
+		v1.n = (int)v1.n & (int)as_number(prg, v[i]);
 	}
 
 	return true;
@@ -1763,13 +1620,10 @@ bool bitfunc_leftshift(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
+	CHECK_NUMBER(v1)
+
 	for (size_t i = 1; i < v.size(); i++) {
-		if (IS_NUMBER(v1)) {
-			v1.n = (int)v1.n << (int)as_number(prg, v[i]);
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-		}
+		v1.n = (int)v1.n << (int)as_number(prg, v[i]);
 	}
 
 	return true;
@@ -1781,13 +1635,10 @@ bool bitfunc_rightshift(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
+	CHECK_NUMBER(v1)
+
 	for (size_t i = 1; i < v.size(); i++) {
-		if (IS_NUMBER(v1)) {
-			v1.n = (int)v1.n >> (int)as_number(prg, v[i]);
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-		}
+		v1.n = (int)v1.n >> (int)as_number(prg, v[i]);
 	}
 
 	return true;
@@ -1822,12 +1673,9 @@ bool twinklefunc_getch(Program *prg, const std::vector<Token> &v)
 	
 	Variable &v1 = as_variable(prg, v[0]);
 
-	if (IS_NUMBER(v1)) {
-		v1.n = twinkle::getch();
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
+	
+	v1.n = twinkle::getch();
 
 	return true;
 }

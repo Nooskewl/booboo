@@ -1977,9 +1977,7 @@ bool corefunc_subtract(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_NUMBER(v1)
 
 	for (size_t i = 1; i < v.size(); i++) {
 		v1.n -= as_number_inline(prg, v[i]);
@@ -1993,10 +1991,8 @@ bool corefunc_multiply(Program *prg, const std::vector<Token> &v)
 	MIN_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
-	
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+
+	CHECK_NUMBER(v1)	
 
 	for (size_t i = 1; i < v.size(); i++) {
 		v1.n *= as_number_inline(prg, v[i]);
@@ -2010,10 +2006,8 @@ bool corefunc_divide(Program *prg, const std::vector<Token> &v)
 	MIN_ARGS(2)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
-	
-	if (IS_NUMBER(v1) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+
+	CHECK_NUMBER(v1)	
 
 	for (size_t i = 1; i < v.size(); i++) {
 		v1.n /= as_number_inline(prg, v[i]);
@@ -2290,9 +2284,7 @@ bool corefunc_typeof(Program *prg, const std::vector<Token> &v)
 
 	Variable &v2 = as_variable_inline(prg, v[0]);
 
-	if (IS_STRING(v2) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_STRING(v2)
 
 	v2.s = res;
 
@@ -2304,18 +2296,15 @@ bool corefunc_for(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(5)
 
 	Variable &count = as_variable_inline(prg, v[0]);
-	if (IS_NUMBER(count) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+
+	CHECK_NUMBER(count)
 
 	count.n = as_number_inline(prg, v[1]);
 	Variable &expr = as_variable_inline(prg, v[2]);
 	int increment = as_number_inline(prg, v[3]);
 	unsigned int end_label = as_label_inline(prg, v[4]);
 
-	if (IS_EXPRESSION(expr) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	CHECK_EXPRESSION(expr)
 
 	Variable er = evaluate_expression(prg, expr.e);
 
