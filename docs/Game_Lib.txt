@@ -45,7 +45,6 @@ The following sections describe the API:
 	Shader Functions
 	Audio Functions
 	Input Functions
-	Vector Functions
 	JSON Functions
 	Configuration Functions
 	Constants
