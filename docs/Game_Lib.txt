@@ -593,6 +593,12 @@ model_translate
 	The numbers you supply get added to the current position of the model.
 	e.g. model_translate model add_x add_y add_z
 
+model_set_animation
+	Set the animation to the one named. You can optionally pass a BooBoo
+	function that takes and returns no arguments that will be called
+	when the animation finishes.
+	e.g. model_set_animation model "attack" done_attack
+
 model_stop
 	Stop a models animation
 	e.g. model_stop model
