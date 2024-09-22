@@ -141,6 +141,7 @@ bool start()
 
 	gfx::set_minimum_window_size(util::Size<int>(640, 360));
 	util::Size<int> desktop_resolution = gfx::get_desktop_resolution();
+	//gfx::set_maximum_window_size(desktop_resolution);
 
 #if !defined IOS && !defined ANDROID
 	const int min_supp_w = 1280;
