@@ -62,6 +62,18 @@ struct JSON_Info {
 	std::map<int, util::JSON *> jsons;
 };
 
+struct Model {
+	float sx, sy, sz;
+	float rx, ry, rz;
+	float x, y, z;
+	gfx::Model *model;
+};
+
+struct Model_Info {
+	int model_id;
+	std::map<int, Model *> models;
+};
+
 static MML_Info *mml_info(Program *prg)
 {
 	MML_Info *info = (MML_Info *)booboo::get_black_box(prg, "com.b1stable.booboo.mml");
@@ -157,6 +169,17 @@ static JSON_Info *json_info(Program *prg)
 		info = new JSON_Info;
 		info->json_id = 0;
 		booboo::set_black_box(prg, "com.b1stable.booboo.json", info);
+	}
+	return info;
+}
+
+static Model_Info *model_info(Program *prg)
+{
+	Model_Info *info = (Model_Info *)booboo::get_black_box(prg, "com.b1stable.booboo.model");
+	if (info == nullptr) {
+		info = new Model_Info;
+		info->model_id = 0;
+		booboo::set_black_box(prg, "com.b1stable.booboo.model", info);
 	}
 	return info;
 }
@@ -2717,6 +2740,176 @@ static bool jsonfunc_get_number(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool modelfunc_load(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+
+	Model_Info *info = model_info(prg);
+
+	CHECK_NUMBER(v1)
+	
+	v1.n = info->model_id;
+
+	gfx::Model *model = new gfx::Model(name);
+
+	Model *m = new Model;
+	m->sx = m->sy = m->sz = 1;
+	m->rx = m->ry = m->rz = m->x = m->y = m->z = 0;
+	m->model = model;
+
+	info->models[info->model_id++] = m;
+
+	return true;
+}
+
+static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(5)
+
+	int model_id = as_number(prg, v[0]);
+	int r = as_number(prg, v[1]);
+	int g = as_number(prg, v[2]);
+	int b = as_number(prg, v[3]);
+	int a = as_number(prg, v[4]);
+
+	Model_Info *info = model_info(prg);
+
+	Model *model = info->models[model_id];
+
+	SDL_Colour c;
+	c.r = r;
+	c.g = g;
+	c.b = b;
+	c.a = a;
+
+	glm::mat4 save_mv, save_p;
+	gfx::get_matrices(save_mv, save_p);
+
+	glm::mat4 t = save_mv;
+	t = glm::scale(t, glm::vec3(model->sx, model->sy, model->sz));
+	t = glm::rotate(t, model->rx, glm::vec3(1.0f, 0.0f, 0.0f));
+	t = glm::rotate(t, model->ry, glm::vec3(0.0f, 1.0f, 0.0f));
+	t = glm::rotate(t, model->rz, glm::vec3(0.0f, 0.0f, 1.0f));
+	t = glm::translate(t, glm::vec3(model->x, model->y, model->z));
+	
+	gfx::set_matrices(t, save_p);
+	gfx::update_projection();
+
+	gfx::enable_depth_write(true);
+	gfx::enable_depth_test(true);
+
+	model->model->draw_tinted_textured(c);
+	
+	gfx::enable_depth_test(false);
+	gfx::enable_depth_write(false);
+
+	gfx::set_matrices(save_mv, save_p);
+	gfx::update_projection();
+
+	return true;
+}
+
+static bool modelfunc_scale(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int model_id = as_number(prg, v[0]);
+	float sx = as_number(prg, v[1]);
+	float sy = as_number(prg, v[2]);
+	float sz = as_number(prg, v[3]);
+
+	Model_Info *info = model_info(prg);
+
+	Model *model = info->models[model_id];
+
+	model->sx += sx;
+	model->sy += sy;
+	model->sz += sz;
+
+	return true;
+}
+
+static bool modelfunc_rotate(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int model_id = as_number(prg, v[0]);
+	float rx = as_number(prg, v[1]);
+	float ry = as_number(prg, v[2]);
+	float rz = as_number(prg, v[3]);
+
+	Model_Info *info = model_info(prg);
+
+	Model *model = info->models[model_id];
+
+	model->rx += rx;
+	model->ry += ry;
+	model->rz += rz;
+
+	return true;
+}
+
+static bool modelfunc_translate(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int model_id = as_number(prg, v[0]);
+	float x = as_number(prg, v[1]);
+	float y = as_number(prg, v[2]);
+	float z = as_number(prg, v[3]);
+
+	Model_Info *info = model_info(prg);
+
+	Model *model = info->models[model_id];
+
+	model->x += x;
+	model->y += y;
+	model->z += z;
+
+	return true;
+}
+
+static bool modelfunc_set_2d(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	gfx::set_default_projection(shim::real_screen_size, shim::screen_offset, shim::scale);
+	gfx::update_projection();
+	
+	return true;
+}
+
+static bool modelfunc_set_3d(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	// scales adjust for screen_offset
+	float scale_x = (shim::screen_size.w*shim::scale)/shim::real_screen_size.w;
+	float scale_y = (shim::screen_size.h*shim::scale)/shim::real_screen_size.h;
+
+	float aspect = shim::screen_size.w / (float)shim::screen_size.h;
+	glm::mat4 _proj = glm::perspective(float(M_PI/4.0f), aspect, 1.0f, 1000.0f);
+
+	glm::mat4 _mv;
+
+	if (shim::screen_offset.x > 0.0f) {
+		_mv = glm::scale(_mv, glm::vec3(scale_x, 1.0f, 1.0f));
+	}
+	if (shim::screen_offset.y > 0.0f) {
+		_mv = glm::scale(_mv, glm::vec3(1.0f, scale_y, 1.0f));
+	}
+
+	_mv = glm::translate(_mv, glm::vec3(0.0f, 0.0f, -2.0f));
+	
+	gfx::set_matrices(_mv, _proj);
+	gfx::update_projection();
+	
+	return true;
+}
+
 void start_lib_game()
 {
 	add_instruction("inspect", miscfunc_inspect);
@@ -2825,6 +3018,13 @@ void start_lib_game()
 	add_instruction("json_load", jsonfunc_load);
 	add_instruction("json_get_string", jsonfunc_get_string);
 	add_instruction("json_get_number", jsonfunc_get_number);
+	add_instruction("model_load", modelfunc_load);
+	add_instruction("model_draw", modelfunc_draw);
+	add_instruction("set_2d", modelfunc_set_2d);
+	add_instruction("set_3d", modelfunc_set_3d);
+	add_instruction("model_scale", modelfunc_scale);
+	add_instruction("model_rotate", modelfunc_rotate);
+	add_instruction("model_translate", modelfunc_translate);
 }
 
 void end_lib_game()
@@ -2865,6 +3065,11 @@ void game_lib_destroy_program(Program *prg)
 	for (size_t i = 0; i < json_i->jsons.size(); i++) {
 		delete json_i->jsons[i];
 	}
+	Model_Info *model_i = model_info(prg);
+	for (size_t i = 0; i < model_i->models.size(); i++) {
+		delete model_i->models[i]->model;
+		delete model_i->models[i];
+	}
 	CFG_Info *cfg_i = cfg_info(prg);
 
 	delete mml_i;
@@ -2872,8 +3077,10 @@ void game_lib_destroy_program(Program *prg)
 	delete image_i;
 	delete font_i;
 	delete tilemap_i;
-	delete cfg_i;
 	delete shader_i;
+	delete json_i;
+	delete model_i;
+	delete cfg_i;
 
 	booboo::set_black_box(prg, "com.b1stable.booboo.mml", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.sample", nullptr);
@@ -2884,4 +3091,5 @@ void game_lib_destroy_program(Program *prg)
 	booboo::set_black_box(prg, "com.b1stable.booboo.cfg", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.shader", nullptr);
 	booboo::set_black_box(prg, "com.b1stable.booboo.json", nullptr);
+	booboo::set_black_box(prg, "com.b1stable.booboo.model", nullptr);
 }

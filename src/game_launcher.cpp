@@ -289,7 +289,7 @@ void handle_event(TGUI_Event *event)
 
 void draw_all()
 {
-	gfx::clear(shim::black);
+	gfx::clear_buffers();
 
 	gfx::set_cull_mode(gfx::NO_FACE);
 	
@@ -670,6 +670,7 @@ int main(int argc, char **argv)
 	shim::use_cwd = true;
 	shim::font_size = 24;
 	shim::convert_directions_to_focus_events = false;
+	shim::create_depth_buffer = true;
 
 	::start();
 
