@@ -1,7 +1,26 @@
 number model
 
 model_load model "zeus.x"
-model_translate model 0 -2 -10
+model_translate model 0 0 -2
+
+number sx sy sz
+
+model_size model sx sy sz
+number scale
+number max
+= max sx
+if (> sy max) change_y
+	= max sy
+:change_y
+if (> sz max) change_z
+	= max sz
+:change_z
+= scale (* -1 (- 1 (/ 1 max)))
++ scale (/ 0.5 max)
+model_scale model scale scale scale
+
+;model_rotate model 0 PI 0
+
 model_set_animation model "ArmatureAction" cb
 
 number font

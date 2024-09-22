@@ -2992,6 +2992,49 @@ static bool modelfunc_reset(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool modelfunc_size(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int id = as_number(prg, v[0]);
+
+	Variable &out_x = as_variable(prg, v[1]);
+	Variable &out_y = as_variable(prg, v[2]);
+	Variable &out_z = as_variable(prg, v[3]);
+
+	CHECK_NUMBER(out_x)
+	CHECK_NUMBER(out_y)
+	CHECK_NUMBER(out_z)
+	
+	Model_Info *info = model_info(prg);
+
+	Model *model = info->models[id];
+
+	gfx::Model::Node *n = model->model->find("Model");
+	if (n == nullptr) {
+		std::vector<gfx::Model::Node *> nodes = model->model->get_nodes();
+		if (nodes.size() > 0) {
+			n = nodes[0];
+		}
+	}
+
+	float szx = 0.0f;
+	float szy = 0.0f;
+	float szz = 0.0f;
+
+	if (n != nullptr) {
+		szx = n->max_x - n->min_x;
+		szy = n->max_y - n->min_y;
+		szz = n->max_z - n->min_z;
+	}
+
+	out_x.n = szx;
+	out_y.n = szy;
+	out_z.n = szz;
+
+	return true;
+}
+
 void start_lib_game()
 {
 	add_instruction("inspect", miscfunc_inspect);
@@ -3110,6 +3153,7 @@ void start_lib_game()
 	add_instruction("model_set_animation", modelfunc_set_animation);
 	add_instruction("model_stop", modelfunc_stop);
 	add_instruction("model_reset", modelfunc_reset);
+	add_instruction("model_size", modelfunc_size);
 }
 
 void end_lib_game()

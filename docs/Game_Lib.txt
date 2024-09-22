@@ -607,6 +607,10 @@ model_reset
 	Reset a models animation
 	e.g. model_reset model
 
+model_size
+	Get the dimensions of a model
+	e.g. model_size model szx szy szz
+
 -- Constants -----------------------------------------------------------------
 
 Note: these values are not read-only (so not technically constant...)
