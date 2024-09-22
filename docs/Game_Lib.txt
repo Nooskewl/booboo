@@ -47,6 +47,7 @@ The following sections describe the API:
 	Input Functions
 	JSON Functions
 	Configuration Functions
+	3D Functions
 	Constants
 
 -- Core Functions ------------------------------------------------------------
@@ -557,6 +558,48 @@ cfg_exists
 cfg_erase
 	Erase a value in a config file
 	e.g. cfg_erase cfg "example"
+
+-- 3D Functions --------------------------------------------------------------
+
+model_load
+	Load a model with an optional armature an animations from .x file
+	e.g. model_load model_id "filename.x"
+
+model_draw
+	Draw a model with its transforms applied
+	e.g. model_draw model r_tint g_tint b_tint a_tint
+
+set_2d
+	Revert back to 2d drawing
+	e.g. set_2d
+
+set_3d
+	Enable 3d rendering and projection
+	e.g. set_3d
+
+model_scale
+	Alter the scale of a model. It starts at 1 across the board. These
+	numbers get added to that.
+	e.g. model_scale model add_sx add_sy add_sz
+
+model_rotate
+	Alter the rotation of a model. These numbers are angles about each
+	axis and get added to the default of 0 and accumulate with each
+	call.
+	e.g. model_rotate model add_angle_x add_angle_y add_angle_z
+
+model_translate
+	Translate (move) a model. This sticks like rotation and scaling.
+	The numbers you supply get added to the current position of the model.
+	e.g. model_translate model add_x add_y add_z
+
+model_stop
+	Stop a models animation
+	e.g. model_stop model
+
+model_reset
+	Reset a models animation
+	e.g. model_reset model
 
 -- Constants -----------------------------------------------------------------
 
