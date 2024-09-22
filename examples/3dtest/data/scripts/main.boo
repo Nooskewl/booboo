@@ -1,10 +1,17 @@
 number model
 
 model_load model "zeus.x"
-model_translate model 0 -2.5 -5
+model_translate model 0 0 -30
+model_set_animation model "ArmatureAction" cb
 
 number font
 font_load font "font.ttf" 48 0
+
+function cb
+{
+	model_stop model
+	model_reset model
+}
 
 function draw
 {

@@ -1831,6 +1831,8 @@ static void sprite_callback(void *data)
 
 static bool spritefunc_set_animation(Program *prg, const std::vector<Token> &v)
 {
+	MIN_ARGS(2)
+
 	int id = as_number(prg, v[0]);
 	std::string anim = as_string(prg, v[1]);
 	
@@ -2910,6 +2912,82 @@ static bool modelfunc_set_3d(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+struct Model_Callback_Data
+{
+	Program *prg;
+	int function;
+	int id;
+};
+
+static void model_callback(void *data)
+{
+	Model_Callback_Data *d = static_cast<Model_Callback_Data *>(data);
+	std::vector<Token> v;
+	Token t;
+	t.type = Token::NUMBER;
+	t.n = d->id;
+	v.push_back(t);
+	call_void_function(d->prg, d->function, v, 0);
+	delete d;
+}
+
+static bool modelfunc_set_animation(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string anim = as_string(prg, v[1]);
+	
+	Model_Info *info = model_info(prg);
+
+	Model *model = info->models[id];
+
+	if (v.size() > 2) {
+		Model_Callback_Data *d = new Model_Callback_Data;
+		d->prg = prg;
+		d->function = as_function(prg, v[2]);
+		d->id = id;
+		model->model->set_animation(anim, model_callback, d);
+	}
+	else {
+		model->model->set_animation(anim);
+	}
+
+	model->model->start();
+
+	return true;
+}
+
+static bool modelfunc_stop(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number(prg, v[0]);
+	
+	Model_Info *info = model_info(prg);
+
+	Model *model = info->models[id];
+
+	model->model->stop();
+
+	return true;
+}
+
+static bool modelfunc_reset(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number(prg, v[0]);
+	
+	Model_Info *info = model_info(prg);
+
+	Model *model = info->models[id];
+
+	model->model->reset();
+
+	return true;
+}
+
 void start_lib_game()
 {
 	add_instruction("inspect", miscfunc_inspect);
@@ -3025,6 +3103,9 @@ void start_lib_game()
 	add_instruction("model_scale", modelfunc_scale);
 	add_instruction("model_rotate", modelfunc_rotate);
 	add_instruction("model_translate", modelfunc_translate);
+	add_instruction("model_set_animation", modelfunc_set_animation);
+	add_instruction("model_stop", modelfunc_stop);
+	add_instruction("model_reset", modelfunc_reset);
 }
 
 void end_lib_game()
