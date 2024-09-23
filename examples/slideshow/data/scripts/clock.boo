@@ -6,7 +6,7 @@ number ticks
 = ticks 0
 
 number cfg
-cfg_load cfg "com.b1stable.clock"
+cfg_load cfg "com.illnorth.clock"
 cfg_get_number cfg ticks "ticks"
 
 function run
@@ -199,5 +199,5 @@ function end
 {
 	cfg_set_number cfg "ticks" ticks
 	number save_result
-	cfg_save cfg save_result "com.b1stable.clock"
+	cfg_save cfg save_result "com.illnorth.clock"
 }

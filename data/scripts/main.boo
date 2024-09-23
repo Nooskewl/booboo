@@ -359,10 +359,10 @@ function launch
 		return
 	:cant
 	number cfg
-	cfg_load cfg "com.b1stable.launcher.reload"
+	cfg_load cfg "com.illnorth.launcher.reload"
 	cfg_set_string cfg "launch" dir
 	number success
-	cfg_save cfg success "com.b1stable.launcher.reload"
+	cfg_save cfg success "com.illnorth.launcher.reload"
 	exit 0
 }
 

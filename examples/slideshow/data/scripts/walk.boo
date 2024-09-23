@@ -12,7 +12,7 @@ number scale
 = scale 1
 
 string cfg_name
-= cfg_name "com.b1stable.walk"
+= cfg_name "com.illnorth.walk"
 
 number cfg
 cfg_load cfg cfg_name

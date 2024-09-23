@@ -650,7 +650,7 @@ int main(int argc, char **argv)
 #endif
 
 	shim::window_title = "BooBoo";
-	shim::organisation_name = "b1stable";
+	shim::organisation_name = "ILLUMINATI NORTH";
 	shim::game_name = "BooBoo";
 	//
 	shim::logging = true;
@@ -690,7 +690,7 @@ int main(int argc, char **argv)
 
 	try {
 		std::string path = save_dir();
-		std::string cfg_text = util::load_text_from_filesystem(path + "/com.b1stable.booboo.launcher.txt");
+		std::string cfg_text = util::load_text_from_filesystem(path + "/com.illnorth.booboo.launcher.txt");
 		util::Tokenizer t(cfg_text, '\n');
 		std::string line;
 		while ((line = t.next()) != "") {
@@ -778,7 +778,7 @@ again:
 	std::vector<Token> tmp;
 	call_void_function(prg, "end", tmp);
 
-	std::string out_path = save_dir() + "/com.b1stable.booboo.launcher.txt";
+	std::string out_path = save_dir() + "/com.illnorth.booboo.launcher.txt";
 	FILE *f = fopen(out_path.c_str(), "w");
 	fprintf(f, "fullscreen=%d\n", gfx::is_fullscreen_window());
 	fprintf(f, "invert_mouse_wheel=%d\n", invert_mouse_wheel);
@@ -815,7 +815,7 @@ again:
 	bool relaunch = false;
 	std::string dir;
 	try {
-		std::string cfg_path = path + "/" + "com.b1stable.launcher.reload.txt";
+		std::string cfg_path = path + "/" + "com.illnorth.launcher.reload.txt";
 		text = util::load_text_from_filesystem(cfg_path);
 
 		util::Tokenizer t(text, '=');

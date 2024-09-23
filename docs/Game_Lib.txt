@@ -637,11 +637,11 @@ json_get_number
 
 cfg_load
 	load a config file
-	e.g. cfg_load cfg "com.b1stable.example"
+	e.g. cfg_load cfg "com.illnorth.example"
 
 cfg_save
 	save a config file
-	e.g. cfg_save cfg ret_bool_success "com.b1stable.example"
+	e.g. cfg_save cfg ret_bool_success "com.illnorth.example"
 
 cfg_get_number
 	read a number from config. Doesn't touch dest if the named value doesn't exist
