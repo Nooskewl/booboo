@@ -3081,26 +3081,32 @@ static bool modelfunc_identity_3d(Program *prg, const std::vector<Token> &v)
 
 static void set_3d()
 {
+/*
 	// scales adjust for screen_offset
 	float scale_x = (shim::screen_size.w*shim::scale)/shim::real_screen_size.w;
 	float scale_y = (shim::screen_size.h*shim::scale)/shim::real_screen_size.h;
+*/
 
 	float aspect = shim::screen_size.w / (float)shim::screen_size.h;
 	glm::mat4 _proj = glm::perspective(float(M_PI/4.0f), aspect, 1.0f, 1000.0f);
 
 	glm::mat4 _mv;
 
+/*
 	if (shim::screen_offset.x > 0.0f) {
 		_mv = glm::scale(_mv, glm::vec3(scale_x, 1.0f, 1.0f));
 	}
 	if (shim::screen_offset.y > 0.0f) {
 		_mv = glm::scale(_mv, glm::vec3(1.0f, scale_y, 1.0f));
 	}
+*/
 
 	_mv = glm::translate(_mv, glm::vec3(0.0f, 0.0f, -2.0f));
-	
+
 	gfx::set_matrices(_mv, _proj);
 	gfx::update_projection();
+	
+	gfx::set_default_scissor_enabled(false);
 }
 
 static bool is_3d = false;
@@ -3116,10 +3122,16 @@ static bool modelfunc_set_2d(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
-	gfx::set_default_projection(shim::real_screen_size, shim::screen_offset, shim::scale);
-	gfx::update_projection();
+	int w = shim::screen_size.w;
+	int h = shim::screen_size.h;
+	float aspect = (float)w/h;
+	gfx::set_min_aspect_ratio(aspect-0.001f);
+	gfx::set_max_aspect_ratio(aspect+0.001f);
+	gfx::restart(w, h, false, shim::real_screen_size.w, shim::real_screen_size.h);
 
 	is_3d = false;
+	
+	gfx::set_default_scissor_enabled(true);
 	
 	return true;
 }
