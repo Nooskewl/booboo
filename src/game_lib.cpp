@@ -3087,7 +3087,7 @@ static void set_3d()
 	float scale_y = (shim::screen_size.h*shim::scale)/shim::real_screen_size.h;
 */
 
-	float aspect = shim::screen_size.w / (float)shim::screen_size.h;
+	float aspect = shim::real_screen_size.w / (float)shim::real_screen_size.h;
 	glm::mat4 _proj = glm::perspective(float(M_PI/4.0f), aspect, 1.0f, 1000.0f);
 
 	glm::mat4 _mv;
