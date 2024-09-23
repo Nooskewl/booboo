@@ -3122,12 +3122,7 @@ static bool modelfunc_set_2d(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
-	int w = shim::screen_size.w;
-	int h = shim::screen_size.h;
-	float aspect = (float)w/h;
-	gfx::set_min_aspect_ratio(aspect-0.001f);
-	gfx::set_max_aspect_ratio(aspect+0.001f);
-	gfx::restart(w, h, false, shim::real_screen_size.w, shim::real_screen_size.h);
+	gfx::set_default_projection(shim::real_screen_size, shim::screen_offset, shim::scale);
 
 	is_3d = false;
 	
