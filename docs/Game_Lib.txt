@@ -43,11 +43,11 @@ The following sections describe the API:
 	Font Functions
 	Tilemap Functions
 	Shader Functions
+	3D Functions
 	Audio Functions
 	Input Functions
 	JSON Functions
 	Configuration Functions
-	3D Functions
 	Constants
 
 -- Core Functions ------------------------------------------------------------
@@ -448,6 +448,114 @@ shader_set_texture
 	Set a texture value in a shader
 	e.g. shader_set_texture shader "tex" my_img
 
+-- 3D Functions --------------------------------------------------------------
+
+model_load
+	Load a model with an optional armature an animations from .x file
+	e.g. model_load model_id "filename.x"
+
+model_draw
+	Draw a model with its transforms applied
+	e.g. model_draw model r_tint g_tint b_tint a_tint
+
+set_2d
+	Revert back to 2d drawing
+	e.g. set_2d
+
+set_3d
+	Enable 3d rendering and projection
+	e.g. set_3d
+
+model_scale
+	Alter the scale of a model. It starts at 1 across the board. These
+	numbers get added to that.
+	e.g. model_scale model add_sx add_sy add_sz
+
+model_rotate
+	Alter the rotation of a model. These numbers are angles about each
+	axis and get added to the default of 0 and accumulate with each
+	call.
+	e.g. model_rotate model add_angle_x add_angle_y add_angle_z
+
+model_translate
+	Translate (move) a model. This sticks like rotation and scaling.
+	The numbers you supply get added to the current position of the model.
+	e.g. model_translate model add_x add_y add_z
+
+model_set_scale
+	Set the scale instead of altering it
+	e.g. model_set_scale model sx sy sz
+
+model_set_rotate
+	Set the model rotation instead of altering it
+	e.g. model_set_rotate model rx ry rz
+
+model_set_translate
+	Set the model position directly
+	e.g. model_set_translate model x y z
+
+model_get_scale
+	Retrieve the models current scale
+	e.g. model_get_scale model sx sy sz
+
+model_get_rotate
+	Retrieve the models current rotation
+	e.g. model_get_rotate model rx ry rz
+
+model_get_translate
+	Retrieve the models current position
+	e.g. model_get_translate model x y z
+
+scale_3d
+	Scale the modelview matrix
+	e.g. scale_3d sx sy sz
+
+rotate_3d
+	Rotate the modelview matrix
+	e.g. rotate_3d rx ry rz
+
+translate_3d
+	Translate the modelview matrix
+	e.g. translate_3d x y z
+
+identity_3d
+	Set the modelview matrix to the identity matrix
+	e.g. identity_3d
+
+model_set_animation
+	Set the animation to the one named. You can optionally pass a BooBoo
+	function that takes and returns no arguments that will be called
+	when the animation finishes.
+	e.g. model_set_animation model "attack" done_attack
+
+model_stop
+	Stop a models animation
+	e.g. model_stop model
+
+model_reset
+	Reset a models animation
+	e.g. model_reset model
+
+model_size
+	Get the dimensions of a model
+	e.g. model_size model szx szy szz
+
+draw_3d
+	Draw arbitrary 3d geometry
+	All vectors are vectors of numbers
+	e.g., one vertex is 3 numbers, one face is 3 numbers, one colour is 4
+	faces are vertex indices
+	colours are per-face-vertex
+	e.g. draw_3d vert_vec face_vec colour_vec num_triangles
+
+draw_3d_textured
+	Draw arbitrary 3d geometry textured
+	All vectors are vectors of numbers
+	e.g., one vertex is 3 numbers, one face is 3 numbers, one colour is 4
+	faces are vertex indices
+	colours are per-face-vertex
+	e.g. draw_3d_textured tex vert_vec face_vec colour_vec texcoord_vec num_triangles
+
 -- Audio Functions -----------------------------------------------------------
 
 mml_create
@@ -558,114 +666,6 @@ cfg_exists
 cfg_erase
 	Erase a value in a config file
 	e.g. cfg_erase cfg "example"
-
--- 3D Functions --------------------------------------------------------------
-
-model_load
-	Load a model with an optional armature an animations from .x file
-	e.g. model_load model_id "filename.x"
-
-model_draw
-	Draw a model with its transforms applied
-	e.g. model_draw model r_tint g_tint b_tint a_tint
-
-set_2d
-	Revert back to 2d drawing
-	e.g. set_2d
-
-set_3d
-	Enable 3d rendering and projection
-	e.g. set_3d
-
-model_scale
-	Alter the scale of a model. It starts at 1 across the board. These
-	numbers get added to that.
-	e.g. model_scale model add_sx add_sy add_sz
-
-model_rotate
-	Alter the rotation of a model. These numbers are angles about each
-	axis and get added to the default of 0 and accumulate with each
-	call.
-	e.g. model_rotate model add_angle_x add_angle_y add_angle_z
-
-model_translate
-	Translate (move) a model. This sticks like rotation and scaling.
-	The numbers you supply get added to the current position of the model.
-	e.g. model_translate model add_x add_y add_z
-
-model_set_scale
-	Set the scale instead of altering it
-	e.g. model_set_scale model sx sy sz
-
-model_set_rotate
-	Set the model rotation instead of altering it
-	e.g. model_set_rotate model rx ry rz
-
-model_set_translate
-	Set the model position directly
-	e.g. model_set_translate model x y z
-
-model_get_scale
-	Retrieve the models current scale
-	e.g. model_get_scale model sx sy sz
-
-model_get_rotate
-	Retrieve the models current rotation
-	e.g. model_get_rotate model rx ry rz
-
-model_get_translate
-	Retrieve the models current position
-	e.g. model_get_translate model x y z
-
-scale_3d
-	Scale the modelview matrix
-	e.g. scale_3d sx sy sz
-
-rotate_3d
-	Rotate the modelview matrix
-	e.g. rotate_3d rx ry rz
-
-translate_3d
-	Translate the modelview matrix
-	e.g. translate_3d x y z
-
-identity_3d
-	Set the modelview matrix to the identity matrix
-	e.g. identity_3d
-
-model_set_animation
-	Set the animation to the one named. You can optionally pass a BooBoo
-	function that takes and returns no arguments that will be called
-	when the animation finishes.
-	e.g. model_set_animation model "attack" done_attack
-
-model_stop
-	Stop a models animation
-	e.g. model_stop model
-
-model_reset
-	Reset a models animation
-	e.g. model_reset model
-
-model_size
-	Get the dimensions of a model
-	e.g. model_size model szx szy szz
-
-draw_3d
-	Draw arbitrary 3d geometry
-	All vectors are vectors of numbers
-	e.g., one vertex is 3 numbers, one face is 3 numbers, one colour is 4
-	faces are vertex indices
-	colours are per-face-vertex
-	e.g. draw_3d vert_vec face_vec colour_vec num_triangles
-
-draw_3d_textured
-	Draw arbitrary 3d geometry textured
-	All vectors are vectors of numbers
-	e.g., one vertex is 3 numbers, one face is 3 numbers, one colour is 4
-	faces are vertex indices
-	colours are per-face-vertex
-	e.g. draw_3d_textured tex vert_vec face_vec colour_vec texcoord_vec num_triangles
 
 -- Constants -----------------------------------------------------------------
 
