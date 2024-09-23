@@ -2,7 +2,7 @@ number model
 
 model_load model "zeus.x"
 
-model_translate model 0 -0.5 0
+model_translate model 0 0 0
 
 number sx sy sz
 

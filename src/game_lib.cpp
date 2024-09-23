@@ -3079,20 +3079,8 @@ static bool modelfunc_identity_3d(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool modelfunc_set_2d(Program *prg, const std::vector<Token> &v)
+static void set_3d()
 {
-	COUNT_ARGS(0)
-
-	gfx::set_default_projection(shim::real_screen_size, shim::screen_offset, shim::scale);
-	gfx::update_projection();
-	
-	return true;
-}
-
-static bool modelfunc_set_3d(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(0)
-
 	// scales adjust for screen_offset
 	float scale_x = (shim::screen_size.w*shim::scale)/shim::real_screen_size.w;
 	float scale_y = (shim::screen_size.h*shim::scale)/shim::real_screen_size.h;
@@ -3113,7 +3101,39 @@ static bool modelfunc_set_3d(Program *prg, const std::vector<Token> &v)
 	
 	gfx::set_matrices(_mv, _proj);
 	gfx::update_projection();
+}
+
+static bool is_3d = false;
+
+static void found_device_callback()
+{
+	if (is_3d) {
+		set_3d();
+	}
+}
+
+static bool modelfunc_set_2d(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	gfx::set_default_projection(shim::real_screen_size, shim::screen_offset, shim::scale);
+	gfx::update_projection();
+
+	is_3d = false;
 	
+	return true;
+}
+
+static bool modelfunc_set_3d(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	set_3d();
+
+	is_3d = true;
+
+	gfx::register_lost_device_callbacks(nullptr, found_device_callback);
+
 	return true;
 }
 
