@@ -141,7 +141,7 @@ else() # Linux
 	endif()
 	if(LUA)
 		set(CORE_LAUNCHER_LIBS "library" lua5.4)
-		set(GAME_LAUNCHER_LIBS "library" twinkle ${SHIM4_LIB} util ${TGUI6_LIB} SDL2 GL Xcursor X11 FLAC vorbis ogg freetype png z lua5.4)
+		set(GAME_LAUNCHER_LIBS "library" twinkle ${SHIM4_LIB} util ${TGUI6_LIB} SDL2 GL Xcursor X11 FLAC vorbis ogg freetype png z lua5.4 GL)
 	else()
 		set(CORE_LAUNCHER_LIBS "library" twinkle ${SHIM4_LIB} util ${TGUI6_LIB} SDL2 GL Xcursor X11 FLAC vorbis ogg freetype png z)
 		set(GAME_LAUNCHER_LIBS "library" twinkle ${SHIM4_LIB} util ${TGUI6_LIB} SDL2 GL Xcursor X11 FLAC vorbis ogg freetype png z)

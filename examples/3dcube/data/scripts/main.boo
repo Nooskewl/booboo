@@ -223,6 +223,10 @@ vector_add colours 216
 vector_add colours 255
 vector_add colours 255
 
+number rx ry
+= rx 0
+= ry 0
+
 set_3d
 
 function draw
@@ -234,5 +238,9 @@ function draw
 
 function run
 {
-	rotate_3d 0.01 0.02 0.0
+	+ rx 0.01
+	+ ry 0.02
+	identity_3d
+	translate_3d 0 0 -5
+	rotate_3d rx ry 0.0
 }

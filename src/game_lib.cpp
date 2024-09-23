@@ -2804,6 +2804,8 @@ static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
 
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
+
+	glDisable_ptr(GL_SCISSOR_TEST);
 	
 	model->model->draw_tinted_textured(c);
 
@@ -3101,12 +3103,8 @@ static void set_3d()
 	}
 */
 
-	_mv = glm::translate(_mv, glm::vec3(0.0f, 0.0f, -2.0f));
-
 	gfx::set_matrices(_mv, _proj);
 	gfx::update_projection();
-	
-	gfx::set_default_scissor_enabled(false);
 }
 
 static bool is_3d = false;
@@ -3125,8 +3123,6 @@ static bool modelfunc_set_2d(Program *prg, const std::vector<Token> &v)
 	gfx::set_default_projection(shim::real_screen_size, shim::screen_offset, shim::scale);
 
 	is_3d = false;
-	
-	gfx::set_default_scissor_enabled(true);
 	
 	return true;
 }
@@ -3301,6 +3297,7 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 	
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
+	glDisable_ptr(GL_SCISSOR_TEST);
 	
 	gfx::Vertex_Cache::instance()->start();
 	gfx::Vertex_Cache::instance()->cache_3d_immediate(vert_vec, num_triangles);
@@ -3356,6 +3353,7 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 	
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
+	glDisable_ptr(GL_SCISSOR_TEST);
 	
 	gfx::Vertex_Cache::instance()->start(image);
 	gfx::Vertex_Cache::instance()->cache_3d_immediate(vert_vec, num_triangles);
