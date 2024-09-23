@@ -2878,6 +2878,66 @@ static bool modelfunc_translate(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool modelfunc_set_scale(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int model_id = as_number(prg, v[0]);
+	float sx = as_number(prg, v[1]);
+	float sy = as_number(prg, v[2]);
+	float sz = as_number(prg, v[3]);
+
+	Model_Info *info = model_info(prg);
+
+	Model *model = info->models[model_id];
+
+	model->sx = sx;
+	model->sy = sy;
+	model->sz = sz;
+
+	return true;
+}
+
+static bool modelfunc_set_rotate(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int model_id = as_number(prg, v[0]);
+	float rx = as_number(prg, v[1]);
+	float ry = as_number(prg, v[2]);
+	float rz = as_number(prg, v[3]);
+
+	Model_Info *info = model_info(prg);
+
+	Model *model = info->models[model_id];
+
+	model->rx = rx;
+	model->ry = ry;
+	model->rz = rz;
+
+	return true;
+}
+
+static bool modelfunc_set_translate(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int model_id = as_number(prg, v[0]);
+	float x = as_number(prg, v[1]);
+	float y = as_number(prg, v[2]);
+	float z = as_number(prg, v[3]);
+
+	Model_Info *info = model_info(prg);
+
+	Model *model = info->models[model_id];
+
+	model->x = x;
+	model->y = y;
+	model->z = z;
+
+	return true;
+}
+
 static bool modelfunc_set_2d(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -3150,6 +3210,9 @@ void start_lib_game()
 	add_instruction("model_scale", modelfunc_scale);
 	add_instruction("model_rotate", modelfunc_rotate);
 	add_instruction("model_translate", modelfunc_translate);
+	add_instruction("model_set_scale", modelfunc_set_scale);
+	add_instruction("model_set_rotate", modelfunc_set_rotate);
+	add_instruction("model_set_translate", modelfunc_set_translate);
 	add_instruction("model_set_animation", modelfunc_set_animation);
 	add_instruction("model_stop", modelfunc_stop);
 	add_instruction("model_reset", modelfunc_reset);

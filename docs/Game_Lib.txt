@@ -593,6 +593,18 @@ model_translate
 	The numbers you supply get added to the current position of the model.
 	e.g. model_translate model add_x add_y add_z
 
+model_set_scale
+	Set the scale instead of altering it
+	e.g. model_set_scale model sx sy sz
+
+model_set_rotate
+	Set the model rotation instead of altering it
+	e.g. model_set_rotate model rx ry rz
+
+model_set_translate
+	Set the model position directly
+	e.g. model_set_translate model x y z
+
 model_set_animation
 	Set the animation to the one named. You can optionally pass a BooBoo
 	function that takes and returns no arguments that will be called

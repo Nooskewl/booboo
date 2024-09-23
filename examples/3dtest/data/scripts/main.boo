@@ -1,7 +1,8 @@
 number model
 
 model_load model "zeus.x"
-model_translate model 0 0 -2
+
+model_translate model 0 -0.5 0
 
 number sx sy sz
 
@@ -15,11 +16,8 @@ if (> sy max) change_y
 if (> sz max) change_z
 	= max sz
 :change_z
-= scale (* -1 (- 1 (/ 1 max)))
-+ scale (/ 0.5 max)
-model_scale model scale scale scale
-
-;model_rotate model 0 PI 0
+= scale (/ 1.0 max)
+model_set_scale model scale scale scale
 
 model_set_animation model "ArmatureAction" cb
 
@@ -41,4 +39,35 @@ function draw
 
 	set_2d
 	font_draw font 255 255 0 255 "Testing..." 50 100
+}
+
+function eabs x
+{
+	if (< x 0) switch
+		neg x
+	:switch
+	return x
+}
+
+function run
+{
+	include "poll_joystick.inc"
+
+	neg joy_y1
+
+	if (< (eabs joy_x1) 0.1) zero_x
+		= joy_x1 0
+	:zero_x
+	if (< (eabs joy_y1) 0.1) zero_y
+		= joy_y1 0
+	:zero_y
+	if (< (eabs joy_x2) 0.1) zero_z
+		= joy_x2 0
+	:zero_z
+
+	/ joy_x1 10
+	/ joy_y1 10
+	/ joy_x2 10
+
+	model_translate model joy_x1 joy_y1 joy_x2
 }
