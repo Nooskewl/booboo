@@ -3013,6 +3013,72 @@ static bool modelfunc_get_translate(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool modelfunc_scale_3d(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	float sx = as_number(prg, v[0]);
+	float sy = as_number(prg, v[1]);
+	float sz = as_number(prg, v[2]);
+
+	glm::mat4 mv, proj;
+	gfx::get_matrices(mv, proj);
+	mv *= glm::scale(mv, glm::vec3(sx, sy, sz));
+	gfx::set_matrices(mv, proj);
+	gfx::update_projection();
+
+	return true;
+}
+
+static bool modelfunc_rotate_3d(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	float rx = as_number(prg, v[0]);
+	float ry = as_number(prg, v[1]);
+	float rz = as_number(prg, v[2]);
+
+	glm::mat4 mv, proj;
+	gfx::get_matrices(mv, proj);
+	mv = glm::rotate(mv, rx, glm::vec3(1.0f, 0.0f, 0.0f));
+	mv = glm::rotate(mv, ry, glm::vec3(0.0f, 1.0f, 0.0f));
+	mv = glm::rotate(mv, rz, glm::vec3(0.0f, 0.0f, 1.0f));
+	gfx::set_matrices(mv, proj);
+	gfx::update_projection();
+
+	return true;
+}
+
+static bool modelfunc_translate_3d(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	float x = as_number(prg, v[0]);
+	float y = as_number(prg, v[1]);
+	float z = as_number(prg, v[2]);
+
+	glm::mat4 mv, proj;
+	gfx::get_matrices(mv, proj);
+	mv = glm::translate(mv, glm::vec3(x, y, z));
+	gfx::set_matrices(mv, proj);
+	gfx::update_projection();
+
+	return true;
+}
+
+static bool modelfunc_identity_3d(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	glm::mat4 mv, proj;
+	gfx::get_matrices(mv, proj);
+	mv = glm::mat4();
+	gfx::set_matrices(mv, proj);
+	gfx::update_projection();
+
+	return true;
+}
+
 static bool modelfunc_set_2d(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -3170,6 +3236,110 @@ static bool modelfunc_size(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	Variable &verts = as_variable(prg, v[0]);
+	Variable &faces = as_variable(prg, v[1]);
+	Variable &colours = as_variable(prg, v[2]);
+	int num_triangles = as_number(prg, v[3]);
+
+	float vert_vec[12*3*num_triangles];
+
+	int count = 0;
+	int ccount = 0;
+
+	for (int i = 0; i < num_triangles; i++) {
+		for (int j = 0; j < 3; j++) {
+			int index = faces.v[i*3+j].n;
+			// xyz
+			vert_vec[count++] = verts.v[index*3+0].n;
+			vert_vec[count++] = verts.v[index*3+1].n;
+			vert_vec[count++] = verts.v[index*3+2].n;
+			// normals
+			vert_vec[count++] = 0.0f;
+			vert_vec[count++] = 0.0f;
+			vert_vec[count++] = 0.0f;
+			// texcoord
+			vert_vec[count++] = 0.0f;
+			vert_vec[count++] = 0.0f;
+			// colour
+			vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+			vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+			vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+			vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+		}
+	}
+	
+	gfx::enable_depth_write(true);
+	gfx::enable_depth_test(true);
+	
+	gfx::Vertex_Cache::instance()->start();
+	gfx::Vertex_Cache::instance()->cache_3d_immediate(vert_vec, num_triangles);
+	gfx::Vertex_Cache::instance()->end();
+
+	gfx::enable_depth_test(false);
+	gfx::enable_depth_write(false);
+
+	return true;
+}
+
+static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(6)
+
+	int tex = as_number(prg, v[0]);
+	Variable &verts = as_variable(prg, v[1]);
+	Variable &faces = as_variable(prg, v[2]);
+	Variable &colours = as_variable(prg, v[3]);
+	Variable &texcoords = as_variable(prg, v[4]);
+	int num_triangles = as_number(prg, v[5]);
+
+	float vert_vec[12*3*num_triangles];
+
+	int count = 0;
+	int ccount = 0;
+	int tcount = 0;
+
+	for (int i = 0; i < num_triangles; i++) {
+		for (int j = 0; j < 3; j++) {
+			int index = faces.v[i*3+j].n;
+			// xyz
+			vert_vec[count++] = verts.v[index*3+0].n;
+			vert_vec[count++] = verts.v[index*3+1].n;
+			vert_vec[count++] = verts.v[index*3+2].n;
+			// normals
+			vert_vec[count++] = 0.0f;
+			vert_vec[count++] = 0.0f;
+			vert_vec[count++] = 0.0f;
+			// texcoord
+			vert_vec[count++] = texcoords.v[tcount++].n;
+			vert_vec[count++] = texcoords.v[tcount++].n;
+			// colour
+			vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+			vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+			vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+			vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+		}
+	}
+	
+	Image_Info *iinfo = image_info(prg);
+	gfx::Image *image = iinfo->images[tex];
+	
+	gfx::enable_depth_write(true);
+	gfx::enable_depth_test(true);
+	
+	gfx::Vertex_Cache::instance()->start(image);
+	gfx::Vertex_Cache::instance()->cache_3d_immediate(vert_vec, num_triangles);
+	gfx::Vertex_Cache::instance()->end();
+
+	gfx::enable_depth_test(false);
+	gfx::enable_depth_write(false);
+
+	return true;
+}
+
 void start_lib_game()
 {
 	add_instruction("inspect", miscfunc_inspect);
@@ -3291,10 +3461,16 @@ void start_lib_game()
 	add_instruction("model_get_scale", modelfunc_get_scale);
 	add_instruction("model_get_rotate", modelfunc_get_rotate);
 	add_instruction("model_get_translate", modelfunc_get_translate);
+	add_instruction("scale_3d", modelfunc_scale_3d);
+	add_instruction("rotate_3d", modelfunc_rotate_3d);
+	add_instruction("translate_3d", modelfunc_translate_3d);
+	add_instruction("identity_3d", modelfunc_identity_3d);
 	add_instruction("model_set_animation", modelfunc_set_animation);
 	add_instruction("model_stop", modelfunc_stop);
 	add_instruction("model_reset", modelfunc_reset);
 	add_instruction("model_size", modelfunc_size);
+	add_instruction("draw_3d", modelfunc_draw_3d);
+	add_instruction("draw_3d_textured", modelfunc_draw_3d_textured);
 }
 
 void end_lib_game()

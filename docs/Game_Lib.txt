@@ -617,6 +617,22 @@ model_get_translate
 	Retrieve the models current position
 	e.g. model_get_translate model x y z
 
+scale_3d
+	Scale the modelview matrix
+	e.g. scale_3d sx sy sz
+
+rotate_3d
+	Rotate the modelview matrix
+	e.g. rotate_3d rx ry rz
+
+translate_3d
+	Translate the modelview matrix
+	e.g. translate_3d x y z
+
+identity_3d
+	Set the modelview matrix to the identity matrix
+	e.g. identity_3d
+
 model_set_animation
 	Set the animation to the one named. You can optionally pass a BooBoo
 	function that takes and returns no arguments that will be called
@@ -634,6 +650,22 @@ model_reset
 model_size
 	Get the dimensions of a model
 	e.g. model_size model szx szy szz
+
+draw_3d
+	Draw arbitrary 3d geometry
+	All vectors are vectors of numbers
+	e.g., one vertex is 3 numbers, one face is 3 numbers, one colour is 4
+	faces are vertex indices
+	colours are per-face-vertex
+	e.g. draw_3d vert_vec face_vec colour_vec num_triangles
+
+draw_3d_textured
+	Draw arbitrary 3d geometry textured
+	All vectors are vectors of numbers
+	e.g., one vertex is 3 numbers, one face is 3 numbers, one colour is 4
+	faces are vertex indices
+	colours are per-face-vertex
+	e.g. draw_3d_textured tex vert_vec face_vec colour_vec texcoord_vec num_triangles
 
 -- Constants -----------------------------------------------------------------
 
