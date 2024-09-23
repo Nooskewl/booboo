@@ -2938,6 +2938,81 @@ static bool modelfunc_set_translate(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool modelfunc_get_scale(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int model_id = as_number(prg, v[0]);
+
+	Variable &sx = as_variable(prg, v[1]);
+	Variable &sy = as_variable(prg, v[2]);
+	Variable &sz = as_variable(prg, v[3]);
+
+	CHECK_NUMBER(sx)
+	CHECK_NUMBER(sy)
+	CHECK_NUMBER(sz)
+
+	Model_Info *info = model_info(prg);
+
+	Model *model = info->models[model_id];
+
+	sx.n = model->sx;
+	sy.n = model->sy;
+	sz.n = model->sz;
+
+	return true;
+}
+
+static bool modelfunc_get_rotate(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int model_id = as_number(prg, v[0]);
+
+	Variable &rx = as_variable(prg, v[1]);
+	Variable &ry = as_variable(prg, v[2]);
+	Variable &rz = as_variable(prg, v[3]);
+
+	CHECK_NUMBER(rx)
+	CHECK_NUMBER(ry)
+	CHECK_NUMBER(rz)
+
+	Model_Info *info = model_info(prg);
+
+	Model *model = info->models[model_id];
+
+	rx.n = model->rx;
+	ry.n = model->ry;
+	rz.n = model->rz;
+
+	return true;
+}
+
+static bool modelfunc_get_translate(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int model_id = as_number(prg, v[0]);
+
+	Variable &x = as_variable(prg, v[1]);
+	Variable &y = as_variable(prg, v[2]);
+	Variable &z = as_variable(prg, v[3]);
+
+	CHECK_NUMBER(x)
+	CHECK_NUMBER(y)
+	CHECK_NUMBER(z)
+
+	Model_Info *info = model_info(prg);
+
+	Model *model = info->models[model_id];
+
+	x.n = model->x;
+	y.n = model->y;
+	z.n = model->z;
+
+	return true;
+}
+
 static bool modelfunc_set_2d(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -3213,6 +3288,9 @@ void start_lib_game()
 	add_instruction("model_set_scale", modelfunc_set_scale);
 	add_instruction("model_set_rotate", modelfunc_set_rotate);
 	add_instruction("model_set_translate", modelfunc_set_translate);
+	add_instruction("model_get_scale", modelfunc_get_scale);
+	add_instruction("model_get_rotate", modelfunc_get_rotate);
+	add_instruction("model_get_translate", modelfunc_get_translate);
 	add_instruction("model_set_animation", modelfunc_set_animation);
 	add_instruction("model_stop", modelfunc_stop);
 	add_instruction("model_reset", modelfunc_reset);

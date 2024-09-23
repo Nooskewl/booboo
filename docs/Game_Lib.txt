@@ -605,6 +605,18 @@ model_set_translate
 	Set the model position directly
 	e.g. model_set_translate model x y z
 
+model_get_scale
+	Retrieve the models current scale
+	e.g. model_get_scale model sx sy sz
+
+model_get_rotate
+	Retrieve the models current rotation
+	e.g. model_get_rotate model rx ry rz
+
+model_get_translate
+	Retrieve the models current position
+	e.g. model_get_translate model x y z
+
 model_set_animation
 	Set the animation to the one named. You can optionally pass a BooBoo
 	function that takes and returns no arguments that will be called
