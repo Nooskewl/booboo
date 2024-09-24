@@ -557,6 +557,38 @@ draw_3d_textured
 	colours are per-face-vertex
 	e.g. draw_3d_textured tex vert_vec face_vec colour_vec texcoord_vec num_triangles
 
+billboard_create
+	Create a billboard
+	e.g. billboard_create result image x y z w h
+
+billboard_draw
+	Draw a tinted billboard
+	e.g. billboard_draw billboard r g b a
+
+billboard_scale
+	Scale a billboard
+	e.g. billboard_scale billboard sx sy sz
+
+billboard_translate
+	Translate a billboard
+	e.g. billboard_translate billboard x y z
+
+billboard_set_scale
+	Set the scale of a billboard
+	e.g. billboard_set_scale billboard sx sy sz
+
+billboard_set_translate
+	Set the position of a billboard
+	e.g. billboard_set_translate billboard x y z
+
+billboard_get_scale
+	Get the scale of a billboard
+	e.g. billboard_get_scale billboard sx sy sz
+
+billboard_get_translate
+	Get the position of a billboard
+	e.g. billboard_get_translate billboard x y z
+
 -- Collision Detection Functions ---------------------------------------------
 
 cd_model_point

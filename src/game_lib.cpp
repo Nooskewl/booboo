@@ -76,6 +76,18 @@ struct Model_Info {
 	std::map<int, Model *> models;
 };
 
+struct Billboard {
+	float sx, sy, sz;
+	float x, y, z;
+	float w, h;
+	gfx::Image *image;
+};
+
+struct Billboard_Info {
+	int billboard_id;
+	std::map<int, Billboard *> billboards;
+};
+
 static MML_Info *mml_info(Program *prg)
 {
 	MML_Info *info = (MML_Info *)booboo::get_black_box(prg, "com.illnorth.booboo.mml");
@@ -182,6 +194,17 @@ static Model_Info *model_info(Program *prg)
 		info = new Model_Info;
 		info->model_id = 0;
 		booboo::set_black_box(prg, "com.illnorth.booboo.model", info);
+	}
+	return info;
+}
+
+static Billboard_Info *billboard_info(Program *prg)
+{
+	Billboard_Info *info = (Billboard_Info *)booboo::get_black_box(prg, "com.illnorth.booboo.billboard");
+	if (info == nullptr) {
+		info = new Billboard_Info;
+		info->billboard_id = 0;
+		booboo::set_black_box(prg, "com.illnorth.booboo.billboard", info);
 	}
 	return info;
 }
@@ -3431,6 +3454,248 @@ static bool modelfunc_clone(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool modelfunc_billboard_create(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(7)
+
+	Variable &result = as_variable(prg, v[0]);
+	int image_id = as_number(prg, v[1]);
+	float x = as_number(prg, v[2]);
+	float y = as_number(prg, v[3]);
+	float z = as_number(prg, v[4]);
+	float w = as_number(prg, v[5]);
+	float h = as_number(prg, v[6]);
+
+	CHECK_NUMBER(result)
+	
+	Image_Info *info = image_info(prg);
+	gfx::Image *image = info->images[image_id];
+	
+	Billboard_Info *info2 = billboard_info(prg);
+	Billboard *billboard = new Billboard;
+	billboard->image = image;
+	billboard->x = x;
+	billboard->y = y;
+	billboard->z = z;
+	billboard->sx = 1.0f;
+	billboard->sy = 1.0f;
+	billboard->sz = 1.0f;
+	billboard->w = w;
+	billboard->h = h;
+	result.n = info2->billboard_id;
+	info2->billboards[info2->billboard_id++] = billboard;
+	return true;
+}
+
+static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(5)
+
+	int billboard_id = as_number(prg, v[0]);
+	int r = as_number(prg, v[1]);
+	int g = as_number(prg, v[2]);
+	int b = as_number(prg, v[3]);
+	int a = as_number(prg, v[4]);
+
+	Billboard_Info *info = billboard_info(prg);
+	Billboard *billboard = info->billboards[billboard_id];
+
+	const float verts[] = {
+		-0.5f, -0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
+		-0.5f, 0.5f, 0.0f,
+		0.5f, 0.5f, 0.0f,
+	};
+	const int faces[] = {
+		0, 1, 2, 1, 2, 3
+	};
+	const float texcoords[] = {
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		0.0f, 1.0f,
+		1.0f, 0.0f,
+		0.0f, 1.0f,
+		1.0f, 1.0f
+	};
+
+	glm::mat4 mv, proj;
+	gfx::get_matrices(mv, proj);
+
+	glm::vec3 camera_right(mv[0][0], mv[1][0], mv[2][0]);
+	glm::vec3 camera_up(mv[0][1], mv[1][1], mv[2][1]);
+
+	float vec[12*2*3];
+
+	int count = 0;
+	int tc = 0;
+
+	for (size_t i = 0; i < 2; i++) {
+		for (int j = 0; j < 3; j++) {
+			vec[count++] = verts[faces[i*3+j]*3+0];
+			vec[count++] = verts[faces[i*3+j]*3+1];
+			vec[count++] = verts[faces[i*3+j]*3+2];
+			// normals
+			vec[count++] = 0.0f;
+			vec[count++] = 0.0f;
+			vec[count++] = 0.0f;
+			// texcoord
+			vec[count++] = texcoords[tc++];
+			vec[count++] = texcoords[tc++];
+			vec[count++] = r / 255.0f;
+			vec[count++] = g / 255.0f;
+			vec[count++] = b / 255.0f;
+			vec[count++] = a / 255.0f;
+		}
+	}
+	
+	glm::mat4 t = mv;
+	t = glm::translate(t, glm::vec3(billboard->x, billboard->y, billboard->z));
+	t = glm::scale(t, glm::vec3(billboard->sx, billboard->sy, billboard->sz));
+	
+	gfx::set_matrices(t, proj);
+	gfx::update_projection();
+
+	gfx::enable_depth_write(true);
+	gfx::enable_depth_test(true);
+	glDisable_ptr(GL_SCISSOR_TEST);
+	glEnable_ptr(GL_ALPHA_TEST);
+	
+	gfx::Vertex_Cache::instance()->start(billboard->image);
+	gfx::Vertex_Cache::instance()->cache_3d_immediate(vec, 2);
+	gfx::Vertex_Cache::instance()->end();
+
+	gfx::enable_depth_test(false);
+	gfx::enable_depth_write(false);
+	glDisable_ptr(GL_ALPHA_TEST);
+	
+	gfx::set_matrices(mv, proj);
+	gfx::update_projection();
+
+	return true;
+}
+
+static bool modelfunc_billboard_scale(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int billboard_id = as_number(prg, v[0]);
+	float sx = as_number(prg, v[1]);
+	float sy = as_number(prg, v[2]);
+	float sz = as_number(prg, v[3]);
+
+	Billboard_Info *info = billboard_info(prg);
+	Billboard *billboard = info->billboards[billboard_id];
+
+	billboard->sx += sx;
+	billboard->sy += sy;
+	billboard->sz += sz;
+
+	return true;
+}
+
+static bool modelfunc_billboard_translate(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int billboard_id = as_number(prg, v[0]);
+	float x = as_number(prg, v[1]);
+	float y = as_number(prg, v[2]);
+	float z = as_number(prg, v[3]);
+
+	Billboard_Info *info = billboard_info(prg);
+	Billboard *billboard = info->billboards[billboard_id];
+
+	billboard->x += x;
+	billboard->y += y;
+	billboard->z += z;
+
+	return true;
+}
+
+static bool modelfunc_billboard_set_scale(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int billboard_id = as_number(prg, v[0]);
+	float sx = as_number(prg, v[1]);
+	float sy = as_number(prg, v[2]);
+	float sz = as_number(prg, v[3]);
+
+	Billboard_Info *info = billboard_info(prg);
+	Billboard *billboard = info->billboards[billboard_id];
+
+	billboard->sx = sx;
+	billboard->sy = sy;
+	billboard->sz = sz;
+
+	return true;
+}
+
+static bool modelfunc_billboard_set_translate(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int billboard_id = as_number(prg, v[0]);
+	float x = as_number(prg, v[1]);
+	float y = as_number(prg, v[2]);
+	float z = as_number(prg, v[3]);
+
+	Billboard_Info *info = billboard_info(prg);
+	Billboard *billboard = info->billboards[billboard_id];
+
+	billboard->x = x;
+	billboard->y = y;
+	billboard->z = z;
+
+	return true;
+}
+
+static bool modelfunc_billboard_get_scale(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int billboard_id = as_number(prg, v[0]);
+	Variable &sx = as_variable(prg, v[1]);
+	Variable &sy = as_variable(prg, v[2]);
+	Variable &sz = as_variable(prg, v[3]);
+
+	CHECK_NUMBER(sx)
+	CHECK_NUMBER(sy)
+	CHECK_NUMBER(sz)
+
+	Billboard_Info *info = billboard_info(prg);
+	Billboard *billboard = info->billboards[billboard_id];
+
+	sx.n = billboard->sx;
+	sy.n = billboard->sy;
+	sz.n = billboard->sz;
+
+	return true;
+}
+
+static bool modelfunc_billboard_get_translate(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int billboard_id = as_number(prg, v[0]);
+	Variable &x = as_variable(prg, v[1]);
+	Variable &y = as_variable(prg, v[2]);
+	Variable &z = as_variable(prg, v[3]);
+
+	CHECK_NUMBER(x)
+	CHECK_NUMBER(y)
+	CHECK_NUMBER(z)
+
+	Billboard_Info *info = billboard_info(prg);
+	Billboard *billboard = info->billboards[billboard_id];
+
+	x.n = billboard->x;
+	y.n = billboard->y;
+	z.n = billboard->z;
+
+	return true;
+}
+
 static bool cdfunc_model_point(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(5)
@@ -3579,6 +3844,9 @@ void start_lib_game()
 	add_instruction("model_get_scale", modelfunc_get_scale);
 	add_instruction("model_get_rotate", modelfunc_get_rotate);
 	add_instruction("model_get_translate", modelfunc_get_translate);
+	add_instruction("model_get_scale", modelfunc_get_scale);
+	add_instruction("model_get_rotate", modelfunc_get_rotate);
+	add_instruction("model_get_translate", modelfunc_get_translate);
 	add_instruction("scale_3d", modelfunc_scale_3d);
 	add_instruction("rotate_3d", modelfunc_rotate_3d);
 	add_instruction("translate_3d", modelfunc_translate_3d);
@@ -3590,6 +3858,14 @@ void start_lib_game()
 	add_instruction("draw_3d", modelfunc_draw_3d);
 	add_instruction("draw_3d_textured", modelfunc_draw_3d_textured);
 	add_instruction("model_clone", modelfunc_clone);
+	add_instruction("billboard_create", modelfunc_billboard_create);
+	add_instruction("billboard_draw", modelfunc_billboard_draw);
+	add_instruction("billboard_scale", modelfunc_billboard_scale);
+	add_instruction("billboard_translate", modelfunc_billboard_translate);
+	add_instruction("billboard_set_scale", modelfunc_billboard_set_scale);
+	add_instruction("billboard_set_translate", modelfunc_billboard_set_translate);
+	add_instruction("billboard_get_scale", modelfunc_billboard_get_scale);
+	add_instruction("billboard_get_translate", modelfunc_billboard_get_translate);
 	add_instruction("cd_model_point", cdfunc_model_point);
 }
 
@@ -3638,6 +3914,10 @@ void game_lib_destroy_program(Program *prg)
 		}
 		delete model_i->models[i];
 	}
+	Billboard_Info *billboard_i = billboard_info(prg);
+	for (size_t i = 0; i < billboard_i->billboards.size(); i++) {
+		delete billboard_i->billboards[i];
+	}
 	CFG_Info *cfg_i = cfg_info(prg);
 
 	delete mml_i;
@@ -3648,6 +3928,7 @@ void game_lib_destroy_program(Program *prg)
 	delete shader_i;
 	delete json_i;
 	delete model_i;
+	delete billboard_i;
 	delete cfg_i;
 
 	booboo::set_black_box(prg, "com.illnorth.booboo.mml", nullptr);
@@ -3660,4 +3941,5 @@ void game_lib_destroy_program(Program *prg)
 	booboo::set_black_box(prg, "com.illnorth.booboo.shader", nullptr);
 	booboo::set_black_box(prg, "com.illnorth.booboo.json", nullptr);
 	booboo::set_black_box(prg, "com.illnorth.booboo.model", nullptr);
+	booboo::set_black_box(prg, "com.illnorth.booboo.billboard", nullptr);
 }
