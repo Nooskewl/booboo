@@ -3348,7 +3348,7 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 	gfx::enable_depth_test(false);
 	gfx::enable_depth_write(false);
 
-	delete vert_vec;
+	delete[] vert_vec;
 
 	return true;
 }
