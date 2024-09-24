@@ -3765,6 +3765,48 @@ static bool cdfunc_model_point(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool cdfunc_model_line_segment(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(11)
+
+	Variable &result = as_variable(prg, v[0]);
+	int model_id = as_number(prg, v[1]);
+	float x = as_number(prg, v[2]);
+	float y = as_number(prg, v[3]);
+	float z = as_number(prg, v[4]);
+	float x2 = as_number(prg, v[5]);
+	float y2 = as_number(prg, v[6]);
+	float z2 = as_number(prg, v[7]);
+	Variable &out_x = as_variable(prg, v[8]);
+	Variable &out_y = as_variable(prg, v[9]);
+	Variable &out_z = as_variable(prg, v[10]);
+
+	CHECK_NUMBER(result)
+	CHECK_NUMBER(out_x)
+	CHECK_NUMBER(out_y)
+	CHECK_NUMBER(out_z)
+	
+	Model_Info *info = model_info(prg);
+	Model *model = info->models[model_id];
+			
+	glm::mat4 mat;
+	mat = glm::translate(mat, glm::vec3(model->x, model->y, model->z));
+	mat = glm::rotate(mat, model->rx, glm::vec3(1.0f, 0.0f, 0.0f));
+	mat = glm::rotate(mat, model->ry, glm::vec3(0.0f, 1.0f, 0.0f));
+	mat = glm::rotate(mat, model->rz, glm::vec3(0.0f, 0.0f, 1.0f));
+	mat = glm::scale(mat, glm::vec3(model->sx, model->sy, model->sz));
+
+	glm::vec3 out;
+
+	result.n = cd::model_line_segment(model->model, mat, glm::vec3(x, y, z), glm::vec3(x2, y2, z2), out);
+
+	out_x.n = out.x;
+	out_y.n = out.y;
+	out_z.n = out.z;
+
+	return true;
+}
+
 void start_lib_game()
 {
 	add_instruction("inspect", miscfunc_inspect);
@@ -3909,6 +3951,7 @@ void start_lib_game()
 	add_instruction("billboard_get_scale", modelfunc_billboard_get_scale);
 	add_instruction("billboard_get_translate", modelfunc_billboard_get_translate);
 	add_instruction("cd_model_point", cdfunc_model_point);
+	add_instruction("cd_model_line_segment", cdfunc_model_line_segment);
 }
 
 void end_lib_game()
