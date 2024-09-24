@@ -3416,7 +3416,7 @@ static bool cdfunc_model_point(Program *prg, const std::vector<Token> &v)
 	mat = glm::rotate(mat, model->rz, glm::vec3(0.0f, 0.0f, 1.0f));
 	mat = glm::scale(mat, glm::vec3(model->sx, model->sy, model->sz));
 
-	result.n = cd::model_point(model->model, glm::vec3(x, y, z), mat);
+	result.n = cd::model_point(model->model, mat, glm::vec3(x, y, z));
 
 	return true;
 }
