@@ -2804,7 +2804,6 @@ static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
 
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
-
 	glDisable_ptr(GL_SCISSOR_TEST);
 	
 	model->model->draw_tinted_textured(c);
@@ -3288,10 +3287,17 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 			vert_vec[count++] = 0.0f;
 			vert_vec[count++] = 0.0f;
 			// colour
-			vert_vec[count++] = colours.v[ccount++].n / 255.0f;
-			vert_vec[count++] = colours.v[ccount++].n / 255.0f;
-			vert_vec[count++] = colours.v[ccount++].n / 255.0f;
-			vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+			if (colours.v.size() > 0) {
+				vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+				vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+				vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+				vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+			}
+			else {
+				for (int k = 0; k < 4; k++) {
+					vert_vec[count++] = 1.0f;
+				}
+			}
 		}
 	}
 	
@@ -3341,19 +3347,33 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 			vert_vec[count++] = texcoords.v[tcount++].n;
 			vert_vec[count++] = texcoords.v[tcount++].n;
 			// colour
-			vert_vec[count++] = colours.v[ccount++].n / 255.0f;
-			vert_vec[count++] = colours.v[ccount++].n / 255.0f;
-			vert_vec[count++] = colours.v[ccount++].n / 255.0f;
-			vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+			if (colours.v.size() > 0) {
+				vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+				vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+				vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+				vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+			}
+			else {
+				for (int k = 0; k < 4; k++) {
+					vert_vec[count++] = 1.0f;
+				}
+			}
 		}
 	}
-	
-	Image_Info *iinfo = image_info(prg);
-	gfx::Image *image = iinfo->images[tex];
 	
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
 	glDisable_ptr(GL_SCISSOR_TEST);
+	
+	Image_Info *iinfo = image_info(prg);
+	gfx::Image *image = iinfo->images[tex];
+	GLuint texture = image->get_opengl_texture();
+	glBindTexture_ptr(GL_TEXTURE_2D, texture);
+	PRINT_GL_ERROR("glActiveTexture\n");
+	glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	PRINT_GL_ERROR("glTexParameteri\n");
+	glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	PRINT_GL_ERROR("glTexParameteri\n");
 	
 	gfx::Vertex_Cache::instance()->start(image);
 	gfx::Vertex_Cache::instance()->cache_3d_immediate(vert_vec, num_triangles);
@@ -3361,6 +3381,10 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 
 	gfx::enable_depth_test(false);
 	gfx::enable_depth_write(false);
+	glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	PRINT_GL_ERROR("glTexParameteri\n");
+	glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	PRINT_GL_ERROR("glTexParameteri\n");
 
 	return true;
 }
