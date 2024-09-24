@@ -65,5 +65,10 @@ function run
 	/ joy_y1 25
 	/ joy_x2 25
 
+	/ joy_x3 100
+	/ joy_y3 100
+	neg joy_y3
+
+	rotate_3d 0 (+ joy_x3 joy_y3) 0
 	translate_3d joy_x1 joy_y1 joy_x2
 }

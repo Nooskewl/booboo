@@ -3565,9 +3565,12 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 
 	for (size_t i = 0; i < 2; i++) {
 		for (int j = 0; j < 3; j++) {
-			vec[count++] = verts[faces[i*3+j]*3+0];
-			vec[count++] = verts[faces[i*3+j]*3+1];
-			vec[count++] = verts[faces[i*3+j]*3+2];
+			float x = verts[faces[i*3+j]*3+0];
+			float y = verts[faces[i*3+j]*3+1];
+			glm::vec3 pt = glm::vec3(billboard->x, billboard->y, billboard->z) + camera_right * x * billboard->w + camera_up * y * billboard->h;
+			vec[count++] = pt.x;
+			vec[count++] = pt.y;
+			vec[count++] = pt.z;
 			// normals
 			vec[count++] = 0.0f;
 			vec[count++] = 0.0f;
