@@ -72,7 +72,7 @@ function run
 	neg joy_y1
 
 	/ joy_x1 25
-	/ joy_x2 100
+	/ joy_x2 25
 	/ joy_y1 25
 	/ joy_y2 25
 
