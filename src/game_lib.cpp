@@ -2322,11 +2322,16 @@ static bool joyfunc_count(Program *prg, const std::vector<Token> &v)
 
 static bool joyfunc_rumble(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	MIN_ARGS(1)
 
 	int ms = as_number(prg, v[0]);
+	int num = -1;
 
-	input::rumble(ms);
+	if (v.size() > 1) {
+		num = as_number(prg, v[1]);
+	}
+
+	input::rumble(ms, num);
 
 	return true;
 }
