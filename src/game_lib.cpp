@@ -67,6 +67,8 @@ struct Model {
 	float rx, ry, rz;
 	float x, y, z;
 	gfx::Model *model;
+	bool is_clone;
+	bool hidden;
 };
 
 struct Model_Info {
@@ -2766,6 +2768,8 @@ static bool modelfunc_load(Program *prg, const std::vector<Token> &v)
 	m->sx = m->sy = m->sz = 1;
 	m->rx = m->ry = m->rz = m->x = m->y = m->z = 0;
 	m->model = model;
+	m->is_clone = false;
+	m->hidden = false;
 
 	info->models[info->model_id++] = m;
 
@@ -2782,11 +2786,14 @@ static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
 	int b = as_number(prg, v[3]);
 	int a = as_number(prg, v[4]);
 
-	gfx::Vertex_Cache::instance()->end();
-
 	Model_Info *info = model_info(prg);
-
 	Model *model = info->models[model_id];
+
+	if (model->hidden) {
+		return true;
+	}
+
+	gfx::Vertex_Cache::instance()->end();
 
 	SDL_Colour c;
 	c.r = r;
@@ -3394,6 +3401,36 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 	return true;
 }
 
+static bool modelfunc_clone(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &result = as_variable(prg, v[0]);
+	int id = as_number(prg, v[1]);
+
+	CHECK_NUMBER(result)
+	
+	Model_Info *info = model_info(prg);
+	Model *model = new Model;
+	Model *orig = info->models[id];
+	model->model = orig->model;
+	model->x = orig->x;
+	model->y = orig->y;
+	model->z = orig->z;
+	model->sx = orig->sx;
+	model->sy = orig->sy;
+	model->sz = orig->sz;
+	model->rx = orig->rx;
+	model->ry = orig->ry;
+	model->rz = orig->rz;
+	model->hidden = orig->hidden;
+	model->is_clone = true;
+	result.n = info->model_id;
+	info->models[info->model_id++] = model;
+
+	return true;
+}
+
 static bool cdfunc_model_point(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(5)
@@ -3552,6 +3589,7 @@ void start_lib_game()
 	add_instruction("model_size", modelfunc_size);
 	add_instruction("draw_3d", modelfunc_draw_3d);
 	add_instruction("draw_3d_textured", modelfunc_draw_3d_textured);
+	add_instruction("model_clone", modelfunc_clone);
 	add_instruction("cd_model_point", cdfunc_model_point);
 }
 
@@ -3595,7 +3633,9 @@ void game_lib_destroy_program(Program *prg)
 	}
 	Model_Info *model_i = model_info(prg);
 	for (size_t i = 0; i < model_i->models.size(); i++) {
-		delete model_i->models[i]->model;
+		if (model_i->models[i]->is_clone == false) {
+			delete model_i->models[i]->model;
+		}
 		delete model_i->models[i];
 	}
 	CFG_Info *cfg_i = cfg_info(prg);
