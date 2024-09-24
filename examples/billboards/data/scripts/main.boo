@@ -25,10 +25,13 @@ for i 0 (< i num_billboards) 1 loop
 	
 set_3d
 
-;translate_3d 0 0 -10
-
 number angle
-= angle (/ PI 2.0)
+= angle 0
+
+number x y z
+= x 0
+= y 0
+= z 0
 
 function draw
 {
@@ -52,17 +55,17 @@ function run
 {
 	include "poll_joystick.inc"
 
-	neg joy_y1
-
-	if (< (eabs joy_x1) 0.1) zero_x
+	if (< (eabs joy_x1) 0.1) clip_x1
 		= joy_x1 0
-	:zero_x
-	if (< (eabs joy_y1) 0.1) zero_y
+	:clip_x1
+	if (< (eabs joy_y1) 0.1) clip_y1
 		= joy_y1 0
-	:zero_y
-	if (< (eabs joy_y2) 0.1) zero_y2
+	:clip_y1
+	if (< (eabs joy_y2) 0.1) clip_y2
 		= joy_y2 0
-	:zero_y2
+	:clip_y2
+
+	neg joy_y1
 
 	/ joy_x1 100
 	/ joy_y1 25
@@ -70,14 +73,20 @@ function run
 
 	+ angle joy_x1
 
-	number x y
-	= x angle
-	cos x
-	= x (* x joy_y1)
-	= y angle
-	sin y
-	= y (* y joy_y1)
+	number xi yi zi
+	= xi (+ angle (/ PI 2))
+	cos xi
+	= xi (* xi joy_y1)
+	= yi joy_y2
+	= zi (+ angle (/ PI 2))
+	sin zi
+	= zi (* zi joy_y1)
 
-	translate_3d x joy_y2 y
-	rotate_3d 0 joy_x1 0
+	+ x xi
+	+ y yi
+	+ z zi
+
+	identity_3d
+	rotate_3d 0 angle 0
+	translate_3d x y z
 }
