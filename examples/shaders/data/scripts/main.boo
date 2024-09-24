@@ -28,11 +28,16 @@ function draw
 	get_buffer_size bw bh
 	/ bw 2
 
+	number scr_w scr_h
+	get_screen_size scr_w scr_h
+
 	shader_use shader
 	shader_set_float shader "t" t
 	shader_set_float shader "mush_x" mx
 	shader_set_float shader "mush_y" my
 	shader_set_float shader "maxx" bw
+	shader_set_int shader "screen_w" scr_w
+	shader_set_int shader "screen_h" scr_h
 	filled_rectangle 0 0 0 255 0 0 0 255 0 0 0 255 0 0 0 255 0 0 640 360
 	shader_use_default
 }
