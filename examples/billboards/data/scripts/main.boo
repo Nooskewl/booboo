@@ -4,7 +4,7 @@ image_load tree "tree.png"
 vector billboards
 
 number num_billboards
-= num_billboards 10
+= num_billboards 100
 
 number i
 for i 0 (< i num_billboards) 1 loop
@@ -13,7 +13,7 @@ for i 0 (< i num_billboards) 1 loop
 	rand x 0 1000
 	- x 500
 	/ x 500
-	* x 2
+	* x 10
 	number z
 	rand z 0 1000
 	- z 500
@@ -25,7 +25,10 @@ for i 0 (< i num_billboards) 1 loop
 	
 set_3d
 
-translate_3d 0 0 -5
+;translate_3d 0 0 -10
+
+number angle
+= angle (/ PI 2.0)
 
 function draw
 {
@@ -57,18 +60,24 @@ function run
 	if (< (eabs joy_y1) 0.1) zero_y
 		= joy_y1 0
 	:zero_y
-	if (< (eabs joy_x2) 0.1) zero_z
-		= joy_x2 0
-	:zero_z
+	if (< (eabs joy_y2) 0.1) zero_y2
+		= joy_y2 0
+	:zero_y2
 
-	/ joy_x1 25
+	/ joy_x1 100
 	/ joy_y1 25
-	/ joy_x2 25
+	/ joy_y2 25
 
-	/ joy_x3 100
-	/ joy_y3 100
-	neg joy_y3
+	+ angle joy_x1
 
-	rotate_3d 0 (+ joy_x3 joy_y3) 0
-	translate_3d joy_x1 joy_y1 joy_x2
+	number x y
+	= x angle
+	cos x
+	= x (* x joy_y1)
+	= y angle
+	sin y
+	= y (* y joy_y1)
+
+	translate_3d x joy_y2 y
+	rotate_3d 0 joy_x1 0
 }

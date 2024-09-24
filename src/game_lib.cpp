@@ -2831,13 +2831,13 @@ static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
 	glm::mat4 save_mv, save_p;
 	gfx::get_matrices(save_mv, save_p);
 
-	glm::mat4 t;
+	glm::mat4 t = save_mv;
 	t = glm::translate(t, glm::vec3(model->x, model->y, model->z));
 	t = glm::rotate(t, model->rx, glm::vec3(1.0f, 0.0f, 0.0f));
 	t = glm::rotate(t, model->ry, glm::vec3(0.0f, 1.0f, 0.0f));
 	t = glm::rotate(t, model->rz, glm::vec3(0.0f, 0.0f, 1.0f));
 	t = glm::scale(t, glm::vec3(model->sx, model->sy, model->sz));
-	
+
 	gfx::set_matrices(t, save_p);
 	gfx::update_projection();
 
