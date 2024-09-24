@@ -593,6 +593,7 @@ billboard_get_translate
 
 cd_model_point
 	Check if a point is inside a model
+	The model must be closed for this to work properly
 	e.g. cd_model_point result model x y z
 
 -- Audio Functions -----------------------------------------------------------
