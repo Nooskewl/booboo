@@ -1,5 +1,5 @@
 number shader
-shader_load shader "glsl/darkness_fragment.txt" 2
+shader_load shader "darkness_fragment" 2
 shader_use shader
 shader_set_colour shader "colour1" 0 0 0 255
 shader_set_colour shader "colour2" 255 255 255 255

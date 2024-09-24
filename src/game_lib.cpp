@@ -2572,7 +2572,7 @@ static bool shaderfunc_load(Program *prg, const std::vector<Token> &v)
 
 	std::string fname = as_string(prg, v[1]);
 
-	gfx::Shader::Precision vp = gfx::Shader::HIGH;
+	gfx::Shader::Precision vp = gfx::Shader::MEDIUM;
 	gfx::Shader::Precision fp = (gfx::Shader::Precision)as_number(prg, v[2]);
 	
 	Shader_Info *info = shader_info(prg);
@@ -2581,13 +2581,25 @@ static bool shaderfunc_load(Program *prg, const std::vector<Token> &v)
 	
 	v1.n = info->shader_id;
 
-	std::string vs = DEFAULT_GLSL_VERTEX_SHADER;
-	std::string fs = util::load_text("gfx/shaders/" + fname);
+	gfx::Shader *shader = nullptr;
 
-	gfx::Shader::OpenGL_Shader *vert = gfx::Shader::load_opengl_vertex_shader(vs, vp);
-	gfx::Shader::OpenGL_Shader *frag = gfx::Shader::load_opengl_fragment_shader(fs, fp);
+	if (shim::opengl) {
+		std::string vs = DEFAULT_GLSL_VERTEX_SHADER;
+		std::string fs = util::load_text("gfx/shaders/glsl/" + fname + ".txt");
 
-	gfx::Shader *shader = new gfx::Shader(vert, frag);
+		gfx::Shader::OpenGL_Shader *vert = gfx::Shader::load_opengl_vertex_shader(vs, vp);
+		gfx::Shader::OpenGL_Shader *frag = gfx::Shader::load_opengl_fragment_shader(fs, fp);
+
+		shader = new gfx::Shader(vert, frag);
+	}
+#ifdef _WIN32
+	else {
+		gfx::Shader::D3D_Vertex_Shader *vert = gfx::Shader::load_d3d_vertex_shader("default_vertex");
+		gfx::Shader::D3D_Fragment_Shader *frag = gfx::Shader::load_d3d_fragment_shader(fname);
+
+		shader = new gfx::Shader(vert, frag);
+	}
+#endif
 
 	info->shaders[info->shader_id++] = shader;
 
@@ -2839,7 +2851,14 @@ static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
 
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
-	glDisable_ptr(GL_SCISSOR_TEST);
+	if (shim::opengl) {
+		glDisable_ptr(GL_SCISSOR_TEST);
+	}
+#ifdef _WIN32
+	else {
+		shim::d3d_device->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
+	}
+#endif
 	
 	model->model->draw_tinted_textured(c);
 
@@ -3338,7 +3357,14 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 	
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
-	glDisable_ptr(GL_SCISSOR_TEST);
+	if (shim::opengl) {
+		glDisable_ptr(GL_SCISSOR_TEST);
+	}
+#ifdef _WIN32
+	else {
+		shim::d3d_device->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
+	}
+#endif
 	
 	gfx::Vertex_Cache::instance()->start();
 	gfx::Vertex_Cache::instance()->cache_3d_immediate(vert_vec, num_triangles);
@@ -3398,17 +3424,26 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 	
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
-	glDisable_ptr(GL_SCISSOR_TEST);
+	if (shim::opengl) {
+		glDisable_ptr(GL_SCISSOR_TEST);
+	}
+#ifdef _WIN32
+	else {
+		shim::d3d_device->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
+	}
+#endif
 	
 	Image_Info *iinfo = image_info(prg);
 	gfx::Image *image = iinfo->images[tex];
-	GLuint texture = image->get_opengl_texture();
-	glBindTexture_ptr(GL_TEXTURE_2D, texture);
-	PRINT_GL_ERROR("glActiveTexture\n");
-	glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	PRINT_GL_ERROR("glTexParameteri\n");
-	glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	PRINT_GL_ERROR("glTexParameteri\n");
+	if (shim::opengl) {
+		GLuint texture = image->get_opengl_texture();
+		glBindTexture_ptr(GL_TEXTURE_2D, texture);
+		PRINT_GL_ERROR("glActiveTexture\n");
+		glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		PRINT_GL_ERROR("glTexParameteri\n");
+		glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		PRINT_GL_ERROR("glTexParameteri\n");
+	}
 	
 	gfx::Vertex_Cache::instance()->start(image);
 	gfx::Vertex_Cache::instance()->cache_3d_immediate(vert_vec, num_triangles);
@@ -3416,10 +3451,13 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 
 	gfx::enable_depth_test(false);
 	gfx::enable_depth_write(false);
-	glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	PRINT_GL_ERROR("glTexParameteri\n");
-	glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	PRINT_GL_ERROR("glTexParameteri\n");
+
+	if (shim::opengl) {
+		glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		PRINT_GL_ERROR("glTexParameteri\n");
+		glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		PRINT_GL_ERROR("glTexParameteri\n");
+	}
 
 	return true;
 }
@@ -3557,8 +3595,14 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
-	glDisable_ptr(GL_SCISSOR_TEST);
-	glEnable_ptr(GL_ALPHA_TEST);
+	if (shim::opengl) {
+		glDisable_ptr(GL_SCISSOR_TEST);
+	}
+#ifdef _WIN32
+	else {
+		shim::d3d_device->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
+	}
+#endif
 	
 	gfx::Vertex_Cache::instance()->start(billboard->image);
 	gfx::Vertex_Cache::instance()->cache_3d_immediate(vec, 2);
@@ -3566,7 +3610,6 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 
 	gfx::enable_depth_test(false);
 	gfx::enable_depth_write(false);
-	glDisable_ptr(GL_ALPHA_TEST);
 	
 	gfx::set_matrices(mv, proj);
 	gfx::update_projection();
