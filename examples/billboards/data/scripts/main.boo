@@ -58,6 +58,9 @@ function run
 	if (< (eabs joy_x1) 0.1) clip_x1
 		= joy_x1 0
 	:clip_x1
+	if (< (eabs joy_x2) 0.1) clip_x2
+		= joy_x2 0
+	:clip_x2
 	if (< (eabs joy_y1) 0.1) clip_y1
 		= joy_y1 0
 	:clip_y1
@@ -65,26 +68,37 @@ function run
 		= joy_y2 0
 	:clip_y2
 
+	neg joy_x1
 	neg joy_y1
 
-	/ joy_x1 100
+	/ joy_x1 25
+	/ joy_x2 100
 	/ joy_y1 25
 	/ joy_y2 25
 
-	+ angle joy_x1
+	+ angle joy_x2
 
 	number xi yi zi
 	= xi (+ angle (/ PI 2))
 	cos xi
 	= xi (* xi joy_y1)
-	= yi joy_y2
+	= yi 0
 	= zi (+ angle (/ PI 2))
 	sin zi
 	= zi (* zi joy_y1)
 
-	+ x xi
-	+ y yi
-	+ z zi
+	number xi2 yi2 zi2
+	= xi2 angle
+	cos xi2
+	= xi2 (* xi2 joy_x1)
+	= yi2 0
+	= zi2 angle
+	sin zi2
+	= zi2 (* zi2 joy_x1)
+
+	+ x xi xi2
+	+ y yi yi2
+	+ z zi zi2
 
 	identity_3d
 	rotate_3d 0 angle 0
