@@ -71,10 +71,10 @@ function run
 	neg joy_x1
 	neg joy_y1
 
-	/ joy_x1 25
-	/ joy_x2 25
-	/ joy_y1 25
-	/ joy_y2 25
+	/ joy_x1 10
+	/ joy_x2 10
+	/ joy_y1 10
+	/ joy_y2 10
 
 	+ angle joy_x2
 
