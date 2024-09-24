@@ -3394,6 +3394,115 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 	return true;
 }
 
+bool ray_collides(glm::vec3 ray_origin, glm::vec3 ray_vector, glm::vec3 a, glm::vec3 b, glm::vec3 c)
+{
+	constexpr float epsilon = std::numeric_limits<float>::epsilon();
+
+	glm::vec3 edge1 = b - a;
+	glm::vec3 edge2 = c - a;
+	glm::vec3 ray_cross_e2 = glm::cross(ray_vector, edge2);
+	float det = glm::dot(edge1, ray_cross_e2);
+
+	if (det > -epsilon && det < epsilon) {
+		return false; // This ray is parallel to this 
+	}
+
+	float inv_det = 1.0 / det;
+	glm::vec3 s = ray_origin - a;
+	float u = inv_det * glm::dot(s, ray_cross_e2);
+
+	if (u < 0 || u > 1) {
+		return false;
+	}
+
+	glm::vec3 s_cross_e1 = glm::cross(s, edge1);
+	float v = inv_det * glm::dot(ray_vector, s_cross_e1);
+
+	if (v < 0 || u + v > 1) {
+		return false;
+	}
+
+	// At this stage we can compute t to find out where the intersection point is on the line.
+	float t = inv_det * glm::dot(edge2, s_cross_e1);
+
+	if (t > epsilon) { // ray intersection
+		return true;
+	}
+
+	return false;
+}
+
+static bool cdfunc_model_point(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(5)
+
+	Variable &result = as_variable(prg, v[0]);
+	int model_id = as_number(prg, v[1]);
+	float x = as_number(prg, v[2]);
+	float y = as_number(prg, v[3]);
+	float z = as_number(prg, v[4]);
+
+	CHECK_NUMBER(result)
+	
+	Model_Info *info = model_info(prg);
+	Model *model = info->models[model_id];
+
+	std::string anim = model->model->get_current_animation();
+	int frame = model->model->get_current_frame();
+
+	gfx::Model::Node *node = model->model->find("Model");
+	if (node == nullptr) {
+		std::vector<gfx::Model::Node *> nodes = model->model->get_nodes();
+		if (nodes.size() > 0) {
+			node = nodes[0];
+		}
+	}
+
+	int nt = node->num_triangles;
+
+	float *verts = model->model->calc_frame(anim, frame);
+
+	glm::vec3 ray(1.0f, 0.0f, 0.0f);
+
+	int num_collisions = 0;
+
+	for (int i = 0; i < nt; i++) {
+		glm::vec4 pt[3];
+		for (int vert = 0; vert < 3; vert++) {
+			pt[vert].x = verts[i*36+vert*12+0];
+			pt[vert].y = verts[i*36+vert*12+1];
+			pt[vert].z = verts[i*36+vert*12+2];
+			pt[vert].w = 1.0f;
+			glm::mat4 mat;
+			mat = glm::translate(mat, glm::vec3(model->x, model->y, model->z));
+			mat = glm::rotate(mat, model->rx, glm::vec3(1.0f, 0.0f, 0.0f));
+			mat = glm::rotate(mat, model->ry, glm::vec3(0.0f, 1.0f, 0.0f));
+			mat = glm::rotate(mat, model->rz, glm::vec3(0.0f, 0.0f, 1.0f));
+			mat = glm::scale(mat, glm::vec3(model->sx, model->sy, model->sz));
+			pt[vert] = mat * pt[vert];
+		}
+		glm::vec3 pt3[3];
+		for (int j = 0; j < 3; j++) {
+			pt3[j].x = pt[j].x;
+			pt3[j].y = pt[j].y;
+			pt3[j].z = pt[j].z;
+		}
+
+		if (ray_collides(glm::vec3(x, y, z), ray, pt3[0], pt3[1], pt3[2])) {
+			num_collisions++;
+		}
+	}
+
+	if (num_collisions % 2 == 1) {
+		result.n = 1;
+	}
+	else {
+		result.n = 0;
+	}
+
+	return true;
+}
+
 void start_lib_game()
 {
 	add_instruction("inspect", miscfunc_inspect);
@@ -3525,6 +3634,7 @@ void start_lib_game()
 	add_instruction("model_size", modelfunc_size);
 	add_instruction("draw_3d", modelfunc_draw_3d);
 	add_instruction("draw_3d_textured", modelfunc_draw_3d_textured);
+	add_instruction("cd_model_point", cdfunc_model_point);
 }
 
 void end_lib_game()
