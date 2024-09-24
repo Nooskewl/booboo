@@ -44,6 +44,7 @@ The following sections describe the API:
 	Tilemap Functions
 	Shader Functions
 	3D Functions
+	Collision Detection Functions
 	Audio Functions
 	Input Functions
 	JSON Functions
@@ -555,6 +556,12 @@ draw_3d_textured
 	faces are vertex indices
 	colours are per-face-vertex
 	e.g. draw_3d_textured tex vert_vec face_vec colour_vec texcoord_vec num_triangles
+
+-- Collision Detection Functions ---------------------------------------------
+
+cd_model_point
+	Check if a point is inside a model
+	e.g. cd_model_point result model x y z
 
 -- Audio Functions -----------------------------------------------------------
 
