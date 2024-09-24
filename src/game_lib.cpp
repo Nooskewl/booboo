@@ -68,7 +68,6 @@ struct Model {
 	float x, y, z;
 	gfx::Model *model;
 	bool is_clone;
-	bool hidden;
 };
 
 struct Model_Info {
@@ -570,7 +569,7 @@ static bool gfxfunc_set_target(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 
 	Image_Info *info = image_info(prg);
 
@@ -1121,7 +1120,7 @@ static bool imagefunc_draw(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(9)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	double r = as_number(prg, v[1]);
 	double g = as_number(prg, v[2]);
 	double b = as_number(prg, v[3]);
@@ -1164,7 +1163,7 @@ static bool imagefunc_stretch_region(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(15)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	double r = as_number(prg, v[1]);
 	double g = as_number(prg, v[2]);
 	double b = as_number(prg, v[3]);
@@ -1213,7 +1212,7 @@ static bool imagefunc_draw_rotated_scaled(Program *prg, const std::vector<Token>
 {
 	COUNT_ARGS(14)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	double r = as_number(prg, v[1]);
 	double g = as_number(prg, v[2]);
 	double b = as_number(prg, v[3]);
@@ -1303,7 +1302,7 @@ static bool imagefunc_size(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 
 	Variable &v1 = as_variable(prg, v[1]);
 	Variable &v2 = as_variable(prg, v[2]);
@@ -1331,7 +1330,7 @@ static bool imagefunc_draw_9patch(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(9)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	int r = as_number(prg, v[1]);
 	int g = as_number(prg, v[2]);
 	int b = as_number(prg, v[3]);
@@ -1391,7 +1390,7 @@ static bool fontfunc_draw(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(8)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	double r = as_number(prg, v[1]);
 	double g = as_number(prg, v[2]);
 	double b = as_number(prg, v[3]);
@@ -1433,7 +1432,7 @@ static bool fontfunc_width(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
 	std::string text = as_string(prg, v[2]);
 	
@@ -1454,7 +1453,7 @@ static bool fontfunc_height(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
 	
 	Font_Info *info = font_info(prg);
@@ -1474,7 +1473,7 @@ static bool fontfunc_add_extra_glyph(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	int glyph_id = as_number(prg, v[1]);
 	int image_id = as_number(prg, v[2]);
 	
@@ -2610,7 +2609,7 @@ static bool shaderfunc_use(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	
 	Shader_Info *info = shader_info(prg);
 	gfx::Shader *shader = info->shaders[id];
@@ -2637,7 +2636,7 @@ static bool shaderfunc_set_bool(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	std::string name = as_string(prg, v[1]);
 	bool b = as_number(prg, v[2]);
 	
@@ -2653,7 +2652,7 @@ static bool shaderfunc_set_int(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	std::string name = as_string(prg, v[1]);
 	int i = as_number(prg, v[2]);
 	
@@ -2669,7 +2668,7 @@ static bool shaderfunc_set_float(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	std::string name = as_string(prg, v[1]);
 	double f = as_number(prg, v[2]);
 	
@@ -2685,7 +2684,7 @@ static bool shaderfunc_set_texture(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	std::string name = as_string(prg, v[1]);
 	double t = as_number(prg, v[2]);
 	
@@ -2704,7 +2703,7 @@ static bool shaderfunc_set_colour(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(6)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	std::string name = as_string(prg, v[1]);
 	int r = as_number(prg, v[2]);
 	int g = as_number(prg, v[3]);
@@ -2750,7 +2749,7 @@ static bool jsonfunc_get_string(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
 	std::string name = as_string(prg, v[2]);
 	
@@ -2769,7 +2768,7 @@ static bool jsonfunc_get_number(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	double id = as_number(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
 	std::string name = as_string(prg, v[2]);
 	
@@ -2804,7 +2803,6 @@ static bool modelfunc_load(Program *prg, const std::vector<Token> &v)
 	m->rx = m->ry = m->rz = m->x = m->y = m->z = 0;
 	m->model = model;
 	m->is_clone = false;
-	m->hidden = false;
 
 	info->models[info->model_id++] = m;
 
@@ -2824,12 +2822,6 @@ static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
 	Model_Info *info = model_info(prg);
 	Model *model = info->models[model_id];
 
-	if (model->hidden) {
-		return true;
-	}
-
-	gfx::Vertex_Cache::instance()->end();
-
 	SDL_Colour c;
 	c.r = r;
 	c.g = g;
@@ -2839,7 +2831,7 @@ static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
 	glm::mat4 save_mv, save_p;
 	gfx::get_matrices(save_mv, save_p);
 
-	glm::mat4 t = save_mv;
+	glm::mat4 t;
 	t = glm::translate(t, glm::vec3(model->x, model->y, model->z));
 	t = glm::rotate(t, model->rx, glm::vec3(1.0f, 0.0f, 0.0f));
 	t = glm::rotate(t, model->ry, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -2862,8 +2854,6 @@ static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
 	
 	model->model->draw_tinted_textured(c);
 
-	gfx::Vertex_Cache::instance()->end();
-	
 	gfx::enable_depth_test(false);
 	gfx::enable_depth_write(false);
 
@@ -3136,25 +3126,10 @@ static bool modelfunc_identity_3d(Program *prg, const std::vector<Token> &v)
 
 static void set_3d()
 {
-/*
-	// scales adjust for screen_offset
-	float scale_x = (shim::screen_size.w*shim::scale)/shim::real_screen_size.w;
-	float scale_y = (shim::screen_size.h*shim::scale)/shim::real_screen_size.h;
-*/
-
 	float aspect = shim::real_screen_size.w / (float)shim::real_screen_size.h;
 	glm::mat4 _proj = glm::perspective(float(M_PI/4.0f), aspect, 1.0f, 1000.0f);
 
 	glm::mat4 _mv;
-
-/*
-	if (shim::screen_offset.x > 0.0f) {
-		_mv = glm::scale(_mv, glm::vec3(scale_x, 1.0f, 1.0f));
-	}
-	if (shim::screen_offset.y > 0.0f) {
-		_mv = glm::scale(_mv, glm::vec3(1.0f, scale_y, 1.0f));
-	}
-*/
 
 	gfx::set_matrices(_mv, _proj);
 	gfx::update_projection();
@@ -3321,7 +3296,7 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 	Variable &colours = as_variable(prg, v[2]);
 	int num_triangles = as_number(prg, v[3]);
 
-	float vert_vec[12*3*num_triangles];
+	float *vert_vec = new float[12*3*num_triangles];
 
 	int count = 0;
 	int ccount = 0;
@@ -3372,6 +3347,8 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 
 	gfx::enable_depth_test(false);
 	gfx::enable_depth_write(false);
+
+	delete vert_vec;
 
 	return true;
 }
@@ -3444,6 +3421,16 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 		glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		PRINT_GL_ERROR("glTexParameteri\n");
 	}
+#ifdef _WIN32
+	else {
+		if (shim::d3d_device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP) != D3D_OK) {
+			util::infomsg("SetSamplerState failed.\n");
+		}
+		if (shim::d3d_device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP) != D3D_OK) {
+			util::infomsg("SetSamplerState failed.\n");
+		}
+	}
+#endif
 	
 	gfx::Vertex_Cache::instance()->start(image);
 	gfx::Vertex_Cache::instance()->cache_3d_immediate(vert_vec, num_triangles);
@@ -3458,6 +3445,16 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 		glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		PRINT_GL_ERROR("glTexParameteri\n");
 	}
+#ifdef _WIN32
+	else {
+		if (shim::d3d_device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP) != D3D_OK) {
+			util::infomsg("SetSamplerState failed.\n");
+		}
+		if (shim::d3d_device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP) != D3D_OK) {
+			util::infomsg("SetSamplerState failed.\n");
+		}
+	}
+#endif
 
 	return true;
 }
@@ -3484,7 +3481,6 @@ static bool modelfunc_clone(Program *prg, const std::vector<Token> &v)
 	model->rx = orig->rx;
 	model->ry = orig->ry;
 	model->rz = orig->rz;
-	model->hidden = orig->hidden;
 	model->is_clone = true;
 	result.n = info->model_id;
 	info->models[info->model_id++] = model;
