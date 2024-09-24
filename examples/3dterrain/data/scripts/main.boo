@@ -1,6 +1,6 @@
 number level
 model_load level "level.x"
-model_set_scale level 10 10 10
+model_set_scale level 20 10 20
 
 set_3d
 
@@ -11,8 +11,8 @@ number angle2
 
 number x y z
 = x 0
-= y -10
-= z 2
+= y -100
+= z 0
 
 function draw
 {
@@ -80,15 +80,15 @@ function run
 	+ z zi zi2
 
 	number y1i y2i
-	= y1i (- y 5)
-	= y2i (+ y 100);
+	= y1i (- y 100)
+	= y2i (+ y 1000);
 
 	number col out_x out_y out_z
 	cd_model_line_segment col level x y1i z x y2i z out_x out_y out_z
 
 	if (== col 1) collided
 		= y out_y
-		- y 4
+		- y 6
 	:collided
 
 	identity_3d
