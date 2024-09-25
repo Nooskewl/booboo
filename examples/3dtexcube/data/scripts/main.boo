@@ -323,5 +323,6 @@ function run
 	+ ry 0.02
 	identity_3d
 	translate_3d 0 0 -5
-	rotate_3d rx ry 0.0
+	rotate_3d rx 1 0 0
+	rotate_3d ry 0 1 0
 }

@@ -467,6 +467,10 @@ set_3d
 	Enable 3d rendering and projection
 	e.g. set_3d
 
+model_identity
+	Set model transform to identity
+	e.g. model_identity model
+
 model_scale
 	Alter the scale of a model. It starts at 1 across the board. These
 	numbers get added to that.
@@ -476,36 +480,20 @@ model_rotate
 	Alter the rotation of a model. These numbers are angles about each
 	axis and get added to the default of 0 and accumulate with each
 	call.
-	e.g. model_rotate model add_angle_x add_angle_y add_angle_z
+	e.g. model_rotate model angle axisx axisy axisz
 
 model_translate
 	Translate (move) a model. This sticks like rotation and scaling.
 	The numbers you supply get added to the current position of the model.
 	e.g. model_translate model add_x add_y add_z
 
-model_set_scale
-	Set the scale instead of altering it
-	e.g. model_set_scale model sx sy sz
-
-model_set_rotate
-	Set the model rotation instead of altering it
-	e.g. model_set_rotate model rx ry rz
-
-model_set_translate
-	Set the model position directly
-	e.g. model_set_translate model x y z
-
-model_get_scale
-	Retrieve the models current scale
-	e.g. model_get_scale model sx sy sz
-
-model_get_rotate
-	Retrieve the models current rotation
-	e.g. model_get_rotate model rx ry rz
-
-model_get_translate
+model_get_position
 	Retrieve the models current position
 	e.g. model_get_translate model x y z
+
+identity_3d
+	Set the modelview matrix to the identity matrix
+	e.g. identity_3d
 
 scale_3d
 	Scale the modelview matrix
@@ -518,10 +506,6 @@ rotate_3d
 translate_3d
 	Translate the modelview matrix
 	e.g. translate_3d x y z
-
-identity_3d
-	Set the modelview matrix to the identity matrix
-	e.g. identity_3d
 
 model_set_animation
 	Set the animation to the one named. You can optionally pass a BooBoo
@@ -565,6 +549,10 @@ billboard_draw
 	Draw a tinted billboard
 	e.g. billboard_draw billboard r g b a
 
+billboard_identity
+	Set billboard transform to identity
+	e.g. billboard_identity billboard
+
 billboard_scale
 	Scale a billboard
 	e.g. billboard_scale billboard sx sy sz
@@ -573,19 +561,7 @@ billboard_translate
 	Translate a billboard
 	e.g. billboard_translate billboard x y z
 
-billboard_set_scale
-	Set the scale of a billboard
-	e.g. billboard_set_scale billboard sx sy sz
-
-billboard_set_translate
-	Set the position of a billboard
-	e.g. billboard_set_translate billboard x y z
-
-billboard_get_scale
-	Get the scale of a billboard
-	e.g. billboard_get_scale billboard sx sy sz
-
-billboard_get_translate
+billboard_get_position
 	Get the position of a billboard
 	e.g. billboard_get_translate billboard x y z
 

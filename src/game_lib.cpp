@@ -63,9 +63,7 @@ struct JSON_Info {
 };
 
 struct Model {
-	float sx, sy, sz;
-	float rx, ry, rz;
-	float x, y, z;
+	glm::mat4 mat;
 	gfx::Model *model;
 	bool is_clone;
 };
@@ -76,9 +74,11 @@ struct Model_Info {
 };
 
 struct Billboard {
-	float sx, sy, sz;
-	float x, y, z;
-	float w, h;
+	float x;
+	float y;
+	float z;
+	float w;
+	float h;
 	gfx::Image *image;
 };
 
@@ -2799,8 +2799,7 @@ static bool modelfunc_load(Program *prg, const std::vector<Token> &v)
 	gfx::Model *model = new gfx::Model(name);
 
 	Model *m = new Model;
-	m->sx = m->sy = m->sz = 1;
-	m->rx = m->ry = m->rz = m->x = m->y = m->z = 0;
+	m->mat = glm::mat4();
 	m->model = model;
 	m->is_clone = false;
 
@@ -2832,11 +2831,9 @@ static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
 	gfx::get_matrices(save_mv, save_p);
 
 	glm::mat4 t = save_mv;
-	t = glm::translate(t, glm::vec3(model->x, model->y, model->z));
-	t = glm::rotate(t, model->rx, glm::vec3(1.0f, 0.0f, 0.0f));
-	t = glm::rotate(t, model->ry, glm::vec3(0.0f, 1.0f, 0.0f));
-	t = glm::rotate(t, model->rz, glm::vec3(0.0f, 0.0f, 1.0f));
-	t = glm::scale(t, glm::vec3(model->sx, model->sy, model->sz));
+	//huh
+	t = t * model->mat;
+	//t = model->mat * t;
 
 	gfx::set_matrices(t, save_p);
 	gfx::update_projection();
@@ -2863,6 +2860,21 @@ static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool modelfunc_identity(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int model_id = as_number(prg, v[0]);
+
+	Model_Info *info = model_info(prg);
+
+	Model *model = info->models[model_id];
+
+	model->mat = glm::mat4();
+
+	return true;
+}
+
 static bool modelfunc_scale(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
@@ -2876,29 +2888,26 @@ static bool modelfunc_scale(Program *prg, const std::vector<Token> &v)
 
 	Model *model = info->models[model_id];
 
-	model->sx += sx;
-	model->sy += sy;
-	model->sz += sz;
+	model->mat = glm::scale(model->mat, glm::vec3(sx, sy, sz));
 
 	return true;
 }
 
 static bool modelfunc_rotate(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(4)
+	COUNT_ARGS(5)
 
 	int model_id = as_number(prg, v[0]);
-	float rx = as_number(prg, v[1]);
-	float ry = as_number(prg, v[2]);
-	float rz = as_number(prg, v[3]);
+	float angle = as_number(prg, v[1]);
+	float ax = as_number(prg, v[2]);
+	float ay = as_number(prg, v[3]);
+	float az = as_number(prg, v[4]);
 
 	Model_Info *info = model_info(prg);
 
 	Model *model = info->models[model_id];
 
-	model->rx += rx;
-	model->ry += ry;
-	model->rz += rz;
+	model->mat = glm::rotate(model->mat, angle, glm::vec3(ax, ay, az));
 
 	return true;
 }
@@ -2916,124 +2925,12 @@ static bool modelfunc_translate(Program *prg, const std::vector<Token> &v)
 
 	Model *model = info->models[model_id];
 
-	model->x += x;
-	model->y += y;
-	model->z += z;
+	model->mat = glm::translate(model->mat, glm::vec3(x, y, z));
 
 	return true;
 }
 
-static bool modelfunc_set_scale(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(4)
-
-	int model_id = as_number(prg, v[0]);
-	float sx = as_number(prg, v[1]);
-	float sy = as_number(prg, v[2]);
-	float sz = as_number(prg, v[3]);
-
-	Model_Info *info = model_info(prg);
-
-	Model *model = info->models[model_id];
-
-	model->sx = sx;
-	model->sy = sy;
-	model->sz = sz;
-
-	return true;
-}
-
-static bool modelfunc_set_rotate(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(4)
-
-	int model_id = as_number(prg, v[0]);
-	float rx = as_number(prg, v[1]);
-	float ry = as_number(prg, v[2]);
-	float rz = as_number(prg, v[3]);
-
-	Model_Info *info = model_info(prg);
-
-	Model *model = info->models[model_id];
-
-	model->rx = rx;
-	model->ry = ry;
-	model->rz = rz;
-
-	return true;
-}
-
-static bool modelfunc_set_translate(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(4)
-
-	int model_id = as_number(prg, v[0]);
-	float x = as_number(prg, v[1]);
-	float y = as_number(prg, v[2]);
-	float z = as_number(prg, v[3]);
-
-	Model_Info *info = model_info(prg);
-
-	Model *model = info->models[model_id];
-
-	model->x = x;
-	model->y = y;
-	model->z = z;
-
-	return true;
-}
-
-static bool modelfunc_get_scale(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(4)
-
-	int model_id = as_number(prg, v[0]);
-
-	Variable &sx = as_variable(prg, v[1]);
-	Variable &sy = as_variable(prg, v[2]);
-	Variable &sz = as_variable(prg, v[3]);
-
-	CHECK_NUMBER(sx)
-	CHECK_NUMBER(sy)
-	CHECK_NUMBER(sz)
-
-	Model_Info *info = model_info(prg);
-
-	Model *model = info->models[model_id];
-
-	sx.n = model->sx;
-	sy.n = model->sy;
-	sz.n = model->sz;
-
-	return true;
-}
-
-static bool modelfunc_get_rotate(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(4)
-
-	int model_id = as_number(prg, v[0]);
-
-	Variable &rx = as_variable(prg, v[1]);
-	Variable &ry = as_variable(prg, v[2]);
-	Variable &rz = as_variable(prg, v[3]);
-
-	CHECK_NUMBER(rx)
-	CHECK_NUMBER(ry)
-	CHECK_NUMBER(rz)
-
-	Model_Info *info = model_info(prg);
-
-	Model *model = info->models[model_id];
-
-	rx.n = model->rx;
-	ry.n = model->ry;
-	rz.n = model->rz;
-
-	return true;
-}
-
-static bool modelfunc_get_translate(Program *prg, const std::vector<Token> &v)
+static bool modelfunc_get_position(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
@@ -3051,9 +2948,23 @@ static bool modelfunc_get_translate(Program *prg, const std::vector<Token> &v)
 
 	Model *model = info->models[model_id];
 
-	x.n = model->x;
-	y.n = model->y;
-	z.n = model->z;
+	glm::vec3 pos = glm::vec3(model->mat[3]);
+	x.n = pos.x;
+	y.n = pos.y;
+	z.n = pos.z;
+
+	return true;
+}
+
+static bool modelfunc_identity_3d(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	glm::mat4 mv, proj;
+	gfx::get_matrices(mv, proj);
+	mv = glm::mat4();
+	gfx::set_matrices(mv, proj);
+	gfx::update_projection();
 
 	return true;
 }
@@ -3068,7 +2979,7 @@ static bool modelfunc_scale_3d(Program *prg, const std::vector<Token> &v)
 
 	glm::mat4 mv, proj;
 	gfx::get_matrices(mv, proj);
-	mv *= glm::scale(mv, glm::vec3(sx, sy, sz));
+	mv = glm::scale(mv, glm::vec3(sx, sy, sz));
 	gfx::set_matrices(mv, proj);
 	gfx::update_projection();
 
@@ -3077,17 +2988,16 @@ static bool modelfunc_scale_3d(Program *prg, const std::vector<Token> &v)
 
 static bool modelfunc_rotate_3d(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(4)
 
-	float rx = as_number(prg, v[0]);
-	float ry = as_number(prg, v[1]);
-	float rz = as_number(prg, v[2]);
+	float angle = as_number(prg, v[0]);
+	float ax = as_number(prg, v[1]);
+	float ay = as_number(prg, v[2]);
+	float az = as_number(prg, v[3]);
 
 	glm::mat4 mv, proj;
 	gfx::get_matrices(mv, proj);
-	mv = glm::rotate(mv, rx, glm::vec3(1.0f, 0.0f, 0.0f));
-	mv = glm::rotate(mv, ry, glm::vec3(0.0f, 1.0f, 0.0f));
-	mv = glm::rotate(mv, rz, glm::vec3(0.0f, 0.0f, 1.0f));
+	mv = glm::rotate(mv, angle, glm::vec3(ax, ay, az));
 	gfx::set_matrices(mv, proj);
 	gfx::update_projection();
 
@@ -3111,23 +3021,10 @@ static bool modelfunc_translate_3d(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool modelfunc_identity_3d(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(0)
-
-	glm::mat4 mv, proj;
-	gfx::get_matrices(mv, proj);
-	mv = glm::mat4();
-	gfx::set_matrices(mv, proj);
-	gfx::update_projection();
-
-	return true;
-}
-
 static void set_3d()
 {
 	float aspect = shim::real_screen_size.w / (float)shim::real_screen_size.h;
-	glm::mat4 _proj = glm::perspective(float(M_PI/4.0f), aspect, 1.0f, 1000.0f);
+	glm::mat4 _proj = glm::perspective(float(M_PI/4.0f), aspect, 1.0f, 10000.0f);
 
 	glm::mat4 _mv;
 
@@ -3480,15 +3377,7 @@ static bool modelfunc_clone(Program *prg, const std::vector<Token> &v)
 	Model *model = new Model;
 	Model *orig = info->models[id];
 	model->model = orig->model;
-	model->x = orig->x;
-	model->y = orig->y;
-	model->z = orig->z;
-	model->sx = orig->sx;
-	model->sy = orig->sy;
-	model->sz = orig->sz;
-	model->rx = orig->rx;
-	model->ry = orig->ry;
-	model->rz = orig->rz;
+	model->mat = orig->mat;
 	model->is_clone = true;
 	result.n = info->model_id;
 	info->models[info->model_id++] = model;
@@ -3519,9 +3408,6 @@ static bool modelfunc_billboard_create(Program *prg, const std::vector<Token> &v
 	billboard->x = x;
 	billboard->y = y;
 	billboard->z = z;
-	billboard->sx = 1.0f;
-	billboard->sy = 1.0f;
-	billboard->sz = 1.0f;
 	billboard->w = w;
 	billboard->h = h;
 	result.n = info2->billboard_id;
@@ -3575,7 +3461,8 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 		for (int j = 0; j < 3; j++) {
 			float x = verts[faces[i*3+j]*3+0];
 			float y = verts[faces[i*3+j]*3+1];
-			glm::vec3 pt = glm::vec3(billboard->x, billboard->y, billboard->z) + camera_right * x * billboard->w + camera_up * y * billboard->h;
+			glm::vec3 pos = glm::vec3(billboard->x, billboard->y, billboard->z);
+			glm::vec3 pt = pos + camera_right * x * billboard->w + camera_up * y * billboard->h;
 			vec[count++] = pt.x;
 			vec[count++] = pt.y;
 			vec[count++] = pt.z;
@@ -3595,11 +3482,10 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 	
 	glm::mat4 t = mv;
 	t = glm::translate(t, glm::vec3(billboard->x, billboard->y, billboard->z));
-	t = glm::scale(t, glm::vec3(billboard->sx, billboard->sy, billboard->sz));
 	
 	gfx::set_matrices(t, proj);
 	gfx::update_projection();
-
+	
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
 	if (shim::opengl) {
@@ -3610,7 +3496,7 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 		shim::d3d_device->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 	}
 #endif
-	
+
 	gfx::Vertex_Cache::instance()->start(billboard->image);
 	gfx::Vertex_Cache::instance()->cache_3d_immediate(vec, 2);
 	gfx::Vertex_Cache::instance()->end();
@@ -3624,106 +3510,7 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool modelfunc_billboard_scale(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(4)
-
-	int billboard_id = as_number(prg, v[0]);
-	float sx = as_number(prg, v[1]);
-	float sy = as_number(prg, v[2]);
-	float sz = as_number(prg, v[3]);
-
-	Billboard_Info *info = billboard_info(prg);
-	Billboard *billboard = info->billboards[billboard_id];
-
-	billboard->sx += sx;
-	billboard->sy += sy;
-	billboard->sz += sz;
-
-	return true;
-}
-
-static bool modelfunc_billboard_translate(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(4)
-
-	int billboard_id = as_number(prg, v[0]);
-	float x = as_number(prg, v[1]);
-	float y = as_number(prg, v[2]);
-	float z = as_number(prg, v[3]);
-
-	Billboard_Info *info = billboard_info(prg);
-	Billboard *billboard = info->billboards[billboard_id];
-
-	billboard->x += x;
-	billboard->y += y;
-	billboard->z += z;
-
-	return true;
-}
-
-static bool modelfunc_billboard_set_scale(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(4)
-
-	int billboard_id = as_number(prg, v[0]);
-	float sx = as_number(prg, v[1]);
-	float sy = as_number(prg, v[2]);
-	float sz = as_number(prg, v[3]);
-
-	Billboard_Info *info = billboard_info(prg);
-	Billboard *billboard = info->billboards[billboard_id];
-
-	billboard->sx = sx;
-	billboard->sy = sy;
-	billboard->sz = sz;
-
-	return true;
-}
-
-static bool modelfunc_billboard_set_translate(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(4)
-
-	int billboard_id = as_number(prg, v[0]);
-	float x = as_number(prg, v[1]);
-	float y = as_number(prg, v[2]);
-	float z = as_number(prg, v[3]);
-
-	Billboard_Info *info = billboard_info(prg);
-	Billboard *billboard = info->billboards[billboard_id];
-
-	billboard->x = x;
-	billboard->y = y;
-	billboard->z = z;
-
-	return true;
-}
-
-static bool modelfunc_billboard_get_scale(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(4)
-
-	int billboard_id = as_number(prg, v[0]);
-	Variable &sx = as_variable(prg, v[1]);
-	Variable &sy = as_variable(prg, v[2]);
-	Variable &sz = as_variable(prg, v[3]);
-
-	CHECK_NUMBER(sx)
-	CHECK_NUMBER(sy)
-	CHECK_NUMBER(sz)
-
-	Billboard_Info *info = billboard_info(prg);
-	Billboard *billboard = info->billboards[billboard_id];
-
-	sx.n = billboard->sx;
-	sy.n = billboard->sy;
-	sz.n = billboard->sz;
-
-	return true;
-}
-
-static bool modelfunc_billboard_get_translate(Program *prg, const std::vector<Token> &v)
+static bool modelfunc_billboard_get_position(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
@@ -3746,6 +3533,25 @@ static bool modelfunc_billboard_get_translate(Program *prg, const std::vector<To
 	return true;
 }
 
+static bool modelfunc_billboard_set_position(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int billboard_id = as_number(prg, v[0]);
+	float x = as_number(prg, v[1]);
+	float y = as_number(prg, v[2]);
+	float z = as_number(prg, v[3]);
+
+	Billboard_Info *info = billboard_info(prg);
+	Billboard *billboard = info->billboards[billboard_id];
+
+	billboard->x = x;
+	billboard->y = y;
+	billboard->z = z;
+
+	return true;
+}
+
 static bool cdfunc_model_point(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(5)
@@ -3761,14 +3567,7 @@ static bool cdfunc_model_point(Program *prg, const std::vector<Token> &v)
 	Model_Info *info = model_info(prg);
 	Model *model = info->models[model_id];
 			
-	glm::mat4 mat;
-	mat = glm::translate(mat, glm::vec3(model->x, model->y, model->z));
-	mat = glm::rotate(mat, model->rx, glm::vec3(1.0f, 0.0f, 0.0f));
-	mat = glm::rotate(mat, model->ry, glm::vec3(0.0f, 1.0f, 0.0f));
-	mat = glm::rotate(mat, model->rz, glm::vec3(0.0f, 0.0f, 1.0f));
-	mat = glm::scale(mat, glm::vec3(model->sx, model->sy, model->sz));
-
-	result.n = cd::model_point(model->model, mat, glm::vec3(x, y, z));
+	result.n = cd::model_point(model->model, model->mat, glm::vec3(x, y, z));
 
 	return true;
 }
@@ -3797,16 +3596,9 @@ static bool cdfunc_model_line_segment(Program *prg, const std::vector<Token> &v)
 	Model_Info *info = model_info(prg);
 	Model *model = info->models[model_id];
 			
-	glm::mat4 mat;
-	mat = glm::translate(mat, glm::vec3(model->x, model->y, model->z));
-	mat = glm::rotate(mat, model->rx, glm::vec3(1.0f, 0.0f, 0.0f));
-	mat = glm::rotate(mat, model->ry, glm::vec3(0.0f, 1.0f, 0.0f));
-	mat = glm::rotate(mat, model->rz, glm::vec3(0.0f, 0.0f, 1.0f));
-	mat = glm::scale(mat, glm::vec3(model->sx, model->sy, model->sz));
-
 	glm::vec3 out;
 
-	result.n = cd::model_line_segment(model->model, mat, glm::vec3(x, y, z), glm::vec3(x2, y2, z2), out);
+	result.n = cd::model_line_segment(model->model, model->mat, glm::vec3(x, y, z), glm::vec3(x2, y2, z2), out);
 
 	out_x.n = out.x;
 	out_y.n = out.y;
@@ -3927,22 +3719,15 @@ void start_lib_game()
 	add_instruction("model_draw", modelfunc_draw);
 	add_instruction("set_2d", modelfunc_set_2d);
 	add_instruction("set_3d", modelfunc_set_3d);
+	add_instruction("model_identity", modelfunc_identity);
 	add_instruction("model_scale", modelfunc_scale);
 	add_instruction("model_rotate", modelfunc_rotate);
 	add_instruction("model_translate", modelfunc_translate);
-	add_instruction("model_set_scale", modelfunc_set_scale);
-	add_instruction("model_set_rotate", modelfunc_set_rotate);
-	add_instruction("model_set_translate", modelfunc_set_translate);
-	add_instruction("model_get_scale", modelfunc_get_scale);
-	add_instruction("model_get_rotate", modelfunc_get_rotate);
-	add_instruction("model_get_translate", modelfunc_get_translate);
-	add_instruction("model_get_scale", modelfunc_get_scale);
-	add_instruction("model_get_rotate", modelfunc_get_rotate);
-	add_instruction("model_get_translate", modelfunc_get_translate);
+	add_instruction("model_get_position", modelfunc_get_position);
+	add_instruction("identity_3d", modelfunc_identity_3d);
 	add_instruction("scale_3d", modelfunc_scale_3d);
 	add_instruction("rotate_3d", modelfunc_rotate_3d);
 	add_instruction("translate_3d", modelfunc_translate_3d);
-	add_instruction("identity_3d", modelfunc_identity_3d);
 	add_instruction("model_set_animation", modelfunc_set_animation);
 	add_instruction("model_stop", modelfunc_stop);
 	add_instruction("model_reset", modelfunc_reset);
@@ -3952,12 +3737,8 @@ void start_lib_game()
 	add_instruction("model_clone", modelfunc_clone);
 	add_instruction("billboard_create", modelfunc_billboard_create);
 	add_instruction("billboard_draw", modelfunc_billboard_draw);
-	add_instruction("billboard_scale", modelfunc_billboard_scale);
-	add_instruction("billboard_translate", modelfunc_billboard_translate);
-	add_instruction("billboard_set_scale", modelfunc_billboard_set_scale);
-	add_instruction("billboard_set_translate", modelfunc_billboard_set_translate);
-	add_instruction("billboard_get_scale", modelfunc_billboard_get_scale);
-	add_instruction("billboard_get_translate", modelfunc_billboard_get_translate);
+	add_instruction("billboard_get_position", modelfunc_billboard_get_position);
+	add_instruction("billboard_set_position", modelfunc_billboard_set_position);
 	add_instruction("cd_model_point", cdfunc_model_point);
 	add_instruction("cd_model_line_segment", cdfunc_model_line_segment);
 }

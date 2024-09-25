@@ -1,6 +1,6 @@
 number level
 model_load level "level.x"
-model_rotate level PI 0 0
+model_rotate level PI 1 0 0
 
 set_3d
 
@@ -20,6 +20,12 @@ number inited
 function draw
 {
 	clear 100 100 255
+
+	identity_3d
+	scale_3d 0.1 0.1 0.1
+	rotate_3d angle2 1 0 0
+	rotate_3d angle 0 1 0
+	translate_3d x y z
 
 	model_draw level 255 255 255 255
 }
@@ -52,44 +58,40 @@ function run
 	neg joy_x1
 	neg joy_y1
 
-	* joy_x1 2
+	* joy_x1 5
 	/ joy_x2 10
-	* joy_y1 2
+	* joy_y1 5
 	/ joy_y2 10
 
 	+ angle joy_x2
 	+ angle2 joy_y2
 
-	number xi yi zi
+	number xi zi
 	= xi (+ angle (/ PI 2))
 	cos xi
 	= xi (* xi joy_y1)
-	= yi 0
 	= zi (+ angle (/ PI 2))
 	sin zi
 	= zi (* zi joy_y1)
 
-	number xi2 yi2 zi2
+	number xi2 zi2
 	= xi2 angle
 	cos xi2
 	= xi2 (* xi2 joy_x1)
-	= yi2 0
 	= zi2 angle
 	sin zi2
 	= zi2 (* zi2 joy_x1)
 
 	number incx incy incz
 	= incx (+ xi xi2)
-	= incy (+ yi yi2)
 	= incz (+ zi zi2)
 
 	+ x incx
-	+ y incy
 	+ z incz
 
-	if (|| (!= incx 0) (!= incy 0) (!= incz 0) (== inited 0)) check_coll
+	if (|| (!= incx 0) (!= incz 0) (== inited 0)) check_coll
 		number y1i y2i
-		= y1i (- y 1000)
+		= y1i (- y 1000000)
 		= y2i (+ y 1000000);
 
 		number col out_x out_y out_z
@@ -97,13 +99,8 @@ function run
 
 		if (== col 1) collided
 			= y out_y
-			- y 1
 		:collided
 
 		= inited 1
 	:check_coll
-
-	identity_3d
-	rotate_3d angle2 angle 0
-	translate_3d x y z
 }

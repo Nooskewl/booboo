@@ -17,7 +17,6 @@ if (> sz max) change_z
 	= max sz
 :change_z
 = scale (/ 1.0 max)
-model_set_scale model scale scale scale
 
 model_set_animation model "ArmatureAction" cb
 
@@ -26,8 +25,12 @@ number clone1 clone2
 model_clone clone1 model
 model_clone clone2 model
 
-model_translate clone1 1.5 0 0
-model_translate clone2 -1.5 0 0
+model_translate clone1 1 0 0
+model_translate clone2 -1 0 0
+
+model_scale model scale scale scale
+model_scale clone1 scale scale scale
+model_scale clone2 scale scale scale
 
 function cb
 {
@@ -68,10 +71,6 @@ function run
 	if (< (eabs joy_x2) 0.1) zero_z
 		= joy_x2 0
 	:zero_z
-
-	/ joy_x1 10
-	/ joy_y1 10
-	/ joy_x2 10
 
 	model_translate model joy_x1 joy_y1 joy_x2
 }

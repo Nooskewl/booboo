@@ -19,7 +19,7 @@ for i 0 (< i num_billboards) 1 loop
 	- z 500
 	/ z 500
 	* z 10
-	billboard_create b tree x 0 z 0.4 0.8
+	billboard_create b tree x 0 z 0.8 0.8
 	vector_add billboards b
 :loop
 	
@@ -101,6 +101,6 @@ function run
 	+ z zi zi2
 
 	identity_3d
-	rotate_3d 0 angle 0
+	rotate_3d angle 0 1 0
 	translate_3d x y z
 }

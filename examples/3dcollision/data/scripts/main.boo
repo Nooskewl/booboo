@@ -17,14 +17,14 @@ if (> sz max) change_z
 	= max sz
 :change_z
 = scale (/ 1.0 max)
-model_set_scale zeus scale scale scale
+model_scale zeus scale scale scale
 
 model_set_animation zeus "ArmatureAction" cb
 
 number sphere
 model_load sphere "sphere.x"
 model_translate sphere 0 0 -2.5
-model_set_scale sphere 0.01 0.01 0.01
+model_scale sphere 0.01 0.01 0.01
 
 number font
 font_load font "font.ttf" 48 0
@@ -71,14 +71,10 @@ function run
 		= joy_x2 0
 	:zero_z
 
-	/ joy_x1 25
-	/ joy_y1 25
-	/ joy_x2 25
-
 	model_translate sphere joy_x1 joy_y1 joy_x2
 
 	number spx spy spz
-	model_get_translate sphere spx spy spz
+	model_get_position sphere spx spy spz
 	number collides
 	cd_model_point collides zeus spx spy spz
 
