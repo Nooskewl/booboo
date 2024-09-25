@@ -3296,7 +3296,17 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 	Variable &colours = as_variable(prg, v[2]);
 	int num_triangles = as_number(prg, v[3]);
 
-	float *vert_vec = new float[12*3*num_triangles];
+	static float *vert_vec = nullptr;
+	static int vec_sz = 0;
+
+	if (vert_vec == nullptr) {
+		vert_vec = (float *)malloc(12*3*num_triangles*sizeof(float));
+		vec_sz = num_triangles;
+	}
+	else if (num_triangles > vec_sz) {
+		vert_vec = (float *)realloc(vert_vec, 12*3*num_triangles*sizeof(float));
+		vec_sz = num_triangles;
+	}
 
 	int count = 0;
 	int ccount = 0;
@@ -3347,8 +3357,6 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 
 	gfx::enable_depth_test(false);
 	gfx::enable_depth_write(false);
-
-	delete[] vert_vec;
 
 	return true;
 }
