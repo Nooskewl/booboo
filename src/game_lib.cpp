@@ -3481,7 +3481,7 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 	}
 	
 	glm::mat4 t = mv;
-	t = glm::translate(t, glm::vec3(billboard->x, billboard->y, billboard->z));
+	//t = glm::translate(t, glm::vec3(billboard->x, billboard->y, billboard->z));
 	
 	gfx::set_matrices(t, proj);
 	gfx::update_projection();
