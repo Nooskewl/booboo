@@ -1,6 +1,6 @@
 number level
 model_load level "level.x"
-model_set_scale level 20 10 20
+model_rotate level PI 0 0
 
 set_3d
 
@@ -11,8 +11,11 @@ number angle2
 
 number x y z
 = x 0
-= y -100
+= y -10000
 = z 0
+
+number inited
+= inited 0
 
 function draw
 {
@@ -49,9 +52,9 @@ function run
 	neg joy_x1
 	neg joy_y1
 
-	/ joy_x1 10
+	* joy_x1 2
 	/ joy_x2 10
-	/ joy_y1 10
+	* joy_y1 2
 	/ joy_y2 10
 
 	+ angle joy_x2
@@ -75,21 +78,30 @@ function run
 	sin zi2
 	= zi2 (* zi2 joy_x1)
 
-	+ x xi xi2
-	+ y yi yi2
-	+ z zi zi2
+	number incx incy incz
+	= incx (+ xi xi2)
+	= incy (+ yi yi2)
+	= incz (+ zi zi2)
 
-	number y1i y2i
-	= y1i (- y 100)
-	= y2i (+ y 1000);
+	+ x incx
+	+ y incy
+	+ z incz
 
-	number col out_x out_y out_z
-	cd_model_line_segment col level x y1i z x y2i z out_x out_y out_z
+	if (|| (!= incx 0) (!= incy 0) (!= incz 0) (== inited 0)) check_coll
+		number y1i y2i
+		= y1i (- y 1000)
+		= y2i (+ y 1000000);
 
-	if (== col 1) collided
-		= y out_y
-		- y 6
-	:collided
+		number col out_x out_y out_z
+		cd_model_line_segment col level x y1i z x y2i z out_x out_y out_z
+
+		if (== col 1) collided
+			= y out_y
+			- y 1
+		:collided
+
+		= inited 1
+	:check_coll
 
 	identity_3d
 	rotate_3d angle2 angle 0
