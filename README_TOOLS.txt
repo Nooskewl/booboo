@@ -8,3 +8,5 @@ uncompress_cpa unpacks a CPA archive into a
 data/ directory.
 
 play_mml is an MML music/SFX player.
+
+pack_shader needed for d3d only makes a binary shader from source, as the D3DX library for compiling shaders online isn't used. Requires DirectX 9 SDK in the path.
