@@ -6,8 +6,8 @@
 #include <shlwapi.h>
 #endif
 
-#include <shim4/shim4.h>
-#include <shim4/internal/gfx.h>
+#include <shim5/shim5.h>
+#include <shim5/internal/gfx.h>
 
 #include <libutil/libutil.h>
 using namespace noo;

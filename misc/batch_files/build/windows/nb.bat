@@ -11,14 +11,14 @@ if "%1"=="release" goto release
 if "%1"=="demo" goto endloop rem not supported in this script
 if "%1"=="steam" goto endloop rem not supported in this script
 if "%1"=="t" goto tgui6_flag
-if "%1"=="s" goto shim4_flag
+if "%1"=="s" goto shim5_flag
 if "%1"=="g" goto game_flag
 if "%1"=="d" goto endloop rem not supported by this script
 goto doneloop
 :tgui6_flag
 set TARGET="t"
 goto endloop
-:shim4_flag
+:shim5_flag
 set TARGET="s"
 goto endloop
 :game_flag
@@ -36,16 +36,16 @@ goto beginloop
 :doneloop
 
 if %TARGET%=="t" goto tgui6_type
-if %TARGET%=="s" goto shim4_type
+if %TARGET%=="s" goto shim5_type
 if %TARGET%=="g" goto game_type
 
 :tgui6_type
 if %CFG%=="release" goto tgui6_release
 goto tgui6
 
-:shim4_type
-if %CFG%=="release" goto shim4_release
-goto shim4
+:shim5_type
+if %CFG%=="release" goto shim5_release
+goto shim5
 
 :game_type
 if %CFG%=="release" goto game_release
@@ -63,13 +63,13 @@ goto done
 cd c:\users\trent\code\tgui6\build
 msbuild /p:configuration=release tgui6.sln
 goto done
-:shim4
-cd c:\users\trent\code\shim4\build
-msbuild /p:configuration=relwithdebinfo shim4.sln
+:shim5
+cd c:\users\trent\code\shim5\build
+msbuild /p:configuration=relwithdebinfo shim5.sln
 goto done
-:shim4_release
-cd c:\users\trent\code\shim4\build
-msbuild /p:configuration=release shim4.sln
+:shim5_release
+cd c:\users\trent\code\shim5\build
+msbuild /p:configuration=release shim5.sln
 goto done
 :game
 if "%2"=="r" goto game_release

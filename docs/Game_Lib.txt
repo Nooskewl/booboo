@@ -29,7 +29,7 @@ Lots of the demos and examples use a simple Z/X key to A/B button mapping,
 so the keys are Z/X and arrows if you're using a keyboard. Most but not all
 included examples support the keyboard as well as joysticks.
 
-The file shim4.json can be put in your data/ directory to supply some extra
+The file shim5.json can be put in your data/ directory to supply some extra
 parameters and info such as window title and other things.
 
 All colours use premultiplied alpha.

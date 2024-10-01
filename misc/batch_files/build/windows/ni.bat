@@ -11,14 +11,14 @@ if "%1"=="release" goto release
 if "%1"=="demo" goto endloop rem not supported in this script
 if "%1"=="steam" goto endloop rem not supported in this script
 if "%1"=="t" goto tgui6_flag
-if "%1"=="s" goto shim4_flag
+if "%1"=="s" goto shim5_flag
 if "%1"=="g" goto game_flag
 if "%1"=="d" goto data_flag
 goto doneloop
 :tgui6_flag
 set TARGET="t"
 goto endloop
-:shim4_flag
+:shim5_flag
 set TARGET="s"
 goto endloop
 :game_flag
@@ -39,7 +39,7 @@ goto beginloop
 :doneloop
 
 if %TARGET%=="t" goto tgui6
-if %TARGET%=="s" goto shim4
+if %TARGET%=="s" goto shim5
 if %TARGET%=="g" goto game
 if %TARGET%=="d" goto data
 
@@ -54,13 +54,13 @@ goto done
 :tgui6_release
 rem copy release\tgui6.dll ..\..\b
 goto done
-:shim4
-cd c:\users\trent\code\shim4\build
-if %CFG%=="release" goto shim4_release
-rem copy relwithdebinfo\shim4.dll ..\..\b
+:shim5
+cd c:\users\trent\code\shim5\build
+if %CFG%=="release" goto shim5_release
+rem copy relwithdebinfo\shim5.dll ..\..\b
 goto done
-:shim4_release
-rem copy release\shim4.dll ..\..\b
+:shim5_release
+rem copy release\shim5.dll ..\..\b
 goto done
 :game
 cd c:\users\trent\code\booboo\build

@@ -8,7 +8,7 @@ CWD=`pwd`
 cd ~/code
 cd tgui6/build
 make -j$NPROC
-cd ../../shim4/build
+cd ../../shim5/build
 make -j$NPROC
 cd ../../booboo/build
 rm "booboo"

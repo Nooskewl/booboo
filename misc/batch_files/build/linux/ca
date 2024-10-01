@@ -6,9 +6,9 @@ TTH_FLAGS=""
 PI=0
 
 if uname -a | grep raspberry > /dev/null ; then
-	USER_INCLUDE_PATH="~/code/shim4/external;/usr/include/SDL2;~/code/twinkle"
+	USER_INCLUDE_PATH="~/code/shim5/external;/usr/include/SDL2;~/code/twinkle"
 else
-	USER_INCLUDE_PATH="~/code/steamworks/public;~/code/shim4/external;/usr/include/SDL2;~/code/twinkle"
+	USER_INCLUDE_PATH="~/code/steamworks/public;~/code/shim5/external;/usr/include/SDL2;~/code/twinkle"
 fi
 
 while [ "${1-}" ] ; do
@@ -52,16 +52,16 @@ cd tgui6
 rm -rf build
 mkdir build
 cd build
-cmake .. -DUSER_INCLUDE_PATH="$USER_INCLUDE_PATH;~/code/shim4/external/SDL2_ttf-2.0.14" $TGUI_FLAGS
-cd ../../shim4
+cmake .. -DUSER_INCLUDE_PATH="$USER_INCLUDE_PATH;~/code/shim5/external/SDL2_ttf-2.0.14" $TGUI_FLAGS
+cd ../../shim5
 rm -rf build
 mkdir build
 cd build
-cmake .. -DUSER_INCLUDE_PATH="$USER_INCLUDE_PATH;/usr/include/freetype2;/code/shim4/external/SDL2_ttf-2.0.14;~/code/tgui6/include" -DUSER_LIBRARY_PATH="~/code/tgui6/build;~/code/shim4/build" $SHIM_FLAGS
+cmake .. -DUSER_INCLUDE_PATH="$USER_INCLUDE_PATH;/usr/include/freetype2;/code/shim5/external/SDL2_ttf-2.0.14;~/code/tgui6/include" -DUSER_LIBRARY_PATH="~/code/tgui6/build;~/code/shim5/build" $SHIM_FLAGS
 cd ../../booboo
 rm -rf build
 mkdir build
 cd build
-cmake .. -DUSER_INCLUDE_PATH="$USER_INCLUDE_PATH;~/code/shim4/external/SDL2_ttf-2.0.14;~/code/tgui6/include;~/code/shim4/include;~/code/booboo/wedge3/include" -DUSER_LIBRARY_PATH="~/code/twinkle;~/code/tgui6/build;~/code/shim4/build;~/code/booboo/build;~/code/steamworks/redistributable_bin/linux64" -DGAME_LAUNCHER=on $TTH_FLAGS
+cmake .. -DUSER_INCLUDE_PATH="$USER_INCLUDE_PATH;~/code/shim5/external/SDL2_ttf-2.0.14;~/code/tgui6/include;~/code/shim5/include;~/code/booboo/wedge3/include" -DUSER_LIBRARY_PATH="~/code/twinkle;~/code/tgui6/build;~/code/shim5/build;~/code/booboo/build;~/code/steamworks/redistributable_bin/linux64" -DGAME_LAUNCHER=on $TTH_FLAGS
 
 popd > /dev/null

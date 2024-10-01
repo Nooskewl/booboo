@@ -13,7 +13,7 @@ if "%1"=="release" goto endloop rem not supported in this script
 if "%1"=="demo" goto demo
 if "%1"=="steam" goto steam
 if "%1"=="t" goto tgui6_flag
-if "%1"=="s" goto shim4_flag
+if "%1"=="s" goto shim5_flag
 if "%1"=="g" goto game_flag
 if "%1"=="d" goto data_flag
 goto doneloop
@@ -29,7 +29,7 @@ goto endloop
 :tgui6_flag
 set TARGET="t"
 goto endloop
-:shim4_flag
+:shim5_flag
 set TARGET="s"
 goto endloop
 :game_flag
@@ -44,7 +44,7 @@ goto beginloop
 :doneloop
 
 if %TARGET%=="t" goto tgui6
-if %TARGET%=="s" goto shim4
+if %TARGET%=="s" goto shim5
 if %TARGET%=="g" goto game
 if %TARGET%=="d" goto data
 
@@ -58,12 +58,12 @@ mkdir build
 cd build
 c:\users\trent\code\booboo\misc\batch_files\cmake\windows\tgui6.bat %CFG_FLAGS% %STEAMWORKS_FLAGS%
 goto done
-:shim4
-cd c:\users\trent\code\shim4
+:shim5
+cd c:\users\trent\code\shim5
 rmdir /s /q build
 mkdir build
 cd build
-c:\users\trent\code\booboo\misc\batch_files\cmake\windows\shim4.bat %CFG_FLAGS% %STEAMWORKS_FLAGS%
+c:\users\trent\code\booboo\misc\batch_files\cmake\windows\shim5.bat %CFG_FLAGS% %STEAMWORKS_FLAGS%
 goto done
 :game
 del "c:\users\trent\code\b\BooBoo.exe"
