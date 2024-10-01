@@ -2840,6 +2840,7 @@ static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
 
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
+/*
 	if (shim::opengl) {
 		glDisable_ptr(GL_SCISSOR_TEST);
 	}
@@ -2848,7 +2849,8 @@ static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
 		shim::d3d_device->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 	}
 #endif
-	
+*/
+
 	model->model->draw_tinted_textured(c);
 
 	gfx::enable_depth_test(false);
@@ -3023,7 +3025,7 @@ static bool modelfunc_translate_3d(Program *prg, const std::vector<Token> &v)
 
 static void set_3d()
 {
-	float aspect = shim::real_screen_size.w / (float)shim::real_screen_size.h;
+	float aspect = shim::screen_size.w / (float)shim::screen_size.h;
 	glm::mat4 _proj = glm::perspective(float(M_PI/4.0f), aspect, 1.0f, 10000.0f);
 
 	glm::mat4 _mv;
@@ -3239,6 +3241,7 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 	
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
+/*
 	if (shim::opengl) {
 		glDisable_ptr(GL_SCISSOR_TEST);
 	}
@@ -3247,7 +3250,8 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 		shim::d3d_device->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 	}
 #endif
-	
+*/
+
 	gfx::Vertex_Cache::instance()->start();
 	gfx::Vertex_Cache::instance()->cache_3d_immediate(vert_vec, num_triangles);
 	gfx::Vertex_Cache::instance()->end();
@@ -3306,6 +3310,7 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 	
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
+/*
 	if (shim::opengl) {
 		glDisable_ptr(GL_SCISSOR_TEST);
 	}
@@ -3314,7 +3319,8 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 		shim::d3d_device->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 	}
 #endif
-	
+*/
+
 	Image_Info *iinfo = image_info(prg);
 	gfx::Image *image = iinfo->images[tex];
 	if (shim::opengl) {
@@ -3488,6 +3494,7 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 	
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
+/*
 	if (shim::opengl) {
 		glDisable_ptr(GL_SCISSOR_TEST);
 	}
@@ -3496,6 +3503,7 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 		shim::d3d_device->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 	}
 #endif
+*/
 
 	gfx::Vertex_Cache::instance()->start(billboard->image);
 	gfx::Vertex_Cache::instance()->cache_3d_immediate(vec, 2);
