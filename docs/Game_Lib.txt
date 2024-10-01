@@ -549,21 +549,13 @@ billboard_draw
 	Draw a tinted billboard
 	e.g. billboard_draw billboard r g b a
 
-billboard_identity
-	Set billboard transform to identity
-	e.g. billboard_identity billboard
+billboard_translate
+	Move a billboard
+	e.g. billboard_translate b x y z
 
 billboard_scale
 	Scale a billboard
-	e.g. billboard_scale billboard sx sy sz
-
-billboard_translate
-	Translate a billboard
-	e.g. billboard_translate billboard x y z
-
-billboard_get_position
-	Get the position of a billboard
-	e.g. billboard_get_translate billboard x y z
+	e.g. billboard_scale b sx sy
 
 -- Collision Detection Functions ---------------------------------------------
 

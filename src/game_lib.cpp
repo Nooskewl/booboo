@@ -3510,44 +3510,38 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool modelfunc_billboard_get_position(Program *prg, const std::vector<Token> &v)
+static bool modelfunc_billboard_translate(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
 	int billboard_id = as_number(prg, v[0]);
-	Variable &x = as_variable(prg, v[1]);
-	Variable &y = as_variable(prg, v[2]);
-	Variable &z = as_variable(prg, v[3]);
-
-	CHECK_NUMBER(x)
-	CHECK_NUMBER(y)
-	CHECK_NUMBER(z)
+	double x = as_number(prg, v[1]);
+	double y = as_number(prg, v[2]);
+	double z = as_number(prg, v[3]);
 
 	Billboard_Info *info = billboard_info(prg);
 	Billboard *billboard = info->billboards[billboard_id];
 
-	x.n = billboard->x;
-	y.n = billboard->y;
-	z.n = billboard->z;
+	billboard->x += x;
+	billboard->y += y;
+	billboard->z += z;
 
 	return true;
 }
 
-static bool modelfunc_billboard_set_position(Program *prg, const std::vector<Token> &v)
+static bool modelfunc_billboard_scale(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(4)
+	COUNT_ARGS(3)
 
 	int billboard_id = as_number(prg, v[0]);
-	float x = as_number(prg, v[1]);
-	float y = as_number(prg, v[2]);
-	float z = as_number(prg, v[3]);
+	double sx = as_number(prg, v[1]);
+	double sy = as_number(prg, v[2]);
 
 	Billboard_Info *info = billboard_info(prg);
 	Billboard *billboard = info->billboards[billboard_id];
 
-	billboard->x = x;
-	billboard->y = y;
-	billboard->z = z;
+	billboard->w *= sx;
+	billboard->h *= sy;
 
 	return true;
 }
@@ -3737,8 +3731,8 @@ void start_lib_game()
 	add_instruction("model_clone", modelfunc_clone);
 	add_instruction("billboard_create", modelfunc_billboard_create);
 	add_instruction("billboard_draw", modelfunc_billboard_draw);
-	add_instruction("billboard_get_position", modelfunc_billboard_get_position);
-	add_instruction("billboard_set_position", modelfunc_billboard_set_position);
+	add_instruction("billboard_translate", modelfunc_billboard_translate);
+	add_instruction("billboard_scale", modelfunc_billboard_scale);
 	add_instruction("cd_model_point", cdfunc_model_point);
 	add_instruction("cd_model_line_segment", cdfunc_model_line_segment);
 }
