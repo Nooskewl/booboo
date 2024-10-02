@@ -2783,9 +2783,9 @@ static bool jsonfunc_get_number(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool is_3d = false;
+bool is_3d = false;
 
-static void set_3d()
+void set_3d()
 {
 	float aspect = shim::screen_size.w / (float)shim::screen_size.h;
 	glm::mat4 _proj = glm::perspective(float(M_PI/4.0f), aspect, 1.0f, 10000.0f);
@@ -2798,7 +2798,7 @@ static void set_3d()
 	is_3d = true;
 }
 
-static void set_2d()
+void set_2d()
 {
 	gfx::set_default_projection(shim::screen_size, shim::screen_offset, shim::scale);
 	gfx::update_projection();

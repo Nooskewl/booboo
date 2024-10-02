@@ -297,8 +297,15 @@ void draw_all()
 	std::vector<Token> tmp;
 	call_void_function(prg, "draw", tmp);
 
+	bool _is_3d = is_3d;
+	set_2d();
+
 	gfx::draw_guis();
 	gfx::draw_notifications();
+
+	if (_is_3d) {
+		set_3d();
+	}
 
 	gfx::flip();
 }
