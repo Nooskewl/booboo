@@ -2783,6 +2783,29 @@ static bool jsonfunc_get_number(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool is_3d = false;
+
+static void set_3d()
+{
+	float aspect = shim::screen_size.w / (float)shim::screen_size.h;
+	glm::mat4 _proj = glm::perspective(float(M_PI/4.0f), aspect, 1.0f, 10000.0f);
+
+	glm::mat4 _mv;
+
+	gfx::set_matrices(_mv, _proj);
+	gfx::update_projection();
+
+	is_3d = true;
+}
+
+static void set_2d()
+{
+	gfx::set_default_projection(shim::screen_size, shim::screen_offset, shim::scale);
+	gfx::update_projection();
+
+	is_3d = false;
+}
+
 static bool modelfunc_load(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -3023,23 +3046,13 @@ static bool modelfunc_translate_3d(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static void set_3d()
-{
-	float aspect = shim::screen_size.w / (float)shim::screen_size.h;
-	glm::mat4 _proj = glm::perspective(float(M_PI/4.0f), aspect, 1.0f, 10000.0f);
-
-	glm::mat4 _mv;
-
-	gfx::set_matrices(_mv, _proj);
-	gfx::update_projection();
-}
-
-static bool is_3d = false;
-
 static void found_device_callback()
 {
 	if (is_3d) {
 		set_3d();
+	}
+	else {
+		set_2d();
 	}
 }
 
@@ -3047,10 +3060,8 @@ static bool modelfunc_set_2d(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
-	gfx::set_default_projection(shim::real_screen_size, shim::screen_offset, shim::scale);
+	set_2d();
 
-	is_3d = false;
-	
 	return true;
 }
 
@@ -3059,10 +3070,6 @@ static bool modelfunc_set_3d(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(0)
 
 	set_3d();
-
-	is_3d = true;
-
-	gfx::register_lost_device_callbacks(nullptr, found_device_callback);
 
 	return true;
 }
@@ -3611,6 +3618,8 @@ static bool cdfunc_model_line_segment(Program *prg, const std::vector<Token> &v)
 
 void start_lib_game()
 {
+	gfx::register_lost_device_callbacks(nullptr, found_device_callback);
+
 	add_instruction("inspect", miscfunc_inspect);
 	add_instruction("delay", miscfunc_delay);
 	add_instruction("get_ticks", miscfunc_get_ticks);
