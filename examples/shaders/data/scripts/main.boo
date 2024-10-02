@@ -1,48 +1,19 @@
 number shader
-shader_load shader "darkness_fragment" 2
-shader_use shader
-shader_set_colour shader "colour1" 0 0 0 255
-shader_set_colour shader "colour2" 255 255 255 255
-shader_use_default
+shader_load shader "red_fragment" 2
 
-number ticks
-= ticks 0
+number tree
+image_load tree "tree.png"
 
 function draw
 {
-	number t
-	= t ticks
-	% t 1000
-	/ t 500
-	if (>= t 1) pingpong
-	- t 1
-	= t (- 1 t)
-:pingpong
-
-	number mx my
-	get_screen_size mx my
-	/ mx 2
-	/ my 2
-
-	number bw bh
-	get_buffer_size bw bh
-	/ bw 2
-
-	number scr_w scr_h
-	get_screen_size scr_w scr_h
-
 	shader_use shader
-	shader_set_float shader "t" t
-	shader_set_float shader "mush_x" mx
-	shader_set_float shader "mush_y" my
-	shader_set_float shader "maxx" bw
-	shader_set_int shader "screen_w" scr_w
-	shader_set_int shader "screen_h" scr_h
-	filled_rectangle 0 0 0 255 0 0 0 255 0 0 0 255 0 0 0 255 0 0 640 360
-	shader_use_default
-}
 
-function run
-{
-	+ ticks 1
+	number w h
+	image_size tree w h
+	/ w 2
+	/ h 2
+
+	image_draw tree 255 255 255 255 (- (/ 640 2) w) (- (/ 360 2) h) 0 0
+
+	shader_use_default
 }
