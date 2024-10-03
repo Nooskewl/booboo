@@ -342,15 +342,17 @@ void draw_all()
 	std::vector<Token> tmp;
 	call_void_function(prg, "draw", tmp);
 
-	bool _is_3d = is_3d;
-	set_2d();
+	glm::mat4 _mv, _proj;
+	gfx::get_matrices(_mv, _proj);
+
+	gfx::set_default_projection(shim::screen_size, shim::screen_offset, shim::scale);
+	gfx::update_projection();
 
 	gfx::draw_guis();
 	gfx::draw_notifications();
 
-	if (_is_3d) {
-		set_3d();
-	}
+	gfx::set_matrices(_mv, _proj);
+	gfx::update_projection();
 
 	gfx::flip();
 }
