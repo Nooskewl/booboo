@@ -33,6 +33,8 @@ number x y z
 = y 0
 = z 0
 
+mouse_set_relative TRUE
+
 function draw
 {
 	clear 100 100 255
@@ -54,6 +56,30 @@ function eabs x
 function run
 {
 	include "poll_joystick.inc"
+
+	number dx dy
+	mouse_get_delta dx dy
+	if (!= 0 dx) set_x2
+		= joy_x2 (/ dx 10)
+	:set_x2
+
+	number w a s d
+	key_get w KEY_w
+	key_get a KEY_a
+	key_get s KEY_s
+	key_get d KEY_d
+	if (!= 0 w) set_forward
+		= joy_y1 -1
+	:set_forward
+	if (!= 0 s) set_backward
+		= joy_y1 1
+	:set_backward
+	if (!= 0 a) set_strafe_left
+		= joy_x1 -1
+	:set_strafe_left
+	if (!= 0 d) set_strafe_right
+		= joy_x1 1
+	:set_strafe_right
 
 	if (< (eabs joy_x1) 0.1) clip_x1
 		= joy_x1 0
