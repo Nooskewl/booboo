@@ -33,6 +33,46 @@ static bool mouse_b1;
 static bool mouse_b2;
 static bool mouse_b3;
 static int mouse_wheel_y;
+static int mouse_dx;
+static int mouse_dy;
+static bool delta_got;
+
+static bool mousefunc_set_relative(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	bool onoff = as_number(prg, v[0]);
+
+	SDL_SetRelativeMouseMode((SDL_bool)onoff);
+
+	return true;
+}
+
+static bool mousefunc_get_delta(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v2 = as_variable(prg, v[1]);
+	
+	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+
+	if (delta_got == false) {
+		mouse_dx = 0;
+		mouse_dy = 0;
+		delta_got = true;
+	}
+
+	v1.n = mouse_dx;
+	v2.n = mouse_dy;
+
+	mouse_dx = 0;
+	mouse_dy = 0;
+
+	return true;
+}
 
 static bool mousefunc_get_position(Program *prg, const std::vector<Token> &v)
 {
@@ -108,6 +148,9 @@ bool start()
 	mouse_b2 = false;
 	mouse_b3 = false;
 	mouse_wheel_y = 0;
+	mouse_dx = 0;
+	mouse_dy = 0;
+	delta_got = false;
 
 	toggle_fullscreen = false;
 	invert_mouse_wheel = false;
@@ -218,6 +261,8 @@ void handle_event(TGUI_Event *event)
 			mouse_pos.x = event->mouse.x;
 			mouse_pos.y = event->mouse.y;
 		}
+		mouse_dx += event->mouse.dx;
+		mouse_dy += event->mouse.dy;
 	}
 	else if (event->type == TGUI_MOUSE_DOWN && !event->mouse.is_repeat) {
 		switch (event->mouse.button) {
@@ -691,6 +736,8 @@ int main(int argc, char **argv)
 	start_lib_standard();
 	start_lib_game();
 
+	add_instruction("mouse_set_relative", mousefunc_set_relative);
+	add_instruction("mouse_get_delta", mousefunc_get_delta);
 	add_instruction("mouse_get_position", mousefunc_get_position);
 	add_instruction("mouse_get_buttons", mousefunc_get_buttons);
 	add_instruction("key_get", keyfunc_get);

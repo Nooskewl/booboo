@@ -618,6 +618,16 @@ mouse_get_buttons
 	Wheel will be 1 (forward) 0 (not moved) or -1 (backward)
 	e.g. mouse_get_buttons left middle right wheel
 
+mouse_get_delta
+	Get the mouse delta movement since last call
+	The first time this is called, the values will be set to 0 and
+	return 0
+	e.g. mouse_get_delta dx dy
+
+mouse_set_relative
+	Keep the mouse in the window and use relative coordinates
+	e.g. mouse_set_relative bonoff
+
 key_get
 	Read if a key is pressed or not. Please use or modify keycodes.inc
 	From the 'keys' example for keycode constants.
