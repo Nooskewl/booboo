@@ -545,6 +545,11 @@ billboard_create
 	Create a billboard
 	e.g. billboard_create result image x y z w h
 
+billboard_from_sprite
+	Create a billboard backed by a sprite
+	unit is the number of pixels that spans 1 3D unit
+	e.g. billboard_from_sprite result sprite x y z w h unit
+
 billboard_draw
 	Draw a tinted billboard
 	e.g. billboard_draw billboard r g b a
