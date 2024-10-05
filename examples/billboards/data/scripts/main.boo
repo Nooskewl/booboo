@@ -19,7 +19,7 @@ for i 0 (< i num_billboards) 1 loop
 	- z 500
 	/ z 500
 	* z 10
-	billboard_create b tree x 0 z 0.8 0.8
+	billboard_create b tree x 0 z 0.55 0.8
 	vector_add billboards b
 :loop
 	

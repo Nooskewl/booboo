@@ -19,7 +19,7 @@ for i 0 (< i num_billboards) 1 loop
 	- z 500
 	/ z 500
 	* z 10
-	billboard_create b tree x 0.4 z 0.8 0.8
+	billboard_create b tree x 0.4 z 0.55 0.8
 	vector_add billboards b
 	:loop
 
@@ -27,7 +27,7 @@ number sprite
 sprite_load sprite "pleasant"
 
 number pleasant
-billboard_from_sprite pleasant sprite 0 0.25 0 0 0 32
+billboard_from_sprite pleasant sprite 0 0.25 -1 0 0 32
 
 number texture
 image_load texture "texture.png"
