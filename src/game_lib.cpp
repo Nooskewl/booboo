@@ -79,7 +79,14 @@ struct Billboard {
 	float z;
 	float w;
 	float h;
+	float tx;
+	float ty;
+	float tz;
+	float sx;
+	float sy;
+	int unit;
 	gfx::Image *image;
+	gfx::Sprite *sprite;
 };
 
 struct Billboard_Info {
@@ -2788,7 +2795,7 @@ bool is_3d = false;
 void set_3d()
 {
 	float aspect = shim::screen_size.w / (float)shim::screen_size.h;
-	glm::mat4 _proj = glm::perspective(float(M_PI/4.0f), aspect, 1.0f, 10000.0f);
+	glm::mat4 _proj = glm::perspective(float(M_PI/4.0f), aspect, 0.1f, 10000.0f);
 
 	glm::mat4 _mv;
 
@@ -3418,11 +3425,56 @@ static bool modelfunc_billboard_create(Program *prg, const std::vector<Token> &v
 	Billboard_Info *info2 = billboard_info(prg);
 	Billboard *billboard = new Billboard;
 	billboard->image = image;
+	billboard->sprite = nullptr;
 	billboard->x = x;
 	billboard->y = y;
 	billboard->z = z;
 	billboard->w = w;
 	billboard->h = h;
+	billboard->tx = 0;
+	billboard->ty = 0;
+	billboard->tz = 0;
+	billboard->sx = 1;
+	billboard->sy = 1;
+	billboard->unit = 0;
+	result.n = info2->billboard_id;
+	info2->billboards[info2->billboard_id++] = billboard;
+	return true;
+}
+
+static bool modelfunc_billboard_from_sprite(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(8)
+
+	Variable &result = as_variable(prg, v[0]);
+	int sprite_id = as_number(prg, v[1]);
+	float x = as_number(prg, v[2]);
+	float y = as_number(prg, v[3]);
+	float z = as_number(prg, v[4]);
+	float w = as_number(prg, v[5]);
+	float h = as_number(prg, v[6]);
+	int unit = as_number(prg, v[7]);
+
+	CHECK_NUMBER(result)
+	
+	Sprite_Info *info = sprite_info(prg);
+	gfx::Sprite *sprite = info->sprites[sprite_id];
+	
+	Billboard_Info *info2 = billboard_info(prg);
+	Billboard *billboard = new Billboard;
+	billboard->image = nullptr;
+	billboard->sprite = sprite;
+	billboard->x = x;
+	billboard->y = y;
+	billboard->z = z;
+	billboard->w = w;
+	billboard->h = h;
+	billboard->tx = 0;
+	billboard->ty = 0;
+	billboard->tz = 0;
+	billboard->sx = 1;
+	billboard->sy = 1;
+	billboard->unit = unit;
 	result.n = info2->billboard_id;
 	info2->billboards[info2->billboard_id++] = billboard;
 	return true;
@@ -3459,6 +3511,13 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 		1.0f, 1.0f
 	};
 
+	gfx::Image *img = billboard->image;
+	if (img == nullptr) {
+		img = billboard->sprite->get_current_image();
+		billboard->w = img->size.w / (float)billboard->unit;
+		billboard->h = img->size.h / (float)billboard->unit;
+	}
+
 	glm::mat4 mv, proj;
 	gfx::get_matrices(mv, proj);
 
@@ -3474,8 +3533,8 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 		for (int j = 0; j < 3; j++) {
 			float x = verts[faces[i*3+j]*3+0];
 			float y = verts[faces[i*3+j]*3+1];
-			glm::vec3 pos = glm::vec3(billboard->x, billboard->y, billboard->z);
-			glm::vec3 pt = pos + camera_right * x * billboard->w + camera_up * y * billboard->h;
+			glm::vec3 pos = glm::vec3(billboard->x+billboard->tx, billboard->y+billboard->ty, billboard->z+billboard->tz);
+			glm::vec3 pt = pos + camera_right * x * billboard->w * billboard->sx + camera_up * y * billboard->h * billboard->sy;
 			vec[count++] = pt.x;
 			vec[count++] = pt.y;
 			vec[count++] = pt.z;
@@ -3512,7 +3571,7 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 #endif
 */
 
-	gfx::Vertex_Cache::instance()->start(billboard->image);
+	gfx::Vertex_Cache::instance()->start(img);
 	gfx::Vertex_Cache::instance()->cache_3d_immediate(vec, 2);
 	gfx::Vertex_Cache::instance()->end();
 
@@ -3537,9 +3596,9 @@ static bool modelfunc_billboard_translate(Program *prg, const std::vector<Token>
 	Billboard_Info *info = billboard_info(prg);
 	Billboard *billboard = info->billboards[billboard_id];
 
-	billboard->x += x;
-	billboard->y += y;
-	billboard->z += z;
+	billboard->tx += x;
+	billboard->ty += y;
+	billboard->tz += z;
 
 	return true;
 }
@@ -3555,8 +3614,8 @@ static bool modelfunc_billboard_scale(Program *prg, const std::vector<Token> &v)
 	Billboard_Info *info = billboard_info(prg);
 	Billboard *billboard = info->billboards[billboard_id];
 
-	billboard->w *= sx;
-	billboard->h *= sy;
+	billboard->sx *= sx;
+	billboard->sy *= sy;
 
 	return true;
 }
@@ -3747,6 +3806,7 @@ void start_lib_game()
 	add_instruction("draw_3d_textured", modelfunc_draw_3d_textured);
 	add_instruction("model_clone", modelfunc_clone);
 	add_instruction("billboard_create", modelfunc_billboard_create);
+	add_instruction("billboard_from_sprite", modelfunc_billboard_from_sprite);
 	add_instruction("billboard_draw", modelfunc_billboard_draw);
 	add_instruction("billboard_translate", modelfunc_billboard_translate);
 	add_instruction("billboard_scale", modelfunc_billboard_scale);
