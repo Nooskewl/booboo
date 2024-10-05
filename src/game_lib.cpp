@@ -84,7 +84,7 @@ struct Billboard {
 	float tz;
 	float sx;
 	float sy;
-	int unit;
+	float unit;
 	gfx::Image *image;
 	gfx::Sprite *sprite;
 };
@@ -3453,7 +3453,7 @@ static bool modelfunc_billboard_from_sprite(Program *prg, const std::vector<Toke
 	float z = as_number(prg, v[4]);
 	float w = as_number(prg, v[5]);
 	float h = as_number(prg, v[6]);
-	int unit = as_number(prg, v[7]);
+	float unit = as_number(prg, v[7]);
 
 	CHECK_NUMBER(result)
 	
