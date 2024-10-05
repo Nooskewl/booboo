@@ -27,6 +27,8 @@ set_3d
 
 number angle
 = angle 0
+number anglex
+= anglex 0
 
 number x y z
 = x 0
@@ -62,6 +64,9 @@ function run
 	if (!= 0 dx) set_x2
 		= joy_x2 (/ dx 10)
 	:set_x2
+	if (!= 0 dy) set_y2
+		= joy_y2 (/ dy 10)
+	:set_y2
 
 	number w a s d
 	key_get w KEY_w
@@ -103,6 +108,7 @@ function run
 	/ joy_y2 10
 
 	+ angle joy_x2
+	+ anglex joy_y2
 
 	number xi yi zi
 	= xi (+ angle (/ PI 2))
@@ -127,6 +133,7 @@ function run
 	+ z zi zi2
 
 	identity_3d
+	rotate_3d anglex 1 0 0
 	rotate_3d angle 0 1 0
 	translate_3d x y z
 }
