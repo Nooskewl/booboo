@@ -399,7 +399,7 @@ static bool miscfunc_args(Program *prg, const std::vector<Token> &v)
 	for (int i = 0; i < shim::argc; i++) {
 		Variable var;
 		var.type = Variable::STRING;
-		//var.name = "-constant-";
+		var.name = "-constant-";
 		var.s = shim::argv[i];
 		v1.v.push_back(var);
 	}
@@ -450,7 +450,7 @@ static bool miscfunc_file_list(Program *prg, const std::vector<Token> &v)
 	for (size_t i = 0; i < l.size(); i++) {
 		Variable var;
 		var.type = Variable::STRING;
-		//var.name = "-constant-";
+		var.name = "-constant-";
 		var.s = l[i];
 		v1.v.push_back(var);
 	}
@@ -1623,30 +1623,30 @@ static bool tilemapfunc_get_groups(Program *prg, const std::vector<Token> &v)
 		gfx::Tilemap::Group &g = groups[i];
 		Variable v;
 		v.type = Variable::VECTOR;
-		//v.name = "-constant-";
+		v.name = "-constant-";
 		Variable type;
 		type.type = Variable::NUMBER;
-		//type.name = "-constant-";
+		type.name = "-constant-";
 		type.n = g.type;
 		v.v.push_back(type);
 		Variable x;
 		x.type = Variable::NUMBER;
-		//x.name = "-constant-";
+		x.name = "-constant-";
 		x.n = g.x;
 		v.v.push_back(x);
 		Variable y;
 		y.type = Variable::NUMBER;
-		//y.name = "-constant-";
+		y.name = "-constant-";
 		y.n = g.y;
 		v.v.push_back(y);
 		Variable w;
 		w.type = Variable::NUMBER;
-		//w.name = "-constant-";
+		w.name = "-constant-";
 		w.n = g.w;
 		v.v.push_back(w);
 		Variable h;
 		h.type = Variable::NUMBER;
-		//h.name = "-constant-";
+		h.name = "-constant-";
 		h.n = g.h;
 		v.v.push_back(h);
 		vec.v.push_back(v);
@@ -1731,15 +1731,15 @@ static bool tilemapfunc_find_path(Program *prg, const std::vector<Token> &v)
 		util::A_Star::Node &n = *it;
 		Variable vec;
 		vec.type = Variable::VECTOR;
-		//vec.name = "-constant-";
+		vec.name = "-constant-";
 		Variable x;
 		x.type = Variable::NUMBER;
-		//x.name = "-constant-";
+		x.name = "-constant-";
 		x.n = n.position.x;
 		vec.v.push_back(x);
 		Variable y;
 		y.type = Variable::NUMBER;
-		//y.name = "-constant-";
+		y.name = "-constant-";
 		y.n = n.position.y;
 		vec.v.push_back(y);
 		v1.v.push_back(vec);
@@ -2150,7 +2150,7 @@ static bool spritefunc_frame_times(Program *prg, const std::vector<Token> &v)
 	for (size_t i = 0; i < times.size(); i++) {
 		Variable v;
 		v.type = Variable::NUMBER;
-		//v.name = "-constant-";
+		v.name = "-constant-";
 		v.n = times[i];
 		vec.v.push_back(v);
 	}
