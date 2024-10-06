@@ -33,44 +33,22 @@ number texture
 image_load texture "texture.png"
 
 vector positions
-vector_add positions -1000
-vector_add positions -0.01
-vector_add positions -1000
-vector_add positions -1000
-vector_add positions -0.01
-vector_add positions 1000
-vector_add positions 1000
-vector_add positions -0.01
-vector_add positions -1000
-vector_add positions -1000
-vector_add positions -0.01
-vector_add positions 1000
-vector_add positions 1000
-vector_add positions -0.01
-vector_add positions -1000
-vector_add positions 1000
-vector_add positions -0.01
-vector_add positions 1000
+vector_add positions -1000 -0.01 -1000
+vector_add positions -1000 -0.01 1000
+vector_add positions 1000 -0.01 -1000
+vector_add positions -1000 -0.01 1000
+vector_add positions 1000 -0.01 -1000
+vector_add positions 1000 -0.01 1000
 vector texcoords
-vector_add texcoords 0
-vector_add texcoords 0
-vector_add texcoords 0
-vector_add texcoords 10000
-vector_add texcoords 10000
-vector_add texcoords 0
-vector_add texcoords 0
-vector_add texcoords 10000
-vector_add texcoords 10000
-vector_add texcoords 0
-vector_add texcoords 10000
-vector_add texcoords 10000
+vector_add texcoords 0 0
+vector_add texcoords 0 10000
+vector_add texcoords 10000 0
+vector_add texcoords 0 10000
+vector_add texcoords 10000 0
+vector_add texcoords 10000 10000
 vector faces
-vector_add faces 0
-vector_add faces 1
-vector_add faces 2
-vector_add faces 3
-vector_add faces 4
-vector_add faces 5
+vector_add faces 0 1 2
+vector_add faces 3 4 5
 vector colours
 	
 set_3d
