@@ -1835,6 +1835,9 @@ bool corefunc_set(Program *prg, const std::vector<Token> &v)
 		if (IS_VECTOR(v2)) {
 			v1.v = v2.v;
 		}
+		else if (IS_EXPRESSION(v2)) {
+			v1.v = evaluate_expression(prg, v2.e).v;
+		}
 		else {
 			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 		}
@@ -1843,6 +1846,9 @@ bool corefunc_set(Program *prg, const std::vector<Token> &v)
 		Variable &v2 = as_variable_inline(prg, v[1]);
 		if (IS_MAP(v2)) {
 			v1.m = v2.m;
+		}
+		else if (IS_EXPRESSION(v2)) {
+			v1.m = evaluate_expression(prg, v2.e).m;
 		}
 		else {
 			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
@@ -2319,7 +2325,7 @@ bool corefunc_if(Program *prg, const std::vector<Token> &v)
 Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 {
 	Variable ret;
-	//ret.name = "-constant-";
+	ret.name = "-constant-";
 
 	if (v[0].type == Token::NUMBER) {
 		double n = as_number_inline(prg, v[0]);
@@ -2423,7 +2429,7 @@ Variable exprfunc_subtract(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	//var.name = "-constant-";
+	var.name = "-constant-";
 	var.n = n;
 	return var;
 }
@@ -2438,7 +2444,7 @@ Variable exprfunc_multiply(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	//var.name = "-constant-";
+	var.name = "-constant-";
 	var.n = n;
 	return var;
 }
@@ -2453,7 +2459,7 @@ Variable exprfunc_divide(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	//var.name = "-constant-";
+	var.name = "-constant-";
 	var.n = n;
 	return var;
 }
@@ -2464,7 +2470,7 @@ Variable exprfunc_modulus(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	//var.name = "-constant-";
+	var.name = "-constant-";
 	var.n = (int)as_number_inline(prg, v[0]) % (int)as_number_inline(prg, v[1]);
 	return var;
 }
@@ -2479,7 +2485,7 @@ Variable exprfunc_and(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	//var.name = "-constant-";
+	var.name = "-constant-";
 	var.n = b;
 	return var;
 }
@@ -2494,7 +2500,7 @@ Variable exprfunc_or(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	//var.name = "-constant-";
+	var.name = "-constant-";
 	var.n = b;
 	return var;
 }
@@ -2529,7 +2535,7 @@ Variable exprfunc_greater(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	//var.name = "-constant-";
+	var.name = "-constant-";
 	var.n = b;
 	return var;
 }
@@ -2564,7 +2570,7 @@ Variable exprfunc_less(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	//var.name = "-constant-";
+	var.name = "-constant-";
 	var.n = b;
 	return var;
 }
@@ -2599,7 +2605,7 @@ Variable exprfunc_greaterequal(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	//var.name = "-constant-";
+	var.name = "-constant-";
 	var.n = b;
 	return var;
 }
@@ -2634,7 +2640,7 @@ Variable exprfunc_lessequal(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	//var.name = "-constant-";
+	var.name = "-constant-";
 	var.n = b;
 	return var;
 }
@@ -2669,7 +2675,7 @@ Variable exprfunc_equal(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	//var.name = "-constant-";
+	var.name = "-constant-";
 	var.n = b;
 	return var;
 }
@@ -2704,7 +2710,7 @@ Variable exprfunc_notequal(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	//var.name = "-constant-";
+	var.name = "-constant-";
 	var.n = b;
 	return var;
 }
@@ -2719,7 +2725,7 @@ Variable exprfunc_bitor(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	//var.name = "-constant-";
+	var.name = "-constant-";
 	var.n = n;
 	return var;
 }
@@ -2734,7 +2740,7 @@ Variable exprfunc_xor(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	//var.name = "-constant-";
+	var.name = "-constant-";
 	var.n = n;
 	return var;
 }
@@ -2749,7 +2755,7 @@ Variable exprfunc_bitand(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	//var.name = "-constant-";
+	var.name = "-constant-";
 	var.n = n;
 	return var;
 }
@@ -2764,7 +2770,7 @@ Variable exprfunc_leftshift(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	//var.name = "-constant-";
+	var.name = "-constant-";
 	var.n = n;
 	return var;
 }
@@ -2779,9 +2785,107 @@ Variable exprfunc_rightshift(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	//var.name = "-constant-";
+	var.name = "-constant-";
 	var.n = n;
 	return var;
+}
+
+Variable exprfunc_mmul(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	Variable ret;
+	ret.type = Variable::VECTOR;
+	ret.name = "-constant-";
+
+	if (v[1].type == Token::NUMBER) {
+		Variable &vec = as_variable(prg, v[0]);
+
+		CHECK_VECTOR(vec)
+
+		for (size_t i = 0; i < vec.v.size(); i++) {
+			Variable var;
+			var.type = Variable::VECTOR;
+			for (size_t j = 0; j < vec.v[0].v.size(); j++) {
+				var.v.push_back(vec.v[i].v[j]);
+			}
+			ret.v.push_back(var);
+		}
+
+		for (size_t n = 1; n < v.size(); n++) {
+			for (size_t i = 0; i < vec.v.size(); i++) {
+				for (size_t j = 0; j < vec.v[0].v.size(); j++) {
+					ret.v[i].v[j].n *= as_number(prg, v[n]);
+				}
+			}
+		}
+
+		return ret;
+	}
+	else {
+		Variable &vec = as_variable(prg, v[0]);
+		
+		CHECK_VECTOR(vec)
+
+		ret = vec;
+
+		for (size_t n = 1; n < v.size(); n++) {	
+			Variable &vec2 = as_variable(prg, v[n]);
+
+			CHECK_VECTOR(vec2);
+
+			if (ret.v.size() != vec2.v[0].v.size()) {
+				throw Error(std::string(__FUNCTION__) + ": " + "Matrices cannot be multiplied at " + get_error_info(prg));
+			}
+
+			std::vector<Variable> bak = ret.v;
+
+			unsigned int w = vec2.v.size();
+			unsigned int h = ret.v[0].v.size();
+
+			while (ret.v.size() > w) {
+				ret.v.pop_back();
+			}
+			for (size_t i = 0; i < ret.v.size(); i++) {
+				while (ret.v[i].v.size() > h) {
+					ret.v[i].v.pop_back();
+				}
+			}
+
+			if (ret.v.size() != w || ret.v[0].v.size() != h) {
+				for (unsigned int c = 0; c < w; c++) {
+					Variable var;
+					var.type = Variable::VECTOR;
+					for (unsigned int r = 0; r < h; r++) {
+						Variable var2;
+						var2.type = Variable::NUMBER;
+						var2.n = 0;
+						var.v.push_back(var2);
+					}
+					ret.v.push_back(var);
+				}
+			}
+
+			int rr = 0;
+			for (size_t r = 0; r < ret.v[0].v.size(); r++) {
+				int cc = 0;
+				for (size_t c = 0; c < ret.v.size(); c++) {
+					Variable &vecreal = vec2.v[c];
+					int sum = 0;
+					for (size_t r2 = 0; r2 < vecreal.v.size(); r2++) {
+						sum += bak[r2].v[r].n * vecreal.v[r2].n;
+					}
+					ret.v[cc].v[rr].n = sum;
+					cc++;
+				}
+				rr++;
+			}
+		}
+
+		return ret;
+	}
+
+	return ret;
 }
 
 static void init_token_map()
@@ -2832,6 +2936,7 @@ void start()
 	add_expression_handler("&", exprfunc_bitand);
 	add_expression_handler("<<", exprfunc_leftshift);
 	add_expression_handler(">>", exprfunc_rightshift);
+	add_expression_handler("mmul", exprfunc_mmul);
 
 	add_instruction("reset", breaker_reset);
 	add_instruction("exit", breaker_exit);
