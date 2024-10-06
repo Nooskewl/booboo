@@ -66,6 +66,12 @@ function run
 	+ angle joy_x2
 	+ angle2 joy_y2
 
+	if (< angle2 (* -1 (/ PI 2))) cliplow (> angle2 (/ PI 2)) cliphigh
+		= angle2 (* -1 (/ PI 2))
+	:cliplow
+		= angle2 (/ PI 2)
+	:cliphigh
+
 	number xi zi
 	= xi (+ angle (/ PI 2))
 	cos xi
