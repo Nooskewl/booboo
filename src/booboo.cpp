@@ -2834,6 +2834,20 @@ Variable exprfunc_mmul(Program *prg, const std::vector<Token> &v)
 
 			CHECK_VECTOR(vec2);
 
+			bool is_mat;
+			Variable tmp;
+			if (vec2.v[0].type == Variable::VECTOR) {
+				is_mat = true;
+			}
+			else {
+				is_mat = false;
+				tmp = vec2;
+				vec2.v.clear();
+				vec2.v.push_back(tmp);
+			}
+
+			printf("%d %d\n", ret.v.size(), vec2.v[0].v.size());
+
 			if (ret.v.size() != vec2.v[0].v.size()) {
 				throw Error(std::string(__FUNCTION__) + ": " + "Matrices cannot be multiplied at " + get_error_info(prg));
 			}
@@ -2879,6 +2893,12 @@ Variable exprfunc_mmul(Program *prg, const std::vector<Token> &v)
 					cc++;
 				}
 				rr++;
+			}
+
+			if (is_mat == false) {
+				vec2 = tmp;
+				tmp = ret;
+				ret = tmp.v[0];
 			}
 		}
 
