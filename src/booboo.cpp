@@ -2912,6 +2912,22 @@ Variable exprfunc_vmul(Program *prg, const std::vector<Token> &v)
 	return vec;
 }
 
+Variable exprfunc_vdiv(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	Variable vec = as_variable_inline(prg, v[0]);
+
+	CHECK_VECTOR(vec)
+
+	for (size_t i = 1; i < v.size(); i++) {
+		double n = as_number_inline(prg, v[i]);
+		vec = vecmul(vec, 1.0/n);
+	}
+
+	return vec;
+}
+
 static double veclen(const Variable &vec)
 {
 	return sqrt(pow(vec.v[0].n, 2) + pow(vec.v[1].n, 2) + pow(vec.v[2].n, 2));
@@ -2985,6 +3001,8 @@ Variable exprfunc_vangle(Program *prg, const std::vector<Token> &v)
 
 Variable exprfunc_cross(Program *prg, const std::vector<Token> &v)
 {
+	MIN_ARGS(2)
+
 	Variable vec = as_variable_inline(prg, v[0]);
 
 	CHECK_VECTOR(vec)
@@ -3002,6 +3020,17 @@ Variable exprfunc_cross(Program *prg, const std::vector<Token> &v)
 	}
 
 	return vec;
+}
+
+Variable exprfunc_normalize(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &vec = as_variable_inline(prg, v[0]);
+
+	CHECK_VECTOR(vec)
+
+	return vecmul(vec, 1.0 / veclen(vec));
 }
 
 static void init_token_map()
@@ -3054,10 +3083,12 @@ void start()
 	add_expression_handler(">>", exprfunc_rightshift);
 	add_expression_handler("mmul", exprfunc_mmul);
 	add_expression_handler("vmul", exprfunc_vmul);
+	add_expression_handler("vdiv", exprfunc_vdiv);
 	add_expression_handler("vlen", exprfunc_vlen);
 	add_expression_handler("dot", exprfunc_dot);
 	add_expression_handler("vangle", exprfunc_vangle);
 	add_expression_handler("cross", exprfunc_cross);
+	add_expression_handler("normalize", exprfunc_normalize);
 
 	add_instruction("reset", breaker_reset);
 	add_instruction("exit", breaker_exit);
