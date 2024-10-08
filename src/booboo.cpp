@@ -2798,40 +2798,23 @@ Variable exprfunc_mmul(Program *prg, const std::vector<Token> &v)
 	ret.type = Variable::VECTOR;
 	ret.name = "-constant-";
 
-	if (v[1].type == Token::NUMBER) {
-		Variable &vec = as_variable(prg, v[0]);
+	Variable &vec = as_variable(prg, v[0]);
+	
+	CHECK_VECTOR(vec)
 
-		CHECK_VECTOR(vec)
+	ret = vec;
 
-		for (size_t i = 0; i < vec.v.size(); i++) {
-			Variable var;
-			var.type = Variable::VECTOR;
-			for (size_t j = 0; j < vec.v[0].v.size(); j++) {
-				var.v.push_back(vec.v[i].v[j]);
-			}
-			ret.v.push_back(var);
-		}
+	for (size_t n = 1; n < v.size(); n++) {	
+		Variable &vec2 = as_variable(prg, v[n]);
 
-		for (size_t n = 1; n < v.size(); n++) {
-			for (size_t i = 0; i < vec.v.size(); i++) {
-				for (size_t j = 0; j < vec.v[0].v.size(); j++) {
-					ret.v[i].v[j].n *= as_number(prg, v[n]);
+		if (IS_NUMBER(vec2)) {
+			for (size_t i = 0; i < ret.v.size(); i++) {
+				for (size_t j = 0; j < ret.v[0].v.size(); j++) {
+					ret.v[i].v[j].n *= vec2.n;
 				}
 			}
 		}
-
-		return ret;
-	}
-	else {
-		Variable &vec = as_variable(prg, v[0]);
-		
-		CHECK_VECTOR(vec)
-
-		ret = vec;
-
-		for (size_t n = 1; n < v.size(); n++) {	
-			Variable &vec2 = as_variable(prg, v[n]);
-
+		else {
 			CHECK_VECTOR(vec2);
 
 			bool is_mat;
@@ -2845,8 +2828,6 @@ Variable exprfunc_mmul(Program *prg, const std::vector<Token> &v)
 				vec2.v.clear();
 				vec2.v.push_back(tmp);
 			}
-
-			printf("%d %d\n", ret.v.size(), vec2.v[0].v.size());
 
 			if (ret.v.size() != vec2.v[0].v.size()) {
 				throw Error(std::string(__FUNCTION__) + ": " + "Matrices cannot be multiplied at " + get_error_info(prg));
@@ -2901,8 +2882,6 @@ Variable exprfunc_mmul(Program *prg, const std::vector<Token> &v)
 				ret = tmp.v[0];
 			}
 		}
-
-		return ret;
 	}
 
 	return ret;
