@@ -959,10 +959,22 @@ static bool vectorfunc_init(Program *prg, const std::vector<Token> &v)
 	vec.v.clear();
 
 	for (size_t i = 1; i < v.size(); i++) {
-		Variable var;
-		var.type = Variable::NUMBER;
-		var.n = as_number(prg, v[i]);
-		vec.v.push_back(var);
+		if (v[i].type == Token::NUMBER) {
+			Variable var;
+			var.type = Variable::NUMBER;
+			var.n = as_number(prg, v[i]);
+			vec.v.push_back(var);
+		}
+		else if (v[i].type == Token::STRING) {
+			Variable var;
+			var.type = Variable::STRING;
+			var.s = as_string(prg, v[i]);
+			vec.v.push_back(var);
+		}
+		else {
+			Variable &var = as_variable(prg, v[i]);
+			vec.v.push_back(var);
+		}
 	}
 
 	return true;
