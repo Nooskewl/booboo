@@ -2798,14 +2798,14 @@ Variable exprfunc_mmul(Program *prg, const std::vector<Token> &v)
 	ret.type = Variable::VECTOR;
 	ret.name = "-constant-";
 
-	Variable &vec = as_variable(prg, v[0]);
+	Variable &vec = as_variable_inline(prg, v[0]);
 	
 	CHECK_VECTOR(vec)
 
 	ret = vec;
 
 	for (size_t n = 1; n < v.size(); n++) {	
-		Variable &vec2 = as_variable(prg, v[n]);
+		Variable &vec2 = as_variable_inline(prg, v[n]);
 
 		if (IS_NUMBER(vec2)) {
 			for (size_t i = 0; i < ret.v.size(); i++) {
@@ -2887,6 +2887,123 @@ Variable exprfunc_mmul(Program *prg, const std::vector<Token> &v)
 	return ret;
 }
 
+static Variable vecmul(Variable vec, double n)
+{
+	for (size_t j = 0; j < vec.v.size(); j++) {
+		vec.v[j].n *= n;
+	}
+
+	return vec;
+}
+
+Variable exprfunc_vmul(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	Variable vec = as_variable_inline(prg, v[0]);
+
+	CHECK_VECTOR(vec)
+
+	for (size_t i = 1; i < v.size(); i++) {
+		double n = as_number_inline(prg, v[i]);
+		vec = vecmul(vec, n);
+	}
+
+	return vec;
+}
+
+static double veclen(const Variable &vec)
+{
+	return sqrt(pow(vec.v[0].n, 2) + pow(vec.v[1].n, 2) + pow(vec.v[2].n, 2));
+}
+
+Variable exprfunc_vlen(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable &vec = as_variable_inline(prg, v[0]);
+
+	CHECK_VECTOR(vec)
+	
+	if (vec.v.size() < 3) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Vector with < 3 components not supported at " + get_error_info(prg));
+	}
+
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = veclen(vec);
+
+	return var;
+}
+
+static double vecdot(const Variable &vec1, const Variable &vec2)
+{
+	return vec1.v[0].n * vec2.v[0].n + vec1.v[1].n * vec2.v[1].n + vec1.v[2].n * vec2.v[2].n;
+}
+
+Variable exprfunc_dot(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	const Variable &vec1 = as_variable_inline(prg, v[0]);
+	const Variable &vec2 = as_variable_inline(prg, v[1]);
+
+	CHECK_VECTOR(vec1)
+	CHECK_VECTOR(vec2)
+
+	if (vec1.v.size() < 3 || vec2.v.size() < 3) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Vector with < 3 components not supported at " + get_error_info(prg));
+	}
+
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = vecdot(vec1, vec2);
+
+	return var;
+}
+
+Variable exprfunc_vangle(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &vec1 = as_variable_inline(prg, v[0]);
+	Variable &vec2 = as_variable_inline(prg, v[1]);
+
+	CHECK_VECTOR(vec1)
+	CHECK_VECTOR(vec2)
+	
+	if (vec1.v.size() < 3 || vec2.v.size() < 3) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Vector with < 3 components not supported at " + get_error_info(prg));
+	}
+	
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = acosf(vecdot(vec1, vec2) / veclen(vecmul(vec1, veclen(vec2))));
+
+	return var;
+}
+
+Variable exprfunc_cross(Program *prg, const std::vector<Token> &v)
+{
+	Variable vec = as_variable_inline(prg, v[0]);
+
+	CHECK_VECTOR(vec)
+
+	for (size_t i = 1; i < v.size(); i++) {
+		Variable &vec2 = as_variable_inline(prg, v[i]);
+		CHECK_VECTOR(vec2)
+		if (vec.v.size() < 3 || vec2.v.size() < 3) {
+			throw Error(std::string(__FUNCTION__) + ": " + "Vector with < 3 components not supported at " + get_error_info(prg));
+		}
+		Variable tmp = vec;
+		vec.v[0].n = tmp.v[0].n * vec2.v[2].n - tmp.v[2].n * vec2.v[1].n;
+		vec.v[1].n = tmp.v[2].n * vec2.v[0].n - tmp.v[0].n * vec2.v[2].n;
+		vec.v[2].n = tmp.v[0].n * vec2.v[1].n - tmp.v[1].n * vec2.v[0].n;
+	}
+
+	return vec;
+}
+
 static void init_token_map()
 {
 	add_token_handler(':', tokenfunc_label);
@@ -2936,6 +3053,11 @@ void start()
 	add_expression_handler("<<", exprfunc_leftshift);
 	add_expression_handler(">>", exprfunc_rightshift);
 	add_expression_handler("mmul", exprfunc_mmul);
+	add_expression_handler("vmul", exprfunc_vmul);
+	add_expression_handler("vlen", exprfunc_vlen);
+	add_expression_handler("dot", exprfunc_dot);
+	add_expression_handler("vangle", exprfunc_vangle);
+	add_expression_handler("cross", exprfunc_cross);
 
 	add_instruction("reset", breaker_reset);
 	add_instruction("exit", breaker_exit);
