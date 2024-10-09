@@ -69,6 +69,20 @@ inline Variable &as_variable_inline(Program *prg, const Token &t)
 	return prg->variables[t.i];
 }
 
+inline Variable as_variable_resolve_inline(Program *prg, const Token &t)
+{
+	if (t.type != Token::SYMBOL) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+	if (prg->variables[t.i].type == Variable::FISH) {
+		return go_fish(prg, prg->variables[t.i].f);
+	}
+	if (prg->variables[t.i].type == Variable::EXPRESSION) {
+		return evaluate_expression(prg, prg->variables[t.i].e);
+	}
+	return prg->variables[t.i];
+}
+
 inline double as_number_inline(Program *prg, const Token &t)
 {
 	if (t.type == Token::NUMBER) {

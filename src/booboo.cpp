@@ -2798,14 +2798,14 @@ Variable exprfunc_mmul(Program *prg, const std::vector<Token> &v)
 	ret.type = Variable::VECTOR;
 	ret.name = "-constant-";
 
-	Variable &vec = as_variable_inline(prg, v[0]);
+	Variable vec = as_variable_resolve_inline(prg, v[0]);
 	
 	CHECK_VECTOR(vec)
 
 	ret = vec;
 
 	for (size_t n = 1; n < v.size(); n++) {	
-		Variable &vec2 = as_variable_inline(prg, v[n]);
+		Variable vec2 = as_variable_resolve_inline(prg, v[n]);
 
 		if (IS_NUMBER(vec2)) {
 			for (size_t i = 0; i < ret.v.size(); i++) {
@@ -2996,7 +2996,7 @@ Variable exprfunc_vmul(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	Variable vec = as_variable_inline(prg, v[0]);
+	Variable vec = as_variable_resolve_inline(prg, v[0]);
 
 	CHECK_VECTOR(vec)
 
@@ -3012,7 +3012,7 @@ Variable exprfunc_vdiv(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	Variable vec = as_variable_inline(prg, v[0]);
+	Variable vec = as_variable_resolve_inline(prg, v[0]);
 
 	CHECK_VECTOR(vec)
 
@@ -3033,7 +3033,7 @@ Variable exprfunc_vlen(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &vec = as_variable_inline(prg, v[0]);
+	Variable vec = as_variable_resolve_inline(prg, v[0]);
 
 	CHECK_VECTOR(vec)
 	
@@ -3057,8 +3057,8 @@ Variable exprfunc_dot(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	const Variable &vec1 = as_variable_inline(prg, v[0]);
-	const Variable &vec2 = as_variable_inline(prg, v[1]);
+	const Variable vec1 = as_variable_resolve_inline(prg, v[0]);
+	const Variable vec2 = as_variable_resolve_inline(prg, v[1]);
 
 	CHECK_VECTOR(vec1)
 	CHECK_VECTOR(vec2)
@@ -3078,8 +3078,8 @@ Variable exprfunc_vangle(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &vec1 = as_variable_inline(prg, v[0]);
-	Variable &vec2 = as_variable_inline(prg, v[1]);
+	Variable vec1 = as_variable_resolve_inline(prg, v[0]);
+	Variable vec2 = as_variable_resolve_inline(prg, v[1]);
 
 	CHECK_VECTOR(vec1)
 	CHECK_VECTOR(vec2)
@@ -3099,7 +3099,7 @@ Variable exprfunc_cross(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	Variable vec = as_variable_inline(prg, v[0]);
+	Variable vec = as_variable_resolve_inline(prg, v[0]);
 
 	CHECK_VECTOR(vec)
 
@@ -3122,7 +3122,7 @@ Variable exprfunc_normalize(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &vec = as_variable_inline(prg, v[0]);
+	Variable vec = as_variable_resolve_inline(prg, v[0]);
 
 	CHECK_VECTOR(vec)
 
@@ -3133,7 +3133,7 @@ Variable exprfunc_vadd(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	Variable vec = as_variable_inline(prg, v[0]);
+	Variable vec = as_variable_resolve_inline(prg, v[0]);
 
 	CHECK_VECTOR(vec)
 
@@ -3155,7 +3155,7 @@ Variable exprfunc_vsub(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	Variable vec = as_variable_inline(prg, v[0]);
+	Variable vec = as_variable_resolve_inline(prg, v[0]);
 
 	CHECK_VECTOR(vec)
 
