@@ -27,10 +27,10 @@ for i 0 (< i num_billboards) 1 loop
 	:loop
 
 number sprite
-sprite_load sprite "enemy"
+sprite_load sprite "pleasant"
 
-number enemy
-billboard_from_sprite enemy sprite 0 0.33 -2 0 0 108
+number pleasant
+billboard_from_sprite pleasant sprite 0 0.25 -2 0 0 32
 
 number texture
 image_load texture "texture.png"
@@ -90,7 +90,7 @@ function set_dest
 	= dz r
 }
 
-function move_enemy
+function move_pleasant
 {
 	vector v1 v2 diff tmp
 	vector_init v1 px py pz
@@ -103,7 +103,7 @@ function move_enemy
 	= tmp (vmul (normalize diff) SPEED)
 	+ px [tmp 0]
 	+ pz [tmp 2]
-	billboard_translate enemy [tmp 0] 0 [tmp 2]
+	billboard_translate pleasant [tmp 0] 0 [tmp 2]
 }
 
 function normalize_angle a
@@ -173,7 +173,7 @@ function draw
 		sprite_set_animation_lazy sprite "walk_e"
 	:right
 
-	billboard_draw enemy 255 255 255 255
+	billboard_draw pleasant 255 255 255 255
 }
 
 function eabs x
@@ -272,5 +272,5 @@ function run
 	rotate_3d angle 0 1 0
 	translate_3d x (+ y -0.1) z
 
-	call move_enemy
+	call move_pleasant
 }
