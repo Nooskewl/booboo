@@ -53,9 +53,9 @@ for i 0 (< i num_billboards) 1 loop
 	* z 10
 	billboard_create b tree x 0.4 z 0.55 0.8
 	vector_add billboards b
-	:loop
+:loop
 
-vector enemies enemy
+vector enemies
 
 call spawn_enemy
 
@@ -122,7 +122,19 @@ function spawn_enemy
 	number pleasant
 	billboard_from_sprite pleasant sprite x 0.25 z 0 0 32
 
-	vector_init enemy sprite pleasant x 0 z 0 0 0 FALSE 0
+	map enemy
+	map_set enemy "sprite" sprite
+	map_set enemy "billboard" pleasant
+	map_set enemy "x" x
+	map_set enemy "y" 0
+	map_set enemy "z" z
+	map_set enemy "dx" 0
+	map_set enemy "dy" 0
+	map_set enemy "dz" 0
+	map_set enemy "dead" FALSE
+	map_set enemy "dead_count" 0
+	map_set enemy "attacking" FALSE
+	map_set enemy "attack_count" 0
 
 	vector_add enemies enemy
 
@@ -141,31 +153,31 @@ function set_dest e
 	- r 500
 	/ r 500
 	* r 10
-	= [e 5] r
+	= [e "dx"] r
 	rand r 0 1000
 	- r 500
 	/ r 500
 	* r 10
-	= [e 7] r
+	= [e "dz"] r
 }
 
 function move_enemy e
 {
-	if (== TRUE [e 8]) done2
+	if (== TRUE [e "dead"]) done2
 		return
 	:done2
 	vector v1 v2 diff tmp
-	vector_init v1 [e 2] [e 3] [e 4]
-	vector_init v2 [e 5] [e 6] [e 7]
+	vector_init v1 [e "x"] [e "y"] [e "z"]
+	vector_init v2 [e "dx"] [e "dy"] [e "dz"]
 	= diff (vsub v2 v1)
 	if (< (vlen diff) 0.1) done
 		call set_dest e
 		return
 	:done
 	= tmp (vmul (normalize diff) SPEED)
-	+ [e 2] [tmp 0]
-	+ [e 4] [tmp 2]
-	billboard_translate [e 1] [tmp 0] 0 [tmp 2]
+	+ [e "x"] [tmp 0]
+	+ [e "z"] [tmp 2]
+	billboard_translate [e "billboard"] [tmp 0] 0 [tmp 2]
 }
 
 function spawn_bullet x y z dx dy dz friendly
@@ -173,8 +185,15 @@ function spawn_bullet x y z dx dy dz friendly
 	number billboard
 	billboard_create billboard projectile x y z 0.25 0.25
 
-	vector bullet
-	vector_init bullet x y z dx dy dz friendly billboard
+	map bullet
+	map_set bullet "x" x
+	map_set bullet "y" y
+	map_set bullet "z" z
+	map_set bullet "dx" dx
+	map_set bullet "dy" dy
+	map_set bullet "dz" dz
+	map_set bullet "friendly" friendly
+	map_set bullet "billboard" billboard
 	vector_add bullets bullet
 }
 
@@ -222,14 +241,16 @@ function draw
 	vector_size enemies sz
 
 	for i 0 (< i sz) 1 loop2
-		if (== TRUE [enemies i 8]) is_dead not_dead
-			sprite_set_animation_lazy [enemies i 0] "dead"
+		if (== TRUE [[enemies i] "dead"]) is_dead (== TRUE [[enemies i] "attacking"]) do_attacking not_dead
+			sprite_set_animation_lazy [[enemies i] "sprite"] "dead"
 		:is_dead
+			sprite_set_animation_lazy [[enemies i] "sprite"] "fire"
+		:do_attacking
 			vector tmp1 tmp2 tmp3 tmp4
 			number angle2
 
-			vector_init tmp1 [enemies i 2] [enemies i 3] [enemies i 4]
-			vector_init tmp2 [enemies i 5] [enemies i 6] [enemies i 7]
+			vector_init tmp1 [[enemies i] "x"] [[enemies i] "y"] [[enemies i] "z"]
+			vector_init tmp2 [[enemies i] "dx"] [[enemies i] "dy"] [[enemies i] "dz"]
 			vector_init tmp3 0 0 1
 			= tmp4 (vsub tmp2 tmp1)
 			
@@ -250,21 +271,21 @@ function draw
 			call_result a normalize_angle a
 
 			if (|| (< a (* PI 0.25)) (> a (* PI 1.75))) front (< a (* PI 0.75)) left (< a (* PI 1.25)) back right
-				sprite_set_animation_lazy [enemies i 0] "walk_s"
+				sprite_set_animation_lazy [[enemies i] "sprite"] "walk_s"
 			:front
-				sprite_set_animation_lazy [enemies i 0] "walk_w"
+				sprite_set_animation_lazy [[enemies i] "sprite"] "walk_w"
 			:left
-				sprite_set_animation_lazy [enemies i 0] "walk_n"
+				sprite_set_animation_lazy [[enemies i] "sprite"] "walk_n"
 			:back
-				sprite_set_animation_lazy [enemies i 0] "walk_e"
+				sprite_set_animation_lazy [[enemies i] "sprite"] "walk_e"
 			:right
 		:not_dead
-		billboard_draw [enemies i 1] 255 255 255 255
+		billboard_draw [[enemies i] "billboard"] 255 255 255 255
 	:loop2
 
 	vector_size bullets sz
 	for i 0 (< i sz) 1 next_bullet
-		billboard_draw [bullets i 7] 255 255 255 255
+		billboard_draw [[bullets i] "billboard"] 255 255 255 255
 	:next_bullet
 
 	set_2d
@@ -410,7 +431,30 @@ function run
 	number sz i
 	vector_size enemies sz
 	for i 0 (< i sz) 1 loop
-		call move_enemy [enemies i]
+		vector v1 v2
+		vector_init v1 [[enemies i] "x"] [[enemies i] "y"] [[enemies i] "z"]
+		vector_init v2 (* x -1) 0 (* z -1)
+		number dist
+		= dist (vlen (vsub v1 v2))
+		number close
+		if (< dist 2.5) is_close not_close
+			= close TRUE
+		:is_close
+			= close FALSE
+		:not_close
+		if (== TRUE [[enemies i] "attacking"]) attacking not_attacking
+			if (== FALSE close) stop_attacking
+				= [[enemies i] "attacking"] FALSE
+				call set_dest [enemies i]
+			:stop_attacking
+		:attacking
+			if (== TRUE close) start_attacking move
+				= [[enemies i] "attacking"] TRUE
+				= [[enemies i] "attack_count"] 0
+			:start_attacking
+				call move_enemy [enemies i]
+			:move
+		:not_attacking
 	:loop
 
 	+ next_spawn 1
@@ -425,18 +469,18 @@ function run
 	= i 0
 :again
 	vector v
-	vector_init v [bullets i 3] [bullets i 4] [bullets i 5]
+	vector_init v [[bullets i] "dx"] [[bullets i] "dy"] [[bullets i] "dz"]
 	= v (vmul v BULLET_SPEED)
-	+ [bullets i 0] [v 0]
-	+ [bullets i 1] [v 1]
-	+ [bullets i 2] [v 2]
-	billboard_translate [bullets i 7] [v 0] [v 1] [v 2]
+	+ [[bullets i] "x"] [v 0]
+	+ [[bullets i] "y"] [v 1]
+	+ [[bullets i] "z"] [v 2]
+	billboard_translate [[bullets i] "billboard"] [v 0] [v 1] [v 2]
 	number del
 	= del FALSE
-	if (|| (< [bullets i 0] -10) (> [bullets i 0] 10)) delete_it
+	if (|| (< [[bullets i] "x"] -10) (> [[bullets i] "x"] 10)) delete_it
 		= del TRUE
 	:delete_it
-	if (|| (< [bullets i 2] -10) (> [bullets i 2] 10)) delete_it2
+	if (|| (< [[bullets i] "z"] -10) (> [[bullets i] "z"] 10)) delete_it2
 		= del TRUE
 	:delete_it2
 	? del TRUE
@@ -480,15 +524,15 @@ function run
 	jge no_bullets
 	? j nb
 	jge no_bullets
-	if (== FALSE [bullets j 6]) next_b2
+	if (== FALSE [[bullets j] "friendly"]) next_b2
 		goto no_collide
 	:next_b2
 	number col
-	cd_sphere_sphere col [enemies i 2] [enemies i 3] [enemies i 4] 0.25 [bullets j 0] [bullets j 1] [bullets j 2] 0.125
+	cd_sphere_sphere col [[enemies i] "x"] [[enemies i] "y"] [[enemies i] "z"] 0.25 [[bullets j] "x"] [[bullets j] "y"] [[bullets j] "z"] 0.125
 	? col 0
 	je no_collide
-	= [enemies i 8] TRUE
-	= [enemies i 9] 30
+	= [[enemies i] "dead"] TRUE
+	= [[enemies i] "dead_count"] 30
 	- nb 1
 	vector_erase bullets j
 	mml_play hit 1 0
@@ -508,10 +552,10 @@ function run
 :next_dead
 	? i ne
 	jge killed_enemies
-	? [enemies i 8] FALSE
+	? [[enemies i] "dead"] FALSE
 	je not_dead
-	- [enemies i 9] 1
-	? [enemies i 9] 0
+	- [[enemies i] "dead_count"] 1
+	? [[enemies i] "dead_count"] 0
 	jge not_dead
 	vector_erase enemies i
 	- ne 1
