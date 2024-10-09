@@ -1,4 +1,4 @@
-resize 320 180
+resize 240 135
 
 number SPEED
 = SPEED 0.01
@@ -255,7 +255,7 @@ function draw
 	number hand_w hand_h
 	image_size hand hand_w hand_h
 	if (> fired 0) draw_hand
-		image_draw hand 255 255 255 255 (- (* 320 0.75) (/ hand_w 2)) (- 180 hand_h) 0 0
+		image_draw hand 255 255 255 255 (- (* 240 0.75) (/ hand_w 2)) (- 135 hand_h) 0 0
 	:draw_hand
 }
 
@@ -424,7 +424,7 @@ function run
 		= v (normalize v)
 		call spawn_bullet (* x -1) 0.2 (* z -1) [v 0] [v 1] [v 2] TRUE
 		mml_play fire_sfx 1 0
-		= fired 15
+		= fired 30
 	:fire
 
 	= fire_down (== joy_a 1)
