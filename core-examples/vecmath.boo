@@ -33,6 +33,14 @@ call printv c
 print "V3 normalized="
 call printv c
 
+= c (vadd v1 v2)
+print "v1 + v2="
+call printv c
+
+= c (vsub v3 v2)
+print "v3 - v2="
+call printv c
+
 function printv v
 {
 	print "[% % %]\n" [v 0] [v 1] [v 2]

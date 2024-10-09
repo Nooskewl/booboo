@@ -3033,6 +3033,50 @@ Variable exprfunc_normalize(Program *prg, const std::vector<Token> &v)
 	return vecmul(vec, 1.0 / veclen(vec));
 }
 
+Variable exprfunc_vadd(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	Variable vec = as_variable_inline(prg, v[0]);
+
+	CHECK_VECTOR(vec)
+
+	for (size_t i = 1; i < v.size(); i++) {
+		Variable &vec2 = as_variable_inline(prg, v[i]);
+		CHECK_VECTOR(vec2)
+		if (vec.v.size() != vec2.v.size()) {
+			throw Error(std::string(__FUNCTION__) + ": " + "Can't add different sized vectors at " + get_error_info(prg));
+		}
+		for (size_t j = 0; j < vec.v.size(); j++) {
+			vec.v[j].n += vec2.v[j].n;
+		}
+	}
+
+	return vec;
+}
+
+Variable exprfunc_vsub(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	Variable vec = as_variable_inline(prg, v[0]);
+
+	CHECK_VECTOR(vec)
+
+	for (size_t i = 1; i < v.size(); i++) {
+		Variable &vec2 = as_variable_inline(prg, v[i]);
+		CHECK_VECTOR(vec2)
+		if (vec.v.size() != vec2.v.size()) {
+			throw Error(std::string(__FUNCTION__) + ": " + "Can't subtract different sized vectors at " + get_error_info(prg));
+		}
+		for (size_t j = 0; j < vec.v.size(); j++) {
+			vec.v[j].n -= vec2.v[j].n;
+		}
+	}
+
+	return vec;
+}
+
 static void init_token_map()
 {
 	add_token_handler(':', tokenfunc_label);
@@ -3089,6 +3133,8 @@ void start()
 	add_expression_handler("vangle", exprfunc_vangle);
 	add_expression_handler("cross", exprfunc_cross);
 	add_expression_handler("normalize", exprfunc_normalize);
+	add_expression_handler("vadd", exprfunc_vadd);
+	add_expression_handler("vsub", exprfunc_vsub);
 
 	add_instruction("reset", breaker_reset);
 	add_instruction("exit", breaker_exit);
