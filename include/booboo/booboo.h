@@ -117,6 +117,7 @@ std::string get_error_info(Program *prg);
 
 // These are helpful within your own library functions
 Variable &as_variable(Program *prg, const Token &t);
+Variable as_variable_resolve(Program *prg, const Token &t);
 double as_number(Program *prg, const Token &t);
 std::string as_string(Program *prg, const Token &t);
 int as_label(Program *prg, const Token &t);

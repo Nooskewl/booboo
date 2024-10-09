@@ -972,7 +972,7 @@ static bool vectorfunc_init(Program *prg, const std::vector<Token> &v)
 			vec.v.push_back(var);
 		}
 		else {
-			Variable &var = as_variable(prg, v[i]);
+			Variable var = as_variable_resolve(prg, v[i]);
 			vec.v.push_back(var);
 		}
 	}

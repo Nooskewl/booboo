@@ -3436,6 +3436,11 @@ Variable &as_variable(Program *prg, const Token &t)
 	return as_variable_inline(prg, t);
 }
 
+Variable as_variable_resolve(Program *prg, const Token &t)
+{
+	return as_variable_resolve_inline(prg, t);
+}
+
 double as_number(Program *prg, const Token &t)
 {
 	return as_number_inline(prg, t);
