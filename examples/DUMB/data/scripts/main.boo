@@ -1,5 +1,14 @@
 resize 240 135
 
+number score
+= score 0
+
+number font
+font_load font "font.ttf" 16 1
+
+number eicon
+image_load eicon "stand_s.png"
+
 number SPEED
 = SPEED 0.01
 
@@ -254,6 +263,27 @@ function draw
 
 	set_2d
 
+	string scores
+	string_format scores "%" score
+
+	number xx
+	= xx 240
+	- xx 20
+	number w
+	font_width font w scores
+	- xx w
+
+	font_draw font 0 0 0 255 scores (- xx 1) 10
+	font_draw font 0 0 0 255 scores (+ xx 1) 10
+	font_draw font 0 0 0 255 scores xx 9
+	font_draw font 0 0 0 255 scores xx 11
+	font_draw font 255 255 255 255 scores xx 10
+
+	- xx 10
+	- xx 16
+
+	image_draw eicon 255 255 255 255 xx 10 0 0
+
 	number hand
 	= hand hand_normal
 	if (> fired 0) draw_hand
@@ -453,6 +483,7 @@ function run
 	vector_erase enemies i
 	vector_erase bullets j
 	mml_play hit 1 0
+	+ score 100
 	goto next_e
 :no_collide
 	+ j 1
