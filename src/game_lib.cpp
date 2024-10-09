@@ -2826,6 +2826,8 @@ void set_2d()
 	gfx::set_default_projection(shim::screen_size, shim::screen_offset, shim::scale);
 	gfx::update_projection();
 
+	gfx::apply_screen_shake();
+
 	is_3d = false;
 }
 
