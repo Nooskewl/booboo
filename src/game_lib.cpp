@@ -2460,7 +2460,7 @@ static bool cfgfunc_get_string(Program *prg, const std::vector<Token> &v)
 	CFG_Info *info = cfg_info(prg);
 
 	CHECK_NUMBER(v1)
-	CHECK_NUMBER(v2)
+	CHECK_STRING(v2)
 
 	int id = v1.n;
 	
