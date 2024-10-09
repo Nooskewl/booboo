@@ -3675,6 +3675,31 @@ static bool cdfunc_model_line_segment(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool cdfunc_sphere_sphere(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(9)
+
+	Variable &result = as_variable(prg, v[0]);
+	float x = as_number(prg, v[1]);
+	float y = as_number(prg, v[2]);
+	float z = as_number(prg, v[3]);
+	float r = as_number(prg, v[4]);
+	float x2 = as_number(prg, v[5]);
+	float y2 = as_number(prg, v[6]);
+	float z2 = as_number(prg, v[7]);
+	float r2 = as_number(prg, v[8]);
+
+	CHECK_NUMBER(result)
+
+	x -= x2;
+	y -= y2;
+	z -= z2;
+	float len = sqrt(x*x + y*y + z*z);
+	result.n = len < (r+r2);
+
+	return true;
+}
+
 void start_lib_game()
 {
 	gfx::register_lost_device_callbacks(nullptr, found_device_callback);
@@ -3812,6 +3837,7 @@ void start_lib_game()
 	add_instruction("billboard_scale", modelfunc_billboard_scale);
 	add_instruction("cd_model_point", cdfunc_model_point);
 	add_instruction("cd_model_line_segment", cdfunc_model_line_segment);
+	add_instruction("cd_sphere_sphere", cdfunc_sphere_sphere);
 }
 
 void end_lib_game()

@@ -569,6 +569,15 @@ cd_model_point
 	The model must be closed for this to work properly
 	e.g. cd_model_point result model x y z
 
+cd_model_line_segment
+	Check if a line segment intersects or is contained in a model
+	If result is TRUE, outx/outy/outz will have the intersection point
+	e.g. cd_model_line_segment result model x y z x2 y2 z2 outx outy outz
+
+cd_sphere_sphere
+	Check if two sphere intersect
+	e.g. cd_sphere_sphere result x y z r x2 y2 z2 r2
+
 -- Audio Functions -----------------------------------------------------------
 
 mml_create
