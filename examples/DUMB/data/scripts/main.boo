@@ -139,14 +139,22 @@ function draw
 		billboard_draw [billboards i] 255 255 255 255
 	:loop
 
-	vector tmp1 tmp2 tmp3
+	vector tmp1 tmp2 tmp3 tmp4
 	number angle2
 
 	vector_init tmp1 px py pz
 	vector_init tmp2 dx dy dz
 	vector_init tmp3 0 0 1
+	= tmp4 (vsub tmp2 tmp1)
+	
+	= angle2 (vangle tmp4 tmp3)
 
-	= angle2 (vangle (vsub tmp2 tmp1) tmp3)
+	vector cross plane
+	= cross (cross tmp4 tmp3)
+	vector_init plane 0 1 0
+	if (< (dot plane cross) 0) negate
+		neg angle2
+	:negate
 
 	call_result angle normalize_angle angle
 

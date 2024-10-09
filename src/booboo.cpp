@@ -3119,19 +3119,7 @@ Variable exprfunc_vangle(Program *prg, const std::vector<Token> &v)
 	Variable var;
 	var.type = Variable::NUMBER;
 	var.n = acosf(vecdot(vec1, vec2) / veclen(vecmul(vec1, veclen(vec2))));
-	Variable cross = veccross(vec1, vec2);
-	Variable plane, tmp;
-	tmp.type = Variable::NUMBER;
-	plane.type = Variable::VECTOR;
-	tmp.n = 0;
-	plane.v.push_back(tmp);
-	tmp.n = 1;
-	plane.v.push_back(tmp);
-	tmp.n = 0;
-	plane.v.push_back(tmp);
-	if (vecdot(plane, cross) < 0) {
-		var.n = -var.n;
-	}
+
 	return var;
 }
 
