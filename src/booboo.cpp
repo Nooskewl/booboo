@@ -2887,12 +2887,8 @@ Variable exprfunc_mmul(Program *prg, const std::vector<Token> &v)
 	return ret;
 }
 
-Variable exprfunc_midentity(Program *prg, const std::vector<Token> &v)
+static Variable identity(int sz)
 {
-	COUNT_ARGS(1)
-	
-	int sz = as_number_inline(prg, v[0]);
-
 	Variable var;
 	var.type = Variable::VECTOR;
 
@@ -2914,6 +2910,77 @@ Variable exprfunc_midentity(Program *prg, const std::vector<Token> &v)
 	}
 
 	return var;
+}
+
+Variable exprfunc_midentity(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+	
+	int sz = as_number_inline(prg, v[0]);
+
+	return identity(sz);
+}
+
+Variable exprfunc_mscale(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	float sx = as_number_inline(prg, v[0]);
+	float sy = as_number_inline(prg, v[1]);
+	float sz = as_number_inline(prg, v[2]);
+
+	Variable mat = identity(4);
+
+	mat.v[0].v[0].n = sx;
+	mat.v[1].v[1].n = sy;
+	mat.v[2].v[2].n = sz;
+
+	return mat;
+}
+
+Variable exprfunc_mrotate(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+	
+	float angle = as_number_inline(prg, v[0]);
+	float x = as_number_inline(prg, v[1]);
+	float y = as_number_inline(prg, v[2]);
+	float z = as_number_inline(prg, v[3]);
+
+	float s = sin(angle);
+	float c = cos(angle);
+	float invc = 1 - c;
+
+	Variable mat = identity(4);
+
+	mat.v[0].v[0].n = (invc * x * x) + c;
+	mat.v[0].v[1].n = (invc * x * y) + (z * s);
+	mat.v[0].v[2].n = (invc * x * z) - (y * s);
+	mat.v[1].v[0].n = (invc * x * y) - (z * s);
+	mat.v[1].v[1].n = (invc * y * y) + c;
+	mat.v[1].v[2].n = (invc * z * y) + (x * s);
+	mat.v[2].v[0].n = (invc * x * z) + (y * s);
+	mat.v[2].v[1].n = (invc * y * z) - (x * s);
+	mat.v[2].v[2].n = (invc * z * z) + c;
+
+	return mat;
+}
+
+Variable exprfunc_mtranslate(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	Variable mat = identity(4);
+
+	float tx = as_number_inline(prg, v[0]);
+	float ty = as_number_inline(prg, v[1]);
+	float tz = as_number_inline(prg, v[2]);
+
+	mat[3][0] = tx;
+	mat[3][1] = ty;
+	mat[3][2] = tz;
+
+	return mat;
 }
 
 static Variable vecmul(Variable vec, double n)
@@ -3156,6 +3223,9 @@ void start()
 	add_expression_handler(">>", exprfunc_rightshift);
 	add_expression_handler("mmul", exprfunc_mmul);
 	add_expression_handler("midentity", exprfunc_midentity);
+	add_expression_handler("mscale", exprfunc_mscale);
+	add_expression_handler("mrotate", exprfunc_mrotate);
+	add_expression_handler("mtranslate", exprfunc_mtranslate);
 	add_expression_handler("vmul", exprfunc_vmul);
 	add_expression_handler("vdiv", exprfunc_vdiv);
 	add_expression_handler("vlen", exprfunc_vlen);
