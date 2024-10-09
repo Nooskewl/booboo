@@ -406,4 +406,34 @@ function run
 	:fire
 
 	= fire_down (== joy_a 1)
+
+	number ne nb j
+	vector_size enemies ne
+	vector_size bullets nb
+
+	= i 0
+:next_e
+	= j 0
+:next_b
+	? ne 0
+	je no_bullets
+	? nb 0
+	je no_bullets
+	number col
+	cd_sphere_sphere col [enemies i 2] [enemies i 3] [enemies i 4] 0.25 [bullets j 0] [bullets j 1] [bullets j 2] 0.125
+	? col 0
+	je no_collide
+	- ne 1
+	- nb 1
+	vector_erase enemies i
+	vector_erase bullets j
+	goto next_e
+:no_collide
+	+ j 1
+	? j nb
+	jl next_b
+	+ i 1
+	? i ne
+	jl next_e
+:no_bullets
 }
