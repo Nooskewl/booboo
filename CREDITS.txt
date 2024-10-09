@@ -2,3 +2,5 @@ The Leibniz benchmarks other than BooBoo are from:
 https://github.com/niklas-heer/speed-comparison
 
 Smol-Brain made the mountains model (https://www.cgtrader.com/free-3d-models/various/various-models/snowy-mountain-366286fa-77b4-45ca-be47-f4125d5b79cd)
+
+Some DUMB sprites are from Freedoom: https://freedoom.github.io/
