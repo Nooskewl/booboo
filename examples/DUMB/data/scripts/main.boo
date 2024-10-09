@@ -15,6 +15,11 @@ vector billboards
 number num_billboards
 = num_billboards 100
 
+number hit
+mml_create hit "@PO0 = { 0 1000 }\nA @TYPE1 @PO0 a8 @PO0"
+number fire_sfx
+mml_create fire_sfx "@PO0 = { 0 100 }\nA @TYPE0 o3 y16 @PO0 a8 @PO0"
+
 number i
 for i 0 (< i num_billboards) 1 loop
 	number b
@@ -37,7 +42,7 @@ vector enemies enemy
 call spawn_enemy
 
 number SPAWN_TIME next_spawn
-= SPAWN_TIME 180
+= SPAWN_TIME 100
 = next_spawn 0
 
 number texture
@@ -403,6 +408,7 @@ function run
 		vector_init v c 0 s
 		= v (normalize v)
 		call spawn_bullet (* x -1) 0.2 (* z -1) [v 0] [v 1] [v 2] TRUE
+		mml_play fire_sfx 1 0
 	:fire
 
 	= fire_down (== joy_a 1)
@@ -427,6 +433,7 @@ function run
 	- nb 1
 	vector_erase enemies i
 	vector_erase bullets j
+	mml_play hit 1 0
 	goto next_e
 :no_collide
 	+ j 1
