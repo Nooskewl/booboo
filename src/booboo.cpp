@@ -2976,9 +2976,9 @@ Variable exprfunc_mtranslate(Program *prg, const std::vector<Token> &v)
 	float ty = as_number_inline(prg, v[1]);
 	float tz = as_number_inline(prg, v[2]);
 
-	mat[3][0] = tx;
-	mat[3][1] = ty;
-	mat[3][2] = tz;
+	mat.v[3].v[0].n = tx;
+	mat.v[3].v[1].n = ty;
+	mat.v[3].v[2].n = tz;
 
 	return mat;
 }
