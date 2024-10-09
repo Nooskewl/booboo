@@ -2,7 +2,7 @@ number SPEED
 = SPEED 0.01
 
 number BULLET_SPEED
-= BULLET_SPEED 0.1
+= BULLET_SPEED 0.2
 
 number tree
 image_load tree "tree.png"
@@ -18,7 +18,7 @@ number num_billboards
 number hit
 mml_create hit "@PO0 = { 0 1000 }\nA @TYPE1 @PO0 a8 @PO0"
 number fire_sfx
-mml_create fire_sfx "@PO0 = { 0 100 }\nA @TYPE0 o3 y16 @PO0 a8 @PO0"
+mml_create fire_sfx "@PO0 = { 0 100 }\nA @TYPE0 o1 y16 @PO0 a8 @PO0"
 
 number i
 for i 0 (< i num_billboards) 1 loop
