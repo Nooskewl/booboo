@@ -644,6 +644,7 @@ function run
 			screen_shake 1.5 500
 			rumble 500
 		:player_not_dead
+		mml_play hit 1 0
 		vector_erase bullets i
 		- nb 1
 		goto check_next_bullet
