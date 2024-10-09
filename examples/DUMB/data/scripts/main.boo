@@ -122,7 +122,7 @@ function spawn_enemy
 	number pleasant
 	billboard_from_sprite pleasant sprite x 0.25 z 0 0 32
 
-	vector_init enemy sprite pleasant x 0 z 0 0 0
+	vector_init enemy sprite pleasant x 0 z 0 0 0 FALSE 0
 
 	vector_add enemies enemy
 
@@ -151,6 +151,9 @@ function set_dest e
 
 function move_enemy e
 {
+	if (== TRUE [e 8]) done2
+		return
+	:done2
 	vector v1 v2 diff tmp
 	vector_init v1 [e 2] [e 3] [e 4]
 	vector_init v2 [e 5] [e 6] [e 7]
@@ -219,40 +222,43 @@ function draw
 	vector_size enemies sz
 
 	for i 0 (< i sz) 1 loop2
-		vector tmp1 tmp2 tmp3 tmp4
-		number angle2
+		if (== TRUE [enemies i 8]) is_dead not_dead
+			sprite_set_animation_lazy [enemies i 0] "dead"
+		:is_dead
+			vector tmp1 tmp2 tmp3 tmp4
+			number angle2
 
-		vector_init tmp1 [enemies i 2] [enemies i 3] [enemies i 4]
-		vector_init tmp2 [enemies i 5] [enemies i 6] [enemies i 7]
-		vector_init tmp3 0 0 1
-		= tmp4 (vsub tmp2 tmp1)
-		
-		= angle2 (vangle tmp4 tmp3)
+			vector_init tmp1 [enemies i 2] [enemies i 3] [enemies i 4]
+			vector_init tmp2 [enemies i 5] [enemies i 6] [enemies i 7]
+			vector_init tmp3 0 0 1
+			= tmp4 (vsub tmp2 tmp1)
+			
+			= angle2 (vangle tmp4 tmp3)
 
-		vector cross plane
-		= cross (cross tmp4 tmp3)
-		vector_init plane 0 1 0
-		if (< (dot plane cross) 0) negate
-			neg angle2
-		:negate
+			vector cross plane
+			= cross (cross tmp4 tmp3)
+			vector_init plane 0 1 0
+			if (< (dot plane cross) 0) negate
+				neg angle2
+			:negate
 
-		call_result angle normalize_angle angle
+			call_result angle normalize_angle angle
 
-		number a
-		= a (- angle2 angle)
+			number a
+			= a (- angle2 angle)
 
-		call_result a normalize_angle a
+			call_result a normalize_angle a
 
-		if (|| (< a (* PI 0.25)) (> a (* PI 1.75))) front (< a (* PI 0.75)) left (< a (* PI 1.25)) back right
-			sprite_set_animation_lazy [enemies i 0] "walk_s"
-		:front
-			sprite_set_animation_lazy [enemies i 0] "walk_w"
-		:left
-			sprite_set_animation_lazy [enemies i 0] "walk_n"
-		:back
-			sprite_set_animation_lazy [enemies i 0] "walk_e"
-		:right
-
+			if (|| (< a (* PI 0.25)) (> a (* PI 1.75))) front (< a (* PI 0.75)) left (< a (* PI 1.25)) back right
+				sprite_set_animation_lazy [enemies i 0] "walk_s"
+			:front
+				sprite_set_animation_lazy [enemies i 0] "walk_w"
+			:left
+				sprite_set_animation_lazy [enemies i 0] "walk_n"
+			:back
+				sprite_set_animation_lazy [enemies i 0] "walk_e"
+			:right
+		:not_dead
 		billboard_draw [enemies i 1] 255 255 255 255
 	:loop2
 
@@ -470,29 +476,48 @@ function run
 :next_e
 	= j 0
 :next_b
-	? ne 0
-	je no_bullets
-	? nb 0
-	je no_bullets
+	? i ne
+	jge no_bullets
+	? j nb
+	jge no_bullets
 	number col
 	cd_sphere_sphere col [enemies i 2] [enemies i 3] [enemies i 4] 0.25 [bullets j 0] [bullets j 1] [bullets j 2] 0.125
 	? col 0
 	je no_collide
-	- ne 1
+	= [enemies i 8] TRUE
+	= [enemies i 9] 30
 	- nb 1
-	vector_erase enemies i
 	vector_erase bullets j
 	mml_play hit 1 0
 	+ score 100
-	goto next_e
+	goto next_e2
 :no_collide
 	+ j 1
 	? j nb
 	jl next_b
+:next_e2
 	+ i 1
 	? i ne
 	jl next_e
 :no_bullets
+
+	= i 0
+:next_dead
+	? i ne
+	jge killed_enemies
+	? [enemies i 8] FALSE
+	je not_dead
+	- [enemies i 9] 1
+	? [enemies i 9] 0
+	jge not_dead
+	vector_erase enemies i
+	- ne 1
+	goto next_dead
+:not_dead
+	+ i 1
+	? i ne
+	jl next_dead
+:killed_enemies
 
 	- fired 1
 }
