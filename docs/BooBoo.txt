@@ -313,6 +313,16 @@ log10
 	Base 10 logarithm
 	e.g. log10 x
 
+Vector and matrix math
+	Some vector and matrix math is available through expression
+	operators. Supported are: mmul, midentity, mscale, mrotate,
+	mtranslate, vmul, vdiv, vlen, dot, vangle, cross, normalize,
+	vadd, vsubb
+	Most of these behave as you'd expect. midentity takes 1 argument,
+	the size of the matrix. mscale, mrotate and mtranslate produce
+	transformation matrices to be multiplied by another matrix
+	(mscale and mtranslate take 3 parameters, mrotate takes 4.)
+
 -- Vector Functions ----------------------------------------------------------
 
 vector_add
