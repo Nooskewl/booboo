@@ -3093,6 +3093,15 @@ Variable exprfunc_dot(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
+static Variable veccross(Variable vec, Variable vec2)
+{
+	Variable tmp = vec;
+	vec.v[0].n = tmp.v[0].n * vec2.v[2].n - tmp.v[2].n * vec2.v[1].n;
+	vec.v[1].n = tmp.v[2].n * vec2.v[0].n - tmp.v[0].n * vec2.v[2].n;
+	vec.v[2].n = tmp.v[0].n * vec2.v[1].n - tmp.v[1].n * vec2.v[0].n;
+	return vec;
+}
+
 Variable exprfunc_vangle(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -3110,7 +3119,19 @@ Variable exprfunc_vangle(Program *prg, const std::vector<Token> &v)
 	Variable var;
 	var.type = Variable::NUMBER;
 	var.n = acosf(vecdot(vec1, vec2) / veclen(vecmul(vec1, veclen(vec2))));
-
+	Variable cross = veccross(vec1, vec2);
+	Variable plane, tmp;
+	tmp.type = Variable::NUMBER;
+	plane.type = Variable::VECTOR;
+	tmp.n = 0;
+	plane.v.push_back(tmp);
+	tmp.n = 1;
+	plane.v.push_back(tmp);
+	tmp.n = 0;
+	plane.v.push_back(tmp);
+	if (vecdot(plane, cross) < 0) {
+		var.n = -var.n;
+	}
 	return var;
 }
 
@@ -3128,10 +3149,7 @@ Variable exprfunc_cross(Program *prg, const std::vector<Token> &v)
 		if (vec.v.size() < 3 || vec2.v.size() < 3) {
 			throw Error(std::string(__FUNCTION__) + ": " + "Vector with < 3 components not supported at " + get_error_info(prg));
 		}
-		Variable tmp = vec;
-		vec.v[0].n = tmp.v[0].n * vec2.v[2].n - tmp.v[2].n * vec2.v[1].n;
-		vec.v[1].n = tmp.v[2].n * vec2.v[0].n - tmp.v[0].n * vec2.v[2].n;
-		vec.v[2].n = tmp.v[0].n * vec2.v[1].n - tmp.v[1].n * vec2.v[0].n;
+		vec = veccross(vec, vec2);
 	}
 
 	return vec;
