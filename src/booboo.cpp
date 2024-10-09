@@ -3001,8 +3001,27 @@ Variable exprfunc_vmul(Program *prg, const std::vector<Token> &v)
 	CHECK_VECTOR(vec)
 
 	for (size_t i = 1; i < v.size(); i++) {
-		double n = as_number_inline(prg, v[i]);
-		vec = vecmul(vec, n);
+		Variable var = as_variable_resolve_inline(prg, v[i]);
+		if (var.type == Variable::NUMBER) {
+			vec = vecmul(vec, var.n);
+		}
+		else if (var.type == Variable::VECTOR) {
+			if (var.v.size() < 1 || var.v[0].v.size() != vec.v.size()) {
+				throw Error(std::string(__FUNCTION__) + ": " + "Vector and matrix cannot be multiplied at " + get_error_info(prg));
+			}
+			Variable tmp = vec;
+			for (size_t c = 0; c < vec.v.size(); c++) {
+				int sum = 0;
+				for (size_t r = 0; r < vec.v.size(); r++) {
+					sum += vec.v[r].n * var.v[c].v[r].n;
+				}
+				tmp.v[c].n = sum;
+			}
+			vec = tmp;
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Unsupported types in vector multiplication at " + get_error_info(prg));
+		}
 	}
 
 	return vec;
