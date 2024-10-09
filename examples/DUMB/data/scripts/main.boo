@@ -12,8 +12,10 @@ image_load tree "tree.png"
 number projectile
 image_load projectile "projectile.png"
 
-number hand
-image_load hand "fire.png"
+number hand_normal
+image_load hand_normal "hand_normal.png"
+number hand_fire
+image_load hand_fire "hand_fire.png"
 number fired
 = fired 0
 
@@ -252,11 +254,12 @@ function draw
 
 	set_2d
 
-	number hand_w hand_h
-	image_size hand hand_w hand_h
+	number hand
+	= hand hand_normal
 	if (> fired 0) draw_hand
-		image_draw hand 255 255 255 255 (- (* 240 0.75) (/ hand_w 2)) (- 135 hand_h) 0 0
+		= hand hand_fire
 	:draw_hand
+	image_draw hand 255 255 255 255 32 0 0 0
 }
 
 function eabs x
