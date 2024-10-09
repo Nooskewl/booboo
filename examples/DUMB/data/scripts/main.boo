@@ -26,11 +26,13 @@ for i 0 (< i num_billboards) 1 loop
 	vector_add billboards b
 	:loop
 
-number sprite
-sprite_load sprite "pleasant"
+vector enemies enemy
 
-number pleasant
-billboard_from_sprite pleasant sprite 0 0.25 -2 0 0 32
+call spawn_enemy
+
+number SPAWN_TIME next_spawn
+= SPAWN_TIME 180
+= next_spawn 0
 
 number texture
 image_load texture "texture.png"
@@ -66,44 +68,69 @@ number x y z
 = y 0
 = z 0
 
-number px py pz dx dy dz
-= px 0
-= py 0
-= pz 0
-
-call set_dest
-
 mouse_set_relative TRUE
 
-function set_dest
+function spawn_enemy
+{
+	number x
+	rand x 0 1000
+	- x 500
+	/ x 500
+	* x 10
+
+	number z
+	rand z 0 1000
+	- z 500
+	/ z 500
+	* z 10
+
+	number sprite
+	sprite_load sprite "pleasant"
+
+	number pleasant
+	billboard_from_sprite pleasant sprite x 0.25 z 0 0 32
+
+	vector_init enemy sprite pleasant x 0 z 0 0 0
+
+	vector_add enemies enemy
+
+	number sz
+	vector_size enemies sz
+	- sz 1
+
+	call set_dest [enemies sz]
+}
+
+
+function set_dest e
 {
 	number r
 	rand r 0 1000
 	- r 500
 	/ r 500
 	* r 10
-	= dx r
+	= [e 5] r
 	rand r 0 1000
 	- r 500
 	/ r 500
 	* r 10
-	= dz r
+	= [e 7] r
 }
 
-function move_pleasant
+function move_enemy e
 {
 	vector v1 v2 diff tmp
-	vector_init v1 px py pz
-	vector_init v2 dx dy dz
+	vector_init v1 [e 2] [e 3] [e 4]
+	vector_init v2 [e 5] [e 6] [e 7]
 	= diff (vsub v2 v1)
 	if (< (vlen diff) 0.1) done
-		call set_dest
+		call set_dest e
 		return
 	:done
 	= tmp (vmul (normalize diff) SPEED)
-	+ px [tmp 0]
-	+ pz [tmp 2]
-	billboard_translate pleasant [tmp 0] 0 [tmp 2]
+	+ [e 2] [tmp 0]
+	+ [e 4] [tmp 2]
+	billboard_translate [e 1] [tmp 0] 0 [tmp 2]
 }
 
 function normalize_angle a
@@ -139,41 +166,46 @@ function draw
 		billboard_draw [billboards i] 255 255 255 255
 	:loop
 
-	vector tmp1 tmp2 tmp3 tmp4
-	number angle2
+	number sz
+	vector_size enemies sz
 
-	vector_init tmp1 px py pz
-	vector_init tmp2 dx dy dz
-	vector_init tmp3 0 0 1
-	= tmp4 (vsub tmp2 tmp1)
-	
-	= angle2 (vangle tmp4 tmp3)
+	for i 0 (< i sz) 1 loop2
+		vector tmp1 tmp2 tmp3 tmp4
+		number angle2
 
-	vector cross plane
-	= cross (cross tmp4 tmp3)
-	vector_init plane 0 1 0
-	if (< (dot plane cross) 0) negate
-		neg angle2
-	:negate
+		vector_init tmp1 [enemies i 2] [enemies i 3] [enemies i 4]
+		vector_init tmp2 [enemies i 5] [enemies i 6] [enemies i 7]
+		vector_init tmp3 0 0 1
+		= tmp4 (vsub tmp2 tmp1)
+		
+		= angle2 (vangle tmp4 tmp3)
 
-	call_result angle normalize_angle angle
+		vector cross plane
+		= cross (cross tmp4 tmp3)
+		vector_init plane 0 1 0
+		if (< (dot plane cross) 0) negate
+			neg angle2
+		:negate
 
-	number a
-	= a (- angle2 angle)
+		call_result angle normalize_angle angle
 
-	call_result a normalize_angle a
+		number a
+		= a (- angle2 angle)
 
-	if (|| (< a (* PI 0.25)) (> a (* PI 1.75))) front (< a (* PI 0.75)) left (< a (* PI 1.25)) back right
-		sprite_set_animation_lazy sprite "walk_s"
-	:front
-		sprite_set_animation_lazy sprite "walk_w"
-	:left
-		sprite_set_animation_lazy sprite "walk_n"
-	:back
-		sprite_set_animation_lazy sprite "walk_e"
-	:right
+		call_result a normalize_angle a
 
-	billboard_draw pleasant 255 255 255 255
+		if (|| (< a (* PI 0.25)) (> a (* PI 1.75))) front (< a (* PI 0.75)) left (< a (* PI 1.25)) back right
+			sprite_set_animation_lazy [enemies i 0] "walk_s"
+		:front
+			sprite_set_animation_lazy [enemies i 0] "walk_w"
+		:left
+			sprite_set_animation_lazy [enemies i 0] "walk_n"
+		:back
+			sprite_set_animation_lazy [enemies i 0] "walk_e"
+		:right
+
+		billboard_draw [enemies i 1] 255 255 255 255
+	:loop2
 }
 
 function eabs x
@@ -267,10 +299,33 @@ function run
 	+ y yi yi2
 	+ z zi zi2
 
+	if (< x -10) incx
+		= x -10
+	:incx
+	if (> x 10) decx
+		= x 10
+	:decx
+	if (< z -10) incz
+		= z -10
+	:incz
+	if (> z 10) decz
+		= z 10
+	:decz
+
 	identity_3d
 	rotate_3d anglex 1 0 0
 	rotate_3d angle 0 1 0
 	translate_3d x (+ y -0.1) z
 
-	call move_pleasant
+	number sz i
+	vector_size enemies sz
+	for i 0 (< i sz) 1 loop
+		call move_enemy [enemies i]
+	:loop
+
+	+ next_spawn 1
+	if (>= next_spawn SPAWN_TIME) spawn
+		call spawn_enemy
+		= next_spawn 0
+	:spawn
 }
