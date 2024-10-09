@@ -1860,6 +1860,22 @@ static void sprite_callback(void *data)
 	delete d;
 }
 
+static bool spritefunc_set_animation_lazy(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string anim = as_string(prg, v[1]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	sprite->set_animation_lazy(anim);
+
+	return true;
+}
+
 static bool spritefunc_set_animation(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
@@ -3502,7 +3518,7 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 	const int faces[] = {
 		0, 1, 2, 1, 2, 3
 	};
-	const float texcoords[] = {
+	float texcoords[] = {
 		0.0f, 0.0f,
 		1.0f, 0.0f,
 		0.0f, 1.0f,
@@ -3516,6 +3532,17 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 		img = billboard->sprite->get_current_image();
 		billboard->w = img->size.w / (float)billboard->unit;
 		billboard->h = img->size.h / (float)billboard->unit;
+		gfx::Image *root = img->get_root();
+		float tx1 = (float)img->get_offset().x / root->size.w;
+		float tx2 = tx1 + 1.0f / billboard->sprite->get_num_frames();
+		for (int i = 0; i < 6; i++) {
+			if (texcoords[i*2+0] == 0.0f) {
+				texcoords[i*2+0] = tx1;
+			}
+			else {
+				texcoords[i*2+0] = tx2;
+			}
+		}
 	}
 
 	glm::mat4 mv, proj;
@@ -3766,6 +3793,7 @@ void start_lib_game()
 	add_instruction("tilemap_set_tile", tilemapfunc_set_tile);
 	add_instruction("tilemap_get_tile", tilemapfunc_get_tile);
 	add_instruction("sprite_load", spritefunc_load);
+	add_instruction("sprite_set_animation_lazy", spritefunc_set_animation_lazy);
 	add_instruction("sprite_set_animation", spritefunc_set_animation);
 	add_instruction("sprite_get_animation", spritefunc_get_animation);
 	add_instruction("sprite_get_previous_animation", spritefunc_get_previous_animation);

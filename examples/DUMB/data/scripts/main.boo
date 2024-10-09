@@ -164,13 +164,13 @@ function draw
 	call_result a normalize_angle a
 
 	if (|| (< a (* PI 0.25)) (> a (* PI 1.75))) front (< a (* PI 0.75)) left (< a (* PI 1.25)) back right
-		sprite_set_animation sprite "stand_s"
+		sprite_set_animation_lazy sprite "walk_s"
 	:front
-		sprite_set_animation sprite "stand_w"
+		sprite_set_animation_lazy sprite "walk_w"
 	:left
-		sprite_set_animation sprite "stand_n"
+		sprite_set_animation_lazy sprite "walk_n"
 	:back
-		sprite_set_animation sprite "stand_e"
+		sprite_set_animation_lazy sprite "walk_e"
 	:right
 
 	billboard_draw pleasant 255 255 255 255

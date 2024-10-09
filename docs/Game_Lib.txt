@@ -268,6 +268,11 @@ sprite_set_animation
 	was called on.
 	e.g. sprite_set_animation sprite "punch" my_function
 
+sprite_set_animation_lazy
+	Like sprite_set_animation but forces nothing if the same animation has
+	already been set. Cannot take callbacks
+	e.g. sprite_set_animation_lazy sprite "run"
+
 sprite_get_animation
 	Returns the name of the current animation
 	e.g. sprite_get_animation sprite anim_name
