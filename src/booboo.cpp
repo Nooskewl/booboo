@@ -1653,6 +1653,9 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 			var.s = param.s;
 			//var.name = param.token;
 		}
+		else if (prg->variables[param.i].type == Variable::EXPRESSION) {
+			var = evaluate_expression(prg, prg->variables[param.i].e);
+		}
 		else {
 			var = prg->variables[param.i];
 		}
