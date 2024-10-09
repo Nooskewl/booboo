@@ -1,3 +1,5 @@
+resize 320 180
+
 number SPEED
 = SPEED 0.01
 
@@ -9,6 +11,11 @@ image_load tree "tree.png"
 
 number projectile
 image_load projectile "projectile.png"
+
+number hand
+image_load hand "fire.png"
+number fired
+= fired 0
 
 vector billboards
 
@@ -67,8 +74,6 @@ vector_add faces 0 1 2
 vector_add faces 3 4 5
 vector colours
 	
-set_3d
-
 number angle
 = angle 0
 number anglex
@@ -185,6 +190,13 @@ function draw
 {
 	clear 100 100 255
 	
+	set_3d
+
+	identity_3d
+	rotate_3d anglex 1 0 0
+	rotate_3d angle 0 1 0
+	translate_3d x (- y 0.1) z
+
 	draw_3d_textured texture positions faces colours texcoords 2
 
 	number i
@@ -237,6 +249,14 @@ function draw
 	for i 0 (< i sz) 1 next_bullet
 		billboard_draw [bullets i 7] 255 255 255 255
 	:next_bullet
+
+	set_2d
+
+	number hand_w hand_h
+	image_size hand hand_w hand_h
+	if (> fired 0) draw_hand
+		image_draw hand 255 255 255 255 (- (* 320 0.75) (/ hand_w 2)) (- 180 hand_h) 0 0
+	:draw_hand
 }
 
 function eabs x
@@ -348,11 +368,6 @@ function run
 		= z 10
 	:decz
 
-	identity_3d
-	rotate_3d anglex 1 0 0
-	rotate_3d angle 0 1 0
-	translate_3d x (- y 0.1) z
-
 	number sz i
 	vector_size enemies sz
 	for i 0 (< i sz) 1 loop
@@ -409,6 +424,7 @@ function run
 		= v (normalize v)
 		call spawn_bullet (* x -1) 0.2 (* z -1) [v 0] [v 1] [v 2] TRUE
 		mml_play fire_sfx 1 0
+		= fired 15
 	:fire
 
 	= fire_down (== joy_a 1)
@@ -443,4 +459,6 @@ function run
 	? i ne
 	jl next_e
 :no_bullets
+
+	- fired 1
 }
