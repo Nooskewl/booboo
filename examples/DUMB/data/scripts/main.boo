@@ -480,6 +480,9 @@ function run
 	jge no_bullets
 	? j nb
 	jge no_bullets
+	if (== FALSE [bullets j 6]) next_b2
+		goto no_collide
+	:next_b2
 	number col
 	cd_sphere_sphere col [enemies i 2] [enemies i 3] [enemies i 4] 0.25 [bullets j 0] [bullets j 1] [bullets j 2] 0.125
 	? col 0
