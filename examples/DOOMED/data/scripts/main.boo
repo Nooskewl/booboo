@@ -566,5 +566,25 @@ function run
 	jl next_dead
 :killed_enemies
 
+	for i 0 (< i ne) 1 enemy_attack
+		if (== TRUE [[enemies i] "attacking"]) ok
+			- [[enemies i] "attack_count"] 1
+			if (<= [[enemies i] "attack_count"] 0) enemy_fire
+				= [[enemies i] "attack_count"] 60
+				call do_enemy_attack [enemies i]
+			:enemy_fire
+		:ok
+	:enemy_attack
+
 	- fired 1
+}
+
+function do_enemy_attack e
+{
+	vector v1 v2 diff
+	vector_init v1 [e "x"] [e "y"] [e "z"]
+	vector_init v2 (* x -1) 0 (* z -1)
+	= diff (normalize (vsub v2 v1))
+	call spawn_bullet [e "x"] 0.2 [e "z"] [diff 0] [diff 1] [diff 2] 0
+	mml_play fire_sfx 1 0
 }
