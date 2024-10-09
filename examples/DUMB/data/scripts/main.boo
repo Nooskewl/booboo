@@ -1,8 +1,14 @@
 number SPEED
 = SPEED 0.01
 
+number BULLET_SPEED
+= BULLET_SPEED 0.1
+
 number tree
 image_load tree "tree.png"
+
+number projectile
+image_load projectile "projectile.png"
 
 vector billboards
 
@@ -70,6 +76,11 @@ number x y z
 
 mouse_set_relative TRUE
 
+vector bullets
+
+number fire_down
+= fire_down FALSE
+
 function spawn_enemy
 {
 	number x
@@ -131,6 +142,16 @@ function move_enemy e
 	+ [e 2] [tmp 0]
 	+ [e 4] [tmp 2]
 	billboard_translate [e 1] [tmp 0] 0 [tmp 2]
+}
+
+function spawn_bullet x y z dx dy dz friendly
+{
+	number billboard
+	billboard_create billboard projectile x y z 0.25 0.25
+
+	vector bullet
+	vector_init bullet x y z dx dy dz friendly billboard
+	vector_add bullets bullet
 }
 
 function normalize_angle a
@@ -206,6 +227,11 @@ function draw
 
 		billboard_draw [enemies i 1] 255 255 255 255
 	:loop2
+
+	vector_size bullets sz
+	for i 0 (< i sz) 1 next_bullet
+		billboard_draw [bullets i 7] 255 255 255 255
+	:next_bullet
 }
 
 function eabs x
@@ -219,6 +245,11 @@ function eabs x
 function run
 {
 	include "poll_joystick.inc"
+
+	number b1 b2 b3 wheel
+	mouse_get_buttons b1 b2 b3 wheel
+
+	= joy_a (|| (!= b1 0) (!= joy_a 0))
 
 	number dx dy
 	mouse_get_delta dx dy
@@ -315,7 +346,7 @@ function run
 	identity_3d
 	rotate_3d anglex 1 0 0
 	rotate_3d angle 0 1 0
-	translate_3d x (+ y -0.1) z
+	translate_3d x (- y 0.1) z
 
 	number sz i
 	vector_size enemies sz
@@ -328,4 +359,51 @@ function run
 		call spawn_enemy
 		= next_spawn 0
 	:spawn
+
+	vector_size bullets sz
+	? sz 0
+	jle done_bullets
+	= i 0
+:again
+	vector v
+	vector_init v [bullets i 3] [bullets i 4] [bullets i 5]
+	= v (vmul v BULLET_SPEED)
+	+ [bullets i 0] [v 0]
+	+ [bullets i 1] [v 1]
+	+ [bullets i 2] [v 2]
+	billboard_translate [bullets i 7] [v 0] [v 1] [v 2]
+	number del
+	= del FALSE
+	if (|| (< [bullets i 0] -10) (> [bullets i 0] 10)) delete_it
+		= del TRUE
+	:delete_it
+	if (|| (< [bullets i 2] -10) (> [bullets i 2] 10)) delete_it2
+		= del TRUE
+	:delete_it2
+	? del TRUE
+	jne bottom
+	vector_erase bullets i
+	- sz 1
+	goto next
+:bottom
+	+ i 1
+:next
+	? i sz
+	jl again
+:done_bullets
+
+	if (&& (== fire_down FALSE) (== joy_a 1)) fire
+		number a
+		= a (+ angle (* PI 1.5))
+		number c s
+		= c a
+		cos c
+		= s a
+		sin s
+		vector_init v c 0 s
+		= v (normalize v)
+		call spawn_bullet (* x -1) 0.2 (* z -1) [v 0] [v 1] [v 2] TRUE
+	:fire
+
+	= fire_down (== joy_a 1)
 }
