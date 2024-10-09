@@ -2,12 +2,16 @@ resize 240 135
 
 number score
 = score 0
+number life
+= life 100
 
 number font
 font_load font "font.ttf" 16 1
 
 number eicon
 image_load eicon "stand_s.png"
+number hicon
+image_load hicon "health.png"
 
 number SPEED
 = SPEED 0.01
@@ -289,6 +293,35 @@ function draw
 	:next_bullet
 
 	set_2d
+
+	image_draw hicon 255 255 255 255 20 10 0 0
+
+	number r g b
+	if (>= life 50) green (>= life 25) yellow red
+		= r 0
+		= g 255
+		= b 0
+	:green
+		= r 255
+		= g 255
+		= b 0
+	:yellow
+		= r 255
+		= g 0
+		= b 0
+	:red
+
+	string healths
+	string_format healths "%" life
+	number xx
+	= xx 20
+	+ xx 16
+	+ xx 10
+	font_draw font 0 0 0 255 healths (- xx 1) 10
+	font_draw font 0 0 0 255 healths (+ xx 1) 10
+	font_draw font 0 0 0 255 healths xx 9
+	font_draw font 0 0 0 255 healths xx 11
+	font_draw font r g b 255 healths xx 10
 
 	string scores
 	string_format scores "%" score
@@ -577,6 +610,37 @@ function run
 	:enemy_attack
 
 	- fired 1
+
+	; check if bullets hit player
+	= i 0
+:check_next_bullet
+	? i nb
+	jge done_checking_player
+	? [[bullets i] "friendly"] TRUE
+	je another
+	vector v1 v2
+	vector_init v1 [[bullets i] "x"] [[bullets i] "y"] [[bullets i] "z"]
+	vector_init v2 (* x -1) 0.2 (* z -1)
+	number col
+	cd_sphere_sphere col [v1 0] [v1 1] [v1 2] 0.125 [v2 0] [v2 1] [v2 2] 0.5
+	if (== TRUE col) hit_player
+		- life 1
+		if (<= life 0) player_dead player_not_dead
+			screen_shake 3 2500
+			rumble 2500
+		:player_dead
+			screen_shake 1.5 500
+			rumble 500
+		:player_not_dead
+		vector_erase bullets i
+		- nb 1
+		goto check_next_bullet
+	:hit_player
+:another
+	+ i 1
+	? i nb
+	jl check_next_bullet
+:done_checking_player
 }
 
 function do_enemy_attack e
