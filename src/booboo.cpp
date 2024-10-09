@@ -2887,6 +2887,35 @@ Variable exprfunc_mmul(Program *prg, const std::vector<Token> &v)
 	return ret;
 }
 
+Variable exprfunc_midentity(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+	
+	int sz = as_number_inline(prg, v[0]);
+
+	Variable var;
+	var.type = Variable::VECTOR;
+
+	for (int c = 0; c < sz; c++) {
+		Variable col;
+		col.type = Variable::VECTOR;
+		for (int r = 0; r < sz; r++) {
+			Variable num;
+			num.type = Variable::NUMBER;
+			if (c == r) {
+				num.n = 1;
+			}
+			else {
+				num.n = 0;
+			}
+			col.v.push_back(num);
+		}
+		var.v.push_back(col);
+	}
+
+	return var;
+}
+
 static Variable vecmul(Variable vec, double n)
 {
 	for (size_t j = 0; j < vec.v.size(); j++) {
@@ -3126,6 +3155,7 @@ void start()
 	add_expression_handler("<<", exprfunc_leftshift);
 	add_expression_handler(">>", exprfunc_rightshift);
 	add_expression_handler("mmul", exprfunc_mmul);
+	add_expression_handler("midentity", exprfunc_midentity);
 	add_expression_handler("vmul", exprfunc_vmul);
 	add_expression_handler("vdiv", exprfunc_vdiv);
 	add_expression_handler("vlen", exprfunc_vlen);
