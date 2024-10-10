@@ -506,7 +506,15 @@ static bool gfxfunc_resize(Program *prg, const std::vector<Token> &v)
 	float aspect = (float)w/h;
 	gfx::set_min_aspect_ratio(aspect-0.001f);
 	gfx::set_max_aspect_ratio(aspect+0.001f);
+/*
 	gfx::restart(w, h, false, shim::real_screen_size.w, shim::real_screen_size.h);
+*/
+	//shim::screen_size.w = w;
+	//shim::screen_size.h = h;
+	gfx::set_scaled_size({w, h});
+	gfx::set_screen_size(shim::real_screen_size);
+	//gfx::set_default_projection({w, h}, shim::screen_offset, shim::scale);
+	//gfx::update_projection();
 
 	return true;
 }
