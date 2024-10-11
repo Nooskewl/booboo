@@ -369,7 +369,7 @@ function run
 	number b1 b2 b3 wheel
 	mouse_get_buttons b1 b2 b3 wheel
 
-	= joy_a (|| (!= b1 0) (!= joy_a 0))
+	= joy_a (|| (!= b1 0) (>= joy_y3 0.5))
 
 	number dx dy
 	mouse_get_delta dx dy
