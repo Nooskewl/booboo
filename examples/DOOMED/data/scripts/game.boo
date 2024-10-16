@@ -533,12 +533,15 @@ function run
 	if (&& (== fire_down FALSE) (== joy_a 1)) fire
 		number a
 		= a (+ angle (* PI 1.5))
-		number c s
+		number c s c2
 		= c a
 		cos c
 		= s a
 		sin s
-		vector_init v c 0 s
+		= c2 anglex
+		neg c2
+		sin c2
+		vector_init v c c2 s
 		= v (normalize v)
 		call spawn_bullet (* x -1) 0.2 (* z -1) [v 0] [v 1] [v 2] TRUE
 		mml_play fire_sfx 1 0
