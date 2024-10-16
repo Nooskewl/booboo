@@ -1277,6 +1277,9 @@ func_top:
 					func.s->program[func.s->program.size()-1].data.push_back(t);
 
 					if (pass == PASS1) {
+						if (prg->locals[func_index].find(tok2) != prg->locals[func_index].end()) {
+							throw Error(std::string(__FUNCTION__) + ": " + "Duplicate label " + tok2 + " at " + get_error_info(&func));
+						}
 						prg->locals[func_index][tok2] = var_i;
 					}
 					prg->variables.push_back(v);
@@ -1488,6 +1491,10 @@ func_top:
 			t.s = tok2;
 			t.token = tok2;
 			prg->s->program[prg->s->program.size()-1].data.push_back(t);
+
+			if (pass == PASS1 && prg->variables_map.find(tok2) != prg->variables_map.end()) {
+				throw Error(std::string(__FUNCTION__) + ": " + "Duplicate label " + tok2 + " at " + get_error_info(prg));
+			}
 
 			prg->s->line_numbers.push_back(prg->s->line);
 			prg->variables.push_back(v);
