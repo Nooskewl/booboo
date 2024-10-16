@@ -989,27 +989,7 @@ static bool vectorfunc_add(Program *prg, const std::vector<Token> &v)
 	CHECK_VECTOR(id)
 
 	for (size_t i  = 1; i < v.size(); i++) {
-		Variable var;
-
-		if (v[i].type == Token::NUMBER) {
-			var.type = Variable::NUMBER;
-			var.name = "-booboo-";
-			var.n = v[i].n;
-		}
-		else if (v[i].type == Token::SYMBOL) {
-			var = as_variable(prg, v[i]);
-			if (IS_FISH(var)) {
-				var = go_fish(prg, var.f);
-			}
-			else if (IS_EXPRESSION(var)) {
-				var = evaluate_expression(prg, var.e);
-			}
-		}
-		else {
-			var.type = Variable::STRING;
-			var.name = "-booboo-";
-			var.s = v[i].s;
-		}
+		Variable var = as_variable_resolve(prg, v[i]);
 
 		id.v.push_back(var);
 	}
@@ -1021,7 +1001,7 @@ static bool vectorfunc_size(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable id = as_variable_resolve(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
 
 	CHECK_VECTOR(id)
@@ -1313,7 +1293,7 @@ static bool mapfunc_keys(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &m = as_variable(prg, v[0]);
+	Variable m = as_variable_resolve(prg, v[0]);
 	Variable &vec_var = as_variable(prg, v[1]);
 
 	CHECK_MAP(m)

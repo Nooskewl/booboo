@@ -1663,7 +1663,7 @@ static bool tilemapfunc_set_animated_tiles(Program *prg, const std::vector<Token
 	int delay = (int)as_number(prg, v[1]);
 	int w = (int)as_number(prg, v[2]);
 	int h = (int)as_number(prg, v[3]);
-	Variable &v1 = as_variable(prg, v[4]);
+	Variable v1 = as_variable_resolve(prg, v[4]);
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
@@ -1696,7 +1696,7 @@ static bool tilemapfunc_find_path(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
-	Variable &entity_solids = as_variable(prg, v[2]);
+	Variable entity_solids = as_variable_resolve(prg, v[2]);
 	int start_x = (int)as_number(prg, v[3]);
 	int start_y = (int)as_number(prg, v[4]);
 	int end_x = (int)as_number(prg, v[5]);
@@ -2423,17 +2423,14 @@ static bool cfgfunc_get_number(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	Variable &v2 = as_variable(prg, v[1]);
 	std::string name = as_string(prg, v[2]);
 
 	CFG_Info *info = cfg_info(prg);
 
-	CHECK_NUMBER(v1)
 	CHECK_NUMBER(v2)
 
-	int id = v1.n;
-	
 #ifdef DEBUG
 	if (info->cfgs.find(id) == info->cfgs.end()) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid CFG Value at " + get_error_info(prg));
@@ -2453,17 +2450,14 @@ static bool cfgfunc_get_string(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	Variable &v2 = as_variable(prg, v[1]);
 	std::string name = as_string(prg, v[2]);
 
 	CFG_Info *info = cfg_info(prg);
 
-	CHECK_NUMBER(v1)
 	CHECK_STRING(v2)
 
-	int id = v1.n;
-	
 #ifdef DEBUG
 	if (info->cfgs.find(id) == info->cfgs.end()) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid CFG Value at " + get_error_info(prg));
@@ -2508,16 +2502,12 @@ static bool cfgfunc_set_string(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	std::string name = as_string(prg, v[1]);
 	std::string val = as_string(prg, v[2]);
 
 	CFG_Info *info = cfg_info(prg);
 
-	CHECK_NUMBER(v1)
-
-	int id = v1.n;
-	
 #ifdef DEBUG
 	if (info->cfgs.find(id) == info->cfgs.end()) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid CFG Value at " + get_error_info(prg));
@@ -2562,15 +2552,11 @@ static bool cfgfunc_erase(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	int id = as_number(prg, v[0]);
 	std::string name = as_string(prg, v[1]);
 
 	CFG_Info *info = cfg_info(prg);
 
-	CHECK_NUMBER(v1)
-
-	int id = v1.n;
-	
 #ifdef DEBUG
 	if (info->cfgs.find(id) == info->cfgs.end()) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid CFG Value at " + get_error_info(prg));
@@ -3222,9 +3208,9 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
-	Variable &verts = as_variable(prg, v[0]);
-	Variable &faces = as_variable(prg, v[1]);
-	Variable &colours = as_variable(prg, v[2]);
+	Variable verts = as_variable_resolve(prg, v[0]);
+	Variable faces = as_variable_resolve(prg, v[1]);
+	Variable colours = as_variable_resolve(prg, v[2]);
 	int num_triangles = as_number(prg, v[3]);
 
 	static float *vert_vec = nullptr;
@@ -3299,10 +3285,10 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 	COUNT_ARGS(6)
 
 	int tex = as_number(prg, v[0]);
-	Variable &verts = as_variable(prg, v[1]);
-	Variable &faces = as_variable(prg, v[2]);
-	Variable &colours = as_variable(prg, v[3]);
-	Variable &texcoords = as_variable(prg, v[4]);
+	Variable verts = as_variable_resolve(prg, v[1]);
+	Variable faces = as_variable_resolve(prg, v[2]);
+	Variable colours = as_variable_resolve(prg, v[3]);
+	Variable texcoords = as_variable_resolve(prg, v[4]);
 	int num_triangles = as_number(prg, v[5]);
 
 	float vert_vec[12*3*num_triangles];

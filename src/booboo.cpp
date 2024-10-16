@@ -1778,17 +1778,9 @@ bool breaker_return(Program *prg, const std::vector<Token> &v)
 			v1.s = v[0].s;
 		}
 		else {
-			Variable &v2 = as_variable_inline(prg, v[0]);
+			Variable v2 = as_variable_resolve_inline(prg, v[0]);
 
-			if (IS_EXPRESSION(v2)) {
-				v1 = evaluate_expression(prg, v2.e);
-			}
-			else if (IS_FISH(v2)) {
-				v1 = go_fish(prg, v2.f);
-			}
-			else {
-				v1 = v2;
-			}
+			v1 = v2;
 		}
 	}
 
@@ -1841,24 +1833,18 @@ bool corefunc_set(Program *prg, const std::vector<Token> &v)
 		v1.s = as_string_inline(prg, v[1]);
 	}
 	else if (IS_VECTOR(v1)) {
-		Variable &v2 = as_variable_inline(prg, v[1]);
+		Variable v2 = as_variable_resolve_inline(prg, v[1]);
 		if (IS_VECTOR(v2)) {
 			v1.v = v2.v;
-		}
-		else if (IS_EXPRESSION(v2)) {
-			v1.v = evaluate_expression(prg, v2.e).v;
 		}
 		else {
 			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
 		}
 	}
 	else if (IS_MAP(v1)) {
-		Variable &v2 = as_variable_inline(prg, v[1]);
+		Variable v2 = as_variable_resolve_inline(prg, v[1]);
 		if (IS_MAP(v2)) {
 			v1.m = v2.m;
-		}
-		else if (IS_EXPRESSION(v2)) {
-			v1.m = evaluate_expression(prg, v2.e).m;
 		}
 		else {
 			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
@@ -1979,7 +1965,7 @@ bool corefunc_compare(Program *prg, const std::vector<Token> &v)
 	double n;
 
 	if (v[0].type == Token::SYMBOL) {
-		Variable &var = as_variable_inline(prg, v[0]);
+		Variable var = as_variable_resolve_inline(prg, v[0]);
 		if (IS_NUMBER(var)) {
 			is_num = true;
 			n = var.n;
@@ -2013,7 +1999,7 @@ bool corefunc_compare(Program *prg, const std::vector<Token> &v)
 			s1 = v[0].s;
 		}
 		else if (v[0].type == Token::SYMBOL) {
-			Variable &var = as_variable_inline(prg, v[0]);
+			Variable var = as_variable_resolve_inline(prg, v[0]);
 			if (IS_STRING(var)) {
 				a_string = true;
 				s1 = var.s;
@@ -2025,7 +2011,7 @@ bool corefunc_compare(Program *prg, const std::vector<Token> &v)
 			s2 = v[1].s;
 		}
 		else if (v[1].type == Token::SYMBOL) {
-			Variable &var = as_variable_inline(prg, v[1]);
+			Variable var = as_variable_resolve_inline(prg, v[1]);
 			if (IS_STRING(var)) {
 				b_string = true;
 				s2 = var.s;
@@ -2395,7 +2381,7 @@ Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 			std::vector<Variable> vec = var.v;
 
 			for (size_t i = 1; i < v.size(); i++) {
-				Variable v2 = as_variable_inline(prg, v[i]);
+				Variable v2 = as_variable_resolve_inline(prg, v[i]);
 				if (IS_VECTOR(v2) == false) {
 					throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 				}
@@ -2410,7 +2396,7 @@ Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 			std::map<std::string, Variable> m = var.m;
 
 			for (size_t i = 1; i < v.size(); i++) {
-				Variable v2 = as_variable_inline(prg, v[i]);
+				Variable v2 = as_variable_resolve_inline(prg, v[i]);
 				if (IS_MAP(v2) == false) {
 					throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 				}
@@ -2522,7 +2508,7 @@ Variable exprfunc_greater(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = as_variable_inline(prg, v[0]);
+		Variable var = as_variable_resolve_inline(prg, v[0]);
 		if (IS_STRING(var)) {
 			string = true;
 		}
@@ -2557,7 +2543,7 @@ Variable exprfunc_less(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = as_variable_inline(prg, v[0]);
+		Variable var = as_variable_resolve_inline(prg, v[0]);
 		if (IS_STRING(var)) {
 			string = true;
 		}
@@ -2592,7 +2578,7 @@ Variable exprfunc_greaterequal(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = as_variable_inline(prg, v[0]);
+		Variable var = as_variable_resolve_inline(prg, v[0]);
 		if (IS_STRING(var)) {
 			string = true;
 		}
@@ -2627,7 +2613,7 @@ Variable exprfunc_lessequal(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = as_variable_inline(prg, v[0]);
+		Variable var = as_variable_resolve_inline(prg, v[0]);
 		if (IS_STRING(var)) {
 			string = true;
 		}
@@ -2662,7 +2648,7 @@ Variable exprfunc_equal(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = as_variable_inline(prg, v[0]);
+		Variable var = as_variable_resolve_inline(prg, v[0]);
 		if (IS_STRING(var)) {
 			string = true;
 		}
@@ -2697,7 +2683,7 @@ Variable exprfunc_notequal(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = as_variable_inline(prg, v[0]);
+		Variable var = as_variable_resolve_inline(prg, v[0]);
 		if (IS_STRING(var)) {
 			string = true;
 		}
@@ -3130,7 +3116,7 @@ Variable exprfunc_cross(Program *prg, const std::vector<Token> &v)
 	CHECK_VECTOR(vec)
 
 	for (size_t i = 1; i < v.size(); i++) {
-		Variable &vec2 = as_variable_inline(prg, v[i]);
+		Variable vec2 = as_variable_resolve_inline(prg, v[i]);
 		CHECK_VECTOR(vec2)
 		if (vec.v.size() < 3 || vec2.v.size() < 3) {
 			throw Error(std::string(__FUNCTION__) + ": " + "Vector with < 3 components not supported at " + get_error_info(prg));
@@ -3165,7 +3151,7 @@ Variable exprfunc_vadd(Program *prg, const std::vector<Token> &v)
 	CHECK_VECTOR(vec)
 
 	for (size_t i = 1; i < v.size(); i++) {
-		Variable &vec2 = as_variable_inline(prg, v[i]);
+		Variable vec2 = as_variable_resolve_inline(prg, v[i]);
 		CHECK_VECTOR(vec2)
 		if (vec.v.size() != vec2.v.size()) {
 			throw Error(std::string(__FUNCTION__) + ": " + "Can't add different sized vectors at " + get_error_info(prg));
@@ -3202,7 +3188,7 @@ Variable exprfunc_vsub(Program *prg, const std::vector<Token> &v)
 	CHECK_VECTOR(vec)
 
 	for (size_t i = 1; i < v.size(); i++) {
-		Variable &vec2 = as_variable_inline(prg, v[i]);
+		Variable vec2 = as_variable_resolve_inline(prg, v[i]);
 		CHECK_VECTOR(vec2)
 		if (vec.v.size() != vec2.v.size()) {
 			throw Error(std::string(__FUNCTION__) + ": " + "Can't subtract different sized vectors at " + get_error_info(prg));
