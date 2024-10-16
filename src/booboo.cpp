@@ -3163,8 +3163,23 @@ Variable exprfunc_vadd(Program *prg, const std::vector<Token> &v)
 		if (vec.v.size() != vec2.v.size()) {
 			throw Error(std::string(__FUNCTION__) + ": " + "Can't add different sized vectors at " + get_error_info(prg));
 		}
-		for (size_t j = 0; j < vec.v.size(); j++) {
-			vec.v[j].n += vec2.v[j].n;
+		if (IS_NUMBER(vec.v[0]) && IS_NUMBER(vec2.v[0])) {
+			for (size_t j = 0; j < vec.v.size(); j++) {
+				vec.v[j].n += vec2.v[j].n;
+			}
+		}
+		else if (IS_VECTOR(vec.v[0]) && IS_VECTOR(vec2.v[0])) {
+			if (vec.v[0].v.size() != vec2.v[0].v.size()) {
+				throw Error(std::string(__FUNCTION__) + ": " + "Can't add different sized matrices at " + get_error_info(prg));
+			}
+			for (size_t j = 0; j < vec.v.size(); j++) {
+				for (size_t i = 0; i < vec.v[j].v.size(); i++) {
+					vec.v[j].v[i].n += vec2.v[j].v[i].n;
+				}
+			}
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Add not supported on types at " + get_error_info(prg));
 		}
 	}
 
@@ -3185,8 +3200,23 @@ Variable exprfunc_vsub(Program *prg, const std::vector<Token> &v)
 		if (vec.v.size() != vec2.v.size()) {
 			throw Error(std::string(__FUNCTION__) + ": " + "Can't subtract different sized vectors at " + get_error_info(prg));
 		}
-		for (size_t j = 0; j < vec.v.size(); j++) {
-			vec.v[j].n -= vec2.v[j].n;
+		if (IS_NUMBER(vec.v[0]) && IS_NUMBER(vec2.v[0])) {
+			for (size_t j = 0; j < vec.v.size(); j++) {
+				vec.v[j].n -= vec2.v[j].n;
+			}
+		}
+		else if (IS_VECTOR(vec.v[0]) && IS_VECTOR(vec2.v[0])) {
+			if (vec.v[0].v.size() != vec2.v[0].v.size()) {
+				throw Error(std::string(__FUNCTION__) + ": " + "Can't subtract different sized matrices at " + get_error_info(prg));
+			}
+			for (size_t j = 0; j < vec.v.size(); j++) {
+				for (size_t i = 0; i < vec.v[j].v.size(); i++) {
+					vec.v[j].v[i].n -= vec2.v[j].v[i].n;
+				}
+			}
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Subtract not supported on types at " + get_error_info(prg));
 		}
 	}
 
