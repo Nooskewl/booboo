@@ -1317,14 +1317,14 @@ function run
 	jl erase_it
 	? by 0
 	jl erase_it
-	number max
-	= max size_w
-	- max 1
-	? bx max
+	number max_
+	= max_ size_w
+	- max_ 1
+	? bx max_
 	jge erase_it
-	= max size_h
-	- max 1
-	? by max
+	= max_ size_h
+	- max_ 1
+	? by max_
 	jge erase_it
 	goto in_zone
 :erase_it

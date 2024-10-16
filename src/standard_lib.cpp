@@ -948,6 +948,36 @@ bool mathfunc_log10(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+bool mathfunc_min(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(3)
+
+	Variable &v1 = as_variable(prg, v[0]);
+
+	CHECK_NUMBER(v1)
+
+	for (size_t i = 1; i < v.size(); i++) {
+		v1.n = MIN(v1.n, as_number(prg, v[i]));
+	}
+
+	return true;
+}
+
+bool mathfunc_max(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(3)
+
+	Variable &v1 = as_variable(prg, v[0]);
+
+	CHECK_NUMBER(v1)
+
+	for (size_t i = 1; i < v.size(); i++) {
+		v1.n = MAX(v1.n, as_number(prg, v[i]));
+	}
+
+	return true;
+}
+
 static bool vectorfunc_init(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
@@ -1743,6 +1773,8 @@ void start_lib_standard()
 	add_instruction("hypot", mathfunc_hypot);
 	add_instruction("log", mathfunc_log);
 	add_instruction("log10", mathfunc_log10);
+	add_instruction("min", mathfunc_min);
+	add_instruction("max", mathfunc_max);
 
 	add_instruction("vector_init", vectorfunc_init);
 	add_instruction("vector_add", vectorfunc_add);

@@ -313,6 +313,14 @@ log10
 	Base 10 logarithm
 	e.g. log10 x
 
+min
+	Get the minimum number in a list of values
+	e.g. min result a b c d e f g
+
+max
+	Get the max number in a list of values
+	e.g. max result a b
+
 Vector and matrix math
 	Some vector and matrix math is available through expression
 	operators. Supported are: mul, identity, scale, rotate,

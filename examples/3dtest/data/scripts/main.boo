@@ -8,15 +8,15 @@ number sx sy sz
 
 model_size model sx sy sz
 number scale
-number max
-= max sx
-if (> sy max) change_y
-	= max sy
+number max_
+= max_ sx
+if (> sy max_) change_y
+	= max_ sy
 :change_y
-if (> sz max) change_z
-	= max sz
+if (> sz max_) change_z
+	= max_ sz
 :change_z
-= scale (/ 1.0 max)
+= scale (/ 1.0 max_)
 model_scale model scale scale scale
 
 model_set_animation model "ArmatureAction" cb
