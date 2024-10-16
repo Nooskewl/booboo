@@ -3392,8 +3392,8 @@ static bool modelfunc_clone(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &result = as_variable(prg, v[0]);
-	int id = as_number(prg, v[1]);
+	int id = as_number(prg, v[0]);
+	Variable &result = as_variable(prg, v[1]);
 
 	CHECK_NUMBER(result)
 	
@@ -3575,16 +3575,6 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 	
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
-/*
-	if (shim::opengl) {
-		glDisable_ptr(GL_SCISSOR_TEST);
-	}
-#ifdef _WIN32
-	else {
-		shim::d3d_device->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
-	}
-#endif
-*/
 
 	gfx::Vertex_Cache::instance()->start(img);
 	gfx::Vertex_Cache::instance()->cache_3d_immediate(vec, 2);

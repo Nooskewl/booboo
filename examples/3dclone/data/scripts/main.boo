@@ -22,8 +22,8 @@ model_set_animation model "ArmatureAction" cb
 
 number clone1 clone2
 
-model_clone clone1 model
-model_clone clone2 model
+model_clone model clone1
+model_clone model clone2
 
 model_translate clone1 1 0 0
 model_translate clone2 -1 0 0
