@@ -3025,6 +3025,9 @@ Variable exprfunc_translate(Program *prg, const std::vector<Token> &v)
 
 static double veclen(const Variable &vec)
 {
+	if (vec.v.size() == 2) {
+		return sqrt(pow(vec.v[0].n, 2) + pow(vec.v[1].n, 2));
+	}
 	return sqrt(pow(vec.v[0].n, 2) + pow(vec.v[1].n, 2) + pow(vec.v[2].n, 2));
 }
 
@@ -3036,8 +3039,8 @@ Variable exprfunc_length(Program *prg, const std::vector<Token> &v)
 
 	CHECK_VECTOR(vec)
 	
-	if (vec.v.size() < 3) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Vector with < 3 components not supported at " + get_error_info(prg));
+	if (vec.v.size() != 2 && vec.v.size() != 3) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Vector size not supported in length at " + get_error_info(prg));
 	}
 
 	Variable var;
@@ -3091,6 +3094,18 @@ Variable exprfunc_angle(Program *prg, const std::vector<Token> &v)
 
 	CHECK_VECTOR(vec1)
 	CHECK_VECTOR(vec2)
+
+	if (vec1.v.size() == 2) {
+		double a1 = atan2(vec1.v[1].n, vec1.v[0].n);
+		double a2 = atan2(vec2.v[1].n, vec2.v[0].n);
+		Variable var;
+		var.type = Variable::NUMBER;
+		var.n = a2 - a1;
+		if (var.n < 0) {
+			var.n += M_PI * 2;
+		}
+		return var;
+	}
 	
 	if (vec1.v.size() < 3 || vec2.v.size() < 3) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Vector with < 3 components not supported at " + get_error_info(prg));
