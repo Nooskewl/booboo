@@ -18,6 +18,7 @@ using namespace noo;
 #include <twinkle.h>
 
 #include "booboo/booboo.h"
+#include "booboo/internal.h"
 using namespace booboo;
 
 template <typename T> T sign(T v) { return (T(0) < v) - (v < T(0)); }
@@ -40,8 +41,8 @@ File_Info *file_info(Program *prg)
 
 bool corefunc_getenv(Program *prg, const std::vector<Token> &v)
 {
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string get = as_string(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string get = as_string_inline(prg, v[1]);
 
 	CHECK_STRING(v1)
 
@@ -54,7 +55,7 @@ bool corefunc_print(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 
-	std::string fmt = as_string(prg, v[0]);
+	std::string fmt = as_string_inline(prg, v[0]);
 	int _tok = 1;
 	
 	int prev = 0;
@@ -120,7 +121,7 @@ bool corefunc_print(Program *prg, const std::vector<Token> &v)
 			val = buf;
 		}
 		else {
-			Variable &v1 = as_variable(prg, v[_tok]);
+			Variable &v1 = as_variable_inline(prg, v[_tok]);
 			if (IS_NUMBER(v1)) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
@@ -213,7 +214,7 @@ bool corefunc_input(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &var = as_variable(prg, v[0]);
+	Variable &var = as_variable_inline(prg, v[0]);
 
 	CHECK_STRING(var)
 
@@ -231,7 +232,7 @@ bool corefunc_mkdir(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	std::string path = as_string(prg, v[0]);
+	std::string path = as_string_inline(prg, v[0]);
 
 	util::mkdir(path);
 
@@ -242,7 +243,7 @@ bool corefunc_get_system_language(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_STRING(v1)
 
@@ -255,8 +256,8 @@ bool corefunc_get_full_path(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string path = as_string(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string path = as_string_inline(prg, v[1]);
 
 	CHECK_STRING(v1)
 
@@ -284,7 +285,7 @@ bool corefunc_list_drives(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &vec = as_variable(prg, v[0]);
+	Variable &vec = as_variable_inline(prg, v[0]);
 
 	CHECK_VECTOR(vec)	
 
@@ -313,11 +314,11 @@ bool corefunc_list_directory(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &vec = as_variable(prg, v[0]);
+	Variable &vec = as_variable_inline(prg, v[0]);
 
 	CHECK_VECTOR(vec)
 
-	std::string glob = as_string(prg, v[1]);
+	std::string glob = as_string_inline(prg, v[1]);
 
 	std::string path_part;
 	int p = glob.length() - 1;
@@ -366,8 +367,8 @@ bool stringfunc_format(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string fmt = as_string(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string fmt = as_string_inline(prg, v[1]);
 	int _tok = 2;
 	
 	int prev = 0;
@@ -433,7 +434,7 @@ bool stringfunc_format(Program *prg, const std::vector<Token> &v)
 			val = buf;
 		}
 		else {
-			Variable &v1 = as_variable(prg, v[_tok]);
+			Variable &v1 = as_variable_inline(prg, v[_tok]);
 			if (IS_NUMBER(v1)) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
@@ -527,9 +528,9 @@ bool stringfunc_char_at(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string s = as_string(prg, v[1]);
-	int index = as_number(prg, v[2]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string s = as_string_inline(prg, v[1]);
+	int index = as_number_inline(prg, v[2]);
 
 	uint32_t value = util::utf8_char(s, index);
 
@@ -544,8 +545,8 @@ bool stringfunc_length(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string s = as_string(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string s = as_string_inline(prg, v[1]);
 
 	CHECK_NUMBER(v1)
 		
@@ -558,8 +559,8 @@ bool stringfunc_from_number(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	uint32_t n = as_number(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	uint32_t n = as_number_inline(prg, v[1]);
 
 	CHECK_STRING(v1)
 	
@@ -572,14 +573,14 @@ bool stringfunc_substr(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	int start = as_number(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	int start = as_number_inline(prg, v[1]);
 	int count = -1;
 
 	CHECK_STRING(v1)	
 
 	if (v.size() >= 3) {
-		count = as_number(prg, v[2]);
+		count = as_number_inline(prg, v[2]);
 	}
 
 	v1.s = util::utf8_substr(v1.s, start, count);
@@ -591,7 +592,7 @@ bool stringfunc_uppercase(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_STRING(v1)
 	
@@ -604,7 +605,7 @@ bool stringfunc_lowercase(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_STRING(v1)
 		
@@ -617,7 +618,7 @@ bool stringfunc_trim(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_STRING(v1)
 	
@@ -630,13 +631,13 @@ bool stringfunc_replace(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_STRING(v1)	
 
-	std::string str = as_string(prg, v[1]);
-	std::string regex = as_string(prg, v[2]);
-	std::string fmt = as_string(prg, v[3]);
+	std::string str = as_string_inline(prg, v[1]);
+	std::string regex = as_string_inline(prg, v[2]);
+	std::string fmt = as_string_inline(prg, v[3]);
 
 	v1.s = std::regex_replace(str.c_str(), std::regex(regex), fmt.c_str());
 
@@ -647,12 +648,12 @@ bool stringfunc_match(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_VECTOR(v1)	
 
-	std::string str = as_string(prg, v[1]);
-	std::string regex = as_string(prg, v[2]);
+	std::string str = as_string_inline(prg, v[1]);
+	std::string regex = as_string_inline(prg, v[2]);
 
 	v1.v.clear();
 
@@ -676,9 +677,9 @@ bool stringfunc_matches(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string str = as_string(prg, v[1]);
-	std::string regex = as_string(prg, v[2]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string str = as_string_inline(prg, v[1]);
+	std::string regex = as_string_inline(prg, v[2]);
 
 	CHECK_NUMBER(v1)
 		
@@ -691,7 +692,7 @@ bool mathfunc_sin(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 	
@@ -704,7 +705,7 @@ bool mathfunc_cos(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 
@@ -717,7 +718,7 @@ bool mathfunc_tan(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 		
@@ -730,7 +731,7 @@ bool mathfunc_asin(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 		
@@ -743,7 +744,7 @@ bool mathfunc_acos(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 
@@ -757,7 +758,7 @@ bool mathfunc_atan(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 		
@@ -770,11 +771,11 @@ bool mathfunc_atan2(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 		
-	v1.n = atan2(v1.n, as_number(prg, v[1]));
+	v1.n = atan2(v1.n, as_number_inline(prg, v[1]));
 
 	return true;
 }
@@ -783,7 +784,7 @@ bool mathfunc_abs(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 		
@@ -796,11 +797,11 @@ bool mathfunc_pow(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 		
-	v1.n = pow(v1.n, as_number(prg, v[1]));
+	v1.n = pow(v1.n, as_number_inline(prg, v[1]));
 
 	return true;
 }
@@ -809,7 +810,7 @@ bool mathfunc_sqrt(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 		
@@ -821,7 +822,7 @@ bool mathfunc_sqrt(Program *prg, const std::vector<Token> &v)
 bool mathfunc_floor(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 
@@ -833,7 +834,7 @@ bool mathfunc_floor(Program *prg, const std::vector<Token> &v)
 bool mathfunc_ceil(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 
@@ -846,7 +847,7 @@ bool mathfunc_neg(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 		
@@ -859,8 +860,8 @@ bool mathfunc_intmod(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	int d = as_number(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	int d = as_number_inline(prg, v[1]);
 
 	CHECK_NUMBER(v1)
 		
@@ -873,8 +874,8 @@ bool mathfunc_fmod(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	double d = as_number(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	double d = as_number_inline(prg, v[1]);
 
 	CHECK_NUMBER(v1)
 		
@@ -887,7 +888,7 @@ bool mathfunc_sign(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 		
@@ -900,7 +901,7 @@ bool mathfunc_exp(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 		
@@ -913,11 +914,11 @@ bool mathfunc_hypot(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 		
-	v1.n = hypot(v1.n, as_number(prg, v[1]));
+	v1.n = hypot(v1.n, as_number_inline(prg, v[1]));
 
 	return true;
 }
@@ -926,7 +927,7 @@ bool mathfunc_log(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 		
@@ -939,7 +940,7 @@ bool mathfunc_log10(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 		
@@ -952,12 +953,12 @@ bool mathfunc_min(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(3)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 
 	for (size_t i = 1; i < v.size(); i++) {
-		v1.n = MIN(v1.n, as_number(prg, v[i]));
+		v1.n = MIN(v1.n, as_number_inline(prg, v[i]));
 	}
 
 	return true;
@@ -967,12 +968,12 @@ bool mathfunc_max(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(3)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 
 	for (size_t i = 1; i < v.size(); i++) {
-		v1.n = MAX(v1.n, as_number(prg, v[i]));
+		v1.n = MAX(v1.n, as_number_inline(prg, v[i]));
 	}
 
 	return true;
@@ -982,7 +983,7 @@ static bool vectorfunc_init(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 
-	Variable &vec = as_variable(prg, v[0]);
+	Variable &vec = as_variable_inline(prg, v[0]);
 
 	CHECK_VECTOR(vec)
 
@@ -992,17 +993,17 @@ static bool vectorfunc_init(Program *prg, const std::vector<Token> &v)
 		if (v[i].type == Token::NUMBER) {
 			Variable var;
 			var.type = Variable::NUMBER;
-			var.n = as_number(prg, v[i]);
+			var.n = as_number_inline(prg, v[i]);
 			vec.v.push_back(var);
 		}
 		else if (v[i].type == Token::STRING) {
 			Variable var;
 			var.type = Variable::STRING;
-			var.s = as_string(prg, v[i]);
+			var.s = as_string_inline(prg, v[i]);
 			vec.v.push_back(var);
 		}
 		else {
-			Variable var = as_variable_resolve(prg, v[i]);
+			Variable var = as_variable_resolve_inline(prg, v[i]);
 			vec.v.push_back(var);
 		}
 	}
@@ -1014,12 +1015,12 @@ static bool vectorfunc_add(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable_inline(prg, v[0]);
 
 	CHECK_VECTOR(id)
 
 	for (size_t i  = 1; i < v.size(); i++) {
-		Variable var = as_variable_resolve(prg, v[i]);
+		Variable var = as_variable_resolve_inline(prg, v[i]);
 
 		id.v.push_back(var);
 	}
@@ -1031,8 +1032,8 @@ static bool vectorfunc_size(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable id = as_variable_resolve(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
+	Variable id = as_variable_resolve_inline(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
 
 	CHECK_VECTOR(id)
 	CHECK_NUMBER(v1)
@@ -1044,7 +1045,7 @@ static bool vectorfunc_size(Program *prg, const std::vector<Token> &v)
 
 static bool vectorfunc_set(Program *prg, const std::vector<Token> &v)
 {
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable_inline(prg, v[0]);
 	int val_index = v.size() - 1;
 	std::vector<int> indices;
 
@@ -1053,7 +1054,7 @@ static bool vectorfunc_set(Program *prg, const std::vector<Token> &v)
 	CHECK_VECTOR(id)
 
 	for (int i = 1; i < val_index; i++) {
-		indices.push_back(as_number(prg, v[i]));
+		indices.push_back(as_number_inline(prg, v[i]));
 	}
 
 	Variable var;
@@ -1064,7 +1065,7 @@ static bool vectorfunc_set(Program *prg, const std::vector<Token> &v)
 		var.n = v[val_index].n;
 	}
 	else if (v[val_index].type == Token::SYMBOL) {
-		var = as_variable(prg, v[val_index]);
+		var = as_variable_inline(prg, v[val_index]);
 	}
 	else {
 		var.type = Variable::STRING;
@@ -1103,8 +1104,8 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &id = as_variable(prg, v[0]);
-	double index = as_number(prg, v[1]);
+	Variable &id = as_variable_inline(prg, v[0]);
+	double index = as_number_inline(prg, v[1]);
 
 	CHECK_VECTOR(id)
 
@@ -1120,7 +1121,7 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 		var.n = v[2].n;
 	}
 	else if (v[2].type == Token::SYMBOL) {
-		var = as_variable(prg, v[2]);
+		var = as_variable_inline(prg, v[2]);
 	}
 	else {
 		var.type = Variable::STRING;
@@ -1135,7 +1136,7 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 
 static bool vectorfunc_get(Program *prg, const std::vector<Token> &v)
 {
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable_inline(prg, v[0]);
 	std::vector<int> indices;
 
 	MIN_ARGS(3)
@@ -1143,7 +1144,7 @@ static bool vectorfunc_get(Program *prg, const std::vector<Token> &v)
 	CHECK_VECTOR(id)
 
 	for (size_t i = 2; i < v.size(); i++) {
-		int index = as_number(prg, v[i]);
+		int index = as_number_inline(prg, v[i]);
 		indices.push_back(index);
 	}
 
@@ -1158,7 +1159,7 @@ static bool vectorfunc_get(Program *prg, const std::vector<Token> &v)
 			if (index < 0 || index >= (int)(*p).size()) {
 				throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
 			}
-			Variable &v1 = as_variable(prg, v[1]);
+			Variable &v1 = as_variable_inline(prg, v[1]);
 			std::string bak = v1.name;
 			v1 = (*p)[index];
 			v1.name = bak;
@@ -1187,8 +1188,8 @@ static bool vectorfunc_erase(Program *prg, const std::vector<Token> &v)
 
 	COUNT_ARGS(2)
 
-	Variable &id = as_variable(prg, v[0]);
-	double index = as_number(prg, v[1]);
+	Variable &id = as_variable_inline(prg, v[0]);
+	double index = as_number_inline(prg, v[1]);
 
 	CHECK_VECTOR(id)
 
@@ -1205,7 +1206,7 @@ static bool vectorfunc_clear(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable_inline(prg, v[0]);
 
 	CHECK_VECTOR(id)
 
@@ -1218,7 +1219,7 @@ static bool mapfunc_set(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(3)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable_inline(prg, v[0]);
 
 	CHECK_MAP(id)
 
@@ -1231,7 +1232,7 @@ static bool mapfunc_set(Program *prg, const std::vector<Token> &v)
 		var.n = v[val_index].n;
 	}
 	else if (v[val_index].type == Token::SYMBOL) {
-		var = as_variable(prg, v[val_index]);
+		var = as_variable_inline(prg, v[val_index]);
 		if (IS_FISH(var)) {
 			var = go_fish(prg, var.f);
 		}
@@ -1249,7 +1250,7 @@ static bool mapfunc_set(Program *prg, const std::vector<Token> &v)
 	std::string key;
 
 	for (size_t i = 1; i < (size_t)val_index; i++) {
-		key = as_string(prg, v[i]);
+		key = as_string_inline(prg, v[i]);
 		if ((int)i < val_index-1) {
 			p = &(*p)[key].m;
 		}
@@ -1264,7 +1265,7 @@ static bool mapfunc_get(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(3)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable_inline(prg, v[0]);
 
 	CHECK_MAP(id)
 
@@ -1272,13 +1273,13 @@ static bool mapfunc_get(Program *prg, const std::vector<Token> &v)
 	std::string key;
 
 	for (size_t i = 2; i < v.size(); i++) {
-		key = as_string(prg, v[i]);
+		key = as_string_inline(prg, v[i]);
 		if (i < v.size()-1) {
 			p = &(*p)[key].m;
 		}
 	}
 
-	Variable &v1 = as_variable(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[1]);
 	std::string bak = v1.name;
 	v1 = (*p)[key];
 	v1.name = bak;
@@ -1290,7 +1291,7 @@ static bool mapfunc_clear(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable_inline(prg, v[0]);
 
 	CHECK_MAP(id)
 
@@ -1303,8 +1304,8 @@ static bool mapfunc_erase(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &id = as_variable(prg, v[0]);
-	std::string key = as_string(prg, v[1]);
+	Variable &id = as_variable_inline(prg, v[0]);
+	std::string key = as_string_inline(prg, v[1]);
 
 	CHECK_MAP(id)
 
@@ -1323,8 +1324,8 @@ static bool mapfunc_keys(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable m = as_variable_resolve(prg, v[0]);
-	Variable &vec_var = as_variable(prg, v[1]);
+	Variable m = as_variable_resolve_inline(prg, v[0]);
+	Variable &vec_var = as_variable_inline(prg, v[1]);
 
 	CHECK_MAP(m)
 	CHECK_VECTOR(vec_var)
@@ -1349,9 +1350,9 @@ static bool filefunc_open(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string filename = as_string(prg, v[1]);
-	std::string mode = as_string(prg, v[2]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	std::string filename = as_string_inline(prg, v[1]);
+	std::string mode = as_string_inline(prg, v[2]);
 	
 	File_Info *info = file_info(prg);
 
@@ -1388,7 +1389,7 @@ static bool filefunc_close(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number_inline(prg, v[0]);
 	
 	File_Info *info = file_info(prg);
 
@@ -1401,8 +1402,8 @@ static bool filefunc_read(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	Variable &var = as_variable(prg, v[1]);
+	int id = as_number_inline(prg, v[0]);
+	Variable &var = as_variable_inline(prg, v[1]);
 
 	CHECK_STRING(var)
 
@@ -1417,8 +1418,8 @@ static bool filefunc_read_line(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	Variable &var = as_variable(prg, v[1]);
+	int id = as_number_inline(prg, v[0]);
+	Variable &var = as_variable_inline(prg, v[1]);
 
 	CHECK_STRING(var)
 
@@ -1438,8 +1439,8 @@ static bool filefunc_write(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	std::string val = as_string(prg, v[1]);
+	int id = as_number_inline(prg, v[0]);
+	std::string val = as_string_inline(prg, v[1]);
 
 	File_Info *info = file_info(prg);
 
@@ -1452,8 +1453,8 @@ bool filefunc_print(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	std::string fmt = as_string(prg, v[1]);
+	int id = as_number_inline(prg, v[0]);
+	std::string fmt = as_string_inline(prg, v[1]);
 	int _tok = 2;
 	
 	int prev = 0;
@@ -1519,7 +1520,7 @@ bool filefunc_print(Program *prg, const std::vector<Token> &v)
 			val = buf;
 		}
 		else {
-			Variable &v1 = as_variable(prg, v[_tok]);
+			Variable &v1 = as_variable_inline(prg, v[_tok]);
 			if (IS_NUMBER(v1)) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
@@ -1614,12 +1615,12 @@ bool bitfunc_or(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 
 	for (size_t i = 1; i < v.size(); i++) {
-		v1.n = (int)v1.n | (int)as_number(prg, v[i]);
+		v1.n = (int)v1.n | (int)as_number_inline(prg, v[i]);
 	}
 
 	return true;
@@ -1629,12 +1630,12 @@ bool bitfunc_xor(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 
 	for (size_t i = 1; i < v.size(); i++) {
-		v1.n = (int)v1.n ^ (int)as_number(prg, v[i]);
+		v1.n = (int)v1.n ^ (int)as_number_inline(prg, v[i]);
 	}
 
 	return true;
@@ -1644,12 +1645,12 @@ bool bitfunc_and(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 
 	for (size_t i = 1; i < v.size(); i++) {
-		v1.n = (int)v1.n & (int)as_number(prg, v[i]);
+		v1.n = (int)v1.n & (int)as_number_inline(prg, v[i]);
 	}
 
 	return true;
@@ -1659,12 +1660,12 @@ bool bitfunc_leftshift(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 
 	for (size_t i = 1; i < v.size(); i++) {
-		v1.n = (int)v1.n << (int)as_number(prg, v[i]);
+		v1.n = (int)v1.n << (int)as_number_inline(prg, v[i]);
 	}
 
 	return true;
@@ -1674,12 +1675,12 @@ bool bitfunc_rightshift(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 
 	for (size_t i = 1; i < v.size(); i++) {
-		v1.n = (int)v1.n >> (int)as_number(prg, v[i]);
+		v1.n = (int)v1.n >> (int)as_number_inline(prg, v[i]);
 	}
 
 	return true;
@@ -1689,10 +1690,10 @@ bool twinklefunc_colour(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
-	int fore = as_number(prg, v[0]);
-	int fore_b = as_number(prg, v[1]);
-	int back = as_number(prg, v[2]);
-	int back_b = as_number(prg, v[3]);
+	int fore = as_number_inline(prg, v[0]);
+	int fore_b = as_number_inline(prg, v[1]);
+	int back = as_number_inline(prg, v[2]);
+	int back_b = as_number_inline(prg, v[3]);
 
 	twinkle::set((twinkle::TWINKLE_COLOR)fore, fore_b, (twinkle::TWINKLE_COLOR)back, back_b);
 
@@ -1712,7 +1713,7 @@ bool twinklefunc_getch(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 	
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_NUMBER(v1)
 	

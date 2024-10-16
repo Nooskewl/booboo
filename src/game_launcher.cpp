@@ -15,6 +15,7 @@ using namespace noo;
 #include "booboo/booboo.h"
 #include "booboo/standard_lib.h"
 #include "booboo/game_lib.h"
+#include "booboo/internal.h"
 using namespace booboo;
 
 Program *prg;
@@ -41,7 +42,7 @@ static bool mousefunc_set_relative(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	bool onoff = as_number(prg, v[0]);
+	bool onoff = as_number_inline(prg, v[0]);
 
 	SDL_SetRelativeMouseMode((SDL_bool)onoff);
 
@@ -52,8 +53,8 @@ static bool mousefunc_get_delta(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	Variable &v2 = as_variable(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	Variable &v2 = as_variable_inline(prg, v[1]);
 	
 	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -78,8 +79,8 @@ static bool mousefunc_get_position(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	Variable &v2 = as_variable(prg, v[1]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	Variable &v2 = as_variable_inline(prg, v[1]);
 	
 	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -95,10 +96,10 @@ static bool mousefunc_get_buttons(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	Variable &v2 = as_variable(prg, v[1]);
-	Variable &v3 = as_variable(prg, v[2]);
-	Variable &v4 = as_variable(prg, v[3]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	Variable &v2 = as_variable_inline(prg, v[1]);
+	Variable &v3 = as_variable_inline(prg, v[2]);
+	Variable &v4 = as_variable_inline(prg, v[3]);
 	
 	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER || v3.type != Variable::NUMBER || v4.type != Variable::NUMBER) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -118,14 +119,14 @@ static bool keyfunc_get(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable &v1 = as_variable_inline(prg, v[0]);
 	
 	if (v1.type != Variable::NUMBER) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 
 	bool pressed = false;
-	int checking = as_number(prg, v[1]);
+	int checking = as_number_inline(prg, v[1]);
 
 	for (std::list<int>::iterator it = keys_pressed.begin(); it != keys_pressed.end(); it++) {
 		int &k = *it;

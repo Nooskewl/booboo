@@ -142,10 +142,6 @@ extern std::string (*load_text)(std::string filename); // must be set
 
 } // End namespace booboo
 
-// You can use this at the start of your library functions to ensure correct number of arguments
-#define MIN_ARGS(n) if (v.size() < n) throw Error(std::string(__FUNCTION__) + ": " + "Incorrect number of arguments at " + get_error_info(prg));
-#define COUNT_ARGS(n) if (v.size() != n) throw Error(std::string(__FUNCTION__) + ": " + "Incorrect number of arguments at " + get_error_info(prg));
-		
 #define IS_NUMBER(v) ((v).type == Variable::NUMBER)
 #define IS_STRING(v) ((v).type == Variable::STRING)
 #define IS_VECTOR(v) ((v).type == Variable::VECTOR)
@@ -155,6 +151,11 @@ extern std::string (*load_text)(std::string filename); // must be set
 #define IS_EXPRESSION(v) ((v).type == Variable::EXPRESSION)
 #define IS_FISH(v) ((v).type == Variable::FISH)
 
+#if 1
+// You can use this at the start of your library functions to ensure correct number of arguments
+#define MIN_ARGS(n) if (v.size() < n) throw Error(std::string(__FUNCTION__) + ": " + "Incorrect number of arguments at " + get_error_info(prg));
+#define COUNT_ARGS(n) if (v.size() != n) throw Error(std::string(__FUNCTION__) + ": " + "Incorrect number of arguments at " + get_error_info(prg));
+		
 #define CHECK_NUMBER(v) \
 	if (!IS_NUMBER(v)) { \
 		throw Error(std::string(__FUNCTION__) + ": " + "Expected number at " + get_error_info(prg)); \
@@ -187,6 +188,7 @@ extern std::string (*load_text)(std::string filename); // must be set
 	if (!IS_FISH(v)) { \
 		throw Error(std::string(__FUNCTION__) + ": " + "Expected fish at " + get_error_info(prg)); \
 	}
+#endif
 
 #if 0
 #define MIN_ARGS(n)
