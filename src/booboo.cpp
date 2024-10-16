@@ -2788,6 +2788,17 @@ Variable exprfunc_rightshift(Program *prg, const std::vector<Token> &v)
 
 static Variable matmul(Program *prg, Variable ret, Variable vec2)
 {
+	if (IS_NUMBER(ret) && IS_NUMBER(vec2)) {
+		Variable var;
+		var.type = Variable::NUMBER;
+		var.n = ret.n * vec2.n;
+		return var;
+	}
+	if (IS_NUMBER(ret)) {
+		Variable tmp = ret;
+		ret = vec2;
+		vec2 = tmp;
+	}
 	if (IS_NUMBER(vec2)) {
 		// it's a vector
 		if (IS_NUMBER(ret.v[0])) {
@@ -2908,20 +2919,15 @@ Variable exprfunc_mul(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	Variable ret;
-	ret.type = Variable::VECTOR;
-	ret.name = "-booboo-";
-
-	Variable vec = as_variable_resolve_inline(prg, v[0]);
+	Variable var = as_variable_resolve_inline(prg, v[0]);
 	
-	CHECK_VECTOR(vec)
-
-	ret = vec;
+	Variable ret;
+	ret = var;
 
 	for (size_t n = 1; n < v.size(); n++) {	
-		Variable vec2 = as_variable_resolve_inline(prg, v[n]);
+		Variable var2 = as_variable_resolve_inline(prg, v[n]);
 
-		ret = matmul(prg, ret, vec2);
+		ret = matmul(prg, ret, var2);
 	}
 
 	return ret;
