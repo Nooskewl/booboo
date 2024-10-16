@@ -6,7 +6,7 @@ vector_init tmp 3 4 5
 vector_add mat tmp
 vector_init tmp 6 7 8
 vector_add mat tmp
-= tmp (mmul mat vec)
+= tmp (mul mat vec)
 
 number sz
 vector_size tmp sz

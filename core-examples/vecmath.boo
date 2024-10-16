@@ -11,10 +11,10 @@ print "v3="
 call printv v3
 
 number a
-= a (vangle v1 v2)
+= a (angle v1 v2)
 print "Angle=%\n" a
 
-= a (vlen v2)
+= a (length v2)
 print "Length of v2=%\n" a
 
 vector c
@@ -25,7 +25,7 @@ call printv c
 = a (dot v1 v2)
 print "Dot product=%\n" a
 
-= c (vmul v2 5)
+= c (mul v2 5)
 print "v2 * 5="
 call printv c
 
@@ -33,11 +33,11 @@ call printv c
 print "V3 normalized="
 call printv c
 
-= c (vadd v1 v2)
+= c (add v1 v2)
 print "v1 + v2="
 call printv c
 
-= c (vsub v3 v2)
+= c (sub v3 v2)
 print "v3 - v2="
 call printv c
 

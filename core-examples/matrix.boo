@@ -1,5 +1,5 @@
 vector m
-= m (midentity 4)
+= m (identity 4)
 
 call printm m
 

@@ -71,8 +71,17 @@ inline Variable &as_variable_inline(Program *prg, const Token &t)
 
 inline Variable as_variable_resolve_inline(Program *prg, const Token &t)
 {
-	if (t.type != Token::SYMBOL) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	if (t.type == Token::NUMBER) {
+		Variable var;
+		var.type = Variable::NUMBER;
+		var.n = t.n;
+		return var;
+	}
+	if (t.type == Token::STRING) {
+		Variable var;
+		var.type = Variable::STRING;
+		var.s = t.s;
+		return var;
 	}
 	if (prg->variables[t.i].type == Variable::FISH) {
 		return go_fish(prg, prg->variables[t.i].f);
