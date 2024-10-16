@@ -175,12 +175,12 @@ function move_enemy e
 	vector v1 v2 diff tmp
 	vector_init v1 [e "x"] [e "y"] [e "z"]
 	vector_init v2 [e "dx"] [e "dy"] [e "dz"]
-	= diff (vsub v2 v1)
-	if (< (vlen diff) 0.1) done
+	= diff (sub v2 v1)
+	if (< (length diff) 0.1) done
 		call set_dest e
 		return
 	:done
-	= tmp (vmul (normalize diff) SPEED)
+	= tmp (mul (normalize diff) SPEED)
 	+ [e "x"] [tmp 0]
 	+ [e "z"] [tmp 2]
 	billboard_translate [e "billboard"] [tmp 0] 0 [tmp 2]
@@ -258,9 +258,9 @@ function draw
 			vector_init tmp1 [[enemies i] "x"] [[enemies i] "y"] [[enemies i] "z"]
 			vector_init tmp2 [[enemies i] "dx"] [[enemies i] "dy"] [[enemies i] "dz"]
 			vector_init tmp3 0 0 1
-			= tmp4 (vsub tmp2 tmp1)
+			= tmp4 (sub tmp2 tmp1)
 			
-			= angle2 (vangle tmp4 tmp3)
+			= angle2 (angle tmp4 tmp3)
 
 			vector cross plane
 			= cross (cross tmp4 tmp3)
@@ -470,7 +470,7 @@ function run
 		vector_init v1 [[enemies i] "x"] [[enemies i] "y"] [[enemies i] "z"]
 		vector_init v2 (* x -1) 0 (* z -1)
 		number dist
-		= dist (vlen (vsub v1 v2))
+		= dist (length (sub v1 v2))
 		number close
 		if (< dist 2.5) is_close not_close
 			= close TRUE
@@ -505,7 +505,7 @@ function run
 :again
 	vector v
 	vector_init v [[bullets i] "dx"] [[bullets i] "dy"] [[bullets i] "dz"]
-	= v (vmul v BULLET_SPEED)
+	= v (mul v BULLET_SPEED)
 	+ [[bullets i] "x"] [v 0]
 	+ [[bullets i] "y"] [v 1]
 	+ [[bullets i] "z"] [v 2]
@@ -675,7 +675,7 @@ function do_enemy_attack e
 	vector v1 v2 diff
 	vector_init v1 [e "x"] [e "y"] [e "z"]
 	vector_init v2 (* x -1) 0 (* z -1)
-	= diff (normalize (vsub v2 v1))
+	= diff (normalize (sub v2 v1))
 	call spawn_bullet [e "x"] 0.2 [e "z"] [diff 0] [diff 1] [diff 2] 0
 	mml_play fire_sfx 1 0
 }

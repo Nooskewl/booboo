@@ -2793,7 +2793,117 @@ Variable exprfunc_rightshift(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_mmul(Program *prg, const std::vector<Token> &v)
+static Variable matmul(Program *prg, Variable ret, Variable vec2)
+{
+	if (IS_NUMBER(vec2)) {
+		// it's a vector
+		if (IS_NUMBER(ret.v[0])) {
+			for (size_t i = 0; i < ret.v.size(); i++) {
+				ret.v[i].n *= vec2.n;
+			}
+		}
+		// it's a matrix
+		else {
+			for (size_t i = 0; i < ret.v.size(); i++) {
+				for (size_t j = 0; j < ret.v[0].v.size(); j++) {
+					ret.v[i].v[j].n *= vec2.n;
+				}
+			}
+		}
+	}
+	else {
+		CHECK_VECTOR(vec2);
+
+		bool is_mat1, is_mat2;
+
+		Variable tmp;
+
+		if (IS_VECTOR(ret.v[0])) {
+			is_mat1 = true;
+		}
+		else {
+			is_mat1 = false;
+			tmp = ret;
+			ret.v.clear();
+			for (size_t i = 0; i < tmp.v.size(); i++) {
+				Variable var;
+				var.type = Variable::VECTOR;
+				var.v.push_back(tmp.v[i]);
+				ret.v.push_back(var);
+			}
+		}
+
+		if (IS_VECTOR(vec2.v[0])) {
+			is_mat2 = true;
+		}
+		else {
+			is_mat2 = false;
+			tmp = vec2;
+			vec2.v.clear();
+			vec2.v.push_back(tmp);
+		}
+
+		if (ret.v.size() != vec2.v[0].v.size()) {
+			throw Error(std::string(__FUNCTION__) + ": " + "Matrices cannot be multiplied at " + get_error_info(prg));
+		}
+
+		unsigned int w = vec2.v.size();
+		unsigned int h = ret.v[0].v.size();
+
+		while (ret.v.size() > w) {
+			ret.v.pop_back();
+		}
+		for (size_t i = 0; i < ret.v.size(); i++) {
+			while (ret.v[i].v.size() > h) {
+				ret.v[i].v.pop_back();
+			}
+		}
+
+		if (ret.v.size() != w || ret.v[0].v.size() != h) {
+			for (unsigned int c = 0; c < w; c++) {
+				Variable var;
+				var.type = Variable::VECTOR;
+				for (unsigned int r = 0; r < h; r++) {
+					Variable var2;
+					var2.type = Variable::NUMBER;
+					var2.n = 0;
+					var.v.push_back(var2);
+				}
+				ret.v.push_back(var);
+			}
+		}
+
+		int rr = 0;
+		for (size_t r = 0; r < ret.v[0].v.size(); r++) {
+			int cc = 0;
+			for (size_t c = 0; c < ret.v.size(); c++) {
+				int sum = 0;
+				for (size_t r2 = 0; r2 < vec2.v[c].v.size(); r2++) {
+					sum += ret.v[r2].v[r].n * vec2.v[c].v[r2].n;
+				}
+				ret.v[cc].v[rr].n = sum;
+				cc++;
+			}
+			rr++;
+		}
+
+		if (is_mat1 == false) {
+			tmp = ret;
+			ret.v.clear();
+			for (size_t i = 0; i < tmp.v.size(); i++) {
+				ret.v.push_back(tmp.v[i].v[0]);
+			}
+		}
+		else if (is_mat2 == false) {
+			tmp = ret;
+			ret = tmp.v[0];
+		}
+	}
+
+	return ret;
+}
+
+Variable exprfunc_mul(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -2810,81 +2920,7 @@ Variable exprfunc_mmul(Program *prg, const std::vector<Token> &v)
 	for (size_t n = 1; n < v.size(); n++) {	
 		Variable vec2 = as_variable_resolve_inline(prg, v[n]);
 
-		if (IS_NUMBER(vec2)) {
-			for (size_t i = 0; i < ret.v.size(); i++) {
-				for (size_t j = 0; j < ret.v[0].v.size(); j++) {
-					ret.v[i].v[j].n *= vec2.n;
-				}
-			}
-		}
-		else {
-			CHECK_VECTOR(vec2);
-
-			bool is_mat;
-			Variable tmp;
-			if (vec2.v[0].type == Variable::VECTOR) {
-				is_mat = true;
-			}
-			else {
-				is_mat = false;
-				tmp = vec2;
-				vec2.v.clear();
-				vec2.v.push_back(tmp);
-			}
-
-			if (ret.v.size() != vec2.v[0].v.size()) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Matrices cannot be multiplied at " + get_error_info(prg));
-			}
-
-			std::vector<Variable> bak = ret.v;
-
-			unsigned int w = vec2.v.size();
-			unsigned int h = ret.v[0].v.size();
-
-			while (ret.v.size() > w) {
-				ret.v.pop_back();
-			}
-			for (size_t i = 0; i < ret.v.size(); i++) {
-				while (ret.v[i].v.size() > h) {
-					ret.v[i].v.pop_back();
-				}
-			}
-
-			if (ret.v.size() != w || ret.v[0].v.size() != h) {
-				for (unsigned int c = 0; c < w; c++) {
-					Variable var;
-					var.type = Variable::VECTOR;
-					for (unsigned int r = 0; r < h; r++) {
-						Variable var2;
-						var2.type = Variable::NUMBER;
-						var2.n = 0;
-						var.v.push_back(var2);
-					}
-					ret.v.push_back(var);
-				}
-			}
-
-			int rr = 0;
-			for (size_t r = 0; r < ret.v[0].v.size(); r++) {
-				int cc = 0;
-				for (size_t c = 0; c < ret.v.size(); c++) {
-					Variable &vecreal = vec2.v[c];
-					int sum = 0;
-					for (size_t r2 = 0; r2 < vecreal.v.size(); r2++) {
-						sum += bak[r2].v[r].n * vecreal.v[r2].n;
-					}
-					ret.v[cc].v[rr].n = sum;
-					cc++;
-				}
-				rr++;
-			}
-
-			if (is_mat == false) {
-				vec2 = tmp;
-				tmp = ret;
-				ret = tmp.v[0];
-			}
-		}
+		ret = matmul(prg, ret, vec2);
 	}
 
 	return ret;
@@ -2915,7 +2951,7 @@ static Variable identity(int sz)
 	return var;
 }
 
-Variable exprfunc_midentity(Program *prg, const std::vector<Token> &v)
+Variable exprfunc_identity(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 	
@@ -2924,13 +2960,13 @@ Variable exprfunc_midentity(Program *prg, const std::vector<Token> &v)
 	return identity(sz);
 }
 
-Variable exprfunc_mscale(Program *prg, const std::vector<Token> &v)
+Variable exprfunc_scale(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	float sx = as_number_inline(prg, v[0]);
-	float sy = as_number_inline(prg, v[1]);
-	float sz = as_number_inline(prg, v[2]);
+	double sx = as_number_inline(prg, v[0]);
+	double sy = as_number_inline(prg, v[1]);
+	double sz = as_number_inline(prg, v[2]);
 
 	Variable mat = identity(4);
 
@@ -2941,18 +2977,18 @@ Variable exprfunc_mscale(Program *prg, const std::vector<Token> &v)
 	return mat;
 }
 
-Variable exprfunc_mrotate(Program *prg, const std::vector<Token> &v)
+Variable exprfunc_rotate(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 	
-	float angle = as_number_inline(prg, v[0]);
-	float x = as_number_inline(prg, v[1]);
-	float y = as_number_inline(prg, v[2]);
-	float z = as_number_inline(prg, v[3]);
+	double angle = as_number_inline(prg, v[0]);
+	double x = as_number_inline(prg, v[1]);
+	double y = as_number_inline(prg, v[2]);
+	double z = as_number_inline(prg, v[3]);
 
-	float s = sin(angle);
-	float c = cos(angle);
-	float invc = 1 - c;
+	double s = sin(angle);
+	double c = cos(angle);
+	double invc = 1 - c;
 
 	Variable mat = identity(4);
 
@@ -2969,15 +3005,15 @@ Variable exprfunc_mrotate(Program *prg, const std::vector<Token> &v)
 	return mat;
 }
 
-Variable exprfunc_mtranslate(Program *prg, const std::vector<Token> &v)
+Variable exprfunc_translate(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
 	Variable mat = identity(4);
 
-	float tx = as_number_inline(prg, v[0]);
-	float ty = as_number_inline(prg, v[1]);
-	float tz = as_number_inline(prg, v[2]);
+	double tx = as_number_inline(prg, v[0]);
+	double ty = as_number_inline(prg, v[1]);
+	double tz = as_number_inline(prg, v[2]);
 
 	mat.v[3].v[0].n = tx;
 	mat.v[3].v[1].n = ty;
@@ -2986,72 +3022,12 @@ Variable exprfunc_mtranslate(Program *prg, const std::vector<Token> &v)
 	return mat;
 }
 
-static Variable vecmul(Variable vec, double n)
-{
-	for (size_t j = 0; j < vec.v.size(); j++) {
-		vec.v[j].n *= n;
-	}
-
-	return vec;
-}
-
-Variable exprfunc_vmul(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(2)
-
-	Variable vec = as_variable_resolve_inline(prg, v[0]);
-
-	CHECK_VECTOR(vec)
-
-	for (size_t i = 1; i < v.size(); i++) {
-		Variable var = as_variable_resolve_inline(prg, v[i]);
-		if (var.type == Variable::NUMBER) {
-			vec = vecmul(vec, var.n);
-		}
-		else if (var.type == Variable::VECTOR) {
-			if (var.v.size() < 1 || var.v[0].v.size() != vec.v.size()) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Vector and matrix cannot be multiplied at " + get_error_info(prg));
-			}
-			Variable tmp = vec;
-			for (size_t c = 0; c < vec.v.size(); c++) {
-				int sum = 0;
-				for (size_t r = 0; r < vec.v.size(); r++) {
-					sum += vec.v[r].n * var.v[c].v[r].n;
-				}
-				tmp.v[c].n = sum;
-			}
-			vec = tmp;
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Unsupported types in vector multiplication at " + get_error_info(prg));
-		}
-	}
-
-	return vec;
-}
-
-Variable exprfunc_vdiv(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(2)
-
-	Variable vec = as_variable_resolve_inline(prg, v[0]);
-
-	CHECK_VECTOR(vec)
-
-	for (size_t i = 1; i < v.size(); i++) {
-		double n = as_number_inline(prg, v[i]);
-		vec = vecmul(vec, 1.0/n);
-	}
-
-	return vec;
-}
-
 static double veclen(const Variable &vec)
 {
 	return sqrt(pow(vec.v[0].n, 2) + pow(vec.v[1].n, 2) + pow(vec.v[2].n, 2));
 }
 
-Variable exprfunc_vlen(Program *prg, const std::vector<Token> &v)
+Variable exprfunc_length(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -3105,7 +3081,7 @@ static Variable veccross(Variable vec, Variable vec2)
 	return vec;
 }
 
-Variable exprfunc_vangle(Program *prg, const std::vector<Token> &v)
+Variable exprfunc_angle(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -3118,10 +3094,14 @@ Variable exprfunc_vangle(Program *prg, const std::vector<Token> &v)
 	if (vec1.v.size() < 3 || vec2.v.size() < 3) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Vector with < 3 components not supported at " + get_error_info(prg));
 	}
+
+	Variable len;
+	len.type = Variable::NUMBER;
+	len.n = veclen(vec2);
 	
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.n = acosf(vecdot(vec1, vec2) / veclen(vecmul(vec1, veclen(vec2))));
+	var.n = acosf(vecdot(vec1, vec2) / veclen(matmul(prg, vec1, len)));
 
 	return var;
 }
@@ -3154,7 +3134,11 @@ Variable exprfunc_normalize(Program *prg, const std::vector<Token> &v)
 
 	CHECK_VECTOR(vec)
 
-	return vecmul(vec, 1.0 / veclen(vec));
+	Variable len;
+	len.type = Variable::NUMBER;
+	len.n = 1.0 / veclen(vec);
+
+	return matmul(prg, vec, len);
 }
 
 Variable exprfunc_vadd(Program *prg, const std::vector<Token> &v)
@@ -3249,20 +3233,18 @@ void start()
 	add_expression_handler("&", exprfunc_bitand);
 	add_expression_handler("<<", exprfunc_leftshift);
 	add_expression_handler(">>", exprfunc_rightshift);
-	add_expression_handler("mmul", exprfunc_mmul);
-	add_expression_handler("midentity", exprfunc_midentity);
-	add_expression_handler("mscale", exprfunc_mscale);
-	add_expression_handler("mrotate", exprfunc_mrotate);
-	add_expression_handler("mtranslate", exprfunc_mtranslate);
-	add_expression_handler("vmul", exprfunc_vmul);
-	add_expression_handler("vdiv", exprfunc_vdiv);
-	add_expression_handler("vlen", exprfunc_vlen);
+	add_expression_handler("mul", exprfunc_mul);
+	add_expression_handler("identity", exprfunc_identity);
+	add_expression_handler("scale", exprfunc_scale);
+	add_expression_handler("rotate", exprfunc_rotate);
+	add_expression_handler("translate", exprfunc_translate);
+	add_expression_handler("length", exprfunc_length);
 	add_expression_handler("dot", exprfunc_dot);
-	add_expression_handler("vangle", exprfunc_vangle);
+	add_expression_handler("angle", exprfunc_angle);
 	add_expression_handler("cross", exprfunc_cross);
 	add_expression_handler("normalize", exprfunc_normalize);
-	add_expression_handler("vadd", exprfunc_vadd);
-	add_expression_handler("vsub", exprfunc_vsub);
+	add_expression_handler("add", exprfunc_vadd);
+	add_expression_handler("sub", exprfunc_vsub);
 
 	add_instruction("reset", breaker_reset);
 	add_instruction("exit", breaker_exit);

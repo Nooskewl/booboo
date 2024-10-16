@@ -74,17 +74,17 @@ struct Model_Info {
 };
 
 struct Billboard {
-	float x;
-	float y;
-	float z;
-	float w;
-	float h;
-	float tx;
-	float ty;
-	float tz;
-	float sx;
-	float sy;
-	float unit;
+	double x;
+	double y;
+	double z;
+	double w;
+	double h;
+	double tx;
+	double ty;
+	double tz;
+	double sx;
+	double sy;
+	double unit;
 	gfx::Image *image;
 	gfx::Sprite *sprite;
 };
@@ -503,7 +503,7 @@ static bool gfxfunc_resize(Program *prg, const std::vector<Token> &v)
 	int w = as_number(prg, v[0]);
 	int h = as_number(prg, v[1]);
 
-	float aspect = (float)w/h;
+	double aspect = (double)w/h;
 	gfx::set_min_aspect_ratio(aspect-0.001f);
 	gfx::set_max_aspect_ratio(aspect+0.001f);
 	gfx::set_scaled_size({w, h});
@@ -606,7 +606,7 @@ static bool gfxfunc_screen_shake(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	float amount = as_number(prg, v[0]);
+	double amount = as_number(prg, v[0]);
 	Uint32 duration = as_number(prg, v[1]);
 
 	gfx::screen_shake(amount, duration);
@@ -852,10 +852,10 @@ static bool primfunc_ellipse(Program *prg, const std::vector<Token> &v)
 	p.x = as_number(prg, v[4]);
 	p.y = as_number(prg, v[5]);
 
-	float _rx = as_number(prg, v[6]);
-	float _ry = as_number(prg, v[7]);
-	float thick = as_number(prg, v[8]);
-	float _sections = as_number(prg, v[9]);
+	double _rx = as_number(prg, v[6]);
+	double _ry = as_number(prg, v[7]);
+	double thick = as_number(prg, v[8]);
+	double _sections = as_number(prg, v[9]);
 
 	gfx::draw_ellipse(c, p, _rx, _ry, thick, _sections);
 
@@ -877,9 +877,9 @@ static bool primfunc_filled_ellipse(Program *prg, const std::vector<Token> &v)
 	p.x = as_number(prg, v[4]);
 	p.y = as_number(prg, v[5]);
 
-	float _rx = as_number(prg, v[6]);
-	float _ry = as_number(prg, v[7]);
-	float _sections = as_number(prg, v[8]);
+	double _rx = as_number(prg, v[6]);
+	double _ry = as_number(prg, v[7]);
+	double _sections = as_number(prg, v[8]);
 
 	gfx::draw_filled_ellipse(c, p, _rx, _ry, _sections);
 
@@ -923,7 +923,7 @@ static bool primfunc_filled_circle(Program *prg, const std::vector<Token> &v)
 
 	p.x = as_number(prg, v[4]);
 	p.y = as_number(prg, v[5]);
-	float _r = as_number(prg, v[6]);
+	double _r = as_number(prg, v[6]);
 	int _sections = as_number(prg, v[7]);
 
 	gfx::draw_filled_circle(c, p, _r, _sections);
@@ -978,7 +978,7 @@ static bool mmlfunc_play(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(3)
 
 	int id = as_number(prg, v[0]);
-	float volume = as_number(prg, v[1]);
+	double volume = as_number(prg, v[1]);
 	bool loop = as_number(prg, v[2]);
 
 	MML_Info *info = mml_info(prg);
@@ -1042,7 +1042,7 @@ static bool samplefunc_play(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(3)
 
 	int id = as_number(prg, v[0]);
-	float volume = as_number(prg, v[1]);
+	double volume = as_number(prg, v[1]);
 	bool loop = as_number(prg, v[2]);
 
 	Sample_Info *info = sample_info(prg);
@@ -1342,8 +1342,8 @@ static bool imagefunc_draw_9patch(Program *prg, const std::vector<Token> &v)
 	int g = as_number(prg, v[2]);
 	int b = as_number(prg, v[3]);
 	int a = as_number(prg, v[4]);
-	float x = as_number(prg, v[5]);
-	float y = as_number(prg, v[6]);
+	double x = as_number(prg, v[5]);
+	double y = as_number(prg, v[6]);
 	int w = as_number(prg, v[7]);
 	int h = as_number(prg, v[8]);
 
@@ -2810,8 +2810,8 @@ bool is_3d = false;
 
 void set_3d()
 {
-	float aspect = shim::screen_size.w / (float)shim::screen_size.h;
-	glm::mat4 _proj = glm::perspective(float(M_PI/4.0f), aspect, 0.1f, 10000.0f);
+	double aspect = shim::screen_size.w / (double)shim::screen_size.h;
+	glm::mat4 _proj = glm::perspective(float(M_PI/4.0f), (float)aspect, 0.1f, 10000.0f);
 
 	glm::mat4 _mv;
 
@@ -2930,9 +2930,9 @@ static bool modelfunc_scale(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(4)
 
 	int model_id = as_number(prg, v[0]);
-	float sx = as_number(prg, v[1]);
-	float sy = as_number(prg, v[2]);
-	float sz = as_number(prg, v[3]);
+	double sx = as_number(prg, v[1]);
+	double sy = as_number(prg, v[2]);
+	double sz = as_number(prg, v[3]);
 
 	Model_Info *info = model_info(prg);
 
@@ -2948,16 +2948,16 @@ static bool modelfunc_rotate(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(5)
 
 	int model_id = as_number(prg, v[0]);
-	float angle = as_number(prg, v[1]);
-	float ax = as_number(prg, v[2]);
-	float ay = as_number(prg, v[3]);
-	float az = as_number(prg, v[4]);
+	double angle = as_number(prg, v[1]);
+	double ax = as_number(prg, v[2]);
+	double ay = as_number(prg, v[3]);
+	double az = as_number(prg, v[4]);
 
 	Model_Info *info = model_info(prg);
 
 	Model *model = info->models[model_id];
 
-	model->mat = glm::rotate(model->mat, angle, glm::vec3(ax, ay, az));
+	model->mat = glm::rotate(model->mat, (float)angle, glm::vec3(ax, ay, az));
 
 	return true;
 }
@@ -2967,9 +2967,9 @@ static bool modelfunc_translate(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(4)
 
 	int model_id = as_number(prg, v[0]);
-	float x = as_number(prg, v[1]);
-	float y = as_number(prg, v[2]);
-	float z = as_number(prg, v[3]);
+	double x = as_number(prg, v[1]);
+	double y = as_number(prg, v[2]);
+	double z = as_number(prg, v[3]);
 
 	Model_Info *info = model_info(prg);
 
@@ -3023,9 +3023,9 @@ static bool modelfunc_scale_3d(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	float sx = as_number(prg, v[0]);
-	float sy = as_number(prg, v[1]);
-	float sz = as_number(prg, v[2]);
+	double sx = as_number(prg, v[0]);
+	double sy = as_number(prg, v[1]);
+	double sz = as_number(prg, v[2]);
 
 	glm::mat4 mv, proj;
 	gfx::get_matrices(mv, proj);
@@ -3040,14 +3040,14 @@ static bool modelfunc_rotate_3d(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
-	float angle = as_number(prg, v[0]);
-	float ax = as_number(prg, v[1]);
-	float ay = as_number(prg, v[2]);
-	float az = as_number(prg, v[3]);
+	double angle = as_number(prg, v[0]);
+	double ax = as_number(prg, v[1]);
+	double ay = as_number(prg, v[2]);
+	double az = as_number(prg, v[3]);
 
 	glm::mat4 mv, proj;
 	gfx::get_matrices(mv, proj);
-	mv = glm::rotate(mv, angle, glm::vec3(ax, ay, az));
+	mv = glm::rotate(mv, (float)angle, glm::vec3(ax, ay, az));
 	gfx::set_matrices(mv, proj);
 	gfx::update_projection();
 
@@ -3058,9 +3058,9 @@ static bool modelfunc_translate_3d(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	float x = as_number(prg, v[0]);
-	float y = as_number(prg, v[1]);
-	float z = as_number(prg, v[2]);
+	double x = as_number(prg, v[0]);
+	double y = as_number(prg, v[1]);
+	double z = as_number(prg, v[2]);
 
 	glm::mat4 mv, proj;
 	gfx::get_matrices(mv, proj);
@@ -3201,9 +3201,9 @@ static bool modelfunc_size(Program *prg, const std::vector<Token> &v)
 		}
 	}
 
-	float szx = 0.0f;
-	float szy = 0.0f;
-	float szz = 0.0f;
+	double szx = 0.0f;
+	double szy = 0.0f;
+	double szz = 0.0f;
 
 	if (n != nullptr) {
 		szx = n->max_x - n->min_x;
@@ -3429,11 +3429,11 @@ static bool modelfunc_billboard_create(Program *prg, const std::vector<Token> &v
 
 	Variable &result = as_variable(prg, v[0]);
 	int image_id = as_number(prg, v[1]);
-	float x = as_number(prg, v[2]);
-	float y = as_number(prg, v[3]);
-	float z = as_number(prg, v[4]);
-	float w = as_number(prg, v[5]);
-	float h = as_number(prg, v[6]);
+	double x = as_number(prg, v[2]);
+	double y = as_number(prg, v[3]);
+	double z = as_number(prg, v[4]);
+	double w = as_number(prg, v[5]);
+	double h = as_number(prg, v[6]);
 
 	CHECK_NUMBER(result)
 	
@@ -3466,12 +3466,12 @@ static bool modelfunc_billboard_from_sprite(Program *prg, const std::vector<Toke
 
 	Variable &result = as_variable(prg, v[0]);
 	int sprite_id = as_number(prg, v[1]);
-	float x = as_number(prg, v[2]);
-	float y = as_number(prg, v[3]);
-	float z = as_number(prg, v[4]);
-	float w = as_number(prg, v[5]);
-	float h = as_number(prg, v[6]);
-	float unit = as_number(prg, v[7]);
+	double x = as_number(prg, v[2]);
+	double y = as_number(prg, v[3]);
+	double z = as_number(prg, v[4]);
+	double w = as_number(prg, v[5]);
+	double h = as_number(prg, v[6]);
+	double unit = as_number(prg, v[7]);
 
 	CHECK_NUMBER(result)
 	
@@ -3532,11 +3532,11 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 	gfx::Image *img = billboard->image;
 	if (img == nullptr) {
 		img = billboard->sprite->get_current_image();
-		billboard->w = img->size.w / (float)billboard->unit;
-		billboard->h = img->size.h / (float)billboard->unit;
+		billboard->w = img->size.w / (double)billboard->unit;
+		billboard->h = img->size.h / (double)billboard->unit;
 		gfx::Image *root = img->get_root();
-		float tx1 = (float)img->get_offset().x / root->size.w;
-		float tx2 = tx1 + 1.0f / billboard->sprite->get_num_frames();
+		double tx1 = (double)img->get_offset().x / root->size.w;
+		double tx2 = tx1 + 1.0f / billboard->sprite->get_num_frames();
 		for (int i = 0; i < 6; i++) {
 			if (texcoords[i*2+0] == 0.0f) {
 				texcoords[i*2+0] = tx1;
@@ -3560,8 +3560,8 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 
 	for (size_t i = 0; i < 2; i++) {
 		for (int j = 0; j < 3; j++) {
-			float x = verts[faces[i*3+j]*3+0];
-			float y = verts[faces[i*3+j]*3+1];
+			double x = verts[faces[i*3+j]*3+0];
+			double y = verts[faces[i*3+j]*3+1];
 			glm::vec3 pos = glm::vec3(billboard->x+billboard->tx, billboard->y+billboard->ty, billboard->z+billboard->tz);
 			glm::vec3 pt = pos + camera_right * x * billboard->w * billboard->sx + camera_up * y * billboard->h * billboard->sy;
 			vec[count++] = pt.x;
@@ -3655,9 +3655,9 @@ static bool cdfunc_model_point(Program *prg, const std::vector<Token> &v)
 
 	Variable &result = as_variable(prg, v[0]);
 	int model_id = as_number(prg, v[1]);
-	float x = as_number(prg, v[2]);
-	float y = as_number(prg, v[3]);
-	float z = as_number(prg, v[4]);
+	double x = as_number(prg, v[2]);
+	double y = as_number(prg, v[3]);
+	double z = as_number(prg, v[4]);
 
 	CHECK_NUMBER(result)
 	
@@ -3675,12 +3675,12 @@ static bool cdfunc_model_line_segment(Program *prg, const std::vector<Token> &v)
 
 	Variable &result = as_variable(prg, v[0]);
 	int model_id = as_number(prg, v[1]);
-	float x = as_number(prg, v[2]);
-	float y = as_number(prg, v[3]);
-	float z = as_number(prg, v[4]);
-	float x2 = as_number(prg, v[5]);
-	float y2 = as_number(prg, v[6]);
-	float z2 = as_number(prg, v[7]);
+	double x = as_number(prg, v[2]);
+	double y = as_number(prg, v[3]);
+	double z = as_number(prg, v[4]);
+	double x2 = as_number(prg, v[5]);
+	double y2 = as_number(prg, v[6]);
+	double z2 = as_number(prg, v[7]);
 	Variable &out_x = as_variable(prg, v[8]);
 	Variable &out_y = as_variable(prg, v[9]);
 	Variable &out_z = as_variable(prg, v[10]);
@@ -3709,21 +3709,21 @@ static bool cdfunc_sphere_sphere(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(9)
 
 	Variable &result = as_variable(prg, v[0]);
-	float x = as_number(prg, v[1]);
-	float y = as_number(prg, v[2]);
-	float z = as_number(prg, v[3]);
-	float r = as_number(prg, v[4]);
-	float x2 = as_number(prg, v[5]);
-	float y2 = as_number(prg, v[6]);
-	float z2 = as_number(prg, v[7]);
-	float r2 = as_number(prg, v[8]);
+	double x = as_number(prg, v[1]);
+	double y = as_number(prg, v[2]);
+	double z = as_number(prg, v[3]);
+	double r = as_number(prg, v[4]);
+	double x2 = as_number(prg, v[5]);
+	double y2 = as_number(prg, v[6]);
+	double z2 = as_number(prg, v[7]);
+	double r2 = as_number(prg, v[8]);
 
 	CHECK_NUMBER(result)
 
 	x -= x2;
 	y -= y2;
 	z -= z2;
-	float len = sqrt(x*x + y*y + z*z);
+	double len = sqrt(x*x + y*y + z*z);
 	result.n = len < (r+r2);
 
 	return true;

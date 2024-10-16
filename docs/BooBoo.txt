@@ -315,13 +315,12 @@ log10
 
 Vector and matrix math
 	Some vector and matrix math is available through expression
-	operators. Supported are: mmul, midentity, mscale, mrotate,
-	mtranslate, vmul, vdiv, vlen, dot, vangle, cross, normalize,
-	vadd, vsubb
-	Most of these behave as you'd expect. midentity takes 1 argument,
-	the size of the matrix. mscale, mrotate and mtranslate produce
+	operators. Supported are: mul, identity, scale, rotate,
+	translate, length, dot, angle, cross, normalize, add, sub
+	Most of these behave as you'd expect. identity takes 1 argument,
+	the size of the matrix. scale, rotate and translate produce
 	transformation matrices to be multiplied by another matrix
-	(mscale and mtranslate take 3 parameters, mrotate takes 4.)
+	(scale and translate take 3 parameters, rotate takes 4.)
 
 -- Vector Functions ----------------------------------------------------------
 
