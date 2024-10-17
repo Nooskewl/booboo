@@ -146,7 +146,7 @@ number half
 + i_y half
 - i_y small_h
 ;font_draw small_font tr tg tb 255 text i_x i_y
-= i_x 320
+= i_x 360
 + i_x (/ w 2)
 - i_x pad
 number sw
@@ -211,7 +211,7 @@ number half
 + i_y half
 - i_y small_h
 font_draw small_font tr tg tb 255 text i_x i_y
-= i_x 320
+= i_x 360
 + i_x 128
 - i_x pad
 number sw
