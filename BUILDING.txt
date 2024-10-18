@@ -1,4 +1,4 @@
-1) sudo apt install libsdl2-dev libfreetype-dev libglm-dev cmake git vim vim-gtk3 libflac-dev libogg-dev libvorbis-dev libpng-dev
+1) sudo apt install libsdl2-dev libfreetype-dev libglm-dev cmake git libflac-dev libogg-dev libvorbis-dev libpng-dev
 
 2) git clone https://codeberg.org/CMYKilluminatiNetwork/tgui6.git
    git clone https://codeberg.org/CMYKilluminatiNetwork/shim5.git
