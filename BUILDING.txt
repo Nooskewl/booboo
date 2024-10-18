@@ -1,3 +1,6 @@
+These instructions are for Debian 12. Additional Windows instructions are
+below.
+
 1) sudo apt install libsdl2-dev libfreetype-dev libglm-dev cmake git libflac-dev libogg-dev libvorbis-dev libpng-dev
 
 2) git clone https://codeberg.org/CMYKilluminatiNetwork/tgui6.git
@@ -42,3 +45,20 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DUSER_INCLUDE_PATH="/home/trent/code/tgui6/
 7) You now have BooBoo.exe and BooBooCLI.exe (or without exe on Linux.)
    Remember that BooBoo.exe needs an app, the default is booboo.git/data
    which is a default launcher.
+
+--
+
+Windows specifics:
+
+You can download all the dependencies (this has everything for all our games
+on Codeberg too) from:
+
+https://cmykilluminati.net/files/mingw32-deps-20241018.zip
+
+This has a build.sh like above that's a little different. Change the paths
+as relevant.
+
+You will also need to setup an MSYS2 MinGW32 environment which is something
+I haven't documented yet. You specifically need to install the packages
+prefixed with mingw32 like gcc and cmake.
+
