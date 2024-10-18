@@ -1,6 +1,6 @@
 These instructions are for Debian 12. Additional Windows instructions are
 below. These instructions are similar for any of our games using Shim, only
-you will not use twinkle and will use wedge.
+you will not use twinkle and will usually use wedge too.
 
 1) sudo apt install libsdl2-dev libfreetype-dev libglm-dev cmake git libflac-dev libogg-dev libvorbis-dev libpng-dev
 
