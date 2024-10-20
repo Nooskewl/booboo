@@ -11,32 +11,32 @@ using namespace booboo;
 extern bool quit;
 
 struct MML_Info {
-	int mml_id;
+	unsigned int mml_id;
 	std::map<int, audio::MML *> mmls;
 };
 
 struct Sample_Info {
-	int sample_id;
+	unsigned int sample_id;
 	std::map<int, audio::Sample *> samples;
 };
 
 struct Image_Info {
-	int image_id;
+	unsigned int image_id;
 	std::map<int, gfx::Image *> images;
 };
 
 struct Font_Info {
-	int font_id;
+	unsigned int font_id;
 	std::map<int, gfx::TTF *> fonts;
 };
 
 struct Tilemap_Info {
-	int tilemap_id;
+	unsigned int tilemap_id;
 	std::map<int, gfx::Tilemap *> tilemaps;
 };
 
 struct Sprite_Info {
-	int sprite_id;
+	unsigned int sprite_id;
 	std::map<int, gfx::Sprite *> sprites;
 };
 
@@ -49,17 +49,17 @@ struct Config_Value
 };
 
 struct CFG_Info {
-	int cfg_id;
+	unsigned int cfg_id;
 	std::map<int, std::map<std::string, Config_Value> > cfgs;
 };
 
 struct Shader_Info {
-	int shader_id;
+	unsigned int shader_id;
 	std::map<int, gfx::Shader *> shaders;
 };
 
 struct JSON_Info {
-	int json_id;
+	unsigned int json_id;
 	std::map<int, util::JSON *> jsons;
 };
 
@@ -70,7 +70,7 @@ struct Model {
 };
 
 struct Model_Info {
-	int model_id;
+	unsigned int model_id;
 	std::map<int, Model *> models;
 };
 
@@ -91,8 +91,21 @@ struct Billboard {
 };
 
 struct Billboard_Info {
-	int billboard_id;
+	unsigned int billboard_id;
 	std::map<int, Billboard *> billboards;
+};
+
+class BooBoo_Widget;
+
+struct Widget {
+	BooBoo_Widget *widget;
+	Variable *data;
+};
+
+struct Widget_Info
+{
+	int widget_id;
+	std::map<int, Widget *> widgets;
 };
 
 static MML_Info *mml_info(Program *prg)
@@ -212,6 +225,17 @@ static Billboard_Info *billboard_info(Program *prg)
 		info = new Billboard_Info;
 		info->billboard_id = 0;
 		booboo::set_black_box(prg, "com.illnorth.booboo.billboard", info);
+	}
+	return info;
+}
+
+static Widget_Info *widget_info(Program *prg)
+{
+	Widget_Info *info = (Widget_Info *)booboo::get_black_box(prg, "com.illnorth.booboo.widget");
+	if (info == nullptr) {
+		info = new Widget_Info;
+		info->widget_id = 0;
+		booboo::set_black_box(prg, "com.illnorth.booboo.widget", info);
 	}
 	return info;
 }
@@ -3840,6 +3864,577 @@ static bool cdfunc_sphere_sphere(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+class BooBoo_Widget : public TGUI_Widget {
+public:
+	BooBoo_Widget(Program *prg, int id, int w, int h);
+	BooBoo_Widget(Program *prg, int id, float percent_w, float percent_h);
+	BooBoo_Widget(Program *prg, int id, int w, float percent_h);
+	BooBoo_Widget(Program *prg, int id, float percent_w, int h);
+	BooBoo_Widget(Program *prg, int id, TGUI_Widget::Fit fit, int other);
+	BooBoo_Widget(Program *prg, int id, TGUI_Widget::Fit fit, float percent_other);
+	BooBoo_Widget(Program *prg, int id); // Fit both
+	virtual ~BooBoo_Widget();
+
+	virtual void draw();
+	virtual void handle_event(TGUI_Event *event);
+
+protected:
+	void start(Program *prg, int id);
+
+	Program *prg;
+	int id;
+};
+
+void BooBoo_Widget::start(Program *prg, int id)
+{
+	this->prg = prg;
+	this->id = id;
+}
+
+BooBoo_Widget::BooBoo_Widget(Program *prg, int id, int w, int h) :
+	TGUI_Widget(w, h)
+{
+	start(prg, id);
+}
+
+BooBoo_Widget::BooBoo_Widget(Program *prg, int id, float percent_w, float percent_h) :
+	TGUI_Widget(percent_w, percent_h)
+{
+	start(prg, id);
+}
+
+BooBoo_Widget::BooBoo_Widget(Program *prg, int id, int w, float percent_h) :
+	TGUI_Widget(w, percent_h)
+{
+	start(prg, id);
+}
+
+BooBoo_Widget::BooBoo_Widget(Program *prg, int id, float percent_w, int h) :
+	TGUI_Widget(percent_w, h)
+{
+	start(prg, id);
+}
+
+BooBoo_Widget::BooBoo_Widget(Program *prg, int id, TGUI_Widget::Fit fit, int other) :
+	TGUI_Widget(fit, other)
+{
+	start(prg, id);
+}
+
+BooBoo_Widget::BooBoo_Widget(Program *prg, int id, TGUI_Widget::Fit fit, float percent_other) :
+	TGUI_Widget(fit, percent_other)
+{
+	start(prg, id);
+}
+
+BooBoo_Widget::BooBoo_Widget(Program *prg, int id) :
+	TGUI_Widget()
+{
+	start(prg, id);
+}
+
+BooBoo_Widget::~BooBoo_Widget()
+{
+}
+
+void BooBoo_Widget::draw()
+{
+	Widget_Info *info = widget_info(prg);
+	BooBoo_Widget *widget = info->widgets[id]->widget;
+
+	std::vector<Token> tmp;
+	Token t;
+
+	t.type = Token::NUMBER;
+	t.n = id;
+	tmp.push_back(t);
+
+	t.type = Token::NUMBER;
+	t.n = widget->get_x();
+	tmp.push_back(t);
+	t.n = widget->get_y();
+	tmp.push_back(t);
+	t.n = widget->get_width();
+	tmp.push_back(t);
+	t.n = widget->get_height();
+	tmp.push_back(t);
+
+	t.type = Token::SYMBOL;
+	t.i = prg->variables_map[info->widgets[id]->data->name];
+	tmp.push_back(t);
+
+	call_void_function(prg, "gui_draw", tmp);
+}
+
+void BooBoo_Widget::handle_event(TGUI_Event *event)
+{
+	Widget_Info *info = widget_info(prg);
+	BooBoo_Widget *widget = info->widgets[id]->widget;
+
+	std::vector<Token> tmp;
+	Token t;
+
+	t.type = Token::NUMBER;
+	t.n = id;
+	tmp.push_back(t);
+
+	t.type = Token::NUMBER;
+	t.n = (int)event->type;
+	tmp.push_back(t);
+
+	for (int i = 0; i < 4; i++) {
+		tmp.push_back(t);
+	}
+
+	t.type = Token::NUMBER;
+	t.n = widget->get_x();
+	tmp.push_back(t);
+	t.n = widget->get_y();
+	tmp.push_back(t);
+	t.n = widget->get_width();
+	tmp.push_back(t);
+	t.n = widget->get_height();
+	tmp.push_back(t);
+
+	t.type = Token::SYMBOL;
+	t.i = prg->variables_map[info->widgets[id]->data->name];
+	tmp.push_back(t);
+
+	bool go = true;
+
+	if (event->type == TGUI_KEY_DOWN || event->type == TGUI_KEY_UP) {
+		tmp[2].n = event->keyboard.code;
+		tmp[3].n = event->keyboard.is_repeat;
+	}
+	else if (event->type == TGUI_JOY_DOWN || event->type == TGUI_JOY_UP) {
+		tmp[2].n = event->joystick.button;
+		tmp[3].n = event->joystick.is_repeat;
+	}
+	else if (event->type == TGUI_JOY_AXIS) {
+		tmp[2].n = event->joystick.axis;
+		tmp[3].n = event->joystick.value;
+	}
+	else if (event->type == TGUI_MOUSE_DOWN || event->type == TGUI_MOUSE_UP) {
+		tmp[2].n = event->mouse.button;
+		tmp[3].n = event->mouse.is_repeat;
+		tmp[4].n = event->mouse.x;
+		tmp[5].n = event->mouse.y;
+	}
+	else if (event->type == TGUI_MOUSE_AXIS) {
+		tmp[2].n = event->mouse.x;
+		tmp[3].n = event->mouse.y;
+		tmp[4].n = event->mouse.dx;
+		tmp[5].n = event->mouse.dy;
+	}
+	else if (event->type == TGUI_MOUSE_WHEEL) {
+		tmp[2].n = event->mouse.x;
+		tmp[3].n = event->mouse.y;
+	}
+	else {
+		go = false;
+	}
+	
+	if (go) {
+		call_void_function(prg, "gui_event", tmp);
+	}
+}
+
+static bool widgetfunc_create(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	double w = as_number_inline(prg, v[1]);
+	double h = as_number_inline(prg, v[2]);
+	Variable &data = as_variable_inline(prg, v[3]);
+	
+	Widget_Info *info = widget_info(prg);
+
+	CHECK_NUMBER(v1)
+	
+	v1.n = info->widget_id;
+
+	Widget *widget = new Widget;
+	widget->data = &data;
+
+	if (w < 1.0 && h < 1.0) {
+		widget->widget = new BooBoo_Widget(prg, info->widget_id, (float)w, (float)h);
+	}
+	else if (w < 1.0) {
+		widget->widget = new BooBoo_Widget(prg, info->widget_id, (float)w, (int)h);
+	}
+	else if (h < 1.0) {
+		widget->widget = new BooBoo_Widget(prg, info->widget_id, (int)w, (float)h);
+	}
+	else {
+		widget->widget = new BooBoo_Widget(prg, info->widget_id, (int)w, (int)h);
+	}
+
+	widget->widget->set_accepts_focus(true);
+
+	info->widgets[info->widget_id++] = widget;
+
+	return true;
+}
+
+static bool widgetfunc_create_fit(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	int fit = as_number_inline(prg, v[1]);
+	double other = as_number_inline(prg, v[2]);
+	Variable &data = as_variable_inline(prg, v[3]);
+	
+	Widget_Info *info = widget_info(prg);
+
+	CHECK_NUMBER(v1)
+	
+	v1.n = info->widget_id;
+
+	Widget *widget = new Widget;
+	widget->data = &data;
+
+	if (other < 1.0) {
+		widget->widget = new BooBoo_Widget(prg, info->widget_id, (BooBoo_Widget::Fit)fit, (float)other);
+	}
+	else {
+		widget->widget = new BooBoo_Widget(prg, info->widget_id, fit, (int)other);
+	}
+
+	widget->widget->set_accepts_focus(true);
+
+	info->widgets[info->widget_id++] = widget;
+
+	return true;
+}
+
+static bool widgetfunc_create_fit_both(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &v1 = as_variable_inline(prg, v[0]);
+	Variable &data = as_variable_inline(prg, v[1]);
+	
+	Widget_Info *info = widget_info(prg);
+
+	CHECK_NUMBER(v1)
+	
+	v1.n = info->widget_id;
+
+	Widget *widget = new Widget;
+	widget->data = &data;
+
+	widget->widget = new BooBoo_Widget(prg, info->widget_id);
+
+	widget->widget->set_accepts_focus(true);
+
+	info->widgets[info->widget_id++] = widget;
+
+	return true;
+}
+
+static bool widgetfunc_set_parent(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int child = as_number_inline(prg, v[0]);
+	unsigned int parent = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[child]->widget->set_parent(info->widgets[parent]->widget);
+
+	return true;
+}
+
+static bool widgetfunc_set_left_widget(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	unsigned int left = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_left_widget(info->widgets[left]->widget);
+
+	return true;
+}
+
+static bool widgetfunc_set_right_widget(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	unsigned int right = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_right_widget(info->widgets[right]->widget);
+
+	return true;
+}
+
+static bool widgetfunc_set_up_widget(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	unsigned int up = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_up_widget(info->widgets[up]->widget);
+
+	return true;
+}
+
+static bool widgetfunc_set_down_widget(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	unsigned int down = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_down_widget(info->widgets[down]->widget);
+
+	return true;
+}
+
+static bool widgetfunc_set_float_left(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	bool val = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_float_left(val);
+
+	return true;
+}
+
+static bool widgetfunc_set_float_right(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	bool val = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_float_right(val);
+
+	return true;
+}
+
+static bool widgetfunc_set_float_bottom(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	bool val = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_float_bottom(val);
+
+	return true;
+}
+
+static bool widgetfunc_set_centre_x(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	bool val = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_centre_x(val);
+
+	return true;
+}
+
+static bool widgetfunc_set_centre_y(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	bool val = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_centre_y(val);
+
+	return true;
+}
+
+static bool widgetfunc_set_clear_float_x(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	bool val = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_clear_float_x(val);
+
+	return true;
+}
+
+static bool widgetfunc_set_clear_float_y(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	bool val = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_clear_float_y(val);
+
+	return true;
+}
+
+static bool widgetfunc_set_break_line(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	bool val = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_break_line(val);
+
+	return true;
+}
+
+static bool widgetfunc_set_accepts_focus(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	bool val = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_accepts_focus(val);
+
+	return true;
+}
+
+static bool widgetfunc_set_padding_left(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	int val = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_padding_left(val);
+
+	return true;
+}
+
+static bool widgetfunc_set_padding_right(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	int val = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_padding_right(val);
+
+	return true;
+}
+
+static bool widgetfunc_set_padding_top(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	int val = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_padding_top(val);
+
+	return true;
+}
+
+static bool widgetfunc_set_padding_bottom(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	int val = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_padding_bottom(val);
+
+	return true;
+}
+
+class BooBoo_GUI : public gui::GUI
+{
+public:
+	BooBoo_GUI(BooBoo_Widget *root);
+	virtual ~BooBoo_GUI();
+};
+
+BooBoo_GUI::BooBoo_GUI(BooBoo_Widget *root)
+{
+	root->set_centre_x(true);
+	root->set_centre_y(true);
+
+	TGUI_Widget *modal_main_widget = new TGUI_Widget(1.0f, 1.0f);
+
+	root->set_parent(modal_main_widget);
+
+	gui = new TGUI(modal_main_widget, shim::screen_size.w, shim::screen_size.h);
+}
+
+BooBoo_GUI::~BooBoo_GUI()
+{
+}
+
+static bool widgetfunc_gui_start(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	unsigned int id = as_number_inline(prg, v[0]);
+
+	Widget_Info *info = widget_info(prg);
+
+	BooBoo_GUI *g = new BooBoo_GUI(info->widgets[id]->widget);
+
+	shim::guis.push_back(g);
+
+	return true;
+}
+
+static bool widgetfunc_gui_exit(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	if (shim::guis.size() > 0) {
+		shim::guis[shim::guis.size()-1]->exit();
+	}
+
+	return true;
+}
+
 void start_lib_game()
 {
 	gfx::register_lost_device_callbacks(nullptr, found_device_callback);
@@ -3990,6 +4585,29 @@ void start_lib_game()
 	add_instruction("cd_model_point", cdfunc_model_point);
 	add_instruction("cd_model_line_segment", cdfunc_model_line_segment);
 	add_instruction("cd_sphere_sphere", cdfunc_sphere_sphere);
+	add_instruction("widget_create", widgetfunc_create);
+	add_instruction("widget_create_fit", widgetfunc_create_fit);
+	add_instruction("widget_create_fit_both", widgetfunc_create_fit_both);
+	add_instruction("widget_set_parent", widgetfunc_set_parent);
+	add_instruction("widget_set_float_left", widgetfunc_set_float_left);
+	add_instruction("widget_set_float_right", widgetfunc_set_float_right);
+	add_instruction("widget_set_float_bottom", widgetfunc_set_float_bottom);
+	add_instruction("widget_set_centre_x", widgetfunc_set_centre_x);
+	add_instruction("widget_set_centre_y", widgetfunc_set_centre_y);
+	add_instruction("widget_set_clear_float_x", widgetfunc_set_clear_float_x);
+	add_instruction("widget_set_clear_float_y", widgetfunc_set_clear_float_y);
+	add_instruction("widget_set_break_line", widgetfunc_set_break_line);
+	add_instruction("widget_set_accepts_focus", widgetfunc_set_accepts_focus);
+	add_instruction("widget_set_padding_left", widgetfunc_set_padding_left);
+	add_instruction("widget_set_padding_right", widgetfunc_set_padding_right);
+	add_instruction("widget_set_padding_top", widgetfunc_set_padding_top);
+	add_instruction("widget_set_padding_bottom", widgetfunc_set_padding_bottom);
+	add_instruction("widget_set_left_widget", widgetfunc_set_left_widget);
+	add_instruction("widget_set_right_widget", widgetfunc_set_right_widget);
+	add_instruction("widget_set_up_widget", widgetfunc_set_up_widget);
+	add_instruction("widget_set_down_widget", widgetfunc_set_down_widget);
+	add_instruction("gui_start", widgetfunc_gui_start);
+	add_instruction("gui_exit", widgetfunc_gui_exit);
 }
 
 void end_lib_game()
@@ -4041,6 +4659,10 @@ void game_lib_destroy_program(Program *prg)
 	for (size_t i = 0; i < billboard_i->billboards.size(); i++) {
 		delete billboard_i->billboards[i];
 	}
+	Widget_Info *widget_i = widget_info(prg);
+	for (size_t i = 0; i < widget_i->widgets.size(); i++) {
+		delete widget_i->widgets[i];
+	}
 	CFG_Info *cfg_i = cfg_info(prg);
 
 	delete mml_i;
@@ -4052,6 +4674,7 @@ void game_lib_destroy_program(Program *prg)
 	delete json_i;
 	delete model_i;
 	delete billboard_i;
+	delete widget_i;
 	delete cfg_i;
 
 	booboo::set_black_box(prg, "com.illnorth.booboo.mml", nullptr);
@@ -4065,4 +4688,5 @@ void game_lib_destroy_program(Program *prg)
 	booboo::set_black_box(prg, "com.illnorth.booboo.json", nullptr);
 	booboo::set_black_box(prg, "com.illnorth.booboo.model", nullptr);
 	booboo::set_black_box(prg, "com.illnorth.booboo.billboard", nullptr);
+	booboo::set_black_box(prg, "com.illnorth.booboo.widget", nullptr);
 }

@@ -1225,6 +1225,8 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "JOY_D", TGUI_B_D, pass, var_i);
 	insert_constant(prg, "JOY_L", TGUI_B_L, pass, var_i);
 	insert_constant(prg, "JOY_R", TGUI_B_R, pass, var_i);
+	insert_constant(prg, "FIT_X", TGUI_Widget::FIT_X, pass, var_i);
+	insert_constant(prg, "FIT_Y", TGUI_Widget::FIT_Y, pass, var_i);
 
 	while ((tok = token(prg, tt)) != "") {
 top:

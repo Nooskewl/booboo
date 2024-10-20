@@ -360,6 +360,8 @@ void handle_event(TGUI_Event *event)
 	else if (event->type == TGUI_MOUSE_DOWN || event->type == TGUI_MOUSE_UP) {
 		args[1].n = event->mouse.button;
 		args[2].n = event->mouse.is_repeat;
+		args[3].n = event->mouse.x;
+		args[4].n = event->mouse.y;
 	}
 	else if (event->type == TGUI_MOUSE_AXIS) {
 		args[1].n = event->mouse.x;

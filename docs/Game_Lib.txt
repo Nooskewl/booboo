@@ -49,6 +49,7 @@ The following sections describe the API:
 	Tilemap Functions
 	Shader Functions
 	3D Functions
+	GUI Functions
 	Collision Detection Functions
 	Audio Functions
 	Input Functions
@@ -601,6 +602,112 @@ billboard_destroy
 	Free a billboard
 	e.g. billboard_destroy b
 
+-- GUI Functions -------------------------------------------------------------
+
+Widgets are generic rectangles with a userdata attached to them to supply
+their properties.
+
+widget_create
+	Create a widget
+	Sizes less than 1 are taken as a percentage of the remaining size
+	e.g. widget_create result w h userdata
+
+widget_create_fit
+	Create a widget that fits remaining size on one dimension
+	Constants FIT_X and FIT_Y are used for the first parameter
+	The other dimension is then specified as the second parameter,
+	which can be < 1 to use a percentage size
+	e.g. widget_create_fit result FIT_X h userdata
+
+widget_create_fit_both
+	Create a widget that fits the remaining size on X and Y
+	e.g. widget_create_fit_both result userdata
+
+widget_set_parent
+	Widget hierarchy is important. You want to have one root widget
+	and add everything (perhaps in multiple containers) to it
+	e.g. widget_set_parent child parent
+
+widget_set_float_left
+	Similar to float left in CSS
+	e.g. widget_set_float_left widget onoff
+
+widget_set_float_right
+	Similar to float right in CSS
+	e.g. widget_set_float_right widget onoff
+
+widget_set_float_bottom
+	Similar to float bottom in CSS
+	e.g. widget_set_float_bottom widget onoff
+
+widget_set_centre_x
+	Centre a widget horizontally
+	e.g. widget_set_centre_x widget onoff
+
+widget_set_centre_y
+	Centre a widget vertically
+	e.g. widget_set_centre_y widget onoff
+
+widget_set_clear_float_x
+	Tell a widget to clear past widgets floating horizontally
+	e.g. widget_set_clear_float_x widget onoff
+
+widget_set_clear_float_y
+	Tell a widget to clear past widgets floating vertically
+	e.g. widget_set_clear_float_y widget onoff
+
+widget_set_break_line
+	Start a new row for this widget
+	e.g. widget_set_break_line widget onoff
+
+widget_set_accepts_focus
+	Allow a widget to accept the input focus or not
+	e.g. widget_set_accepts_focus widget onoff
+
+widget_set_padding_left
+	Set left padding
+	e.g. widget_set_padding_left widget px
+
+widget_set_padding_right
+	Set right padding
+	e.g. widget_set_padding_right widget px
+
+widget_set_padding_top
+	Set top padding
+	e.g. widget_set_padding_top widget px
+
+widget_set_padding_bottom
+	Set bottom padding
+	e.g. widget_set_padding_bottom widget px
+
+widget_set_left_widget
+	Hint at the widget to the left of this one for focus changes
+	with keyboard/gamepad
+	e.g. widget_set_left_widget widget left_widget
+
+widget_set_right_widget
+	Hint at the widget to the right of this one for focus changes
+	with keyboard/gamepad
+	e.g. widget_set_right_widget widget right_widget
+
+widget_set_up_widget
+	Hint at the widget to the up of this one for focus changes
+	with keyboard/gamepad
+	e.g. widget_set_up_widget widget up_widget
+
+widget_set_down_widget
+	Hint at the widget to the down of this one for focus changes
+	with keyboard/gamepad
+	e.g. widget_set_down_widget widget down_widget
+
+gui_start
+	Start executing a gui
+	e.g. gui_start root_widget
+
+gui_exit
+	Close the toplevel GUI and destroy widgets
+	e.g. gui_exit
+
 -- Collision Detection Functions ---------------------------------------------
 
 cd_model_point
@@ -1034,6 +1141,10 @@ Joystick buttons for events:
 	JOY_L
 	JOY_R
 
+GUI constants:
+	FIT_X
+	FIT_Y
+
 -- Events --------------------------------------------------------------------
 
 You can receive events so you're sure you don't miss anything. Define a
@@ -1067,6 +1178,8 @@ EVENT_JOY_AXIS
 EVENT_MOUSE_DOWN
 	a - the button
 	b - TRUE if it is a repeat event
+	c - mouse x
+	d - mouse y
 
 EVENT_MOUSE_UP
 	a - the button
