@@ -45,7 +45,7 @@ function owned wx wy ww wh x y
 	return TRUE
 }
 
-function gui_event id type a b c d x y w h data
+function gui_event id type a b c d x y w h focussed data
 {
 	if (&& (== type EVENT_MOUSE_DOWN) (== [data "type"] "button") (== a 1)) play
 		number on_button
@@ -56,7 +56,7 @@ function gui_event id type a b c d x y w h data
 	:play
 }
 
-function gui_draw id x y w h data
+function gui_draw id x y w h focussed data
 {
 	if (== [data "type"] "button") draw_button
 		number tw th

@@ -3880,10 +3880,22 @@ public:
 
 protected:
 	void start(Program *prg, int id);
+	bool is_focussed();
 
 	Program *prg;
 	int id;
 };
+
+bool BooBoo_Widget::is_focussed()
+{
+	if (shim::guis.size() == 0) {
+		return false;
+	}
+	if (gui != shim::guis.back()->gui) {
+		return false;
+	}
+	return gui->get_focus() == this;
+}
 
 void BooBoo_Widget::start(Program *prg, int id)
 {
@@ -3958,6 +3970,9 @@ void BooBoo_Widget::draw()
 	tmp.push_back(t);
 	t.n = widget->get_height();
 	tmp.push_back(t);
+	
+	t.n = widget->is_focussed();
+	tmp.push_back(t);
 
 	t.type = Token::SYMBOL;
 	t.i = prg->variables_map[info->widgets[id]->data->name];
@@ -3994,6 +4009,9 @@ void BooBoo_Widget::handle_event(TGUI_Event *event)
 	t.n = widget->get_width();
 	tmp.push_back(t);
 	t.n = widget->get_height();
+	tmp.push_back(t);
+
+	t.n = widget->is_focussed();
 	tmp.push_back(t);
 
 	t.type = Token::SYMBOL;
