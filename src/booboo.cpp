@@ -335,6 +335,12 @@ static std::string tokenfunc_hex(Program *prg)
 	return buf;
 }
 
+static std::string tokenfunc_ref(Program *prg)
+{
+	prg->s->p++;
+	return "~";
+}
+
 static std::string token(Program *prg, Token::Token_Type &ret_type)
 {
 	skip_whitespace(prg);
@@ -1260,6 +1266,7 @@ top:
 			func.complete_pass = prg->complete_pass;
 			bool is_param = true;
 			bool finished = false;
+			bool param_is_ref = false;
 			while ((tok = token(prg, tt)) != "") {
 func_top:
 				func.s->line = prg->s->line;
@@ -1433,20 +1440,27 @@ func_top:
 					func.s->line_numbers.push_back(prg->s->line);
 				}
 				else if (is_param) {
-					int param_i = var_i++;
-					if (pass == PASS1) {
-						prg->locals[func_index][tok] = param_i;
+					if (tok == "~") {
+						param_is_ref = true;
 					}
 					else {
-						prg->variables_map[tok] = prg->locals[func_index][tok];
-					}
-					Variable v;
-					v.name = tok;
-					if (pass == PASS1) {
-						prg->variables.push_back(v);
-					}
+						int param_i = var_i++;
+						if (pass == PASS1) {
+							prg->locals[func_index][tok] = param_i;
+						}
+						else {
+							prg->variables_map[tok] = prg->locals[func_index][tok];
+						}
+						Variable v;
+						v.name = tok;
+						if (pass == PASS1) {
+							prg->variables.push_back(v);
+						}
 
-					func.params.push_back(param_i);
+						func.params.push_back(param_i);
+						func.ref.push_back(param_is_ref);
+						param_is_ref = false;
+					}
 				}
 				else {
 					if (func.s->program.size() == 0) {
@@ -1708,6 +1722,17 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 	std::string bak = result.name;
 	result = prg->s->result;
 	result.name = bak;
+
+	// keep values for references
+	for (size_t j = 0; j < func.params.size(); j++) {
+		const Token &param = params[j+ignore_params];
+		
+		Variable &var = prg->variables[func.params[j]];
+
+		if (func.ref[j] && param.type != Token::NUMBER && param.type != Token::STRING && prg->variables[param.i].type != Variable::EXPRESSION) {
+			prg->variables[param.i] = var;
+		}
+	}
 
 	prg->s = bak2;
 }
@@ -3283,6 +3308,7 @@ static void init_token_map()
 	add_token_handler('<', tokenfunc_leftshift);
 	add_token_handler('>', tokenfunc_rightshift);
 	add_token_handler('#', tokenfunc_hex);
+	add_token_handler('~', tokenfunc_ref);
 }
 
 void start()

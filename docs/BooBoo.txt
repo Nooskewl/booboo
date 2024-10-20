@@ -61,6 +61,7 @@ include
 
 function
 	define a function
+	References can be defined by prefixing a parameter name by a tilde (~)
 	e.g. function foo param1 param2 { ... }
 
 typeof
