@@ -107,8 +107,12 @@ function button_event type a b c d x y w h focussed ~data
 		map_set data "down" FALSE
 	:up
 
-	if (&& (== TRUE focussed) (|| (&& (== type EVENT_KEY_DOWN) (== KEY_RETURN a)) (&& (== type EVENT_JOY_DOWN) (== a JOY_A)))) play_it
+	if (&& (== TRUE focussed) (== FALSE b) (|| (&& (== type EVENT_KEY_DOWN) (== KEY_RETURN a)) (&& (== type EVENT_JOY_DOWN) (== a JOY_A)))) down2
+		map_set data "down" TRUE
+	:down2
+	if (&& (== [data "down"] TRUE) (== TRUE focussed) (|| (&& (== type EVENT_KEY_UP) (== KEY_RETURN a)) (&& (== type EVENT_JOY_UP) (== a JOY_A)))) play_it
 		mml_play [data "sfx"] 1 0
+		map_set data "down" FALSE
 	:play_it
 }
 
