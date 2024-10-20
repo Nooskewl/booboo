@@ -93,7 +93,7 @@ function gui_draw id x y w h focussed data
 
 		filled_rectangle 0 0 255 255 0 0 255 255 0 255 255 255 0 255 255 255 x y w h
 		rectangle r g b 255 x y w h 2
-		font_draw font 255 255 255 255 [data "text"] xx yy
+		font_draw font r g b 255 [data "text"] xx yy
 	:draw_button
 		filled_rectangle 0 0 255 255 0 0 255 255 0 0 255 255 0 0 255 255 x y w h
 	:draw_bg
