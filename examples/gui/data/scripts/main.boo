@@ -65,24 +65,47 @@ function draw_button x y w h focussed data
 	= yy (+ y (/ h 2))
 	- yy (/ th 2)
 
+	number ox oy
+	if (== [data "down"] TRUE) offset no_offset
+		= ox 5
+		= oy 5
+	:offset
+		= ox 0
+		= oy 0
+	:no_offset
+
+	+ x ox
+	+ y oy
+	+ xx ox
+	+ yy oy
+
 	filled_rectangle 0 0 255 255 0 0 255 255 0 255 255 255 0 255 255 255 x y w h
 	rectangle r g b 255 x y w h 2
 	font_draw font r g b 255 [data "text"] xx yy
 }
 
-function null_event type a b c d x y w h focussed data
+function null_event type a b c d x y w h focussed ~data
 {
 }
 
-function button_event type a b c d x y w h focussed data
+function button_event type a b c d x y w h focussed ~data
 {
-	if (&& (== type EVENT_MOUSE_DOWN) (== a 1)) play
+	if (&& (== type EVENT_MOUSE_DOWN) (== a 1) (== b FALSE)) down
 		number on_button
 		call_result on_button owned x y w h c d
-		if (== on_button TRUE) really_play
+		if (== on_button TRUE) really_down
+			map_set data "down" TRUE
+		:really_down
+	:down
+
+	if (&& (== [data "down"] TRUE) (== type EVENT_MOUSE_UP)) up
+		number on_button
+		call_result on_button owned x y w h c d
+		if (== on_button TRUE) really_up
 			mml_play [data "sfx"] 1 0
-		:really_play
-	:play
+		:really_up
+		map_set data "down" FALSE
+	:up
 
 	if (&& (== TRUE focussed) (|| (&& (== type EVENT_KEY_DOWN) (== KEY_RETURN a)) (&& (== type EVENT_JOY_DOWN) (== a JOY_A)))) play_it
 		mml_play [data "sfx"] 1 0
@@ -96,6 +119,7 @@ function mkbutton text sfx
 	map_set m "sfx" sfx
 	map_set m "draw" draw_button
 	map_set m "event" button_event
+	map_set m "down" FALSE
 	return m
 }
 
@@ -107,7 +131,7 @@ function owned wx wy ww wh x y
 	return TRUE
 }
 
-function gui_event id type a b c d x y w h focussed data
+function gui_event id type a b c d x y w h focussed ~data
 {
 	call [data "event"] type a b c d x y w h focussed data
 }
