@@ -566,7 +566,7 @@ function run
 		goto no_collide
 	:next_b2
 	number col
-	cd_sphere_sphere col [[enemies i] "x"] [[enemies i] "y"] [[enemies i] "z"] 0.25 [[bullets j] "x"] [[bullets j] "y"] [[bullets j] "z"] 0.125
+	cd_sphere_sphere col [[enemies i] "x"] [[enemies i] "y"] [[enemies i] "z"] 0.25 [[bullets j] "x"] [[bullets j] "y"] [[bullets j] "z"] 0.25
 	? col 0
 	je no_collide
 	= [[enemies i] "dead"] TRUE
