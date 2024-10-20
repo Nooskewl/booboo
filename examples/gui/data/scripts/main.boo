@@ -6,18 +6,12 @@ mml_load sfx4 "sfx/b4.mml"
 
 map c b1 b2 b3 b4
 map_set c "type" "window"
-map_set b1 "sfx" sfx1
-map_set b2 "sfx" sfx2
-map_set b3 "sfx" sfx3
-map_set b4 "sfx" sfx4
-map_set b1 "text" "Elixir"
-map_set b2 "text" "Holy Water"
-map_set b3 "text" "Potion"
-map_set b4 "text" "Potion Omega"
-map_set b1 "type" "button"
-map_set b2 "type" "button"
-map_set b3 "type" "button"
-map_set b4 "type" "button"
+map_set c "draw" draw_window
+map_set c "event" null_event
+call_result b1 mkbutton "Elixir" sfx1
+call_result b2 mkbutton "Holy Water" sfx2
+call_result b3 mkbutton "Potion" sfx3
+call_result b4 mkbutton "Potion Omega" sfx4
 
 number font
 font_load font "vga.ttf" 12 1
@@ -45,17 +39,46 @@ gui_start container
 
 gui_set_focus w1
 
-function owned wx wy ww wh x y
+function draw_window x y w h focussed data
 {
-	if (|| (< x wx) (< y wy) (>= x (+ wx ww)) (>= y (+ wy wh))) nope
-		return FALSE
-	:nope
-	return TRUE
+	filled_rectangle 0 0 255 255 0 0 255 255 0 0 255 255 0 0 255 255 x y w h
 }
 
-function gui_event id type a b c d x y w h focussed data
+function draw_button x y w h focussed data
 {
-	if (&& (== type EVENT_MOUSE_DOWN) (== [data "type"] "button") (== a 1)) play
+	number r g b
+	if (== focussed TRUE) yellow white
+		= r 255
+		= g 255
+		= b 0
+	:yellow
+		= r 255
+		= g 255
+		= b 255
+	:white
+	number tw th
+	font_width font tw [data "text"]
+	font_height font th
+
+	number xx yy
+	= xx (+ x (/ w 2))
+	- xx (/ tw 2)
+	= yy (+ y (/ h 2))
+	- yy (/ th 2)
+
+	filled_rectangle 0 0 255 255 0 0 255 255 0 255 255 255 0 255 255 255 x y w h
+	rectangle r g b 255 x y w h 2
+	font_draw font r g b 255 [data "text"] xx yy
+:draw_button
+}
+
+function null_event type a b c d x y w h focussed data
+{
+}
+
+function button_event type a b c d x y w h focussed data
+{
+	if (&& (== type EVENT_MOUSE_DOWN) (== a 1)) play
 		number on_button
 		call_result on_button owned x y w h c d
 		if (== on_button TRUE) really_play
@@ -68,33 +91,31 @@ function gui_event id type a b c d x y w h focussed data
 	:play_it
 }
 
+function mkbutton text sfx
+{
+	map m
+	map_set m "type" "button"
+	map_set m "text" text
+	map_set m "sfx" sfx
+	map_set m "draw" draw_button
+	map_set m "event" button_event
+	return m
+}
+
+function owned wx wy ww wh x y
+{
+	if (|| (< x wx) (< y wy) (>= x (+ wx ww)) (>= y (+ wy wh))) nope
+		return FALSE
+	:nope
+	return TRUE
+}
+
+function gui_event id type a b c d x y w h focussed data
+{
+	call [data "event"] type a b c d x y w h focussed data
+}
+
 function gui_draw id x y w h focussed data
 {
-	if (== [data "type"] "button") draw_button draw_bg
-		number r g b
-		if (== focussed TRUE) yellow white
-			= r 255
-			= g 255
-			= b 0
-		:yellow
-			= r 255
-			= g 255
-			= b 255
-		:white
-		number tw th
-		font_width font tw [data "text"]
-		font_height font th
-
-		number xx yy
-		= xx (+ x (/ w 2))
-		- xx (/ tw 2)
-		= yy (+ y (/ h 2))
-		- yy (/ th 2)
-
-		filled_rectangle 0 0 255 255 0 0 255 255 0 255 255 255 0 255 255 255 x y w h
-		rectangle r g b 255 x y w h 2
-		font_draw font r g b 255 [data "text"] xx yy
-	:draw_button
-		filled_rectangle 0 0 255 255 0 0 255 255 0 0 255 255 0 0 255 255 x y w h
-	:draw_bg
+	call [data "draw"] x y w h focussed data
 }
