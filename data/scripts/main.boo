@@ -1,19 +1,19 @@
 number scanline_skip scanline_alpha
 = scanline_skip 2
-= scanline_alpha 48
+= scanline_alpha 128
 
 number W H
-= W 640
-= H 360
-;resize W H
+= W 1920
+= H 1080
+resize W H
 
 number TOP
 = TOP 20
 
 number font
-font_load font "font.ttf" 16 1
+font_load font "font.ttf" (/ H 25) 1
 number small_font
-font_load small_font "font.ttf" 12 1
+font_load small_font "font.ttf" (/ H 35) 1
 
 number widget
 mml_load widget "sfx/widget.mml"
@@ -281,11 +281,11 @@ function draw
 	:loop
 
 	if (> top 0) draw_more_up
-		image_draw more_down 0 216 255 255 (- 320 7) (- TOP 8) 0 1
+		image_draw more_down 0 216 255 255 (- (/ W 2) 7) (- TOP 8) 0 1
 	:draw_more_up
 
 	if (< (+ top num) sz) draw_more_down
-		image_draw more_down 0 216 255 255 (- 320 7) (+ TOP (* fh num)) 0 0
+		image_draw more_down 0 216 255 255 (- (/ W 2) 7) (+ TOP (* fh num)) 0 0
 	:draw_more_down
 
 	start_primitives
