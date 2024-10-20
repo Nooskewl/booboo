@@ -4079,13 +4079,13 @@ static bool widgetfunc_create(Program *prg, const std::vector<Token> &v)
 	Widget *widget = new Widget;
 	widget->data = &data;
 
-	if (w < 1.0 && h < 1.0) {
+	if (w <= 1.0 && h <= 1.0) {
 		widget->widget = new BooBoo_Widget(prg, info->widget_id, (float)w, (float)h);
 	}
-	else if (w < 1.0) {
+	else if (w <= 1.0) {
 		widget->widget = new BooBoo_Widget(prg, info->widget_id, (float)w, (int)h);
 	}
-	else if (h < 1.0) {
+	else if (h <= 1.0) {
 		widget->widget = new BooBoo_Widget(prg, info->widget_id, (int)w, (float)h);
 	}
 	else {
@@ -4117,7 +4117,7 @@ static bool widgetfunc_create_fit(Program *prg, const std::vector<Token> &v)
 	Widget *widget = new Widget;
 	widget->data = &data;
 
-	if (other < 1.0) {
+	if (other <= 1.0) {
 		widget->widget = new BooBoo_Widget(prg, info->widget_id, (BooBoo_Widget::Fit)fit, (float)other);
 	}
 	else {
@@ -4361,7 +4361,7 @@ static bool widgetfunc_set_padding(Program *prg, const std::vector<Token> &v)
 
 	Widget_Info *info = widget_info(prg);
 
-	if (val < 1.0) {
+	if (val <= 1.0) {
 		info->widgets[widget]->widget->set_padding((float)val);
 	}
 	else {
@@ -4380,7 +4380,7 @@ static bool widgetfunc_set_padding_left(Program *prg, const std::vector<Token> &
 
 	Widget_Info *info = widget_info(prg);
 
-	if (val < 1.0) {
+	if (val <= 1.0) {
 		info->widgets[widget]->widget->set_padding_left((float)val);
 	}
 	else {
@@ -4399,7 +4399,7 @@ static bool widgetfunc_set_padding_right(Program *prg, const std::vector<Token> 
 
 	Widget_Info *info = widget_info(prg);
 
-	if (val < 1.0) {
+	if (val <= 1.0) {
 		info->widgets[widget]->widget->set_padding_right((float)val);
 	}
 	else {
@@ -4418,7 +4418,7 @@ static bool widgetfunc_set_padding_top(Program *prg, const std::vector<Token> &v
 
 	Widget_Info *info = widget_info(prg);
 
-	if (val < 1.0) {
+	if (val <= 1.0) {
 		info->widgets[widget]->widget->set_padding_top((float)val);
 	}
 	else {
@@ -4437,7 +4437,7 @@ static bool widgetfunc_set_padding_bottom(Program *prg, const std::vector<Token>
 
 	Widget_Info *info = widget_info(prg);
 
-	if (val < 1.0) {
+	if (val <= 1.0) {
 		info->widgets[widget]->widget->set_padding_bottom((float)val);
 	}
 	else {
