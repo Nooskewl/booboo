@@ -2,37 +2,27 @@ number scanline_skip scanline_alpha
 = scanline_skip 2
 = scanline_alpha 128
 
-number W H
-= W 1920
-= H 1080
-resize W H
-
 number TOP
 = TOP 20
-
-number font
-font_load font "font.ttf" (/ H 25) 1
-number small_font
-font_load small_font "font.ttf" (/ H 35) 1
 
 number widget
 mml_load widget "sfx/widget.mml"
 number button
 mml_load button "sfx/button.mml"
 
+number W H
+number font
+number small_font
 number fh
-font_height font fh
+number num
+
+call rsz
 
 number more_down
 image_load more_down "ui/more_down.png"
 
 number go_ok
 = go_ok 0
-
-number num
-= num (- (- H (* fh 3.5)) 20)
-/ num fh
-floor num
 
 number old_u old_d old_a old_b
 = old_u 0
@@ -85,6 +75,21 @@ for i 0 (< i sz) 1 check_arg
 if (== found 0) list_current
 	call list_dir "./"
 :list_current
+
+function rsz
+{
+	get_screen_size W H
+	resize W H
+
+	font_load font "font.ttf" (/ H 25) 1
+	font_load small_font "font.ttf" (/ H 35) 1
+
+	font_height font fh
+
+	= num (- (- H (* fh 3.5)) 20)
+	/ num fh
+	floor num
+}
 
 function chop_dir s
 {
@@ -502,4 +507,10 @@ function run
 	= old_d joy_d
 	= old_a joy_a
 	= old_b joy_b
+
+	number sw sh
+	get_screen_size sw sh
+	if (|| (!= sw W) (!= sh H)) do_rsz
+		call rsz
+	:do_rsz
 }
