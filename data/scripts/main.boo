@@ -16,7 +16,7 @@ number small_font
 number fh
 number num
 
-call rsz
+call rsz FALSE
 
 number more_down
 image_load more_down "ui/more_down.png"
@@ -76,8 +76,13 @@ if (== found 0) list_current
 	call list_dir "./"
 :list_current
 
-function rsz
+function rsz destroy_fonts
 {
+	if (== destroy_fonts TRUE) destroy
+		font_destroy font
+		font_destroy small_font
+	:destroy
+
 	get_screen_size W H
 	resize W H
 
@@ -511,6 +516,6 @@ function run
 	number sw sh
 	get_screen_size sw sh
 	if (|| (!= sw W) (!= sh H)) do_rsz
-		call rsz
+		call rsz TRUE
 	:do_rsz
 }
