@@ -49,29 +49,29 @@ widget_create c2 120 500 mc2
 widget_set_accepts_focus c2 FALSE
 widget_set_parent c2 container
 
-widget_create _7 0.333 0.25 m7
+widget_create _7 60 0.25 m7
 widget_set_parent _7 c1
-widget_create _8 0.333 0.25 m8
+widget_create _8 60 0.25 m8
 widget_set_parent _8 c1
-widget_create _9 0.333 0.25 m9
+widget_create _9 60 0.25 m9
 widget_set_parent _9 c1
-widget_create _4 0.333 0.25 m4
+widget_create _4 60 0.25 m4
 widget_set_parent _4 c1
-widget_create _5 0.333 0.25 m5
+widget_create _5 60 0.25 m5
 widget_set_parent _5 c1
-widget_create _6 0.333 0.25 m6
+widget_create _6 60 0.25 m6
 widget_set_parent _6 c1
-widget_create _1 0.333 0.25 m1
+widget_create _1 60 0.25 m1
 widget_set_parent _1 c1
-widget_create _2 0.333 0.25 m2
+widget_create _2 60 0.25 m2
 widget_set_parent _2 c1
-widget_create _3 0.333 0.25 m3
+widget_create _3 60 0.25 m3
 widget_set_parent _3 c1
-widget_create _0 0.333 0.25 m0
+widget_create _0 60 0.25 m0
 widget_set_parent _0 c1
-widget_create _dec 0.333 0.25 mdec
+widget_create _dec 60 0.25 mdec
 widget_set_parent _dec c1
-widget_create _neg 0.333 0.25 mneg
+widget_create _neg 60 0.25 mneg
 widget_set_parent _neg c1
 
 widget_create _mul 0.5 0.25 mmul
