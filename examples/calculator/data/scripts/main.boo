@@ -6,7 +6,7 @@ number peq
 = peq 1
 
 number button_sfx
-mml_create button_sfx "@PO0 = { 0 100 }\nA @PO0 g @PO0"
+mml_create button_sfx "@PO0 = { 0 1000 }\nA @PO0 g32 @PO0"
 
 number font
 font_load font "vga.ttf" 48 1
@@ -186,6 +186,7 @@ function button_event type a b c d x y w h focussed ~data
 
 	if (== pressed 1) press
 		call [ops [data "text"]] data
+		mml_play button_sfx 1 0
 	:press
 }
 
