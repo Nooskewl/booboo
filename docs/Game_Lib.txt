@@ -607,6 +607,14 @@ billboard_destroy
 Widgets are generic rectangles with a userdata attached to them to supply
 their properties.
 
+Two callbacks get called for every GUI event/drawing operation:
+
+gui_event widget_id type a b c d x y w h focussed userdata
+gui_draw widget_id x y w h focussed userdata
+
+a, b, c and d are the same as for the global 'event' callback. x, y, w
+and h are the calculated position and size of the widget in pixels.
+
 widget_create
 	Create a widget
 	Sizes less than 1 are taken as a percentage of the remaining size
