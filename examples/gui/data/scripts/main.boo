@@ -70,7 +70,7 @@ function gui_event id type a b c d x y w h focussed data
 
 function gui_draw id x y w h focussed data
 {
-	if (== [data "type"] "button") draw_button
+	if (== [data "type"] "button") draw_button draw_bg
 		number r g b
 		if (== focussed TRUE) yellow white
 			= r 255
@@ -95,4 +95,6 @@ function gui_draw id x y w h focussed data
 		rectangle r g b 255 x y w h 2
 		font_draw font 255 255 255 255 [data "text"] xx yy
 	:draw_button
+		filled_rectangle 0 0 255 255 0 0 255 255 0 0 255 255 0 0 255 255 x y w h
+	:draw_bg
 }
