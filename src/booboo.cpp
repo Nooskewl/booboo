@@ -1701,6 +1701,9 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 		else if (prg->variables[param.i].type == Variable::EXPRESSION) {
 			var = evaluate_expression(prg, prg->variables[param.i].e);
 		}
+		else if (prg->variables[param.i].type == Variable::FISH) {
+			var = go_fish(prg, prg->variables[param.i].f);
+		}
 		else {
 			var = prg->variables[param.i];
 		}
@@ -1730,7 +1733,12 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 		Variable &var = prg->variables[func.params[j]];
 
 		if (func.ref[j] && param.type != Token::NUMBER && param.type != Token::STRING && prg->variables[param.i].type != Variable::EXPRESSION) {
-			prg->variables[param.i] = var;
+			if (prg->variables[param.i].type == Variable::FISH) {
+				go_fish(prg, prg->variables[param.i].f) = var;
+			}
+			else {
+				prg->variables[param.i] = var;
+			}
 		}
 	}
 
