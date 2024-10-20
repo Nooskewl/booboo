@@ -1195,6 +1195,30 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "KEY_KBDILLUMUP", 1073742104, pass, var_i);
 	insert_constant(prg, "KEY_EJECT", 1073742105, pass, var_i);
 	insert_constant(prg, "KEY_SLEEP", 1073742106, pass, var_i);
+	insert_constant(prg, "EVENT_KEY_DOWN", TGUI_KEY_DOWN, pass, var_i);
+	insert_constant(prg, "EVENT_KEY_UP", TGUI_KEY_UP, pass, var_i);
+	insert_constant(prg, "EVENT_JOY_DOWN", TGUI_JOY_DOWN, pass, var_i);
+	insert_constant(prg, "EVENT_JOY_UP", TGUI_JOY_UP, pass, var_i);
+	insert_constant(prg, "EVENT_JOY_AXIS", TGUI_JOY_AXIS, pass, var_i);
+	insert_constant(prg, "EVENT_MOUSE_DOWN", TGUI_MOUSE_DOWN, pass, var_i);
+	insert_constant(prg, "EVENT_MOUSE_UP", TGUI_MOUSE_UP, pass, var_i);
+	insert_constant(prg, "EVENT_MOUSE_AXIS", TGUI_MOUSE_AXIS, pass, var_i);
+	insert_constant(prg, "EVENT_MOUSE_WHEEL", TGUI_MOUSE_WHEEL, pass, var_i);
+	insert_constant(prg, "JOY_A", TGUI_B_A, pass, var_i);
+	insert_constant(prg, "JOY_B", TGUI_B_B, pass, var_i);
+	insert_constant(prg, "JOY_X", TGUI_B_X, pass, var_i);
+	insert_constant(prg, "JOY_Y", TGUI_B_Y, pass, var_i);
+	insert_constant(prg, "JOY_BACK", TGUI_B_BACK, pass, var_i);
+	insert_constant(prg, "JOY_GUIDE", TGUI_B_GUIDE, pass, var_i);
+	insert_constant(prg, "JOY_START", TGUI_B_START, pass, var_i);
+	insert_constant(prg, "JOY_LS", TGUI_B_LS, pass, var_i);
+	insert_constant(prg, "JOY_RS", TGUI_B_RS, pass, var_i);
+	insert_constant(prg, "JOY_LB", TGUI_B_LB, pass, var_i);
+	insert_constant(prg, "JOY_RB", TGUI_B_RB, pass, var_i);
+	insert_constant(prg, "JOY_U", TGUI_B_U, pass, var_i);
+	insert_constant(prg, "JOY_D", TGUI_B_D, pass, var_i);
+	insert_constant(prg, "JOY_L", TGUI_B_L, pass, var_i);
+	insert_constant(prg, "JOY_R", TGUI_B_R, pass, var_i);
 
 	while ((tok = token(prg, tt)) != "") {
 top:

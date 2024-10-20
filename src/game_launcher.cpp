@@ -332,6 +332,52 @@ void handle_event(TGUI_Event *event)
 			quit = true;
 		}
 	}
+
+	std::vector<Token> args;
+	Token t;
+	t.type = Token::NUMBER;
+	t.n = (int)event->type;
+	args.push_back(t);
+
+	for (int i = 0; i < 4; i++) {
+		args.push_back(t);
+	}
+
+	bool go = true;
+
+	if (event->type == TGUI_KEY_DOWN || event->type == TGUI_KEY_UP) {
+		args[1].n = event->keyboard.code;
+		args[2].n = event->keyboard.is_repeat;
+	}
+	else if (event->type == TGUI_JOY_DOWN || event->type == TGUI_JOY_UP) {
+		args[1].n = event->joystick.button;
+		args[2].n = event->joystick.is_repeat;
+	}
+	else if (event->type == TGUI_JOY_AXIS) {
+		args[1].n = event->joystick.axis;
+		args[2].n = event->joystick.value;
+	}
+	else if (event->type == TGUI_MOUSE_DOWN || event->type == TGUI_MOUSE_UP) {
+		args[1].n = event->mouse.button;
+		args[2].n = event->mouse.is_repeat;
+	}
+	else if (event->type == TGUI_MOUSE_AXIS) {
+		args[1].n = event->mouse.x;
+		args[2].n = event->mouse.y;
+		args[3].n = event->mouse.dx;
+		args[4].n = event->mouse.dy;
+	}
+	else if (event->type == TGUI_MOUSE_WHEEL) {
+		args[1].n = event->mouse.x;
+		args[2].n = event->mouse.y;
+	}
+	else {
+		go = false;
+	}
+	
+	if (go) {
+		call_void_function(prg, "event", args);
+	}
 }
 
 void draw_all()

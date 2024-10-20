@@ -1,8 +1,13 @@
-There are 3 functions taking/returning no parameters called from the app:
+There are 3 optional functions taking/returning no parameters called from the app:
 
 draw - called at refresh rate
 run - called at logic rate (default 60 times per second)
 end - called when the program is exiting
+
+As well as a function taking 5 numbers for events called event. See the Events
+section below for detail on events.
+
+event - called for each event
 
 At startup, global code is run. Then the above mentioned callbacks get called
 at intervals or shutdown.
@@ -50,6 +55,7 @@ The following sections describe the API:
 	JSON Functions
 	Configuration Functions
 	Constants
+	Events
 
 -- Core Functions ------------------------------------------------------------
 
@@ -1000,3 +1006,77 @@ The following keyboard constants are used with key_get:
 	KEY_EJECT
 	KEY_SLEEP
 
+Event types:
+	EVENT_KEY_DOWN
+	EVENT_KEY_UP
+	EVENT_JOY_DOWN
+	EVENT_JOY_UP
+	EVENT_JOY_AXIS
+	EVENT_MOUSE_DOWN
+	EVENT_MOUSE_UP
+	EVENT_MOUSE_AXIS
+	EVENT_MOUSE_WHEEL
+
+Joystick buttons for events:
+	JOY_A
+	JOY_B
+	JOY_X
+	JOY_Y
+	JOY_BACK
+	JOY_GUIDE
+	JOY_START
+	JOY_LS
+	JOY_RS
+	JOY_LB
+	JOY_RB
+	JOY_U
+	JOY_D
+	JOY_L
+	JOY_R
+
+-- Events --------------------------------------------------------------------
+
+You can receive events so you're sure you don't miss anything. Define a
+function called event with 5 arguments:
+
+function event type a b c d { ... }
+
+type will be one of the EVENT_* constants listed in the Constants section.
+The parameters depend on the event type. Unused parameters are undefined
+for an event that doesn't supply them. The parameters for each event type
+are:
+
+EVENT_KEY_DOWN
+	a - the key constant
+	b - TRUE if this is a repeat event
+
+EVENT_KEY_UP
+	a - the key constant
+
+EVENT_JOY_DOWN
+	a - the button constant in constants
+	b - TRUE if it is a repeat event
+
+EVENT_JOY_UP
+	a - the joystick button constant
+
+EVENT_JOY_AXIS
+	a - the axis index
+	b - the value from -1 to 1
+
+EVENT_MOUSE_DOWN
+	a - the button
+	b - TRUE if it is a repeat event
+
+EVENT_MOUSE_UP
+	a - the button
+
+EVENT_MOUSE_AXIS
+	a - the x window coordinate
+	b - the y window coordinate
+	c - the delta x movement
+	d - the delta y movement
+
+EVENT_MOUSE_WHEEL
+	a - the horizontal wheel movement
+	b - the vertical wheel movement
