@@ -25,6 +25,7 @@ font_load font "vga.ttf" 12 1
 number container w1 w2 w3 w4
 
 widget_create container 200 200 c
+widget_set_accepts_focus container FALSE
 widget_create w1 0.5 0.5 b1
 widget_set_parent w1 container
 widget_create w2 0.5 0.5 b2
@@ -35,7 +36,14 @@ widget_set_parent w3 container
 widget_create w4 0.5 0.5 b4
 widget_set_parent w4 container
 
+widget_set_padding w1 5
+widget_set_padding w2 5
+widget_set_padding w3 5
+widget_set_padding w4 5
+
 gui_start container
+
+gui_set_focus w1
 
 function owned wx wy ww wh x y
 {
@@ -54,11 +62,25 @@ function gui_event id type a b c d x y w h focussed data
 			mml_play [data "sfx"] 1 0
 		:really_play
 	:play
+
+	if (&& (== TRUE focussed) (|| (&& (== type EVENT_KEY_DOWN) (== KEY_RETURN a)) (&& (== type EVENT_JOY_DOWN) (== a JOY_A)))) play_it
+		mml_play [data "sfx"] 1 0
+	:play_it
 }
 
 function gui_draw id x y w h focussed data
 {
 	if (== [data "type"] "button") draw_button
+		number r g b
+		if (== focussed TRUE) yellow white
+			= r 255
+			= g 255
+			= b 0
+		:yellow
+			= r 255
+			= g 255
+			= b 255
+		:white
 		number tw th
 		font_width font tw [data "text"]
 		font_height font th
@@ -70,7 +92,7 @@ function gui_draw id x y w h focussed data
 		- yy (/ th 2)
 
 		filled_rectangle 0 0 255 255 0 0 255 255 0 255 255 255 0 255 255 255 x y w h
-		rectangle 255 255 255 255 x y w h 1
+		rectangle r g b 255 x y w h 2
 		font_draw font 255 255 255 255 [data "text"] xx yy
 	:draw_button
 }

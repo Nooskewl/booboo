@@ -3951,6 +3951,8 @@ BooBoo_Widget::~BooBoo_Widget()
 
 void BooBoo_Widget::draw()
 {
+	TGUI_Widget::draw();
+
 	Widget_Info *info = widget_info(prg);
 	BooBoo_Widget *widget = info->widgets[id]->widget;
 
@@ -3983,6 +3985,8 @@ void BooBoo_Widget::draw()
 
 void BooBoo_Widget::handle_event(TGUI_Event *event)
 {
+	TGUI_Widget::handle_event(event);
+
 	Widget_Info *info = widget_info(prg);
 	BooBoo_Widget *widget = info->widgets[id]->widget;
 
@@ -4348,6 +4352,20 @@ static bool widgetfunc_set_accepts_focus(Program *prg, const std::vector<Token> 
 	return true;
 }
 
+static bool widgetfunc_set_padding(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int widget = as_number_inline(prg, v[0]);
+	int val = as_number_inline(prg, v[1]);
+
+	Widget_Info *info = widget_info(prg);
+
+	info->widgets[widget]->widget->set_padding(val);
+
+	return true;
+}
+
 static bool widgetfunc_set_padding_left(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -4438,6 +4456,8 @@ static bool widgetfunc_gui_start(Program *prg, const std::vector<Token> &v)
 	BooBoo_GUI *g = new BooBoo_GUI(info->widgets[id]->widget);
 
 	shim::guis.push_back(g);
+	
+	shim::convert_directions_to_focus_events = true;
 
 	return true;
 }
@@ -4448,6 +4468,24 @@ static bool widgetfunc_gui_exit(Program *prg, const std::vector<Token> &v)
 
 	if (shim::guis.size() > 0) {
 		shim::guis[shim::guis.size()-1]->exit();
+		if (shim::guis.size() == 0) {
+			shim::convert_directions_to_focus_events = false;
+		}
+	}
+
+	return true;
+}
+
+static bool widgetfunc_gui_set_focus(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Widget_Info *info = widget_info(prg);
+
+	unsigned int id = as_number_inline(prg, v[0]);
+
+	if (shim::guis.size() > 0) {
+		shim::guis[shim::guis.size()-1]->gui->set_focus(info->widgets[id]->widget);
 	}
 
 	return true;
@@ -4616,6 +4654,7 @@ void start_lib_game()
 	add_instruction("widget_set_clear_float_y", widgetfunc_set_clear_float_y);
 	add_instruction("widget_set_break_line", widgetfunc_set_break_line);
 	add_instruction("widget_set_accepts_focus", widgetfunc_set_accepts_focus);
+	add_instruction("widget_set_padding", widgetfunc_set_padding);
 	add_instruction("widget_set_padding_left", widgetfunc_set_padding_left);
 	add_instruction("widget_set_padding_right", widgetfunc_set_padding_right);
 	add_instruction("widget_set_padding_top", widgetfunc_set_padding_top);
@@ -4626,6 +4665,7 @@ void start_lib_game()
 	add_instruction("widget_set_down_widget", widgetfunc_set_down_widget);
 	add_instruction("gui_start", widgetfunc_gui_start);
 	add_instruction("gui_exit", widgetfunc_gui_exit);
+	add_instruction("gui_set_focus", widgetfunc_gui_set_focus);
 }
 
 void end_lib_game()
