@@ -4357,11 +4357,16 @@ static bool widgetfunc_set_padding(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	unsigned int widget = as_number_inline(prg, v[0]);
-	int val = as_number_inline(prg, v[1]);
+	double val = as_number_inline(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
 
-	info->widgets[widget]->widget->set_padding(val);
+	if (val < 1.0) {
+		info->widgets[widget]->widget->set_padding((float)val);
+	}
+	else {
+		info->widgets[widget]->widget->set_padding((int)val);
+	}
 
 	return true;
 }
@@ -4371,11 +4376,16 @@ static bool widgetfunc_set_padding_left(Program *prg, const std::vector<Token> &
 	COUNT_ARGS(2)
 
 	unsigned int widget = as_number_inline(prg, v[0]);
-	int val = as_number_inline(prg, v[1]);
+	double val = as_number_inline(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
 
-	info->widgets[widget]->widget->set_padding_left(val);
+	if (val < 1.0) {
+		info->widgets[widget]->widget->set_padding_left((float)val);
+	}
+	else {
+		info->widgets[widget]->widget->set_padding_left((int)val);
+	}
 
 	return true;
 }
@@ -4385,11 +4395,16 @@ static bool widgetfunc_set_padding_right(Program *prg, const std::vector<Token> 
 	COUNT_ARGS(2)
 
 	unsigned int widget = as_number_inline(prg, v[0]);
-	int val = as_number_inline(prg, v[1]);
+	double val = as_number_inline(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
 
-	info->widgets[widget]->widget->set_padding_right(val);
+	if (val < 1.0) {
+		info->widgets[widget]->widget->set_padding_right((float)val);
+	}
+	else {
+		info->widgets[widget]->widget->set_padding_right((int)val);
+	}
 
 	return true;
 }
@@ -4399,11 +4414,16 @@ static bool widgetfunc_set_padding_top(Program *prg, const std::vector<Token> &v
 	COUNT_ARGS(2)
 
 	unsigned int widget = as_number_inline(prg, v[0]);
-	int val = as_number_inline(prg, v[1]);
+	double val = as_number_inline(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
 
-	info->widgets[widget]->widget->set_padding_top(val);
+	if (val < 1.0) {
+		info->widgets[widget]->widget->set_padding_top((float)val);
+	}
+	else {
+		info->widgets[widget]->widget->set_padding_top((int)val);
+	}
 
 	return true;
 }
@@ -4413,11 +4433,16 @@ static bool widgetfunc_set_padding_bottom(Program *prg, const std::vector<Token>
 	COUNT_ARGS(2)
 
 	unsigned int widget = as_number_inline(prg, v[0]);
-	int val = as_number_inline(prg, v[1]);
+	double val = as_number_inline(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
 
-	info->widgets[widget]->widget->set_padding_bottom(val);
+	if (val < 1.0) {
+		info->widgets[widget]->widget->set_padding_bottom((float)val);
+	}
+	else {
+		info->widgets[widget]->widget->set_padding_bottom((int)val);
+	}
 
 	return true;
 }
