@@ -954,6 +954,18 @@ static bool mmlfunc_create(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool mmlfunc_destroy(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number_inline(prg, v[0]);
+	MML_Info *info = mml_info(prg);
+	delete info->mmls[id];
+	info->mmls.erase(id);
+
+	return true;
+}
+
 static bool mmlfunc_load(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -1034,6 +1046,18 @@ static bool samplefunc_load(Program *prg, const std::vector<Token> &v)
 	audio::Sample *sample = new audio::Sample(name);
 
 	info->samples[info->sample_id++] = sample;
+
+	return true;
+}
+
+static bool samplefunc_destroy(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number_inline(prg, v[0]);
+	Sample_Info *info = sample_info(prg);
+	delete info->samples[id];
+	info->samples.erase(id);
 
 	return true;
 }
@@ -1120,6 +1144,18 @@ static bool imagefunc_load(Program *prg, const std::vector<Token> &v)
 	gfx::Image *img = new gfx::Image(name);
 
 	info->images[info->image_id++] = img;
+
+	return true;
+}
+
+static bool imagefunc_destroy(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number_inline(prg, v[0]);
+	Image_Info *info = image_info(prg);
+	delete info->images[id];
+	info->images.erase(id);
 
 	return true;
 }
@@ -1394,6 +1430,18 @@ static bool fontfunc_load(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool fontfunc_destroy(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number_inline(prg, v[0]);
+	Font_Info *info = font_info(prg);
+	delete info->fonts[id];
+	info->fonts.erase(id);
+
+	return true;
+}
+
 static bool fontfunc_draw(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(8)
@@ -1521,6 +1569,18 @@ static bool tilemapfunc_load(Program *prg, const std::vector<Token> &v)
 	gfx::Tilemap *tilemap = new gfx::Tilemap(name);
 
 	info->tilemaps[info->tilemap_id++] = tilemap;
+
+	return true;
+}
+
+static bool tilemapfunc_destroy(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number_inline(prg, v[0]);
+	Tilemap_Info *info = tilemap_info(prg);
+	delete info->tilemaps[id];
+	info->tilemaps.erase(id);
 
 	return true;
 }
@@ -1838,6 +1898,18 @@ static bool spritefunc_load(Program *prg, const std::vector<Token> &v)
 	gfx::Sprite *sprite = new gfx::Sprite(name, name);
 
 	info->sprites[info->sprite_id++] = sprite;
+
+	return true;
+}
+
+static bool spritefunc_destroy(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number_inline(prg, v[0]);
+	Sprite_Info *info = sprite_info(prg);
+	delete info->sprites[id];
+	info->sprites.erase(id);
 
 	return true;
 }
@@ -2403,6 +2475,17 @@ static bool cfgfunc_load(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool cfgfunc_destroy(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number_inline(prg, v[0]);
+	CFG_Info *info = cfg_info(prg);
+	info->cfgs.erase(id);
+
+	return true;
+}
+
 static bool cfgfunc_save(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
@@ -2615,6 +2698,18 @@ static bool shaderfunc_load(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool shaderfunc_destroy(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number_inline(prg, v[0]);
+	Shader_Info *info = shader_info(prg);
+	delete info->shaders[id];
+	info->shaders.erase(id);
+
+	return true;
+}
+
 static bool shaderfunc_use(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -2755,6 +2850,18 @@ static bool jsonfunc_load(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool jsonfunc_destroy(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number_inline(prg, v[0]);
+	JSON_Info *info = json_info(prg);
+	delete info->jsons[id];
+	info->jsons.erase(id);
+
+	return true;
+}
+
 static bool jsonfunc_get_string(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
@@ -2839,6 +2946,21 @@ static bool modelfunc_load(Program *prg, const std::vector<Token> &v)
 	m->is_clone = false;
 
 	info->models[info->model_id++] = m;
+
+	return true;
+}
+
+static bool modelfunc_destroy(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number_inline(prg, v[0]);
+	Model_Info *info = model_info(prg);
+	if (info->models[id]->is_clone == false) {
+		delete info->models[id]->model;
+	}
+	delete info->models[id];
+	info->models.erase(id);
 
 	return true;
 }
@@ -3447,6 +3569,18 @@ static bool modelfunc_billboard_create(Program *prg, const std::vector<Token> &v
 	return true;
 }
 
+static bool modelfunc_billboard_destroy(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number_inline(prg, v[0]);
+	Billboard_Info *info = billboard_info(prg);
+	delete info->billboards[id];
+	info->billboards.erase(id);
+
+	return true;
+}
+
 static bool modelfunc_billboard_from_sprite(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(8)
@@ -3747,6 +3881,7 @@ void start_lib_game()
 	add_instruction("filled_circle", primfunc_filled_circle);
 	add_instruction("image_create", imagefunc_create);
 	add_instruction("image_load", imagefunc_load);
+	add_instruction("image_destroy", imagefunc_destroy);
 	add_instruction("image_draw", imagefunc_draw);
 	add_instruction("image_stretch_region", imagefunc_stretch_region);
 	add_instruction("image_draw_rotated_scaled", imagefunc_draw_rotated_scaled);
@@ -3755,12 +3890,14 @@ void start_lib_game()
 	add_instruction("image_size", imagefunc_size);
 	add_instruction("image_draw_9patch", imagefunc_draw_9patch);
 	add_instruction("font_load", fontfunc_load);
+	add_instruction("font_destroy", fontfunc_destroy);
 	add_instruction("font_draw", fontfunc_draw);
 	add_instruction("font_width", fontfunc_width);
 	add_instruction("font_height", fontfunc_height);
 	add_instruction("font_add_extra_glyph", fontfunc_add_extra_glyph);
 	add_instruction("set_tile_size", tilemapfunc_set_tile_size);
 	add_instruction("tilemap_load", tilemapfunc_load);
+	add_instruction("tilemap_destroy", tilemapfunc_destroy);
 	add_instruction("tilemap_draw", tilemapfunc_draw);
 	add_instruction("tilemap_num_layers", tilemapfunc_num_layers);
 	add_instruction("tilemap_size", tilemapfunc_size);
@@ -3772,6 +3909,7 @@ void start_lib_game()
 	add_instruction("tilemap_set_tile", tilemapfunc_set_tile);
 	add_instruction("tilemap_get_tile", tilemapfunc_get_tile);
 	add_instruction("sprite_load", spritefunc_load);
+	add_instruction("sprite_destroy", spritefunc_destroy);
 	add_instruction("sprite_set_animation_lazy", spritefunc_set_animation_lazy);
 	add_instruction("sprite_set_animation", spritefunc_set_animation);
 	add_instruction("sprite_get_animation", spritefunc_get_animation);
@@ -3790,15 +3928,18 @@ void start_lib_game()
 	add_instruction("sprite_is_started", spritefunc_is_started);
 	add_instruction("mml_create", mmlfunc_create);
 	add_instruction("mml_load", mmlfunc_load);
+	add_instruction("mml_destroy", mmlfunc_destroy);
 	add_instruction("mml_play", mmlfunc_play);
 	add_instruction("mml_stop", mmlfunc_stop);
 	add_instruction("sample_load", samplefunc_load);
+	add_instruction("sample_destroy", samplefunc_destroy);
 	add_instruction("sample_play", samplefunc_play);
 	add_instruction("sample_stop", samplefunc_stop);
 	add_instruction("joystick_poll", joyfunc_poll);
 	add_instruction("joystick_count", joyfunc_count);
 	add_instruction("rumble", joyfunc_rumble);
 	add_instruction("cfg_load", cfgfunc_load);
+	add_instruction("cfg_destroy", cfgfunc_destroy);
 	add_instruction("cfg_save", cfgfunc_save);
 	add_instruction("cfg_get_number", cfgfunc_get_number);
 	add_instruction("cfg_get_string", cfgfunc_get_string);
@@ -3807,6 +3948,7 @@ void start_lib_game()
 	add_instruction("cfg_exists", cfgfunc_exists);
 	add_instruction("cfg_erase", cfgfunc_erase);
 	add_instruction("shader_load", shaderfunc_load);
+	add_instruction("shader_destroy", shaderfunc_destroy);
 	add_instruction("shader_use", shaderfunc_use);
 	add_instruction("shader_use_default", shaderfunc_use_default);
 	add_instruction("shader_set_bool", shaderfunc_set_bool);
@@ -3815,9 +3957,11 @@ void start_lib_game()
 	add_instruction("shader_set_colour", shaderfunc_set_colour);
 	add_instruction("shader_set_texture", shaderfunc_set_texture);
 	add_instruction("json_load", jsonfunc_load);
+	add_instruction("json_destroy", jsonfunc_destroy);
 	add_instruction("json_get_string", jsonfunc_get_string);
 	add_instruction("json_get_number", jsonfunc_get_number);
 	add_instruction("model_load", modelfunc_load);
+	add_instruction("model_destroy", modelfunc_destroy);
 	add_instruction("model_draw", modelfunc_draw);
 	add_instruction("set_2d", modelfunc_set_2d);
 	add_instruction("set_3d", modelfunc_set_3d);
@@ -3839,6 +3983,7 @@ void start_lib_game()
 	add_instruction("model_clone", modelfunc_clone);
 	add_instruction("billboard_create", modelfunc_billboard_create);
 	add_instruction("billboard_from_sprite", modelfunc_billboard_from_sprite);
+	add_instruction("billboard_destroy", modelfunc_billboard_destroy);
 	add_instruction("billboard_draw", modelfunc_billboard_draw);
 	add_instruction("billboard_translate", modelfunc_billboard_translate);
 	add_instruction("billboard_scale", modelfunc_billboard_scale);

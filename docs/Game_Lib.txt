@@ -252,6 +252,10 @@ image_size
 	get image width/height
 	e.g. image_size img w h
 
+image_destroy
+	Free an image
+	e.g. image_destroy img
+
 -- Sprite Functions ----------------------------------------------------------
 
 sprite_load
@@ -327,6 +331,10 @@ sprite_is_started
 	Check if a sprite is started or not
 	e.g. sprite_is_started sprite onoff
 
+sprite_destroy
+	Free a sprite
+	e.g. sprite_destroy s
+
 -- Font Functions ------------------------------------------------------------
 
 font_load
@@ -355,6 +363,10 @@ font_add_extra_glyph
 	You can add up to 256 extra glyphs (0 to 255.) The can be used
 	with @## with font_draw.
 	e.g. font_add_extra_glyph font #00 my_image
+
+font_destroy
+	Free a font
+	e.g. font_destroy f
 
 -- Tilemap Functions ---------------------------------------------------------
 
@@ -419,6 +431,10 @@ tilemap_get_tile
 	e.g. tilemap_get_tile tilemap out_tx out_ty out_solid layer x y
 	out_tx/ty refers to x/y position within the tile sheet.
 
+tilemap_destroy
+	Free a tilemap
+	e.g. tilemap_destroy tilemap
+
 -- Shader Functions ----------------------------------------------------------
 
 shader_load
@@ -453,6 +469,10 @@ shader_set_colour
 shader_set_texture
 	Set a texture value in a shader
 	e.g. shader_set_texture shader "tex" my_img
+
+shader_destroy
+	Free a shader
+	e.g. shader_destroy shader
 
 -- 3D Functions --------------------------------------------------------------
 
@@ -567,6 +587,14 @@ billboard_scale
 	Scale a billboard
 	e.g. billboard_scale b sx sy
 
+model_destroy
+	Free a model
+	e.g. model_destroy model
+
+billboard_destroy
+	Free a billboard
+	e.g. billboard_destroy b
+
 -- Collision Detection Functions ---------------------------------------------
 
 cd_model_point
@@ -612,6 +640,14 @@ sample_play
 sample_stop
 	Stop a looping sample
 	e.g. sample_stop s
+
+mml_destroy
+	Free an MML
+	e.g. mml_destroy mml
+
+sample_destroy
+	Destroy a sample
+	e.g. sample_destroy sample
 
 -- Input Functions -----------------------------------------------------------
 
@@ -670,6 +706,10 @@ json_get_number
 	"[0]" "[1]" etc can be used to access arrays.
 	e.g. json_get_number json n "settings>mouse>sensitivity"
 
+json_destroy
+	Free a JSON object
+	e.g. json_destroy json
+
 -- Configuration Functions ---------------------------------------------------
 
 cfg_load
@@ -703,6 +743,10 @@ cfg_exists
 cfg_erase
 	Erase a value in a config file
 	e.g. cfg_erase cfg "example"
+
+cfg_destroy
+	Free a configuration object
+	e.g. cfg_destroy cfg
 
 -- Constants -----------------------------------------------------------------
 
