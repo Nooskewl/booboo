@@ -5,7 +5,6 @@ mml_load sfx3 "sfx/b3.mml"
 mml_load sfx4 "sfx/b4.mml"
 
 map c b1 b2 b3 b4
-map_set c "type" "window"
 map_set c "draw" draw_window
 map_set c "event" null_event
 call_result b1 mkbutton "Elixir" sfx1
@@ -69,7 +68,6 @@ function draw_button x y w h focussed data
 	filled_rectangle 0 0 255 255 0 0 255 255 0 255 255 255 0 255 255 255 x y w h
 	rectangle r g b 255 x y w h 2
 	font_draw font r g b 255 [data "text"] xx yy
-:draw_button
 }
 
 function null_event type a b c d x y w h focussed data
@@ -94,7 +92,6 @@ function button_event type a b c d x y w h focussed data
 function mkbutton text sfx
 {
 	map m
-	map_set m "type" "button"
 	map_set m "text" text
 	map_set m "sfx" sfx
 	map_set m "draw" draw_button
