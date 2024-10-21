@@ -4452,10 +4452,19 @@ class BooBoo_GUI : public gui::GUI
 public:
 	BooBoo_GUI(BooBoo_Widget *root);
 	virtual ~BooBoo_GUI();
+
+	virtual void update();
+
+private:
+	bool done_transition_in;
 };
 
-BooBoo_GUI::BooBoo_GUI(BooBoo_Widget *root)
+BooBoo_GUI::BooBoo_GUI(BooBoo_Widget *root) :
+	done_transition_in(false)
 {
+	transition = true;
+	transition_is_enlarge = true;
+
 	root->set_centre_x(true);
 	root->set_centre_y(true);
 
@@ -4468,6 +4477,17 @@ BooBoo_GUI::BooBoo_GUI(BooBoo_Widget *root)
 
 BooBoo_GUI::~BooBoo_GUI()
 {
+}
+
+void BooBoo_GUI::update()
+{
+	gui::GUI::update();
+
+	if (transitioning_in == false && done_transition_in == false) {
+		transition_is_enlarge = false;
+		transition_is_shrink = true;
+		done_transition_in = true;
+	}
 }
 
 static bool widgetfunc_gui_start(Program *prg, const std::vector<Token> &v)
