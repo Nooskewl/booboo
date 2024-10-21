@@ -152,7 +152,7 @@ function spawn_enemy
 }
 
 
-function set_dest e
+function set_dest ~e
 {
 	number r
 	rand r 0 1000
@@ -167,7 +167,7 @@ function set_dest e
 	= [e "dz"] r
 }
 
-function move_enemy e
+function move_enemy ~e
 {
 	if (== TRUE [e "dead"]) done2
 		return
