@@ -20,6 +20,6 @@ function run
 
 	if (== b1 1) shake
 		screen_shake 2 500
-		rumble 100
+		rumble 250
 	:shake
 }
