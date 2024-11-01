@@ -86,6 +86,11 @@ typeof
 	Start a hexadecimal number
 	e.g. #FF is equivalent to 255
 
+~
+	A reference. Function parameters preceded by a ~ can be modified
+	by a function
+	e.g. call foo 10 20 ~a
+
 -- Flow Control --------------------------------------------------------------
 
 goto
