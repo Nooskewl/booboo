@@ -2850,6 +2850,51 @@ static bool shaderfunc_set_texture(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool shaderfunc_set_float_vector(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	int id = as_number_inline(prg, v[0]);
+	std::string name = as_string_inline(prg, v[1]);
+	Variable &vec = as_variable_inline(prg, v[2]);
+	
+	Shader_Info *info = shader_info(prg);
+	gfx::Shader *shader = info->shaders[id];
+
+	std::vector<float> floats;
+	for (size_t i = 0; i < vec.v.size(); i++) {
+		floats.push_back(vec.v[i].n);
+	}
+
+	shader->set_float_vector(name, floats.size(), &floats[0], 1);
+
+	return true;
+}
+
+static bool shaderfunc_set_matrix(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	int id = as_number_inline(prg, v[0]);
+	std::string name = as_string_inline(prg, v[1]);
+	Variable &vec = as_variable_inline(prg, v[2]);
+	
+	Shader_Info *info = shader_info(prg);
+	gfx::Shader *shader = info->shaders[id];
+
+	glm::mat4 mat;
+
+	for (size_t i = 0; i < vec.v.size(); i++) {
+		for (size_t j = 0; j < vec.v[i].v.size(); j++) {
+			mat[i][j] = vec.v[i].v[j].n;
+		}
+	}
+
+	shader->set_matrix(name, mat);
+
+	return true;
+}
+
 static bool shaderfunc_set_colour(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(6)
@@ -4692,6 +4737,8 @@ void start_lib_game()
 	add_instruction("shader_set_float", shaderfunc_set_float);
 	add_instruction("shader_set_colour", shaderfunc_set_colour);
 	add_instruction("shader_set_texture", shaderfunc_set_texture);
+	add_instruction("shader_set_float_vector", shaderfunc_set_float_vector);
+	add_instruction("shader_set_matrix", shaderfunc_set_matrix);
 	add_instruction("json_load", jsonfunc_load);
 	add_instruction("json_destroy", jsonfunc_destroy);
 	add_instruction("json_get_string", jsonfunc_get_string);

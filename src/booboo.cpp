@@ -2906,9 +2906,11 @@ static Variable matmul(Program *prg, Variable ret, Variable vec2)
 			vec2.v.push_back(tmp);
 		}
 
+		/*
 		if (is_mat1 && is_mat2) {
 			throw Error(std::string(__FUNCTION__) + ": " + "Vector-vector multiplication is undefined at " + get_error_info(prg));
 		}
+		*/
 
 		if (ret.v.size() != vec2.v[0].v.size()) {
 			throw Error(std::string(__FUNCTION__) + ": " + "Matrices cannot be multiplied at " + get_error_info(prg));
@@ -2990,6 +2992,36 @@ Variable exprfunc_mul(Program *prg, const std::vector<Token> &v)
 	}
 
 	return ret;
+}
+
+static glm::mat4 to_glm_mat4(Variable &v)
+{
+	glm::mat4 m;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			m[i][j] = v.v[i].v[j].n;
+		}
+	}
+	return m;
+}
+
+static Variable from_glm_mat4(glm::mat4 m)
+{
+	Variable var;
+	var.type = Variable::VECTOR;
+	for (int i = 0; i < 4; i++) {
+		glm::vec4 v = m[i];
+		Variable v2;
+		v2.type = Variable::VECTOR;
+		for (int j = 0; j < 4; j++) {
+			Variable v3;
+			v3.type = Variable::NUMBER;
+			v3.n = v[j];
+			v2.v.push_back(v3);
+		}
+		var.v.push_back(v2);
+	}
+	return var;
 }
 
 static Variable identity(int sz)
@@ -3296,6 +3328,32 @@ Variable exprfunc_vsub(Program *prg, const std::vector<Token> &v)
 	return vec;
 }
 
+Variable exprfunc_inverse(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable mat = as_variable_resolve_inline(prg, v[0]);
+
+	CHECK_VECTOR(mat)
+
+	glm::mat4 m = to_glm_mat4(mat);
+	m = glm::inverse(m);
+	return from_glm_mat4(m);
+}
+
+Variable exprfunc_transpose(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable mat = as_variable_resolve_inline(prg, v[0]);
+
+	CHECK_VECTOR(mat)
+
+	glm::mat4 m = to_glm_mat4(mat);
+	m = glm::transpose(m);
+	return from_glm_mat4(m);
+}
+
 static void init_token_map()
 {
 	add_token_handler(':', tokenfunc_label);
@@ -3357,6 +3415,8 @@ void start()
 	add_expression_handler("normalize", exprfunc_normalize);
 	add_expression_handler("add", exprfunc_vadd);
 	add_expression_handler("sub", exprfunc_vsub);
+	add_expression_handler("inverse", exprfunc_inverse);
+	add_expression_handler("transpose", exprfunc_transpose);
 
 	add_instruction("reset", breaker_reset);
 	add_instruction("exit", breaker_exit);
