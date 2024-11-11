@@ -565,7 +565,9 @@ draw_3d
 	e.g., one vertex is 3 numbers, one face is 3 numbers, one colour is 4
 	faces are vertex indices
 	colours are per-face-vertex
-	e.g. draw_3d vert_vec face_vec colour_vec num_triangles
+	empty colour vector = white
+	empty normal vector = 0.0
+	e.g. draw_3d vert_vec face_vec colour_vec normal_vec num_triangles
 
 draw_3d_textured
 	Draw arbitrary 3d geometry textured
@@ -573,7 +575,9 @@ draw_3d_textured
 	e.g., one vertex is 3 numbers, one face is 3 numbers, one colour is 4
 	faces are vertex indices
 	colours are per-face-vertex
-	e.g. draw_3d_textured tex vert_vec face_vec colour_vec texcoord_vec num_triangles
+	empty colour vector = white
+	empty normal vector = 0.0
+	e.g. draw_3d_textured tex vert_vec face_vec colour_vec normal_vec texcoord_vec num_triangles
 
 billboard_create
 	Create a billboard
