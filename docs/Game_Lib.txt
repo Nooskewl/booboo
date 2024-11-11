@@ -446,8 +446,10 @@ tilemap_destroy
 
 shader_load
 	Load a shader
-	e.g. shader_load n "fragment_shader.txt" FP
-	Where FP is a precision from 0 to 2 (low, medium, high.)
+	e.g. shader_load n "my_vert" "my_frag"
+	When running on OpenGL this will load from
+	data/gfx/shaders/glsl/my_vert.txt. D3D will load
+	data/gfx/shaders/hlsl/my_vert.shader
 
 shader_use
 	Use a shader

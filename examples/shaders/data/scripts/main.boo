@@ -1,5 +1,5 @@
 number shader
-shader_load shader "red_fragment" 2
+shader_load shader "" "red_fragment"
 
 number tree
 image_load tree "tree.png"

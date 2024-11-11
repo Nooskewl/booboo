@@ -1,5 +1,6 @@
 #include <shim5/shim5.h>
 #include <shim5/shaders/glsl/default_vertex.h>
+#include <shim5/shaders/glsl/default_fragment.h>
 
 #include <libutil/libutil.h>
 using namespace noo;
@@ -2686,10 +2687,8 @@ static bool shaderfunc_load(Program *prg, const std::vector<Token> &v)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
-	std::string fname = as_string_inline(prg, v[1]);
-
-	gfx::Shader::Precision vp = gfx::Shader::MEDIUM;
-	gfx::Shader::Precision fp = (gfx::Shader::Precision)as_number_inline(prg, v[2]);
+	std::string vname = as_string_inline(prg, v[1]);
+	std::string fname = as_string_inline(prg, v[2]);
 	
 	Shader_Info *info = shader_info(prg);
 
@@ -2700,18 +2699,41 @@ static bool shaderfunc_load(Program *prg, const std::vector<Token> &v)
 	gfx::Shader *shader = nullptr;
 
 	if (shim::opengl) {
-		std::string vs = DEFAULT_GLSL_VERTEX_SHADER;
-		std::string fs = util::load_text("gfx/shaders/glsl/" + fname + ".txt");
+		std::string vs, fs;
+		if (vname == "") {
+			vs = DEFAULT_GLSL_VERTEX_SHADER;
+		}
+		else {
+			vs = util::load_text("gfx/shaders/glsl/" + vname + ".txt");
+		}
+		if (fname == "") {
+			fs = DEFAULT_GLSL_FRAGMENT_SHADER;
+		}
+		else {
+			fs = util::load_text("gfx/shaders/glsl/" + fname + ".txt");
+		}
 
-		gfx::Shader::OpenGL_Shader *vert = gfx::Shader::load_opengl_vertex_shader(vs, vp);
-		gfx::Shader::OpenGL_Shader *frag = gfx::Shader::load_opengl_fragment_shader(fs, fp);
+		gfx::Shader::OpenGL_Shader *vert = gfx::Shader::load_opengl_vertex_shader(vs, gfx::Shader::HIGH);
+		gfx::Shader::OpenGL_Shader *frag = gfx::Shader::load_opengl_fragment_shader(fs, gfx::Shader::HIGH);
 
 		shader = new gfx::Shader(vert, frag);
 	}
 #ifdef _WIN32
 	else {
-		gfx::Shader::D3D_Vertex_Shader *vert = gfx::Shader::load_d3d_vertex_shader("default_vertex");
-		gfx::Shader::D3D_Fragment_Shader *frag = gfx::Shader::load_d3d_fragment_shader(fname);
+		gfx::Shader::D3D_Vertex_Shader *vert;
+		gfx::Shader::D3D_Fragment_Shader *frag;
+		if (vname == "") {
+			vert = gfx::Shader::load_d3d_vertex_shader("default_vertex");
+		}
+		else {
+			vert = gfx::Shader::load_d3d_vertex_shader(vname);
+		}
+		if (fname == "") {
+			frag = gfx::Shader::load_d3d_fragment_shader("default_fragment");
+		}
+		else {
+			frag = gfx::Shader::load_d3d_fragment_shader(fname);
+		}
 
 		shader = new gfx::Shader(vert, frag);
 	}
