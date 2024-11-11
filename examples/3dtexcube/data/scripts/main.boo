@@ -1,7 +1,7 @@
 number tex
 image_load tex "brick.png"
 
-vector verts faces colours texcoords
+vector verts faces colours normals texcoords
 vector_add verts -0.5
 vector_add verts 0.5
 vector_add verts 0.5
@@ -69,162 +69,6 @@ vector_add faces 5
 vector_add faces 0
 vector_add faces 4
 vector_add faces 5
-
-;vector_add colours 255
-;vector_add colours 216
-;vector_add colours 0
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 216
-;vector_add colours 0
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 216
-;vector_add colours 0
-;vector_add colours 255
-;
-;vector_add colours 255
-;vector_add colours 216
-;vector_add colours 0
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 216
-;vector_add colours 0
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 216
-;vector_add colours 0
-;vector_add colours 255
-;
-;vector_add colours 255
-;vector_add colours 216
-;vector_add colours 0
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 216
-;vector_add colours 0
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 216
-;vector_add colours 0
-;vector_add colours 255
-;
-;vector_add colours 255
-;vector_add colours 216
-;vector_add colours 0
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 216
-;vector_add colours 0
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 216
-;vector_add colours 0
-;vector_add colours 255
-;
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
-;vector_add colours 0
-;vector_add colours 216
-;vector_add colours 255
-;vector_add colours 255
 
 vector_add texcoords 0
 vector_add texcoords 0
@@ -314,7 +158,7 @@ function draw
 {
 	clear 100 100 255
 
-	draw_3d_textured tex verts faces colours texcoords 12
+	draw_3d_textured tex verts faces colours normals texcoords 12
 }
 
 function run

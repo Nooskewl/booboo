@@ -50,6 +50,7 @@ vector faces
 vector_add faces 0 1 2
 vector_add faces 3 4 5
 vector colours
+vector normals
 	
 set_3d
 
@@ -69,7 +70,7 @@ function draw
 {
 	clear 100 100 255
 	
-	draw_3d_textured texture positions faces colours texcoords 2
+	draw_3d_textured texture positions faces colours normals texcoords 2
 
 	number i
 	for i 0 (< i num_billboards) 1 loop

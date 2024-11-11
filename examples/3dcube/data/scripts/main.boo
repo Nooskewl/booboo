@@ -223,6 +223,8 @@ vector_add colours 216
 vector_add colours 255
 vector_add colours 255
 
+vector normals
+
 number rx ry
 = rx 0
 = ry 0
@@ -233,7 +235,7 @@ function draw
 {
 	clear 100 100 255
 
-	draw_3d verts faces colours 12
+	draw_3d verts faces colours normals 12
 }
 
 function run

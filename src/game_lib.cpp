@@ -3375,12 +3375,13 @@ static bool modelfunc_size(Program *prg, const std::vector<Token> &v)
 
 static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(4)
+	COUNT_ARGS(5)
 
 	Variable verts = as_variable_resolve_inline(prg, v[0]);
 	Variable faces = as_variable_resolve_inline(prg, v[1]);
 	Variable colours = as_variable_resolve_inline(prg, v[2]);
-	int num_triangles = as_number_inline(prg, v[3]);
+	Variable normals = as_variable_resolve_inline(prg, v[3]);
+	int num_triangles = as_number_inline(prg, v[4]);
 
 	static float *vert_vec = nullptr;
 	static int vec_sz = 0;
@@ -3396,6 +3397,7 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 
 	int count = 0;
 	int ccount = 0;
+	int ncount = 0;
 
 	for (int i = 0; i < num_triangles; i++) {
 		for (int j = 0; j < 3; j++) {
@@ -3405,9 +3407,16 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 			vert_vec[count++] = verts.v[index*3+1].n;
 			vert_vec[count++] = verts.v[index*3+2].n;
 			// normals
-			vert_vec[count++] = 0.0f;
-			vert_vec[count++] = 0.0f;
-			vert_vec[count++] = 0.0f;
+			if (normals.v.size() > 0) {
+				vert_vec[count++] = normals.v[ncount++].n;
+				vert_vec[count++] = normals.v[ncount++].n;
+				vert_vec[count++] = normals.v[ncount++].n;
+			}
+			else {
+				vert_vec[count++] = 0.0f;
+				vert_vec[count++] = 0.0f;
+				vert_vec[count++] = 0.0f;
+			}
 			// texcoord
 			vert_vec[count++] = 0.0f;
 			vert_vec[count++] = 0.0f;
@@ -3451,19 +3460,21 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 
 static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(6)
+	COUNT_ARGS(7)
 
 	int tex = as_number_inline(prg, v[0]);
 	Variable verts = as_variable_resolve_inline(prg, v[1]);
 	Variable faces = as_variable_resolve_inline(prg, v[2]);
 	Variable colours = as_variable_resolve_inline(prg, v[3]);
-	Variable texcoords = as_variable_resolve_inline(prg, v[4]);
-	int num_triangles = as_number_inline(prg, v[5]);
+	Variable normals = as_variable_resolve_inline(prg, v[4]);
+	Variable texcoords = as_variable_resolve_inline(prg, v[5]);
+	int num_triangles = as_number_inline(prg, v[6]);
 
 	float vert_vec[12*3*num_triangles];
 
 	int count = 0;
 	int ccount = 0;
+	int ncount = 0;
 	int tcount = 0;
 
 	for (int i = 0; i < num_triangles; i++) {
@@ -3474,9 +3485,16 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 			vert_vec[count++] = verts.v[index*3+1].n;
 			vert_vec[count++] = verts.v[index*3+2].n;
 			// normals
-			vert_vec[count++] = 0.0f;
-			vert_vec[count++] = 0.0f;
-			vert_vec[count++] = 0.0f;
+			if (normals.v.size() > 0) {
+				vert_vec[count++] = normals.v[ncount++].n;
+				vert_vec[count++] = normals.v[ncount++].n;
+				vert_vec[count++] = normals.v[ncount++].n;
+			}
+			else {
+				vert_vec[count++] = 0.0f;
+				vert_vec[count++] = 0.0f;
+				vert_vec[count++] = 0.0f;
+			}
 			// texcoord
 			vert_vec[count++] = texcoords.v[tcount++].n;
 			vert_vec[count++] = texcoords.v[tcount++].n;
