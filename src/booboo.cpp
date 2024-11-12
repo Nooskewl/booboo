@@ -2948,7 +2948,7 @@ static Variable matmul(Program *prg, Variable ret, Variable vec2)
 		for (size_t r = 0; r < ret.v[0].v.size(); r++) {
 			int cc = 0;
 			for (size_t c = 0; c < ret.v.size(); c++) {
-				int sum = 0;
+				double sum = 0;
 				for (size_t r2 = 0; r2 < vec2.v[c].v.size(); r2++) {
 					sum += ret.v[r2].v[r].n * vec2.v[c].v[r2].n;
 				}
