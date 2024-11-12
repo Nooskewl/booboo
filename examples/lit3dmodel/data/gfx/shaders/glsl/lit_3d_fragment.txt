@@ -7,6 +7,12 @@ void main()
 {
 	vec4 result;
 	vec4 pix = texture2D(tex, texcoord);
-	result = vec4(pix.rgb + colour.rgb * (1.0 - pix.a), 1.0);
+	if (pix.a == 0.0) {
+		result = vec4(colour.rgb, 1.0);
+	}
+	else {
+		float s = (colour.r + colour.g + colour.b) / 3.0;
+		result = vec4(pix.rgb * s * 1.25, 1.0);
+	}
 	gl_FragColor = result;
 }

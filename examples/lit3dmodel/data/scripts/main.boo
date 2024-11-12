@@ -3,6 +3,7 @@ image_load tex "brick.png"
 
 number model
 model_load model "zeus.x"
+model_set_animation model "ArmatureAction"
 
 number shader
 shader_load shader "lit_3d_vertex" "lit_3d_fragment"
