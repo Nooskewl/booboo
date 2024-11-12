@@ -2906,11 +2906,9 @@ static Variable matmul(Program *prg, Variable ret, Variable vec2)
 			vec2.v.push_back(tmp);
 		}
 
-		/*
-		if (is_mat1 && is_mat2) {
+		if (is_mat1 == false && is_mat2 == false) {
 			throw Error(std::string(__FUNCTION__) + ": " + "Vector-vector multiplication is undefined at " + get_error_info(prg));
 		}
-		*/
 
 		if (ret.v.size() != vec2.v[0].v.size()) {
 			throw Error(std::string(__FUNCTION__) + ": " + "Matrices cannot be multiplied at " + get_error_info(prg));
@@ -2918,6 +2916,8 @@ static Variable matmul(Program *prg, Variable ret, Variable vec2)
 
 		unsigned int w = vec2.v.size();
 		unsigned int h = ret.v[0].v.size();
+
+		Variable tmp2 = ret;
 
 		while (ret.v.size() > w) {
 			ret.v.pop_back();
@@ -2943,11 +2943,12 @@ static Variable matmul(Program *prg, Variable ret, Variable vec2)
 		}
 
 		tmp = ret;
+		ret = tmp2;
 
 		int rr = 0;
-		for (size_t r = 0; r < ret.v[0].v.size(); r++) {
+		for (size_t r = 0; r < h; r++) {
 			int cc = 0;
-			for (size_t c = 0; c < ret.v.size(); c++) {
+			for (size_t c = 0; c < w; c++) {
 				double sum = 0;
 				for (size_t r2 = 0; r2 < vec2.v[c].v.size(); r2++) {
 					sum += ret.v[r2].v[r].n * vec2.v[c].v[r2].n;
