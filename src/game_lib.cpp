@@ -1,6 +1,6 @@
 #include <shim5/shim5.h>
 #include <shim5/shaders/glsl/default_vertex.h>
-#include <shim5/shaders/glsl/default_fragment.h>
+#include <shim5/shaders/glsl/default_textured_fragment.h>
 
 #include <libutil/libutil.h>
 using namespace noo;
@@ -2707,7 +2707,7 @@ static bool shaderfunc_load(Program *prg, const std::vector<Token> &v)
 			vs = util::load_text("gfx/shaders/glsl/" + vname + ".txt");
 		}
 		if (fname == "") {
-			fs = DEFAULT_GLSL_FRAGMENT_SHADER;
+			fs = DEFAULT_GLSL_TEXTURED_FRAGMENT_SHADER;
 		}
 		else {
 			fs = util::load_text("gfx/shaders/glsl/" + fname + ".txt");
