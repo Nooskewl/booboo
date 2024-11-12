@@ -1,0 +1,12 @@
+uniform sampler2D tex;
+
+varying vec4 colour;
+varying vec2 texcoord;
+
+void main()
+{
+	vec4 result;
+	vec4 pix = texture2D(tex, texcoord);
+	result = vec4(pix.rgb + colour.rgb * (1.0 - pix.a), 1.0);
+	gl_FragColor = result;
+}
