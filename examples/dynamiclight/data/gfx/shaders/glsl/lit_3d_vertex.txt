@@ -1,0 +1,56 @@
+uniform mat4 modelview;
+uniform mat4 proj;
+uniform vec3 light_pos;
+uniform vec4 ground_colour;
+
+attribute vec3 in_position;
+attribute vec3 in_normal;
+attribute vec2 in_texcoord;
+attribute vec4 in_colour;
+
+varying vec2 texcoord;
+varying vec4 colour;
+
+float det(mat2 matrix) {
+    return matrix[0].x * matrix[1].y - matrix[0].y * matrix[1].x;
+}
+
+mat3 inverse(mat3 matrix) {
+    vec3 row0 = matrix[0];
+    vec3 row1 = matrix[1];
+    vec3 row2 = matrix[2];
+
+    vec3 minors0 = vec3(
+        det(mat2(row1.y, row1.z, row2.y, row2.z)),
+        det(mat2(row1.z, row1.x, row2.z, row2.x)),
+        det(mat2(row1.x, row1.y, row2.x, row2.y))
+    );
+    vec3 minors1 = vec3(
+        det(mat2(row2.y, row2.z, row0.y, row0.z)),
+        det(mat2(row2.z, row2.x, row0.z, row0.x)),
+        det(mat2(row2.x, row2.y, row0.x, row0.y))
+    );
+    vec3 minors2 = vec3(
+        det(mat2(row0.y, row0.z, row1.y, row1.z)),
+        det(mat2(row0.z, row0.x, row1.z, row1.x)),
+        det(mat2(row0.x, row0.y, row1.x, row1.y))
+    );
+
+    mat3 adj = transpose(mat3(minors0, minors1, minors2));
+
+    return (1.0 / dot(row0, minors0)) * adj;
+}
+
+void main()
+{
+	mat3 m = transpose(inverse(mat3(modelview)));
+	vec4 pos4 = vec4(in_position, 1.0);
+	gl_Position = proj * modelview * pos4;
+	vec3 pos = vec3(modelview * pos4);
+	vec4 norm4 = vec4(m * in_normal, 1.0);
+	vec3 norm = vec3(normalize(norm4));
+	vec3 light_dir = normalize(light_pos - pos);
+	float diff = max(dot(norm, light_dir), 0.0) * 0.75;
+	colour = vec4((diff+0.25) * vec3(in_colour), 1.0);
+	texcoord = in_texcoord;
+}
