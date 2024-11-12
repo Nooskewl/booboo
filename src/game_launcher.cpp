@@ -882,6 +882,10 @@ again:
 
 	std::vector<Token> tmp;
 	call_void_function(prg, "end", tmp);
+	
+	shim::current_shader = shim::default_shader;
+	shim::current_shader->use();
+	gfx::update_projection();
 
 	std::string out_path = save_dir() + "/com.illnorth.booboo.launcher.txt";
 	FILE *f = fopen(out_path.c_str(), "w");
