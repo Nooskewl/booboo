@@ -36,18 +36,10 @@ function run
 	translate_3d 0 -0.5 -5
 	scale_3d 0.25 0.25 0.25
 
-	= m (mul m (rotate (/ PI 60) 1 0 0))
 	= m (mul m (rotate (/ PI 120) 0 1 0))
 	vector t
 	= t (translate 100 0 0)
 	= t (mul m t)
-	print "% % % %\n" [t 0 0] [t 0 1] [t 0 2] [t 0 3]
-	print "% % % %\n" [t 1 0] [t 1 1] [t 1 2] [t 1 3]
-	print "% % % %\n" [t 2 0] [t 2 1] [t 2 2] [t 2 3]
-	print "% % % %\n" [t 3 0] [t 3 1] [t 3 2] [t 3 3]
-	print "\n"
 	= light_pos (mul t start_light_pos)
 	vector_erase light_pos 3
-
-	print "% % %\n" [light_pos 0] [light_pos 1] [light_pos 2]
 }
