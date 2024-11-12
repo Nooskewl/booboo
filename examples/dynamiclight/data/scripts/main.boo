@@ -1,16 +1,9 @@
-number tex
-image_load tex "brick.png"
-
 number model
 model_load model "zeus.x"
 model_set_animation model "ArmatureAction"
 
 number shader
 shader_load shader "lit_3d_vertex" "lit_3d_fragment"
-
-number rx ry
-= rx 0
-= ry 0
 
 set_3d
 
