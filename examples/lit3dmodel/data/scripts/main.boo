@@ -29,10 +29,10 @@ function draw
 
 function run
 {
-	+ rx (/ PI 60)
+	;+ rx (/ PI 60)
 	+ ry (/ PI 120)
 	identity_3d
-	translate_3d 0 0 -5
+	translate_3d 0 -0.5 -5
 	rotate_3d rx 1 0 0
 	rotate_3d ry 0 1 0
 	scale_3d 0.25 0.25 0.25
