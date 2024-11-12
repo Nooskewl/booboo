@@ -479,6 +479,14 @@ shader_set_texture
 	Set a texture value in a shader
 	e.g. shader_set_texture shader "tex" my_img
 
+shader_set_matrix
+	Set a matrix uniform value in a shader
+	e.g. shader_set_matrix shader "mymat" m
+
+shader_set_float_vector
+	Set a float vector uniform in a shader
+	e.g. shader_set_float_vector shader "myvec" vec
+
 shader_destroy
 	Free a shader
 	e.g. shader_destroy shader
