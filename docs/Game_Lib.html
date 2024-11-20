@@ -1,358 +1,510 @@
+<h1>BooBoo Game Library</h1>
+
+<p>
 There are 3 optional functions taking/returning no parameters called from the app:
+</p>
 
-draw - called at refresh rate
-run - called at logic rate (default 60 times per second)
-end - called when the program is exiting
+<ul>
+<li><b>draw</b> - called at refresh rate</li>
+<li><b>run</b> - called at logic rate (default 60 times per second)</li>
+<li><b>end</b> - called when the program is exiting</li>
+</ul>
 
-As well as a function taking 5 numbers for events called event. See the Events
-section below for detail on events.
+<p>
+There are also GUI callbacks for events and drawing, and a callback for
+generic input events, which are described in the <a href="#GUI">GUI</a> and
+<a href="#Events">events</a> sections.
+</p>
 
-event - called for each event
-
-There is also a global function for GUI events called gui_event described
-below.
-
+<p>
 At startup, global code is run. Then the above mentioned callbacks get called
 at intervals or shutdown.
+</p>
 
+<p>
 The screen is 640x360 by default, stretched to the window size appropriately.
 F11 toggles between fullscreen/windowed mode. F12 exits.
+</p>
 
+<p>
 There are loads of command line switches you can use which come from Shim.
 A switch starting with + enables and a - disables things, but here are a
 few of them:
+</p>
 
-	+fullscreen
-	+width x
-	+height x
-	-vsync
-	+fps
-	+adapter x
-	+volume [0-255]
+<ul>
+<li>+fullscreen</li>
+<li>+width x</li>
+<li>+height x</li>
+<li>-vsync</li>
+<li>+fps</li>
+<li>+adapter x</li>
+<li>+volume [0-255]</li>
+</ul>
 
+<p>
 Some of the demo games will auto-play by an AI if a joystick isn't connected.
 I'll leave it as an exercise if you want to play them with keyboard.
+</p>
 
+<p>
 Lots of the demos and examples use a simple Z/X key to A/B button mapping,
 so the keys are Z/X and arrows if you're using a keyboard. Most but not all
 included examples support the keyboard as well as joysticks.
+</p>
 
+<p>
 The file shim5.json can be put in your data/ directory to supply some extra
 parameters and info such as window title and other things.
+</p>
 
+<p>
 All colours use premultiplied alpha.
+</p>
 
+<p>
 The following sections describe the API:
-	Core Functions
-	Graphics Functions
-	Primitives Functions
-	Image Functions
-	Sprite Functions
-	Font Functions
-	Tilemap Functions
-	Shader Functions
-	3D Functions
-	GUI Functions
-	Collision Detection Functions
-	Audio Functions
-	Input Functions
-	JSON Functions
-	Configuration Functions
-	Constants
-	Events
+</p>
 
--- Core Functions ------------------------------------------------------------
+<ul>
+<li><a href="#Core">Core Functions</a></li>
+<li><a href="#Graphics">Graphics Functions</a></li>
+<li><a href="#Primitives">Primitives Functions</a></li>
+<li><a href="#Image">Image Functions</a></li>
+<li><a href="#Sprite">Sprite Functions</a></li>
+<li><a href="#Font">Font Functions</a></li>
+<li><a href="#Tilemap">Tilemap Functions</a></li>
+<li><a href="#Shader">Shader Functions</a></li>
+<li><a href="#3D">3D Functions</a></li>
+<li><a href="#GUI">GUI Functions</a></li>
+<li><a href="#Collision">Collision Detection Functions</a></li>
+<li><a href="#Audio">Audio Functions</a></li>
+<li><a href="#Input">Input Functions</a></li>
+<li><a href="#JSON">JSON Functions</a></li>
+<li><a href="#CFG">Configuration Functions</a></li>
+<li><a href="#Constants">Constants</a></li>
+<li><a href="#Events">Events</a></li>
+</ul>
 
-inspect
+<a id="Core"><h2>Core Functions</h2></a>
+
+<h3>inspect</h3>
+<pre>
 	print a value in a popup for debugging
 	e.g. inspect x
+</pre>
 
-delay
+<h3>delay</h3>
+<pre>
 	delay an amount of milliseconds
 	e.g. delay 1000
+</pre>
 
-get_ticks
+<h3>get_ticks</h3>
+<pre>
 	Get milliseconds since BooBoo interpreter launch
 	e.g. get_ticks ticks
+</pre>
 
-rand
+<h3>rand</h3>
+<pre>
 	random integers between two numbers inclusive
 	e.g. rand r 0 99
+</pre>
 
-args
+<h3>args</h3>
+<pre>
 	Populate a vector with strings of the command line arguments
 	e.g. args v
+</pre>
 
-get_logic_rate
+<h3>get_logic_rate</h3>
+<pre>
 	Query the logic rate (default 60)
 	e.g. get_logic_rate r
+</pre>
 
-set_logic_rate
+<h3>set_logic_rate</h3>
+<pre>
 	Change the logic rate. Values between 1 and 1000 inclusive are
 	supported.
 	e.g. set_logic_rate 144
+</pre>
 
-file_list
+<h3>file_list</h3>
+<pre>
 	Get a list of files in the data/ directory or data.cpa
 	e.g. file_list vec
+</pre>
 
--- Graphics Functions --------------------------------------------------------
+<a id="Graphics"><h2>Graphics Functions</h2></a>
 
-clear
+<h3>clear</h3>
+<pre>
 	clear the screen
 	The screen is cleared to black (RGB 0, 0, 0) before draw is called.
 	e.g. clear r g b
+</pre>
 
-flip
+<h3>flip</h3>
+<pre>
 	flip the backbuffer to the screen
 	Normally you don't need this, as a flip is done after draw returns,
 	but there are some situations where it's useful.
 	e.g. flip
+</pre>
 
-resize
+<h3>resize</h3>
+<pre>
 	resize the drawing area projection
 	e.g. resize 240 160
+</pre>
 
-get_screen_size
+<h3>get_screen_size</h3>
+<pre>
 	Get the actual (unscaled) size of the screen/window
 	e.g. screen_size scr_w scr_h
+</pre>
 
-get_buffer_size
+<h3>get_buffer_size</h3>
+<pre>
 	Get the size of the drawing area projection.
 	This is what "resize" changes and it starts at 640x360.
 	e.g. buffer_size bw bh
+</pre>
 
-get_screen_offset
+<h3>get_screen_offset</h3>
+<pre>
 	The BooBoo window is managed in a way that resizing the screen in
 	any way produces a working game with a correct image. Sometimes
 	this requires "black bars". screen_offset gives you the position of
 	the top left of the drawing given any black bars. This is mainly
 	useful for some shaders.
 	e.g. screen_offset ox oy
+</pre>
 
-get_scale
+<h3>get_scale</h3>
+<pre>
 	Retrieve the scale of the projection. BooBoo starts in a 1280x720
 	window with a 640x360 buffer, so e.g. the scale would be 2 to start
 	and would change based on window size and buffer size.
 	e.g. scale s
+</pre>
 
-screen_shake
+<h3>screen_shake</h3>
+<pre>
 	Apply a screen shake effect
 	e.g. screen_shake amount_in_pixels duration_in_millis
+</pre>
 
-is_fullscreen
+<h3>is_fullscreen</h3>
+<pre>
 	Find out if the screen is currently fullscreen
 	e.g. is_fullscreen onoff
+</pre>
 
-toggle_fullscreen
+<h3>toggle_fullscreen</h3>
+<pre>
 	Change from fullscreen to windows or vice versa depending on the
 	current windowed/fullscreen state.
 	e.g. toggle_fullscreen
+</pre>
 
-add_notification
+<h3>add_notification</h3>
+<pre>
 	Add a popup notification in the top right of the screen that goes
 	away after a few seconds. This uses the default font named font.ttf.
 	e.g. add_notification "You won!"
+</pre>
 
-get_refresh_rate
+<h3>get_refresh_rate</h3>
+<pre>
 	Query the refresh rate
 	e.g. get_refresh_rate r
+</pre>
 
-set_scissor
+<h3>set_scissor</h3>
+<pre>
 	Set a scissor rectangle. This is based on the projection you're
 	using, not actual pixel coordinates to make it easier. Anything
 	drawn outside of this will not be drawn.
 	e.g. set_scissor x y w h
+</pre>
 
-unset_scissor
+<h3>unset_scissor</h3>
+<pre>
 	Undo a set_scissor, reverting the scissor rectangle to fullscreen.
 	e.g. unset_scissor
+</pre>
 
--- Primitive Functions -------------------------------------------------------
+<a id="Primitives"><h2>Primitive Functions</h2></a>
 
-start_primitives
+<h3>start_primitives</h3>
+<pre>
 	batch primitives for speed
 	e.g. start_primitives
+</pre>
 
-end_primitives
+<h3>end_primitives</h3>
+<pre>
 	batch primitives for speed
 	e.g. end_primitives
+</pre>
 
-line
+<h3>line</h3>
+<pre>
 	draw a line
 	e.g. line r g b a x1 y1 x2 y2 thickness
+</pre>
 
-triangle
+<h3>triangle</h3>
+<pre>
 	Draw an outline triangle
 	e.g. triangle r g b a x1 y1 x2 y2 x3 y3 thickness
+</pre>
 
-filled_triangle
+<h3>filled_triangle</h3>
+<pre>
 	draw a filled triangle with 3 colours
 	e.g. filled_triangle r1 g1 b1 a1 r2 g2 b2 a2 r3 g3 b3 a3 x1 y1 x2 y2 x3 y3
+</pre>
 
-rectangle
+<h3>rectangle</h3>
+<pre>
 	draw a outline rectangle
 	e.g. rectangle r g b a x y w h thickness
+</pre>
 
-filled_rectangle
+<h3>filled_rectangle</h3>
+<pre>
 	draw a filled rectangle
 	e.g. filled_rectangle r1 g1 b1 a1 r2 g2 b2 a2 r2 g3 b3 a3 r4 g4 b4 a4 x y w h
+</pre>
 
-ellipse
+<h3>ellipse</h3>
+<pre>
 	draw a outline ellipse with give number of pie slices (-1 for auto)
 	e.g. ellipse r g b a x y radius_x radius_y thickness sections
+</pre>
 
-filled_ellipse
+<h3>filled_ellipse</h3>
+<pre>
 	draw a filled ellipse with given number of pie slices (-1 for auto)
 	e.g. filled_ellipse r g b a x y radius_x radius_y sections
+</pre>
 
-circle
+<h3>circle</h3>
+<pre>
 	draw a outline circle with given number of pie slices (-1 for auto)
 	e.g. circle r g b a x y radius thickness sections
+</pre>
 
-filled_circle
+<h3>filled_circle</h3>
+<pre>
 	draw a filled circle with give number of pie slices (-1 for auto)
 	e.g. filled_circle r g b a x y radius sections
+</pre>
 
--- Image Functions -----------------------------------------------------------
+<a id="Image"><h2>Image Functions</h2></a>
 
-image_create
+<h3>image_create</h3>
+<pre>
 	create a render target
 	e.g. image_create dest w h
+</pre>
 
-set_target
+<h3>set_target</h3>
+<pre>
 	Set the render target. This only works with images created with
 	image_create.
 	e.g. set_target img
+</pre>
 
-set_target_backbuffer
+<h3>set_target_backbuffer</h3>
+<pre>
 	Set the render target to the backbuffer
 	e.g. set_target_backbuffer
+</pre>
 
-image_load
+<h3>image_load</h3>
+<pre>
 	load an image
 	e.g. image_load dest filename
+</pre>
 
-image_draw
+<h3>image_draw</h3>
+<pre>
 	draw an image
 	e.g. image_draw img tint_r tint_g tint_b tint_a x y flip_h flip_v
+</pre>
 
-image_stretch_region
+<h3>image_stretch_region</h3>
+<pre>
 	draw a region of an image and maybe stretch it
 	e.g. image_stretch_region image r g b a source_x source_y source_w source_h dest_x dest_y dest_w dest_h flip_h flip_v
+</pre>
 
-image_draw_rotated_scaled
+<h3>image_draw_rotated_scaled</h3>
+<pre>
 	draw an image with rotation and scale
 	e.g. image_draw_rotated_scaled img tint_r tint_g tint_b tint_a pivot_x pivot_y x y angle scale_x scale_y flip_h flip_v
+</pre>
 
-image_draw_9patch
+<h3>image_draw_9patch</h3>
+<pre>
 	Draw an image as a 9patch (9 equal chunks, 3x3 with the edges
 	outlining and the centre filled with the centre chunk)
 	e.g. image_draw_9patch img tint_r tint_g tint_b tint_a x y w h
+</pre>
 
-image_start
+<h3>image_start</h3>
+<pre>
 	start a batch of images for speed (must be same image)
 	e.g. image_start img
+</pre>
 
-image_end
+<h3>image_end</h3>
+<pre>
 	end a batch of images
 	e.g. image_end img
+</pre>
 
-image_size
+<h3>image_size</h3>
+<pre>
 	get image width/height
 	e.g. image_size img w h
+</pre>
 
-image_destroy
+<h3>image_destroy</h3>
+<pre>
 	Free an image
 	e.g. image_destroy img
+</pre>
 
--- Sprite Functions ----------------------------------------------------------
+<a id="Sprite"><h2>Sprite Functions</h2></a>
 
-sprite_load
+<h3>sprite_load</h3>
+<pre>
 	Load a sprite. Please see the example for the format of a sprite.
 	Basically, each animation in a sprite is a sprite sheet exported
 	from Aseprite. Then there is a sprite.json which has a list of
 	animation names.
 	e.g. sprite_load sprite "my_sprite"
+</pre>
 
-sprite_set_animation
+<h3>sprite_set_animation</h3>
+<pre>
 	Set the current animation. You can optionally add a callback which
 	will be called when the animation is finished. The callback takes
 	1 parameter which will be the sprite (number) that set_animation
 	was called on.
 	e.g. sprite_set_animation sprite "punch" my_function
+</pre>
 
-sprite_set_animation_lazy
+<h3>sprite_set_animation_lazy</h3>
+<pre>
 	Like sprite_set_animation but forces nothing if the same animation has
 	already been set. Cannot take callbacks
 	e.g. sprite_set_animation_lazy sprite "run"
+</pre>
 
-sprite_get_animation
+<h3>sprite_get_animation</h3>
+<pre>
 	Returns the name of the current animation
 	e.g. sprite_get_animation sprite anim_name
+</pre>
 
-sprite_get_previous_animation
+<h3>sprite_get_previous_animation</h3>
+<pre>
 	Returns the name of the previous animation
 	e.g. sprite_get_animation sprite anim_name
+</pre>
 
-sprite_length
+<h3>sprite_length</h3>
+<pre>
 	Returns the total length in milliseconds of the current animation
 	e.g. sprite_length sprite l
+</pre>
 
-sprite_current_frame
+<h3>sprite_current_frame</h3>
+<pre>
 	Returns the current frame number
 	e.g.  sprite_current_frame sprite n
+</pre>
 
-sprite_num_frames
+<h3>sprite_num_frames</h3>
+<pre>
 	Gets the number of frames in the current animation
 	e.g. sprite_num_frames sprite nf
+</pre>
 
-sprite_current_frame_size
+<h3>sprite_current_frame_size</h3>
+<pre>
 	Returns the size of the current frame's image
 	e.g. sprite_current_frame_size sprite w h
+</pre>
 
-sprite_start
+<h3>sprite_start</h3>
+<pre>
 	Start a sprite's animation (if stopped)
 	e.g. sprite_start sprite
+</pre>
 
-sprite_stop
+<h3>sprite_stop</h3>
+<pre>
 	Stop a sprite's animation
 	e.g. sprite_stop sprite
+</pre>
 
-sprite_reset
+<h3>sprite_reset</h3>
+<pre>
 	Reset a sprite's animation to the beginning
 	e.g. sprite_reset sprite
+</pre>
 
-sprite_bounds
+<h3>sprite_bounds</h3>
+<pre>
 	Returns the top left/bottom rightmost opaque pixels in the sprite
 	e.g. sprite_bounds sprite x1 y1 x2 y2
+</pre>
 
-sprite_elapsed
+<h3>sprite_elapsed</h3>
+<pre>
 	Get the number of milliseconds of elapsed time of the current
 	animation
 	e.g. sprite_elapsed sprite n
+</pre>
 
-sprite_frame_times
+<h3>sprite_frame_times</h3>
+<pre>
 	Get a vector of numbers which are the duration of each frame in the
 	sprite in milliseconds
 	e.g. sprite_frame_times sprite v
+</pre>
 
-sprite_is_started
+<h3>sprite_is_started</h3>
+<pre>
 	Check if a sprite is started or not
 	e.g. sprite_is_started sprite onoff
+</pre>
 
-sprite_destroy
+<h3>sprite_destroy</h3>
+<pre>
 	Free a sprite
 	e.g. sprite_destroy s
+</pre>
 
--- Font Functions ------------------------------------------------------------
+<a id="Font"><h2>Font Functions</h2></a>
 
-font_load
+<h3>font_load</h3>
+<pre>
 	load a TTF font
 	All of the font functions support UTF8
 	e.g. font_load font "DejaVuSans.ttf" px_size smooth_flag
+</pre>
 
-font_draw
+<h3>font_draw</h3>
+<pre>
 	draw text. Colour codes can be used if you supply a
 	data/gfx/palettes/palette.gpl with a GIMP palette. Colour codes
 	use |## where ## is a hex number referencing a palette entry.
@@ -360,217 +512,309 @@ font_draw
 	Those use @##.
 	e.g.
 	font_draw font r g b a "HELLO" x y
+</pre>
 
-font_width
+<h3>font_width</h3>
+<pre>
 	get width of a string given a font
 	e.g. font_width font dest "FOOBARBAZ"
+</pre>
 
-font_height
+<h3>font_height</h3>
+<pre>
 	get the height of a font
 	e.g. font_height font dest
+</pre>
 
-font_add_extra_glyph
+<h3>font_add_extra_glyph</h3>
+<pre>
 	You can add up to 256 extra glyphs (0 to 255.) The can be used
 	with @## with font_draw.
 	e.g. font_add_extra_glyph font #00 my_image
+</pre>
 
-font_destroy
+<h3>font_destroy</h3>
+<pre>
 	Free a font
 	e.g. font_destroy f
+</pre>
 
--- Tilemap Functions ---------------------------------------------------------
+<a id="Tilemap"><h2>Tilemap Functions</h2></a>
 
-set_tile_size
+<h3>set_tile_size</h3>
+<pre>
 	You should call this to set a (square) tile size before tilemap_load
 	unless your tiles are the default, 16 pixels in size.
 	e.g. set_tile_size 32
+</pre>
 
-tilemap_load
+<h3>tilemap_load</h3>
+<pre>
 	Load a tilemap from data/misc/maps. Tiles should be located in
 	data/gfx/images/tiles and named tiles0.png, tiles1.png and so on
 	(.tga is also supported.) See AshEdit for more details on maps
 	and creating them.
 	e.g. tilemap_load a_number "map.wm2"
+</pre>
 
-tilemap_draw
+<h3>tilemap_draw</h3>
+<pre>
 	Draw a selection of tilemap layers
 	This automatically crops (doesn't draw) tiles outside the screen
 	e.g. tilemap_draw tilemap start_layer_inclusive end_layer_inclusive x y
+</pre>
 
-tilemap_num_layers
+<h3>tilemap_num_layers</h3>
+<pre>
 	Get the number of layers in a tilemap
 	e.g. tilemap_num_layers tilemap nl
+</pre>
 
-tilemap_size
+<h3>tilemap_size</h3>
+<pre>
 	Get the size of a tilemap in tiles
 	e.g. tilemap_size tilemap w h
+</pre>
 
-tilemap_is_solid
+<h3>tilemap_is_solid</h3>
+<pre>
 	Check if a tile is walkable
 	e.g. tilemap_is_solid tilemap solid x y
+</pre>
 
-tilemap_get_groups
+<h3>tilemap_get_groups</h3>
+<pre>
 	Get group info about groups in a tilemap
 	e.g. tilemap_get_groups tilemap vec
 	The vector be stuffed with type/x/y/w/h vectors
+</pre>
 
-tilemap_set_animated_tiles
+<h3>tilemap_set_animated_tiles</h3>
+<pre>
 	Tile groups can be animated. The delay is in milliseconds. Width
 	and height are the width and height of the area to animate. Then
 	the vector contains the topleft tile position of each frame of
 	animation (should be width by height) as a vector of vectors of
 	2 numbers each (x/y)
 	e.g. tilemap_set_animated_tiles tilemap delay w h anim_data
+</pre>
 
-tilemap_find_path
+<h3>tilemap_find_path</h3>
+<pre>
 	A* pathfinding using the tilemap solids and your own supplied points.
 	The path returned is a vector of vectors of x/y values
 	e.g. tilemap_find_path tilemap path extra start_x start_y end_x end_y
 	path will be empty if no path is found
+</pre>
 
-tilemap_set_solid
+<h3>tilemap_set_solid</h3>
+<pre>
 	Set the solid flag of a tile
 	e.g. tilemap_set_solid tilemap x y onoff
+</pre>
 
-tilemap_set_tile
+<h3>tilemap_set_tile</h3>
+<pre>
 	Change a tile in the tilemap to the tile x/y given
 	e.g. tilemap_set_tile tilemap layer posx posy tile_x tile_y solid
+</pre>
 
-tilemap_get_tile
+<h3>tilemap_get_tile</h3>
+<pre>
 	Get tile x/y and solid flag of layer/position in tilemap
 	e.g. tilemap_get_tile tilemap out_tx out_ty out_solid layer x y
 	out_tx/ty refers to x/y position within the tile sheet.
+</pre>
 
-tilemap_destroy
+<h3>tilemap_destroy</h3>
+<pre>
 	Free a tilemap
 	e.g. tilemap_destroy tilemap
+</pre>
 
--- Shader Functions ----------------------------------------------------------
+<a id="Shader"><h2>Shader Functions</h2></a>
 
-shader_load
+<h3>shader_load</h3>
+<pre>
 	Load a shader
 	e.g. shader_load n "my_vert" "my_frag"
 	When running on OpenGL this will load from
 	data/gfx/shaders/glsl/my_vert.txt. D3D will load
 	data/gfx/shaders/hlsl/my_vert.shader
+</pre>
 
-shader_use
+<h3>shader_use</h3>
+<pre>
 	Use a shader
 	e.g. shader_use shader
+</pre>
 
-shader_use_default
+<h3>shader_use_default</h3>
+<pre>
 	Use the default shader
 	e.g. shader_use_default
+</pre>
 
-shader_set_bool
+<h3>shader_set_bool</h3>
+<pre>
 	Set a boolean value in a shader
 	e.g. shader_set_bool shader "b" 0
+</pre>
 
-shader_set_int
+<h3>shader_set_int</h3>
+<pre>
 	Set an integer value in a shader
 	e.g. shader_set_int shader "i" 1298
+</pre>
 
-shader_set_float
+<h3>shader_set_float</h3>
+<pre>
 	Set a float value in a shader
 	e.g. shader_set_float shader "f" 10.1
+</pre>
 
-shader_set_colour
+<h3>shader_set_colour</h3>
+<pre>
 	Set a colour value in a shader
 	e.g. shader_set_colour shader "c" r g b a
+</pre>
 
-shader_set_texture
+<h3>shader_set_texture</h3>
+<pre>
 	Set a texture value in a shader
 	e.g. shader_set_texture shader "tex" my_img
+</pre>
 
-shader_set_matrix
+<h3>shader_set_matrix</h3>
+<pre>
 	Set a matrix uniform value in a shader
 	e.g. shader_set_matrix shader "mymat" m
+</pre>
 
-shader_set_float_vector
+<h3>shader_set_float_vector</h3>
+<pre>
 	Set a float vector uniform in a shader
 	e.g. shader_set_float_vector shader "myvec" vec
+</pre>
 
-shader_destroy
+<h3>shader_destroy</h3>
+<pre>
 	Free a shader
 	e.g. shader_destroy shader
+</pre>
 
--- 3D Functions --------------------------------------------------------------
+<a id="3D"><h2>3D Functions</h2></a>
 
-model_load
+<h3>model_load</h3>
+<pre>
 	Load a model with an optional armature an animations from .x file
 	e.g. model_load model_id "filename.x"
+</pre>
 
-model_draw
+<h3>model_draw</h3>
+<pre>
 	Draw a model with its transforms applied
 	e.g. model_draw model r_tint g_tint b_tint a_tint
+</pre>
 
-set_2d
+<h3>set_2d</h3>
+<pre>
 	Revert back to 2d drawing
 	e.g. set_2d
+</pre>
 
-set_3d
+<h3>set_3d</h3>
+<pre>
 	Enable 3d rendering and projection
 	e.g. set_3d
+</pre>
 
-model_identity
+<h3>model_identity</h3>
+<pre>
 	Set model transform to identity
 	e.g. model_identity model
+</pre>
 
-model_scale
+<h3>model_scale</h3>
+<pre>
 	Alter the scale of a model. It starts at 1 across the board. These
 	numbers get added to that.
 	e.g. model_scale model add_sx add_sy add_sz
+</pre>
 
-model_rotate
+<h3>model_rotate</h3>
+<pre>
 	Alter the rotation of a model. These numbers are angles about each
 	axis and get added to the default of 0 and accumulate with each
 	call.
 	e.g. model_rotate model angle axisx axisy axisz
+</pre>
 
-model_translate
+<h3>model_translate</h3>
+<pre>
 	Translate (move) a model. This sticks like rotation and scaling.
 	The numbers you supply get added to the current position of the model.
 	e.g. model_translate model add_x add_y add_z
+</pre>
 
-model_get_position
+<h3>model_get_position</h3>
+<pre>
 	Retrieve the models current position
 	e.g. model_get_translate model x y z
+</pre>
 
-identity_3d
+<h3>identity_3d</h3>
+<pre>
 	Set the modelview matrix to the identity matrix
 	e.g. identity_3d
+</pre>
 
-scale_3d
+<h3>scale_3d</h3>
+<pre>
 	Scale the modelview matrix
 	e.g. scale_3d sx sy sz
+</pre>
 
-rotate_3d
+<h3>rotate_3d</h3>
+<pre>
 	Rotate the modelview matrix
 	e.g. rotate_3d rx ry rz
+</pre>
 
-translate_3d
+<h3>translate_3d</h3>
+<pre>
 	Translate the modelview matrix
 	e.g. translate_3d x y z
+</pre>
 
-model_set_animation
+<h3>model_set_animation</h3>
+<pre>
 	Set the animation to the one named. You can optionally pass a BooBoo
 	function that takes and returns no arguments that will be called
 	when the animation finishes.
 	e.g. model_set_animation model "attack" done_attack
+</pre>
 
-model_stop
+<h3>model_stop</h3>
+<pre>
 	Stop a models animation
 	e.g. model_stop model
+</pre>
 
-model_reset
+<h3>model_reset</h3>
+<pre>
 	Reset a models animation
 	e.g. model_reset model
+</pre>
 
-model_size
+<h3>model_size</h3>
+<pre>
 	Get the dimensions of a model
 	e.g. model_size model szx szy szz
+</pre>
 
-draw_3d
+<h3>draw_3d</h3>
+<pre>
 	Draw arbitrary 3d geometry
 	All vectors are vectors of numbers
 	e.g., one vertex is 3 numbers, one face is 3 numbers, one colour is 4
@@ -579,8 +823,10 @@ draw_3d
 	empty colour vector = white
 	empty normal vector = 0.0
 	e.g. draw_3d vert_vec face_vec colour_vec normal_vec num_triangles
+</pre>
 
-draw_3d_textured
+<h3>draw_3d_textured</h3>
+<pre>
 	Draw arbitrary 3d geometry textured
 	All vectors are vectors of numbers
 	e.g., one vertex is 3 numbers, one face is 3 numbers, one colour is 4
@@ -589,634 +835,819 @@ draw_3d_textured
 	empty colour vector = white
 	empty normal vector = 0.0
 	e.g. draw_3d_textured tex vert_vec face_vec colour_vec normal_vec texcoord_vec num_triangles
+</pre>
 
-billboard_create
+<h3>billboard_create</h3>
+<pre>
 	Create a billboard
 	e.g. billboard_create result image x y z w h
+</pre>
 
-billboard_from_sprite
+<h3>billboard_from_sprite</h3>
+<pre>
 	Create a billboard backed by a sprite
 	unit is the number of pixels that spans 1 3D unit
 	e.g. billboard_from_sprite result sprite x y z w h unit
+</pre>
 
-billboard_draw
+<h3>billboard_draw</h3>
+<pre>
 	Draw a tinted billboard
 	e.g. billboard_draw billboard r g b a
+</pre>
 
-billboard_translate
+<h3>billboard_translate</h3>
+<pre>
 	Move a billboard
 	e.g. billboard_translate b x y z
+</pre>
 
-billboard_scale
+<h3>billboard_scale</h3>
+<pre>
 	Scale a billboard
 	e.g. billboard_scale b sx sy
+</pre>
 
-model_destroy
+<h3>model_destroy</h3>
+<pre>
 	Free a model
 	e.g. model_destroy model
+</pre>
 
-billboard_destroy
+<h3>billboard_destroy</h3>
+<pre>
 	Free a billboard
 	e.g. billboard_destroy b
+</pre>
 
--- GUI Functions -------------------------------------------------------------
+<a id="GUI"><h2>GUI Functions</h2></a>
 
+<p>
 Widgets are generic rectangles with a userdata attached to them to supply
 their properties.
+</p>
 
+<p>
 Two callbacks get called for every GUI event/drawing operation:
+</p>
 
+<pre>
 gui_event widget_id type a b c d x y w h focussed ~userdata
+</pre>
+
+<pre>
 gui_draw widget_id x y w h focussed ~userdata
+</pre>
 
+<p>
 (note the ~, which is quite handy if you want to store state info in userdata)
+</p>
 
-a, b, c and d are the same as for the global 'event' callback. x, y, w
+<p>
+a, b, c and d are the same as for the global 'event' callback, described in
+<a href="#Events">Events</a>. x, y, w
 and h are the calculated position and size of the widget in pixels.
+</p>
 
-widget_create
+<h3>widget_create</h3>
+<pre>
 	Create a widget
 	Sizes less than 1 are taken as a percentage of the remaining size
 	e.g. widget_create result w h userdata
+</pre>
 
-widget_create_fit
+<h3>widget_create_fit</h3>
+<pre>
 	Create a widget that fits remaining size on one dimension
 	Constants FIT_X and FIT_Y are used for the first parameter
 	The other dimension is then specified as the second parameter,
-	which can be < 1 to use a percentage size
+	which can be less than 1 to use a percentage size
 	e.g. widget_create_fit result FIT_X h userdata
+</pre>
 
-widget_create_fit_both
+<h3>widget_create_fit_both</h3>
+<pre>
 	Create a widget that fits the remaining size on X and Y
 	e.g. widget_create_fit_both result userdata
+</pre>
 
-widget_set_parent
+<h3>widget_set_parent</h3>
+<pre>
 	Widget hierarchy is important. You want to have one root widget
 	and add everything (perhaps in multiple containers) to it
 	e.g. widget_set_parent child parent
+</pre>
 
-widget_set_float_left
+<h3>widget_set_float_left</h3>
+<pre>
 	Similar to float left in CSS
 	e.g. widget_set_float_left widget onoff
+</pre>
 
-widget_set_float_right
+<h3>widget_set_float_right</h3>
+<pre>
 	Similar to float right in CSS
 	e.g. widget_set_float_right widget onoff
+</pre>
 
-widget_set_float_bottom
+<h3>widget_set_float_bottom</h3>
+<pre>
 	Similar to float bottom in CSS
 	e.g. widget_set_float_bottom widget onoff
+</pre>
 
-widget_set_centre_x
+<h3>widget_set_centre_x</h3>
+<pre>
 	Centre a widget horizontally
 	e.g. widget_set_centre_x widget onoff
+</pre>
 
-widget_set_centre_y
+<h3>widget_set_centre_y</h3>
+<pre>
 	Centre a widget vertically
 	e.g. widget_set_centre_y widget onoff
+</pre>
 
-widget_set_clear_float_x
+<h3>widget_set_clear_float_x</h3>
+<pre>
 	Tell a widget to clear past widgets floating horizontally
 	e.g. widget_set_clear_float_x widget onoff
+</pre>
 
-widget_set_clear_float_y
+<h3>widget_set_clear_float_y</h3>
+<pre>
 	Tell a widget to clear past widgets floating vertically
 	e.g. widget_set_clear_float_y widget onoff
+</pre>
 
-widget_set_break_line
+<h3>widget_set_break_line</h3>
+<pre>
 	Start a new row for this widget
 	e.g. widget_set_break_line widget onoff
+</pre>
 
-widget_set_accepts_focus
+<h3>widget_set_accepts_focus</h3>
+<pre>
 	Allow a widget to accept the input focus or not
 	e.g. widget_set_accepts_focus widget onoff
+</pre>
 
-widget_set_padding_left
+<h3>widget_set_padding_left</h3>
+<pre>
 	Set left padding
 	e.g. widget_set_padding_left widget px
+</pre>
 
-widget_set_padding_right
+<h3>widget_set_padding_right</h3>
+<pre>
 	Set right padding
 	e.g. widget_set_padding_right widget px
+</pre>
 
-widget_set_padding_top
+<h3>widget_set_padding_top</h3>
+<pre>
 	Set top padding
 	e.g. widget_set_padding_top widget px
+</pre>
 
-widget_set_padding_bottom
+<h3>widget_set_padding_bottom</h3>
+<pre>
 	Set bottom padding
 	e.g. widget_set_padding_bottom widget px
+</pre>
 
-widget_set_left_widget
+<h3>widget_set_left_widget</h3>
+<pre>
 	Hint at the widget to the left of this one for focus changes
 	with keyboard/gamepad
 	e.g. widget_set_left_widget widget left_widget
+</pre>
 
-widget_set_right_widget
+<h3>widget_set_right_widget</h3>
+<pre>
 	Hint at the widget to the right of this one for focus changes
 	with keyboard/gamepad
 	e.g. widget_set_right_widget widget right_widget
+</pre>
 
-widget_set_up_widget
+<h3>widget_set_up_widget</h3>
+<pre>
 	Hint at the widget to the up of this one for focus changes
 	with keyboard/gamepad
 	e.g. widget_set_up_widget widget up_widget
+</pre>
 
-widget_set_down_widget
+<h3>widget_set_down_widget</h3>
+<pre>
 	Hint at the widget to the down of this one for focus changes
 	with keyboard/gamepad
 	e.g. widget_set_down_widget widget down_widget
+</pre>
 
-gui_start
+<h3>gui_start</h3>
+<pre>
 	Start executing a gui
 	e.g. gui_start root_widget
+</pre>
 
-gui_exit
+<h3>gui_exit</h3>
+<pre>
 	Close the toplevel GUI and destroy widgets
 	e.g. gui_exit
+</pre>
 
--- Collision Detection Functions ---------------------------------------------
+<a id="Collision"><h2>Collision Detection Functions</h2></a>
 
-cd_model_point
+<h3>cd_model_point</h3>
+<pre>
 	Check if a point is inside a model
 	The model must be closed for this to work properly
 	e.g. cd_model_point result model x y z
+</pre>
 
-cd_model_line_segment
+<h3>cd_model_line_segment</h3>
+<pre>
 	Check if a line segment intersects or is contained in a model
 	If result is TRUE, outx/outy/outz will have the intersection point
 	e.g. cd_model_line_segment result model x y z x2 y2 z2 outx outy outz
+</pre>
 
-cd_sphere_sphere
+<h3>cd_sphere_sphere</h3>
+<pre>
 	Check if two sphere intersect
 	e.g. cd_sphere_sphere result x y z r x2 y2 z2 r2
+</pre>
 
--- Audio Functions -----------------------------------------------------------
+<a id="Audio"><h2>Audio Functions</h2></a>
 
-mml_create
+<h3>mml_create</h3>
+<pre>
 	create an MML from a string
 	e.g. mml_create dest "A @TYPE1 abcdefg"
+</pre>
 
-mml_load
+<h3>mml_load</h3>
+<pre>
 	load an MML from file
 	e.g. mml_load dest "sfx/blast.mml"
+</pre>
 
-mml_play
+<h3>mml_play</h3>
+<pre>
 	play a sound
 	e.g. mml_play blast volume loop
+</pre>
 
-mml_stop
+<h3>mml_stop</h3>
+<pre>
 	stop a looping sound
 	e.g. mml_stop blast
+</pre>
 
-sample_load
+<h3>sample_load</h3>
+<pre>
 	load a sample
 	e.g. sample_load s "example.wav"
+</pre>
 
-sample_play
+<h3>sample_play</h3>
+<pre>
 	play a sample
 	e.g. sample_play s volume loop
+</pre>
 
-sample_stop
+<h3>sample_stop</h3>
+<pre>
 	Stop a looping sample
 	e.g. sample_stop s
+</pre>
 
-mml_destroy
+<h3>mml_destroy</h3>
+<pre>
 	Free an MML
 	e.g. mml_destroy mml
+</pre>
 
-sample_destroy
+<h3>sample_destroy</h3>
+<pre>
 	Destroy a sample
 	e.g. sample_destroy sample
+</pre>
 
--- Input Functions -----------------------------------------------------------
+<a id="Input"><h2>Input Functions</h2></a>
 
-joystick_poll
+<h3>joystick_poll</h3>
+<pre>
 	poll a joystick for input
 	e.g. joystick_poll joystick_number x1 y1 x2 y2 x3 y3 l r u d a b x y lb rb ls rs back start
+</pre>
 
-joystick_count
+<h3>joystick_count</h3>
+<pre>
 	get number of connected joysticks
 	e.g. joystick_count num_joysticks
+</pre>
 
-rumble
+<h3>rumble</h3>
+<pre>
 	Rumble the joysticks
 	e.g. rumble duration_in_ms
+</pre>
 
-mouse_get_position
+<h3>mouse_get_position</h3>
+<pre>
 	Get the mouse position scaled relative to the projection
 	The full window starts mapped to 640x360.
 	e.g. mouse_get_position mx my
+</pre>
 
-mouse_get_buttons
+<h3>mouse_get_buttons</h3>
+<pre>
 	Get the mouse button state
 	Wheel will be 1 (forward) 0 (not moved) or -1 (backward)
 	e.g. mouse_get_buttons left middle right wheel
+</pre>
 
-mouse_get_delta
+<h3>mouse_get_delta</h3>
+<pre>
 	Get the mouse delta movement since last call
 	The first time this is called, the values will be set to 0 and
 	return 0
 	e.g. mouse_get_delta dx dy
+</pre>
 
-mouse_set_relative
+<h3>mouse_set_relative</h3>
+<pre>
 	Keep the mouse in the window and use relative coordinates
 	e.g. mouse_set_relative bonoff
+</pre>
 
-key_get
+<h3>key_get</h3>
+<pre>
 	Read if a key is pressed or not. Please use or modify keycodes.inc
 	From the 'keys' example for keycode constants.
 	e.g. key_get dest KEY_SPACE
+</pre>
 
--- JSON Functions ------------------------------------------------------------
+<a id="JSON"><h2>JSON Functions</h2></a>
 
-json_load
+<h3>json_load</h3>
+<pre>
 	Load a JSON file
 	e.g. json_load j "file.json"
+</pre>
 
-json_get_string
+<h3>json_get_string</h3>
+<pre>
 	Read a string from JSON
 	You can dig down into the file by separating keys with ">"
 	"[0]" "[1]" etc can be used to access arrays.
 	e.g. json_get_string json s "settings>profile>name"
+</pre>
 
-json_get_number
+<h3>json_get_number</h3>
+<pre>
 	Read a number from JSON
 	You can dig down into the file by separating keys with ">"
 	"[0]" "[1]" etc can be used to access arrays.
 	e.g. json_get_number json n "settings>mouse>sensitivity"
+</pre>
 
-json_destroy
+<h3>json_destroy</h3>
+<pre>
 	Free a JSON object
 	e.g. json_destroy json
+</pre>
 
--- Configuration Functions ---------------------------------------------------
+<a id="CFG"><h2>Configuration Functions</h2></a>
 
-cfg_load
+<h3>cfg_load</h3>
+<pre>
 	load a config file
 	e.g. cfg_load cfg "com.illnorth.example"
+</pre>
 
-cfg_save
+<h3>cfg_save</h3>
+<pre>
 	save a config file
 	e.g. cfg_save cfg ret_bool_success "com.illnorth.example"
+</pre>
 
-cfg_get_number
+<h3>cfg_get_number</h3>
+<pre>
 	read a number from config. Doesn't touch dest if the named value doesn't exist
 	e.g. cfg_get_number cfg dest "x"
+</pre>
 
-cfg_get_string. Doesn't touch dest if the named value doesn't exist
+<h3>cfg_get_string</h3>
+<pre>
+	Doesn't touch dest if the named value doesn't exist
 	read a string from config
 	e.g. cfg_get_string cfg dest "name"
+</pre>
 
-cfg_set_number
+<h3>cfg_set_number</h3>
+<pre>
 	set a value to be saved in a config file
 	e.g. cfg_set_number cfg "x" 1
+</pre>
 
-cfg_set_string
+<h3>cfg_set_string</h3>
+<pre>
 	set a string value in a config file
 	e.g. cfg_set_string cfg "name" "Trent"
+</pre>
 
-cfg_exists
+<h3>cfg_exists</h3>
+<pre>
 	check if a value exists in a config file
 	e.g. cfg_exists cfg exists "x"
+</pre>
 
-cfg_erase
+<h3>cfg_erase</h3>
+<pre>
 	Erase a value in a config file
 	e.g. cfg_erase cfg "example"
+</pre>
 
-cfg_destroy
+<h3>cfg_destroy</h3>
+<pre>
 	Free a configuration object
 	e.g. cfg_destroy cfg
+</pre>
 
--- Constants -----------------------------------------------------------------
+<a id="Constants"><h2>Constants</h2></a>
 
+<p>
 Note: these values are not read-only (so not technically constant...)
+</p>
 
-TRUE
-	1
-FALSE
-	0
-PI
-	It's pi
+<ul>
+	<li>TRUE - 1</li>
+	<li>FALSE - 0</li>
+	<li>PI - it's pi</li>
+	<li>E - It's e</li>
+</ul>
 
-E
-	It's e
-
+<p>
 The following keyboard constants are used with key_get:
-	KEY_UNKNOWN
-	KEY_RETURN
-	KEY_ESCAPE
-	KEY_BACKSPACE
-	KEY_TAB
-	KEY_SPACE
-	KEY_EXCLAIM
-	KEY_QUOTEDBL
-	KEY_HASH
-	KEY_PERCENT
-	KEY_DOLLAR
-	KEY_AMPERSAND
-	KEY_QUOTE
-	KEY_LEFTPAREN
-	KEY_RIGHTPAREN
-	KEY_ASTERISK
-	KEY_PLUS
-	KEY_COMMA
-	KEY_MINUS
-	KEY_PERIOD
-	KEY_SLASH
-	KEY_0
-	KEY_1
-	KEY_2
-	KEY_3
-	KEY_4
-	KEY_5
-	KEY_6
-	KEY_7
-	KEY_8
-	KEY_9
-	KEY_COLON
-	KEY_SEMICOLON
-	KEY_LESS
-	KEY_EQUALS
-	KEY_GREATER
-	KEY_QUESTION
-	KEY_AT
-	KEY_LEFTBRACKET
-	KEY_BACKSLASH
-	KEY_RIGHTBRACKET
-	KEY_CARET
-	KEY_UNDERSCORE
-	KEY_BACKQUOTE
-	KEY_a
-	KEY_b
-	KEY_c
-	KEY_d
-	KEY_e
-	KEY_f
-	KEY_g
-	KEY_h
-	KEY_i
-	KEY_j
-	KEY_k
-	KEY_l
-	KEY_m
-	KEY_n
-	KEY_o
-	KEY_p
-	KEY_q
-	KEY_r
-	KEY_s
-	KEY_t
-	KEY_u
-	KEY_v
-	KEY_w
-	KEY_x
-	KEY_y
-	KEY_z
-	KEY_CAPSLOCK
-	KEY_F1
-	KEY_F2
-	KEY_F3
-	KEY_F4
-	KEY_F5
-	KEY_F6
-	KEY_F7
-	KEY_F8
-	KEY_F9
-	KEY_F10
-	KEY_F11
-	KEY_F12
-	KEY_PRINTSCREEN
-	KEY_SCROLLLOCK
-	KEY_PAUSE
-	KEY_INSERT
-	KEY_HOME
-	KEY_PAGEUP
-	KEY_DELETE
-	KEY_END
-	KEY_PAGEDOWN
-	KEY_RIGHT
-	KEY_LEFT
-	KEY_DOWN
-	KEY_UP
-	KEY_NUMLOCKCLEAR
-	KEY_KP_DIVIDE
-	KEY_KP_MULTIPLY
-	KEY_KP_MINUS
-	KEY_KP_PLUS
-	KEY_KP_ENTER
-	KEY_KP_1
-	KEY_KP_2
-	KEY_KP_3
-	KEY_KP_4
-	KEY_KP_5
-	KEY_KP_6
-	KEY_KP_7
-	KEY_KP_8
-	KEY_KP_9
-	KEY_KP_0
-	KEY_KP_PERIOD
-	KEY_APPLICATION
-	KEY_POWER
-	KEY_KP_EQUALS
-	KEY_F13
-	KEY_F14
-	KEY_F15
-	KEY_F16
-	KEY_F17
-	KEY_F18
-	KEY_F19
-	KEY_F20
-	KEY_F21
-	KEY_F22
-	KEY_F23
-	KEY_F24
-	KEY_EXECUTE
-	KEY_HELP
-	KEY_MENU
-	KEY_SELECT
-	KEY_STOP
-	KEY_AGAIN
-	KEY_UNDO
-	KEY_CUT
-	KEY_COPY
-	KEY_PASTE
-	KEY_FIND
-	KEY_MUTE
-	KEY_VOLUMEUP
-	KEY_VOLUMEDOWN
-	KEY_KP_COMMA
-	KEY_KP_EQUALSAS400
-	KEY_ALTERASE
-	KEY_SYSREQ
-	KEY_CANCEL
-	KEY_CLEAR
-	KEY_PRIOR
-	KEY_RETURN2
-	KEY_SEPARATOR
-	KEY_OUT
-	KEY_OPER
-	KEY_CLEARAGAIN
-	KEY_CRSEL
-	KEY_EXSEL
-	KEY_KP_00
-	KEY_KP_000
-	KEY_THOUSANDSSEPARATOR
-	KEY_DECIMALSEPARATOR
-	KEY_CURRENCYUNIT
-	KEY_CURRENCYSUBUNIT
-	KEY_KP_LEFTPAREN
-	KEY_KP_RIGHTPAREN
-	KEY_KP_LEFTBRACE
-	KEY_KP_RIGHTBRACE
-	KEY_KP_TAB
-	KEY_KP_BACKSPACE
-	KEY_KP_A
-	KEY_KP_B
-	KEY_KP_C
-	KEY_KP_D
-	KEY_KP_E
-	KEY_KP_F
-	KEY_KP_XOR
-	KEY_KP_POWER
-	KEY_KP_PERCENT
-	KEY_KP_LESS
-	KEY_KP_GREATER
-	KEY_KP_AMPERSAND
-	KEY_KP_DBLAMPERSAND
-	KEY_KP_VERTICALBAR
-	KEY_KP_DBLVERTICALBAR
-	KEY_KP_COLON
-	KEY_KP_HASH
-	KEY_KP_SPACE
-	KEY_KP_AT
-	KEY_KP_EXCLAM
-	KEY_KP_MEMSTORE
-	KEY_KP_MEMRECALL
-	KEY_KP_MEMCLEAR
-	KEY_KP_MEMADD
-	KEY_KP_MEMSUBTRACT
-	KEY_KP_MEMMULTIPLY
-	KEY_KP_MEMDIVIDE
-	KEY_KP_PLUSMINUS
-	KEY_KP_CLEAR
-	KEY_KP_CLEARENTRY
-	KEY_KP_BINARY
-	KEY_KP_OCTAL
-	KEY_KP_DECIMAL
-	KEY_KP_HEXADECIMAL
-	KEY_LCTRL
-	KEY_LSHIFT
-	KEY_LALT
-	KEY_LGUI
-	KEY_RCTRL
-	KEY_RSHIFT
-	KEY_RALT
-	KEY_RGUI
-	KEY_MODE
-	KEY_AUDIONEXT
-	KEY_AUDIOPREV
-	KEY_AUDIOSTOP
-	KEY_AUDIOPLAY
-	KEY_AUDIOMUTE
-	KEY_MEDIASELECT
-	KEY_WWW
-	KEY_MAIL
-	KEY_CALCULATOR
-	KEY_COMPUTER
-	KEY_AC_SEARCH
-	KEY_AC_HOME
-	KEY_AC_BACK
-	KEY_AC_FORWARD
-	KEY_AC_STOP
-	KEY_AC_REFRESH
-	KEY_AC_BOOKMARKS
-	KEY_BRIGHTNESSDOWN
-	KEY_BRIGHTNESSUP
-	KEY_DISPLAYSWITCH
-	KEY_KBDILLUMTOGGLE
-	KEY_KBDILLUMDOWN
-	KEY_KBDILLUMUP
-	KEY_EJECT
-	KEY_SLEEP
+</p>
 
+<ul>
+<li>KEY_UNKNOWN</li>
+<li>KEY_RETURN</li>
+<li>KEY_ESCAPE</li>
+<li>KEY_BACKSPACE</li>
+<li>KEY_TAB</li>
+<li>KEY_SPACE</li>
+<li>KEY_EXCLAIM</li>
+<li>KEY_QUOTEDBL</li>
+<li>KEY_HASH</li>
+<li>KEY_PERCENT</li>
+<li>KEY_DOLLAR</li>
+<li>KEY_AMPERSAND</li>
+<li>KEY_QUOTE</li>
+<li>KEY_LEFTPAREN</li>
+<li>KEY_RIGHTPAREN</li>
+<li>KEY_ASTERISK</li>
+<li>KEY_PLUS</li>
+<li>KEY_COMMA</li>
+<li>KEY_MINUS</li>
+<li>KEY_PERIOD</li>
+<li>KEY_SLASH</li>
+<li>KEY_0</li>
+<li>KEY_1</li>
+<li>KEY_2</li>
+<li>KEY_3</li>
+<li>KEY_4</li>
+<li>KEY_5</li>
+<li>KEY_6</li>
+<li>KEY_7</li>
+<li>KEY_8</li>
+<li>KEY_9</li>
+<li>KEY_COLON</li>
+<li>KEY_SEMICOLON</li>
+<li>KEY_LESS</li>
+<li>KEY_EQUALS</li>
+<li>KEY_GREATER</li>
+<li>KEY_QUESTION</li>
+<li>KEY_AT</li>
+<li>KEY_LEFTBRACKET</li>
+<li>KEY_BACKSLASH</li>
+<li>KEY_RIGHTBRACKET</li>
+<li>KEY_CARET</li>
+<li>KEY_UNDERSCORE</li>
+<li>KEY_BACKQUOTE</li>
+<li>KEY_a</li>
+<li>KEY_b</li>
+<li>KEY_c</li>
+<li>KEY_d</li>
+<li>KEY_e</li>
+<li>KEY_f</li>
+<li>KEY_g</li>
+<li>KEY_h</li>
+<li>KEY_i</li>
+<li>KEY_j</li>
+<li>KEY_k</li>
+<li>KEY_l</li>
+<li>KEY_m</li>
+<li>KEY_n</li>
+<li>KEY_o</li>
+<li>KEY_p</li>
+<li>KEY_q</li>
+<li>KEY_r</li>
+<li>KEY_s</li>
+<li>KEY_t</li>
+<li>KEY_u</li>
+<li>KEY_v</li>
+<li>KEY_w</li>
+<li>KEY_x</li>
+<li>KEY_y</li>
+<li>KEY_z</li>
+<li>KEY_CAPSLOCK</li>
+<li>KEY_F1</li>
+<li>KEY_F2</li>
+<li>KEY_F3</li>
+<li>KEY_F4</li>
+<li>KEY_F5</li>
+<li>KEY_F6</li>
+<li>KEY_F7</li>
+<li>KEY_F8</li>
+<li>KEY_F9</li>
+<li>KEY_F10</li>
+<li>KEY_F11</li>
+<li>KEY_F12</li>
+<li>KEY_PRINTSCREEN</li>
+<li>KEY_SCROLLLOCK</li>
+<li>KEY_PAUSE</li>
+<li>KEY_INSERT</li>
+<li>KEY_HOME</li>
+<li>KEY_PAGEUP</li>
+<li>KEY_DELETE</li>
+<li>KEY_END</li>
+<li>KEY_PAGEDOWN</li>
+<li>KEY_RIGHT</li>
+<li>KEY_LEFT</li>
+<li>KEY_DOWN</li>
+<li>KEY_UP</li>
+<li>KEY_NUMLOCKCLEAR</li>
+<li>KEY_KP_DIVIDE</li>
+<li>KEY_KP_MULTIPLY</li>
+<li>KEY_KP_MINUS</li>
+<li>KEY_KP_PLUS</li>
+<li>KEY_KP_ENTER</li>
+<li>KEY_KP_1</li>
+<li>KEY_KP_2</li>
+<li>KEY_KP_3</li>
+<li>KEY_KP_4</li>
+<li>KEY_KP_5</li>
+<li>KEY_KP_6</li>
+<li>KEY_KP_7</li>
+<li>KEY_KP_8</li>
+<li>KEY_KP_9</li>
+<li>KEY_KP_0</li>
+<li>KEY_KP_PERIOD</li>
+<li>KEY_APPLICATION</li>
+<li>KEY_POWER</li>
+<li>KEY_KP_EQUALS</li>
+<li>KEY_F13</li>
+<li>KEY_F14</li>
+<li>KEY_F15</li>
+<li>KEY_F16</li>
+<li>KEY_F17</li>
+<li>KEY_F18</li>
+<li>KEY_F19</li>
+<li>KEY_F20</li>
+<li>KEY_F21</li>
+<li>KEY_F22</li>
+<li>KEY_F23</li>
+<li>KEY_F24</li>
+<li>KEY_EXECUTE</li>
+<li>KEY_HELP</li>
+<li>KEY_MENU</li>
+<li>KEY_SELECT</li>
+<li>KEY_STOP</li>
+<li>KEY_AGAIN</li>
+<li>KEY_UNDO</li>
+<li>KEY_CUT</li>
+<li>KEY_COPY</li>
+<li>KEY_PASTE</li>
+<li>KEY_FIND</li>
+<li>KEY_MUTE</li>
+<li>KEY_VOLUMEUP</li>
+<li>KEY_VOLUMEDOWN</li>
+<li>KEY_KP_COMMA</li>
+<li>KEY_KP_EQUALSAS400</li>
+<li>KEY_ALTERASE</li>
+<li>KEY_SYSREQ</li>
+<li>KEY_CANCEL</li>
+<li>KEY_CLEAR</li>
+<li>KEY_PRIOR</li>
+<li>KEY_RETURN2</li>
+<li>KEY_SEPARATOR</li>
+<li>KEY_OUT</li>
+<li>KEY_OPER</li>
+<li>KEY_CLEARAGAIN</li>
+<li>KEY_CRSEL</li>
+<li>KEY_EXSEL</li>
+<li>KEY_KP_00</li>
+<li>KEY_KP_000</li>
+<li>KEY_THOUSANDSSEPARATOR</li>
+<li>KEY_DECIMALSEPARATOR</li>
+<li>KEY_CURRENCYUNIT</li>
+<li>KEY_CURRENCYSUBUNIT</li>
+<li>KEY_KP_LEFTPAREN</li>
+<li>KEY_KP_RIGHTPAREN</li>
+<li>KEY_KP_LEFTBRACE</li>
+<li>KEY_KP_RIGHTBRACE</li>
+<li>KEY_KP_TAB</li>
+<li>KEY_KP_BACKSPACE</li>
+<li>KEY_KP_A</li>
+<li>KEY_KP_B</li>
+<li>KEY_KP_C</li>
+<li>KEY_KP_D</li>
+<li>KEY_KP_E</li>
+<li>KEY_KP_F</li>
+<li>KEY_KP_XOR</li>
+<li>KEY_KP_POWER</li>
+<li>KEY_KP_PERCENT</li>
+<li>KEY_KP_LESS</li>
+<li>KEY_KP_GREATER</li>
+<li>KEY_KP_AMPERSAND</li>
+<li>KEY_KP_DBLAMPERSAND</li>
+<li>KEY_KP_VERTICALBAR</li>
+<li>KEY_KP_DBLVERTICALBAR</li>
+<li>KEY_KP_COLON</li>
+<li>KEY_KP_HASH</li>
+<li>KEY_KP_SPACE</li>
+<li>KEY_KP_AT</li>
+<li>KEY_KP_EXCLAM</li>
+<li>KEY_KP_MEMSTORE</li>
+<li>KEY_KP_MEMRECALL</li>
+<li>KEY_KP_MEMCLEAR</li>
+<li>KEY_KP_MEMADD</li>
+<li>KEY_KP_MEMSUBTRACT</li>
+<li>KEY_KP_MEMMULTIPLY</li>
+<li>KEY_KP_MEMDIVIDE</li>
+<li>KEY_KP_PLUSMINUS</li>
+<li>KEY_KP_CLEAR</li>
+<li>KEY_KP_CLEARENTRY</li>
+<li>KEY_KP_BINARY</li>
+<li>KEY_KP_OCTAL</li>
+<li>KEY_KP_DECIMAL</li>
+<li>KEY_KP_HEXADECIMAL</li>
+<li>KEY_LCTRL</li>
+<li>KEY_LSHIFT</li>
+<li>KEY_LALT</li>
+<li>KEY_LGUI</li>
+<li>KEY_RCTRL</li>
+<li>KEY_RSHIFT</li>
+<li>KEY_RALT</li>
+<li>KEY_RGUI</li>
+<li>KEY_MODE</li>
+<li>KEY_AUDIONEXT</li>
+<li>KEY_AUDIOPREV</li>
+<li>KEY_AUDIOSTOP</li>
+<li>KEY_AUDIOPLAY</li>
+<li>KEY_AUDIOMUTE</li>
+<li>KEY_MEDIASELECT</li>
+<li>KEY_WWW</li>
+<li>KEY_MAIL</li>
+<li>KEY_CALCULATOR</li>
+<li>KEY_COMPUTER</li>
+<li>KEY_AC_SEARCH</li>
+<li>KEY_AC_HOME</li>
+<li>KEY_AC_BACK</li>
+<li>KEY_AC_FORWARD</li>
+<li>KEY_AC_STOP</li>
+<li>KEY_AC_REFRESH</li>
+<li>KEY_AC_BOOKMARKS</li>
+<li>KEY_BRIGHTNESSDOWN</li>
+<li>KEY_BRIGHTNESSUP</li>
+<li>KEY_DISPLAYSWITCH</li>
+<li>KEY_KBDILLUMTOGGLE</li>
+<li>KEY_KBDILLUMDOWN</li>
+<li>KEY_KBDILLUMUP</li>
+<li>KEY_EJECT</li>
+<li>KEY_SLEEP</li>
+</ul>
+
+<p>
 Event types:
-	EVENT_KEY_DOWN
-	EVENT_KEY_UP
-	EVENT_JOY_DOWN
-	EVENT_JOY_UP
-	EVENT_JOY_AXIS
-	EVENT_MOUSE_DOWN
-	EVENT_MOUSE_UP
-	EVENT_MOUSE_AXIS
-	EVENT_MOUSE_WHEEL
+</p>
 
+<ul>
+<li>EVENT_KEY_DOWN</li>
+<li>EVENT_KEY_UP</li>
+<li>EVENT_JOY_DOWN</li>
+<li>EVENT_JOY_UP</li>
+<li>EVENT_JOY_AXIS</li>
+<li>EVENT_MOUSE_DOWN</li>
+<li>EVENT_MOUSE_UP</li>
+<li>EVENT_MOUSE_AXIS</li>
+<li>EVENT_MOUSE_WHEEL</li>
+</ul>
+
+<p>
 Joystick buttons for events:
-	JOY_A
-	JOY_B
-	JOY_X
-	JOY_Y
-	JOY_BACK
-	JOY_GUIDE
-	JOY_START
-	JOY_LS
-	JOY_RS
-	JOY_LB
-	JOY_RB
-	JOY_U
-	JOY_D
-	JOY_L
-	JOY_R
+</p>
 
+<ul>
+<li>JOY_A</li>
+<li>JOY_B</li>
+<li>JOY_X</li>
+<li>JOY_Y</li>
+<li>JOY_BACK</li>
+<li>JOY_GUIDE</li>
+<li>JOY_START</li>
+<li>JOY_LS</li>
+<li>JOY_RS</li>
+<li>JOY_LB</li>
+<li>JOY_RB</li>
+<li>JOY_U</li>
+<li>JOY_D</li>
+<li>JOY_L</li>
+<li>JOY_R</li>
+</ul>
+
+<p>
 GUI constants:
-	FIT_X
-	FIT_Y
+</p>
 
--- Events --------------------------------------------------------------------
+<ul>
+<li>FIT_X</li>
+<li>FIT_Y</li>
+</ul>
 
+<a id="Events"><h2>Events</h2></a>
+
+<p>
 You can receive events so you're sure you don't miss anything. Define a
 function called event with 5 arguments:
+</p>
 
+<pre>
 function event type a b c d { ... }
+</pre>
 
+<p>
 type will be one of the EVENT_* constants listed in the Constants section.
 The parameters depend on the event type. Unused parameters are undefined
 for an event that doesn't supply them. The parameters for each event type
 are:
+</p>
 
-EVENT_KEY_DOWN
+<h3>EVENT_KEY_DOWN</h3>
+<pre>
 	a - the key constant
 	b - TRUE if this is a repeat event
+</pre>
 
-EVENT_KEY_UP
+<h3>EVENT_KEY_UP</h3>
+<pre>
 	a - the key constant
+</pre>
 
-EVENT_JOY_DOWN
+<h3>EVENT_JOY_DOWN</h3>
+<pre>
 	a - the button constant in constants
 	b - TRUE if it is a repeat event
+</pre>
 
-EVENT_JOY_UP
+<h3>EVENT_JOY_UP</h3>
+<pre>
 	a - the joystick button constant
+</pre>
 
-EVENT_JOY_AXIS
+<h3>EVENT_JOY_AXIS</h3>
+<pre>
 	a - the axis index
 	b - the value from -1 to 1
+</pre>
 
-EVENT_MOUSE_DOWN
+<h3>EVENT_MOUSE_DOWN</h3>
+<pre>
 	a - the button
 	b - TRUE if it is a repeat event
 	c - mouse x
 	d - mouse y
+</pre>
 
-EVENT_MOUSE_UP
+<h3>EVENT_MOUSE_UP</h3>
+<pre>
 	a - the button
+</pre>
 
-EVENT_MOUSE_AXIS
+<h3>EVENT_MOUSE_AXIS</h3>
+<pre>
 	a - the x window coordinate
 	b - the y window coordinate
 	c - the delta x movement
 	d - the delta y movement
+</pre>
 
-EVENT_MOUSE_WHEEL
+<h3>EVENT_MOUSE_WHEEL</h3>
+<pre>
 	a - the horizontal wheel movement
 	b - the vertical wheel movement
+</pre>
