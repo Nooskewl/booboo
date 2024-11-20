@@ -89,7 +89,7 @@ typeof
 ~
 	A reference. Function parameters preceded by a ~ can be modified
 	by a function
-	e.g. call foo 10 20 ~a
+	e.g. function foo a b ~c
 
 -- Flow Control --------------------------------------------------------------
 
