@@ -1,34 +1,53 @@
+<p>
 This tutorial assumes you have some prior programming experience.
+</p>
 
+<p>
 BooBoo is extremely easy to learn, and I'm not going to cover any API here,
 but only basic syntax. Refer to the docs for API.
+</p>
 
---
+<hr/>
 
+<p>
 BooBoo could be considered similar to a high-level assembly language.
 Everything starts with an opcode (function) followed by parameters. The
 only syntax identifying the end of one statement and the start of another
 is the presence of another API function:
+</p>
 
-<func> <param1> <param2> <func2> <param1> <param2> <param3> <func3> <func4>
+<pre>
+&lt;func> &lt;param1> &lt;param2> &lt;func2> &lt;param1> &lt;param2> &lt;param3> &lt;func3> &lt;func4>
+</pre>
 
+<p>
 Everything between functions is slurped up and passed to the preceding
 function.
+</p>
 
+<p>
 Return values are by convention passed back into the first parameter after
 the function call:
+</p>
 
-<func> <ret> <param1> <param2>
+&lt;func&gt; &lt;ret&gt; &lt;param1&gt; &lt;param2&gt;
 
+<p>
 Functions can be defined:
+</p>
 
+<pre>
 function derp
 {
 	call do_something()
 }
+</pre>
 
+<p>
 And can return values:
+</p>
 
+<pre>
 function derp2 a b c
 {
 	return (+ a b c)
@@ -36,52 +55,86 @@ function derp2 a b c
 ...
 number result
 call_result result derp2 32984 438 13
+</pre>
 
---
+<hr/>
 
+<p>
 Expressions also use Polish notation (operation first) format. A C expression
 like:
+</p>
 
+<pre>
 x = (x * (x + y))
+</pre>
 
+<p>
 Can be written as:
+</p>
 
+<pre>
 = x (* x (+ x y))
+</pre>
 
---
+<hr/>
 
+<p>
 Hello world:
+</p>
 
+<pre>
 print "Hello, World!\n"
+</pre>
 
+<p>
 Hello world Game Launcher (red screen):
+</p>
 
+<pre>
 function draw { clear 255 0 0 }
+</pre>
 
---
+<hr/>
 
+<p>
 Loops:
+</p>
 
+<p>
 You can do loops with the branch functions (je, jge, etc) but more commonly
 you can use a for loop:
+</p>
 
-for <var> <start value> <expression> <increment> <label>
+<pre>
+for &lt;var&gt; &lt;start value&gt; &lt;expression&gt; &lt;increment&gt; &lt;label&gt;
+</pre>
 
+<p>
 for example to loop to 10:
+</p>
 
+<pre>
 number i
-for i 0 (< i 10) 1 again
+for i 0 (&lt; i 10) 1 again
 	print "%\n" i
 :again
+</pre>
 
---
+</hr/>
 
+<p>
 Conditionals:
+</p>
 
-if <expression> <label> <elseif-expression> <label> <else label>
+<pre>
+if &lt;expression&gt; &lt;label&gt; &lt;elseif-expression&gt; &lt;label&gt; &lt;else label&gt;
+</pre>
 
+<p>
 for example:
+</p>
 
+<pre>
 if (== i 10) ten (== i 9) nine below
 	print "TEN!\n"
 :ten
@@ -89,13 +142,17 @@ if (== i 10) ten (== i 9) nine below
 :nine
 	print "BELOW NINE!\n"
 :below
+</pre>
 
---
+<hr/>
 
+<p>
 You can define your own expression sub handlers. For example (== i 10) is an
 expression that evaluates to TRUE if i equals 10. You can define operators like
 ==:
+</p>
 
+<pre>
 function esin x
 {
 	sin x
@@ -103,34 +160,67 @@ function esin x
 }
 ...
 = foo (esin 3.14159)
+</pre>
 
---
+<hr/>
 
+<p>
 Vectors and maps:
+</p>
 
+<p>
 The docs have more info, but you can access vectors and maps with fishes.
 You can fish into a vector:
+</p>
 
-[v x y z] - this will dig into a few vectors to pull a value out
+<p>
+<pre>[v x y z]</pre> - this will dig into a few vectors to pull a value out
+</p>
 
+<p>
 It's equivalent in C++ to:
+</p>
 
+<pre>
 v[x][y][z]
+</pre>
 
+<p>
 Or a map:
+</p>
 
-[m "foo" "bar" "baz"] - this will dig into a few maps to pull out "baz"
+<p>
+<pre>[m "foo" "bar" "baz"]</pre> - this will dig into a few maps to pull out "baz"
+</p>
 
+<p>
 Which is equivalent to m["foo"]["bar"]["baz"] in C++.
+</p>
 
+<p>
 You can nest them:
+</p>
 
+<pre>
 [v x y [m "foo" "bar" [v2 z]]]
+</pre>
 
-In C++ that would be v[x][y][m["foo"]["bar"][v2[z]]];
+<p>
+In C++ that would be:
+<p>
 
+<pre>
+v[x][y][m["foo"]["bar"][v2[z]]]
+</pre>
+
+<p>
 Or you can mix them with expressions:
+</p>
 
+<pre>
 [v x y (+ z 1)]
+</pre>
 
+<p>
 These can be used anywhere a variable can be used.
+</p>
