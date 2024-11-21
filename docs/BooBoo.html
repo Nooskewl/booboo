@@ -1,142 +1,204 @@
+<p>
 The following describe the core functions of BooBoo.
+</p>
 
+<p>
 Sections:
-	Core
-	Flow Control
-	Arithmetic
-	Strings
-	Math
-	Vectors
-	Maps
-	Files
-	Bits
-	Other
+</p>
 
--- Core Functions ------------------------------------------------------------
+<ul>
+<li><a href="#Core">Core</a></li>
+<li><a href="#Flow">Flow Control</a></li>
+<li><a href="#Arithmetic">Arithmetic</a></li>
+<li><a href="#Strings">Strings</a></li>
+<li><a href="#Math">Math</a></li>
+<li><a href="#Vector">Vectors</a></li>
+<li><a href="#Map">Maps</a></li>
+<li><a href="#Files">Files</a></li>
+<li><a href="#Bits">Bits</a></li>
+<li><a href="#Other">Other</a></li>
+</ul>
 
-number
+<a id="Core"><h2>Core Functions</h2></a>
+
+<h3>number</h3>
+<pre>
 	declare a number or numbers
 	e.g. number x y z
+</pre>
 	
-string
+<h3>string</h3>
+<pre>
 	declare a string or strings
 	e.g. string s1 s2
+</pre>
 
-vector
+<h3>vector</h3>
+<pre>
 	declare a vector or vectors
 	e.g. vector x
+</pre>
 
-map
+<h3>map</h3>
+<pre>
 	declare a map or maps
 	e.g. map m
+</pre>
 
-reset
+<h3>reset</h3>
+<pre>
 	load a different BooBoo script
 	e.g. reset "next_slide.boo"
+</pre>
 
-exit
+<h3>exit</h3>
+<pre>
 	Exit the app with a return code to the environment
 	e.g. exit 0
+</pre>
 
-return
+<h3>return</h3>
+<pre>
 	Return a value from a function
 	e.g. return 1
 	or just return if the function doesn't return a value
+</pre>
 
-include
+<h3>include</h3>
+<pre>
 	Include a BooBoo file at this point in the code
 	e.g. include "my_functions.inc"
+</pre>
 
-:
+<h3>:</h3>
+<pre>
 	Define a label
 	e.g. :jump_here
+</pre>
 
-;
+<h3>;</h3>
+<pre>
 	Define a comment
 	e.g. = x 1 ; assign 1 to x
+</pre>
 
-""
+<h3>""</h3>
+<pre>
 	a string
 	e.g. = name "Pelvis Johnson"
+</pre>
 
-function
+<h3>function</h3>
+<pre>
 	define a function
 	References can be defined by prefixing a parameter name by a tilde (~)
 	e.g. function foo param1 param2 { ... }
+</pre>
 
-typeof
+<h3>typeof</h3>
+<pre>
 	Returns a string respresentation of the type of the second parameter
 	e.g. typeof type_string my_var
+</pre>
 
-()
+<h3>()</h3>
+<pre>
 	an expression
 	e.g. (+ x (* y (* z w 2))) in C would be x+(y*(z*w*2))
-	Supported operators are: + - * / % && || > < >= <= == != | ^ & << >>
+	Supported operators are: + - * / % &amp;&amp; || &gt; < >= <= == != | ^ & &lt;&lt; &gt;&gt;
 	The boolean operators return 1 or 0
 	Your own functions can be supplied as operators
+</pre>
 
-[]
+<h3>[]</h3>
+<pre>
 	Vector/map indexing operator
 	e.g. = x [v [m "key"]] in C++ would be x = v[m["key"]]
 	Can be used anywhere a variable is expected.
 	You can use multiple indexes
 	e.g. [v 3 2 1 0] is like v[3][2][1][0] in C.
+</pre>
 
-#
+<h3>#</h3>
+<pre>
 	Start a hexadecimal number
 	e.g. #FF is equivalent to 255
+</pre>
 
-~
+<h3>~</h3>
+<pre>
 	A reference. Function parameters preceded by a ~ can be modified
 	by a function
 	e.g. function foo a b ~c
+</pre>
 
--- Flow Control --------------------------------------------------------------
+<a id="Flow"><h2>Flow Control</h2></a>
 
-goto
+<h3>goto</h3>
+<pre>
 	jump to a label
 	e.g. goto next_loop
+</pre>
 
-?
+<h3>?</h3>
+<pre>
 	Comparison
 	e.g. ? x 1
 	You can also evaluate an expression
-	? 1 (&& (> a b) (< x y)) je true jne false
+	? 1 (&amp;&amp; (&gt; a b) (< x y)) je true jne false
+</pre>
 
-je
+<h3>je</h3>
+<pre>
 	Jumps like this one are based on the last comparison. If it was equal,
 	this will jump, if not, it won't
 	e.g. je process_x_equals_1
+</pre>
 
-jne
+<h3>jne</h3>
+<pre>
 	Jump if not equal
 	e.g. jne process_x_not_1
+</pre>
 
-jl
+<h3>jl</h3>
+<pre>
 	Jump if less
 	e.g. jl my_label
+</pre>
 
-jle
+<h3>jle</h3>
+<pre>
 	Jump if less or equal
 	e.g. jle my_label
+</pre>
 
-jg
+<h3>jg</h3>
+<pre>
 	Jump if greater
 	e.g. jg my_label
+</pre>
 
-jge
+<h3>jge</h3>
+<pre>
 	Jump if greater or equal
 	e.g. jge my_label
+</pre>
 
-call
+<h3>call</h3>
+<pre>
 	Call a function that doesn't return anything
 	e.g. call my_func param1 param2 param2
+</pre>
 
-call_result
+<h3>call_result</h3>
+<pre>
 	Call a function that returns a value
 	e.g. call_result result my_func param1 param2
+</pre>
 
-if
+<h3>if</h3>
+<pre>
 	compare and jump
 	e.g. if (expr1) the_if (expr2) elseif1 (expr3) elseif2 the_else
 	...
@@ -146,188 +208,264 @@ if
 	:the_else
 	the_if elseif1 elseif2 and the_else are labels that are the bottom of
 	their code blocks
+</pre>
 
-for
+<h3>for</h3>
+<pre>
 	A for loop
 	e.g. for i start (expression) increment end_label
 	; your loop code here
 	:end_label
+</pre>
 
--- Arithmetic ----------------------------------------------------------------
+<a id="Arithmetic"><h2>Arithmetic</h2></a>
 
-=
+<h3>=</h3>
+<pre>
 	assign
 	e.g. = x 1
+</pre>
 
-+
+<h3>+</h3>
+<pre>
 	add
 	e.g. + x 1
-
 	You can supply more than 1 parameter at the end
+</pre>
 
--
+<h3>-</h3>
+<pre>
 	subtract
 	e.g. - x 1
-	
 	You can supply more than 1 parameter at the end
+</pre>
 
-*
+<h3>*</h3>
+<pre>
 	multiply
 	e.g. * x 2
-	
 	You can supply more than 1 parameter at the end
+</pre>
 
-/
+<h3>/</h3>
+<pre>
 	divide
 	e.g. / x 2
-
 	You can supply more than 1 parameter at the end
+</pre>
 
-%
+<h3>%</h3>
+<pre>
 	integer modulus
 	e.g. % index count
+</pre>
 
--- String Functions ------------------------------------------------------------
+<a id="Strings"><h2>String Functions</h2></a>
 
-string_format
+<h3>string_format</h3>
+<pre>
 	format strings with replacements
 	e.g. string_format dest "I'm % years old" age
 	printf-equivalent formating options are available with %(...) for
 	example %(3.16g)
+</pre>
 
-string_char_at
+<h3>string_char_at</h3>
+<pre>
 	Get the value of character at index in a string
 	This function is UTF8 compliant
 	e.g. string_char_at dest str index
+</pre>
 
-string_length
+<h3>string_length</h3>
+<pre>
 	Get the length of a string
 	This function is UTF8 compliant
 	e.g. string_length dest str
+</pre>
 
-string_from_number
+<h3>string_from_number</h3>
+<pre>
 	Turns the ascii value into a one character length string
 	This function is UTF8 compliant
 	e.g. string_from_number str 97 ; creates "a"
+</pre>
 
-string_substr
+<h3>string_substr</h3>
+<pre>
 	Create a substring of a string
 	e.g. string_substr s start end
 	End is optional, if not specified it will cut from start till the
 	end of the string.
 	This is UTF8 compliant
+</pre>
 
-string_uppercase
+<h3>string_uppercase</h3>
+<pre>
 	Make a string uppercase
 	e.g. string_uppercase s
+</pre>
 
-string_lowercase
+<h3>string_lowercase</h3>
+<pre>
 	Make a string lowercase
 	e.g. string_lowercase s
+</pre>
 
-string_trim
+<h3>string_trim</h3>
+<pre>
 	Trim leading and trailing whitespace from a string
 	e.g. string_trim s
+</pre>
 
-string_replace
+<h3>string_replace</h3>
+<pre>
 	regex replacement
 	e.g. string_replace out str regex replacement
+</pre>
 
-string_match
+<h3>string_match</h3>
+<pre>
 	Extract sub-strings from a string
 	e.g. string_match out_vector str regex
+</pre>
 
-string_matches
+<h3>string_matches</h3>
+<pre>
 	Check if a string matches a regex
 	e.g. string_matches yesno str regex
+</pre>
 
--- Math Functions ------------------------------------------------------------
+<a id="Math"><h2>Math Functions</h2></a>
 
-fmod
+<h3>fmod</h3>
+<pre>
 	floating point modulus
 	e.g. fmod x 1.5
+</pre>
 
-sin
+<h3>sin</h3>
+<pre>
 	trigonometry functions
 	e.g. sin n
+</pre>
 
-cos
+<h3>cos</h3>
+<pre>
 	trigonometry functions
 	e.g. cos n
+</pre>
 
-tan
+<h3>tan</h3>
+<pre>
 	trigonometry functions
 	e.g. tan n
+</pre>
 
-asin
+<h3>asin</h3>
+<pre>
 	trigonometry functions
 	e.g. asin n
+</pre>
 
-acos
+<h3>acos</h3>
+<pre>
 	trigonometry functions
 	e.g. acos n
+</pre>
 
-atan
+<h3>atan</h3>
+<pre>
 	trigonometry functions
 	e.g. atan n
+</pre>
 
-atan2
+<h3>atan2</h3>
+<pre>
 	trigonometry functions
 	e.g. atan2 y x
+</pre>
 
-abs
+<h3>abs</h3>
+<pre>
 	absolute value
 	e.g. abs value
+</pre>
 
-pow
+<h3>pow</h3>
+<pre>
 	exponentiation
 	e.g. pow x 2
+</pre>
 
-sqrt
+<h3>sqrt</h3>
+<pre>
 	square root
 	e.g. sqrt x
+</pre>
 
-hypot
+<h3>hypot</h3>
+<pre>
 	Calculate hypotenuse of a and b
 	e.g. hypot a b
+</pre>
 
-floor
+<h3>floor</h3>
+<pre>
 	Drop the fractional part of a number
 	e.g. floor x
+</pre>
 
-ceil
+<h3>ceil</h3>
+<pre>
 	Round to the next highest integer
 	e.g. ceil x
+</pre>
 
-neg
+<h3>neg</h3>
+<pre>
 	Invert the sign of a number
 	e.g. neg x
+</pre>
 
-sign
+<h3>sign</h3>
+<pre>
 	Returns the sign of a number
 	e.g. sign x
+</pre>
 
-exp
+<h3>exp</h3>
+<pre>
 	Calculate the value of e
 	e.g. exp x
+</pre>
 
-log
+<h3>log</h3>
+<pre>
 	Logarithm function
 	e.g. log x
+</pre>
 
-log10
+<h3>log10</h3>
+<pre>
 	Base 10 logarithm
 	e.g. log10 x
+</pre>
 
-min
+<h3>min</h3>
+<pre>
 	Get the minimum number in a list of values
 	e.g. min result a b c d e f g
+</pre>
 
-max
+<h3>max</h3>
+<pre>
 	Get the max number in a list of values
 	e.g. max result a b
+</pre>
 
-Vector and matrix math
+<h3>Vector and matrix math</h3>
+<pre>
 	Some vector and matrix math is available through expression
 	operators. Supported are: mul, identity, scale, rotate,
 	translate, length, dot, angle, cross, normalize, add, sub,
@@ -336,163 +474,223 @@ Vector and matrix math
 	the size of the matrix. scale, rotate and translate produce
 	transformation matrices to be multiplied by another matrix
 	(scale and translate take 3 parameters, rotate takes 4.)
+</pre>
 
--- Vector Functions ----------------------------------------------------------
+<a id="Vector"><h2>Vector Functions</h2></a>
 
-vector_add
+<h3>vector_add</h3>
+<pre>
 	push a value onto a vector (must be created e.g. var vector v)
 	e.g. vector_add v 0
+</pre>
 
-vector_size
+<h3>vector_size</h3>
+<pre>
 	get the number of elements in a vector
 	e.g. vector_size vec size
+</pre>
 
-vector_set
+<h3>vector_set</h3>
+<pre>
 	set an element in a vector
 	e.g. vector_set vec index value
-	
 	Note: you can use multiple indices if you know you have a
 	multidimensional vector. BooBoo will dig down into as many vectors as
 	you specify indices for (followed by the value you're setting it to)
+</pre>
 
-vector_insert
+<h3>vector_insert</h3>
+<pre>
 	insert a value in any position in a vector
 	e.g. vector_insert v index value
+</pre>
 
-vector_get
+<h3>vector_get</h3>
+<pre>
 	get the value at index in vector
 	e.g. vector_get v output index
-
 	Note: you can use multiple indices if you know you have a
 	multidimensional vector. For example vector_get v colour y x to index
 	into a 2D array of palette indices
+</pre>
 
-vector_erase
+<h3>vector_erase</h3>
+<pre>
 	remove from a vector
 	e.g. vector_erase v index
+</pre>
 
-vector_clear
+<h3>vector_clear</h3>
+<pre>
 	empty a vector
 	e.g. vector_clear v
+</pre>
 
--- Map Functions -------------------------------------------------------------
+<a id="Map"><h2>Map Functions</h2></a>
 
-map_set
+<h3>map_set</h3>
+<pre>
 	set a key in a map
 	e.g. map_set m "key" value
-
 	map_set can dig down into linked maps the same way as you can
 	with vector_set
+</pre>
 
-map_get
+<h3>map_get</h3>
+<pre>
 	get a value from a map
 	e.g. map_get m output "key"
-
 	map_get can dig down into linked maps the same way as you can
 	with vector_get
+</pre>
 
-map_erase
+<h3>map_erase</h3>
+<pre>
 	erase a key/value pair from a map
 	e.g. map_erase m "key"
+</pre>
 
-map_clear
+<h3>map_clear</h3>
+<pre>
 	clear a map
 	e.g. map_clear m
+</pre>
 
-map_keys
+<h3>map_keys</h3>
+<pre>
 	Get the names of the keys from a map into a vector of strings
 	e.g. map_keys m v
+</pre>
 
--- File Functions ------------------------------------------------------------
+<a id="Files"><h2>File Functions</h2></a>
 
-file_open
+<h3>file_open</h3>
+<pre>
 	open a file, mode can be either "a" "r" or "w"
 	number f file_open f "input.txt" "r"
 	f will be -1 on failure
 	e.g. file_open f "out.txt "w"
+</pre>
 
-file_close
+<h3>file_close</h3>
+<pre>
 	You should always close files you open with this
 	e.g. file_close f
+</pre>
 
-file_read
+<h3>file_read</h3>
+<pre>
 	Read a word from a file
 	e.g. file_read f s
+</pre>
 
-file_read_line
+<h3>file_read_line</h3>
+<pre>
 	Read a line from a file
 	e.g. file_read_line f s
+</pre>
 
-file_write
+<h3>file_write</h3>
+<pre>
 	Write a word to a file
 	e.g. file_write f "turkey"
+</pre>
 
-file_print
+<h3>file_print</h3>
+<pre>
 	Print to a file. Behaves exactly like print but takes a file
 	e.g. file_print f "%(20s)%(20s)%(20s)" x y z
+</pre>
 
--- Bitwise Functions ---------------------------------------------------------
+<a id="Bits"><h2>Bitwise Functions</h2></a>
 
-|
+<h3>|</h3>
+<pre>
 	Bitwise or
 	All bitwise functions cast the numbers to int first
 	e.g. | x 128
+</pre>
 
-^
+<h3>^</h3>
+<pre>
 	Bitwise xor
 	e.g. ^ x y
+</pre>
 
-&
+<h3>&</h3>
+<pre>
 	Bitwise and
-	e.g. & x 255
+	e.g. &amp; x 255
+</pre>
 
-<<
+<h3>&lt;&lt;</h3>
+<pre>
 	Left shift
-	e.g. << x 3
+	e.g. &lt;&lt; x 3
+</pre>
 
->>
+<h3>&gt;&gt;</h3>
+<pre>
 	Right shift
-	e.g. >> x 3
+	e.g. &gt;&gt; x 3
+</pre>
 
--- Other ---------------------------------------------------------------------
+<a id="Other"><h2>Other</h2></a>
 
-print
+<h3>print</h3>
+<pre>
 	print a string (like string_format)
 	e.g. print "Hello, I'm % and I like % and %" name like1 like2
 	printf-equivalent formating options are available with %(...) for
 	example %(3.16g)
+</pre>
 
-input
+<h3>input</h3>
+<pre>
 	Read a word from stdin
 	e.g. input str
+</pre>
 
-getenv
+<h3>getenv</h3>
+<pre>
 	Get an environment variable
 	e.g. getenv dest "HOME"
+</pre>
 
-mkdir
+<h3>mkdir</h3>
+<pre>
 	Create a directory
 	e.g. mkdir my_string_path
+</pre>
 
-list_directory
+<h3>list_directory</h3>
+<pre>
 	List files and directories in a glob
 	e.g. list_directory dest_vector "/home/Pelvis/*"
 	Directories returned will end with "/" and regular files will not.
+</pre>
 
-get_system_language
+<h3>get_system_language</h3>
+<pre>
 	Returns the user interface language of the system
 	e.g. get_system_language lang
 	lang will be in Steam format e.g. "french", "brazilian" etc
+</pre>
 
-list_drives
+<h3>list_drives</h3>
+<pre>
 	Get a list of active drive letters in a vector (e.g. "A", "C", ...)
 	e.g. list_drives v
+</pre>
 
-get_full_path
+<h3>get_full_path</h3>
+<pre>
 	Convert a pathname to a fully qualified pathname
 	e.g. get_full_path full filename
+</pre>
 
-text_colour
+<h3>text_colour</h3>
+<pre>
 	Change the text colour. Colour constants are:
 		BLACK
 		BLUE
@@ -504,15 +702,22 @@ text_colour
 		WHITE
 	Each colour has a bright version toggleable by a boolean.
 	e.g. text_colour BLACK 0 WHITE 1 ; fore fore_bright back back_bright
+</pre>
 
-text_reset
+<h3>text_reset</h3>
+<pre>
 	Reset the text colour
 	e.g. text_reset
+</pre>
 
-text_clear
+<h3>text_clear</h3>
+<pre>
 	Clear the screen
 	e.g. text_clear
+</pre>
 
-getch
+<h3>getch</h3>
+<pre>
 	Input a single character from the terminal, not waiting for newline
 	e.g. getch input_number
+</pre>
