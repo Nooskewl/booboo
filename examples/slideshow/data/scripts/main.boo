@@ -11,7 +11,8 @@ for i 0 (< i nfiles) 1 check_file
 	string_matches matches [files i] "boo$"
 	if (== TRUE matches) add_it
 		string file
-		string_replace file [files i] ".*\\/(.*\\.boo)" "$1"
+		= file [files i]
+		string_replace file ".*\\/(.*\\.boo)" "$1"
 		if (!= file "main.boo") really_add_it
 			vector_add programs file
 		:really_add_it

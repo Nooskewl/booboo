@@ -13,7 +13,8 @@ for i 0 (< i nfiles) 1 check_next
 	string_matches matches [files i] "pleasant\\/.*json$"
 	if (== TRUE matches) add_it
 		string f
-		string_replace f [files i] ".*\\/(.*).json" "$1"
+		= f [files i]
+		string_replace f ".*\\/(.*).json" "$1"
 		if (!= "sprite" f) really_add
 			vector_add names f
 		:really_add

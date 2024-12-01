@@ -15,7 +15,7 @@ for i 0 (< i 3) 1 search
 	print "%: %\n" [strings i] found
 :search
 
-string_replace [strings 0] [strings 0] "A lot of (.*)" "I don't like $1"
+string_replace [strings 0] "A lot of (.*)" "I don't like $1"
 
 print "%\n" [strings 0]
 	

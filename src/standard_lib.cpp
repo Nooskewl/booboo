@@ -254,20 +254,19 @@ bool corefunc_get_system_language(Program *prg, const std::vector<Token> &v)
 
 bool corefunc_get_full_path(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
-	std::string path = as_string_inline(prg, v[1]);
 
 	CHECK_STRING(v1)
 
 #ifdef _WIN32
 	char buf[MAX_PATH];
-	GetFullPathName(path.c_str(), MAX_PATH, buf, NULL);
+	GetFullPathName(v1.s.c_str(), MAX_PATH, buf, NULL);
 	v1.s = buf;
 #else
 	char buf[PATH_MAX];
-	v1.s = realpath(path.c_str(), buf);
+	v1.s = realpath(v1.s.c_str(), buf);
 	if (v1.s != "/") {
 		struct stat s;
 		if (stat(v1.s.c_str(), &s) == 0) {
@@ -629,17 +628,16 @@ bool stringfunc_trim(Program *prg, const std::vector<Token> &v)
 
 bool stringfunc_replace(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(4)
+	COUNT_ARGS(3)
 
 	Variable &v1 = as_variable_inline(prg, v[0]);
 
 	CHECK_STRING(v1)	
 
-	std::string str = as_string_inline(prg, v[1]);
-	std::string regex = as_string_inline(prg, v[2]);
-	std::string fmt = as_string_inline(prg, v[3]);
+	std::string regex = as_string_inline(prg, v[1]);
+	std::string fmt = as_string_inline(prg, v[2]);
 
-	v1.s = std::regex_replace(str.c_str(), std::regex(regex), fmt.c_str());
+	v1.s = std::regex_replace(v1.s.c_str(), std::regex(regex), fmt.c_str());
 
 	return true;
 }

@@ -129,8 +129,8 @@ function matches s regex
 
 function list_dir name
 {
-	get_full_path name name
-	string_replace name name "[\\\\]" "/"
+	get_full_path name
+	string_replace name "[\\\\]" "/"
 
 	number len
 	string_length len name
