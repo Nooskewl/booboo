@@ -178,14 +178,14 @@ The following sections describe the API:
 <h3>get_screen_size</h3>
 <pre>
 	Get the actual (unscaled) size of the screen/window
-	e.g. screen_size scr_w scr_h
+	e.g. get_screen_size scr_w scr_h
 </pre>
 
 <h3>get_buffer_size</h3>
 <pre>
 	Get the size of the drawing area projection.
 	This is what "resize" changes and it starts at 640x360.
-	e.g. buffer_size bw bh
+	e.g. get_buffer_size bw bh
 </pre>
 
 <h3>get_screen_offset</h3>
@@ -195,7 +195,7 @@ The following sections describe the API:
 	this requires "black bars". screen_offset gives you the position of
 	the top left of the drawing given any black bars. This is mainly
 	useful for some shaders.
-	e.g. screen_offset ox oy
+	e.g. get_screen_offset ox oy
 </pre>
 
 <h3>get_scale</h3>
@@ -203,12 +203,13 @@ The following sections describe the API:
 	Retrieve the scale of the projection. BooBoo starts in a 1280x720
 	window with a 640x360 buffer, so e.g. the scale would be 2 to start
 	and would change based on window size and buffer size.
-	e.g. scale s
+	e.g. get_scale s
 </pre>
 
 <h3>screen_shake</h3>
 <pre>
 	Apply a screen shake effect
+	Currently only works with 2d projection, not after set_3d
 	e.g. screen_shake amount_in_pixels duration_in_millis
 </pre>
 
@@ -432,7 +433,7 @@ The following sections describe the API:
 <h3>sprite_get_previous_animation</h3>
 <pre>
 	Returns the name of the previous animation
-	e.g. sprite_get_animation sprite anim_name
+	e.g. sprite_get_previous_animation sprite anim_name
 </pre>
 
 <h3>sprite_length</h3>
