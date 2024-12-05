@@ -350,12 +350,14 @@ void handle_event(TGUI_Event *event)
 		args[2].n = event->keyboard.is_repeat;
 	}
 	else if (event->type == TGUI_JOY_DOWN || event->type == TGUI_JOY_UP) {
-		args[1].n = event->joystick.button;
-		args[2].n = event->joystick.is_repeat;
+		args[1].n = (Uint32)event->joystick.id;
+		args[2].n = event->joystick.button;
+		args[3].n = event->joystick.is_repeat;
 	}
 	else if (event->type == TGUI_JOY_AXIS) {
-		args[1].n = event->joystick.axis;
-		args[2].n = event->joystick.value;
+		args[1].n = (Uint32)event->joystick.id;
+		args[2].n = event->joystick.axis;
+		args[3].n = event->joystick.value;
 	}
 	else if (event->type == TGUI_MOUSE_DOWN || event->type == TGUI_MOUSE_UP) {
 		args[1].n = event->mouse.button;

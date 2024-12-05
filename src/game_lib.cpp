@@ -4114,12 +4114,14 @@ void BooBoo_Widget::handle_event(TGUI_Event *event)
 		tmp[3].n = event->keyboard.is_repeat;
 	}
 	else if (event->type == TGUI_JOY_DOWN || event->type == TGUI_JOY_UP) {
-		tmp[2].n = event->joystick.button;
-		tmp[3].n = event->joystick.is_repeat;
+		tmp[2].n = (Uint32)event->joystick.id;
+		tmp[3].n = event->joystick.button;
+		tmp[4].n = event->joystick.is_repeat;
 	}
 	else if (event->type == TGUI_JOY_AXIS) {
-		tmp[2].n = event->joystick.axis;
-		tmp[3].n = event->joystick.value;
+		tmp[2].n = (Uint32)event->joystick.id;
+		tmp[3].n = event->joystick.axis;
+		tmp[4].n = event->joystick.value;
 	}
 	else if (event->type == TGUI_MOUSE_DOWN || event->type == TGUI_MOUSE_UP) {
 		tmp[2].n = event->mouse.button;
