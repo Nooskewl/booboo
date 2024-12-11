@@ -4191,63 +4191,6 @@ static bool widgetfunc_create(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool widgetfunc_create_fit(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(4)
-
-	Variable &v1 = as_variable_inline(prg, v[0]);
-	int fit = as_number_inline(prg, v[1]);
-	double other = as_number_inline(prg, v[2]);
-	Variable &data = as_variable_inline(prg, v[3]);
-	
-	Widget_Info *info = widget_info(prg);
-
-	CHECK_NUMBER(v1)
-	
-	v1.n = info->widget_id;
-
-	Widget *widget = new Widget;
-	widget->data = &data;
-
-	if (other <= 1.0) {
-		widget->widget = new BooBoo_Widget(prg, info->widget_id, (BooBoo_Widget::Fit)fit, (float)other);
-	}
-	else {
-		widget->widget = new BooBoo_Widget(prg, info->widget_id, fit, (int)other);
-	}
-
-	widget->widget->set_accepts_focus(true);
-
-	info->widgets[info->widget_id++] = widget;
-
-	return true;
-}
-
-static bool widgetfunc_create_fit_both(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(2)
-
-	Variable &v1 = as_variable_inline(prg, v[0]);
-	Variable &data = as_variable_inline(prg, v[1]);
-	
-	Widget_Info *info = widget_info(prg);
-
-	CHECK_NUMBER(v1)
-	
-	v1.n = info->widget_id;
-
-	Widget *widget = new Widget;
-	widget->data = &data;
-
-	widget->widget = new BooBoo_Widget(prg, info->widget_id);
-
-	widget->widget->set_accepts_focus(true);
-
-	info->widgets[info->widget_id++] = widget;
-
-	return true;
-}
-
 static bool widgetfunc_set_parent(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -4843,8 +4786,6 @@ void start_lib_game()
 	add_instruction("cd_model_line_segment", cdfunc_model_line_segment);
 	add_instruction("cd_sphere_sphere", cdfunc_sphere_sphere);
 	add_instruction("widget_create", widgetfunc_create);
-	add_instruction("widget_create_fit", widgetfunc_create_fit);
-	add_instruction("widget_create_fit_both", widgetfunc_create_fit_both);
 	add_instruction("widget_set_parent", widgetfunc_set_parent);
 	add_instruction("widget_set_float_left", widgetfunc_set_float_left);
 	add_instruction("widget_set_float_right", widgetfunc_set_float_right);

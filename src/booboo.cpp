@@ -1226,8 +1226,6 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "JOY_D", TGUI_B_D, pass, var_i);
 	insert_constant(prg, "JOY_L", TGUI_B_L, pass, var_i);
 	insert_constant(prg, "JOY_R", TGUI_B_R, pass, var_i);
-	insert_constant(prg, "FIT_X", TGUI_Widget::FIT_X, pass, var_i);
-	insert_constant(prg, "FIT_Y", TGUI_Widget::FIT_Y, pass, var_i);
 	insert_constant(prg, "TRANSITION_ENLARGE", 0, pass, var_i);
 	insert_constant(prg, "TRANSITION_SHRINK", 1, pass, var_i);
 	insert_constant(prg, "TRANSITION_APPEAR", 2, pass, var_i);

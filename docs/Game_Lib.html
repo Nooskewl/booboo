@@ -932,21 +932,6 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. widget_create result w h userdata
 </pre>
 
-<h3>widget_create_fit</h3>
-<pre>
-	Create a widget that fits remaining size on one dimension
-	Constants FIT_X and FIT_Y are used for the first parameter
-	The other dimension is then specified as the second parameter,
-	which can be less than 1 to use a percentage size
-	e.g. widget_create_fit result FIT_X h userdata
-</pre>
-
-<h3>widget_create_fit_both</h3>
-<pre>
-	Create a widget that fits the remaining size on X and Y
-	e.g. widget_create_fit_both result userdata
-</pre>
-
 <h3>widget_set_parent</h3>
 <pre>
 	Widget hierarchy is important. You want to have one root widget
@@ -1592,11 +1577,6 @@ Joystick buttons for events:
 <p>
 GUI constants:
 </p>
-
-<ul>
-<li>FIT_X</li>
-<li>FIT_Y</li>
-</ul>
 
 <ul>
 	<li>TRANSITION_ENLARGE</li>
