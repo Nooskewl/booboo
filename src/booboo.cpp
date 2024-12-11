@@ -1228,6 +1228,11 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "JOY_R", TGUI_B_R, pass, var_i);
 	insert_constant(prg, "FIT_X", TGUI_Widget::FIT_X, pass, var_i);
 	insert_constant(prg, "FIT_Y", TGUI_Widget::FIT_Y, pass, var_i);
+	insert_constant(prg, "TRANSITION_ENLARGE", 0, pass, var_i);
+	insert_constant(prg, "TRANSITION_SHRINK", 1, pass, var_i);
+	insert_constant(prg, "TRANSITION_APPEAR", 2, pass, var_i);
+	insert_constant(prg, "TRANSITION_SLIDE", 3, pass, var_i);
+	insert_constant(prg, "TRANSITION_SLIDE_VERTICAL", 4, pass, var_i);
 #endif
 
 	while ((tok = token(prg, tt)) != "") {

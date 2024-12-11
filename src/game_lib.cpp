@@ -9,6 +9,11 @@ using namespace noo;
 #include "booboo/internal.h"
 using namespace booboo;
 
+#include "booboo/game_lib.h"
+
+GUI_Transition_Type transition_in_type = TRANSITION_ENLARGE;
+GUI_Transition_Type transition_out_type = TRANSITION_SHRINK;
+
 extern bool quit;
 
 struct MML_Info {
@@ -4550,7 +4555,24 @@ BooBoo_GUI::BooBoo_GUI(BooBoo_Widget *root) :
 	done_transition_in(false)
 {
 	transition = true;
-	transition_is_enlarge = true;
+
+	switch (transition_in_type) {
+		case TRANSITION_ENLARGE:
+			transition_is_enlarge = true;
+			break;
+		case TRANSITION_SHRINK:
+			transition_is_shrink = true;
+			break;
+		case TRANSITION_APPEAR:
+			transition_is_appear = true;
+			break;
+		case TRANSITION_SLIDE:
+			transition_is_slide = true;
+			break;
+		case TRANSITION_SLIDE_VERTICAL:
+			transition_is_slide_vertical = true;
+			break;
+	}
 
 	root->set_centre_x(true);
 	root->set_centre_y(true);
@@ -4571,8 +4593,40 @@ void BooBoo_GUI::update()
 	gui::GUI::update();
 
 	if (transitioning_in == false && done_transition_in == false) {
-		transition_is_enlarge = false;
-		transition_is_shrink = true;
+		switch (transition_in_type) {
+			case TRANSITION_ENLARGE:
+				transition_is_enlarge = false;
+				break;
+			case TRANSITION_SHRINK:
+				transition_is_shrink = false;
+				break;
+			case TRANSITION_APPEAR:
+				transition_is_appear = false;
+				break;
+			case TRANSITION_SLIDE:
+				transition_is_slide = false;
+				break;
+			case TRANSITION_SLIDE_VERTICAL:
+				transition_is_slide_vertical = false;
+				break;
+		}
+		switch (transition_out_type) {
+			case TRANSITION_ENLARGE:
+				transition_is_enlarge = true;
+				break;
+			case TRANSITION_SHRINK:
+				transition_is_shrink = true;
+				break;
+			case TRANSITION_APPEAR:
+				transition_is_appear = true;
+				break;
+			case TRANSITION_SLIDE:
+				transition_is_slide = true;
+				break;
+			case TRANSITION_SLIDE_VERTICAL:
+				transition_is_slide_vertical = true;
+				break;
+		}
 		done_transition_in = true;
 	}
 }
@@ -4619,6 +4673,19 @@ static bool widgetfunc_gui_set_focus(Program *prg, const std::vector<Token> &v)
 	if (shim::guis.size() > 0) {
 		shim::guis[shim::guis.size()-1]->gui->set_focus(info->widgets[id]->widget);
 	}
+
+	return true;
+}
+
+static bool widgetfunc_gui_set_transition_types(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int in = as_number(prg, v[0]);
+	int out = as_number(prg, v[1]);
+
+	transition_in_type = (GUI_Transition_Type)in;
+	transition_out_type = (GUI_Transition_Type)out;
 
 	return true;
 }
@@ -4800,6 +4867,7 @@ void start_lib_game()
 	add_instruction("gui_start", widgetfunc_gui_start);
 	add_instruction("gui_exit", widgetfunc_gui_exit);
 	add_instruction("gui_set_focus", widgetfunc_gui_set_focus);
+	add_instruction("gui_set_transition_types", widgetfunc_gui_set_transition_types);
 }
 
 void end_lib_game()

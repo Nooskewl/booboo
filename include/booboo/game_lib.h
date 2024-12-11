@@ -3,6 +3,14 @@
 
 #include "booboo.h"
 
+enum GUI_Transition_Type {
+	TRANSITION_ENLARGE,
+	TRANSITION_SHRINK,
+	TRANSITION_APPEAR,
+	TRANSITION_SLIDE,
+	TRANSITION_SLIDE_VERTICAL
+};
+
 void start_lib_game();
 void end_lib_game();
 void game_lib_destroy_program(booboo::Program *prg);

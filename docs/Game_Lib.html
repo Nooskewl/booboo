@@ -1072,6 +1072,19 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. gui_exit
 </pre>
 
+<h3>gui_set_focus</h3>
+<pre>
+	Set focus to a widget
+</pre>
+
+<h3>gui_set_transition_types</h3>
+<pre>
+	Set the in/out transition types for GUI start/end
+	transitions. See constants.
+	e.g. gui_set_transition_types TRANSITION_ENLARGE TRANSITION_SHRINK
+	; this is the default
+</pre>
+
 <a id="Collision"><h2>Collision Detection Functions</h2></a>
 
 <h3>cd_model_point</h3>
@@ -1582,6 +1595,14 @@ GUI constants:
 <ul>
 <li>FIT_X</li>
 <li>FIT_Y</li>
+</ul>
+
+<ul>
+	<li>TRANSITION_ENLARGE</li>
+	<li>TRANSITION_SHRINK</li>
+	<li>TRANSITION_APPEAR</li>
+	<li>TRANSITION_SLIDE</li>
+	<li>TRANSITION_SLIDE_VERTICAL</li>
 </ul>
 
 <a id="Events"><h2>Events</h2></a>
