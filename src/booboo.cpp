@@ -965,6 +965,7 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "PURPLE", 5, pass, var_i);
 	insert_constant(prg, "YELLOW", 6, pass, var_i);
 	insert_constant(prg, "WHITE", 7, pass, var_i);
+#ifndef CLI
 	insert_constant(prg, "KEY_UNKNOWN", 0, pass, var_i);
 	insert_constant(prg, "KEY_RETURN", 13, pass, var_i);
 	insert_constant(prg, "KEY_ESCAPE", 27, pass, var_i);
@@ -1227,6 +1228,7 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "JOY_R", TGUI_B_R, pass, var_i);
 	insert_constant(prg, "FIT_X", TGUI_Widget::FIT_X, pass, var_i);
 	insert_constant(prg, "FIT_Y", TGUI_Widget::FIT_Y, pass, var_i);
+#endif
 
 	while ((tok = token(prg, tt)) != "") {
 top:
