@@ -555,6 +555,8 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 
 	bool done = false;
 
+	bool deref = false;
+
 	while (!done) {
 		while (isspace(expr[p]) && p < (int)expr.length()) {
 			p++;
@@ -586,6 +588,8 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			}
 			tok.i = var_i++;
 			tok.token = new_expr;
+			tok.dereference = deref;
+			deref = false;
 
 			Variable v1;
 			v1.name = "__expr" + itos(expression_i++);
@@ -602,6 +606,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 		}
 		else if (c == ')') {
 			done = true;
+			deref = false;
 			break;
 		}
 		else if (c == '[') {
@@ -626,6 +631,8 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			}
 			tok.i = var_i++;
 			tok.token = new_expr;
+			tok.dereference = deref;
+			deref = false;
 
 			Variable v1;
 			v1.name = "__fish" + itos(fish_i++);
@@ -676,6 +683,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			str = util::remove_quotes(util::unescape_string(str));
 			tok.token = str;
 			tok.s = str;
+			tok.dereference = false;
 		}
 		else if (isalpha(c) || c == '_') {
 			tok.type = Token::SYMBOL;
@@ -691,6 +699,8 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 				p++;
 			}
 			tok.token = sym;
+			tok.dereference = deref;
+			deref = false;
 
 			if (pass == PASS2) {
 				if (prg->variables_map.find(sym) == prg->variables_map.end()) {
@@ -699,11 +709,14 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 				tok.i = prg->variables_map[sym];
 			}
 		}
+		else if (c == '`') {
+			deref = true;
+			p++;
+			continue;
+		}
 		else {
 			throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg));
 		}
-
-		tok.dereference = false;
 
 		e.v.push_back(tok);
 	}
@@ -779,6 +792,8 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 
 	bool done = false;
 
+	bool deref = false;
+
 	while (!done) {
 		while (isspace(expr[p]) && p < (int)expr.length()) {
 			p++;
@@ -810,6 +825,8 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			}
 			tok.i = var_i++;
 			tok.token = new_expr;
+			tok.dereference = deref;
+			deref = false;
 
 			Variable v1;
 			v1.name = "__expr" + itos(expression_i++);
@@ -846,6 +863,8 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			}
 			tok.i = var_i++;
 			tok.token = new_expr;
+			tok.dereference = deref;
+			deref = false;
 
 			Variable v1;
 			v1.name = "__fish" + itos(fish_i++);
@@ -862,6 +881,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 		}
 		else if (c == ']') {
 			done = true;
+			deref = false;
 			break;
 		}
 		else if (isdigit(c) || c == '-' || c == '.') {
@@ -900,6 +920,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			str = util::remove_quotes(util::unescape_string(str));
 			tok.token = str;
 			tok.s = str;
+			tok.dereference = false;
 		}
 		else if (isalpha(c) || c == '_') {
 			tok.type = Token::SYMBOL;
@@ -915,6 +936,8 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 				p++;
 			}
 			tok.token = sym;
+			tok.dereference = deref;
+			deref = false;
 
 			if (pass == PASS2) {
 				if (prg->variables_map.find(sym) == prg->variables_map.end()) {
@@ -923,11 +946,14 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 				tok.i = prg->variables_map[sym];
 			}
 		}
+		else if (c == '`') {
+			deref = true;
+			p++;
+			continue;
+		}
 		else {
 			throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg));
 		}
-
-		tok.dereference = false;
 
 		e.v.push_back(tok);
 	}
