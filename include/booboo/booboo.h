@@ -34,6 +34,8 @@ struct Token {
 	};
 
 	std::string token;
+
+	bool dereference;
 };
 
 struct Variable
@@ -46,7 +48,8 @@ struct Variable
 		LABEL,
 		FUNCTION,
 		EXPRESSION,
-		FISH
+		FISH,
+		POINTER
 	} type;
 
 	struct Expression
@@ -150,6 +153,7 @@ extern std::string (*load_text)(std::string filename); // must be set
 #define IS_FUNCTION(v) ((v).type == Variable::FUNCTION)
 #define IS_EXPRESSION(v) ((v).type == Variable::EXPRESSION)
 #define IS_FISH(v) ((v).type == Variable::FISH)
+#define IS_POINTER(v) ((v).type == Variable::POINTER)
 
 #if 1
 // You can use this at the start of your library functions to ensure correct number of arguments

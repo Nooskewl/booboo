@@ -369,6 +369,9 @@ static bool miscfunc_inspect(Program *prg, const std::vector<Token> &v)
 		else if (IS_LABEL(var)) {
 			snprintf(buf, 1000, "-label-");
 		}
+		else if (IS_POINTER(var)) {
+			snprintf(buf, 1000, "-pointer-");
+		}
 	}
 	else {
 		strcpy(buf, "Unknown");

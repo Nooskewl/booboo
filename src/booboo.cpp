@@ -341,6 +341,12 @@ static std::string tokenfunc_ref(Program *prg)
 	return "~";
 }
 
+static std::string tokenfunc_deref(Program *prg)
+{
+	prg->s->p++;
+	return "!";
+}
+
 static std::string token(Program *prg, Token::Token_Type &ret_type)
 {
 	skip_whitespace(prg);
@@ -1233,6 +1239,8 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "TRANSITION_SLIDE_VERTICAL", 4, pass, var_i);
 #endif
 
+	bool _is_deref = false;
+
 	while ((tok = token(prg, tt)) != "") {
 top:
 		if (tok == ";") {
@@ -1243,6 +1251,9 @@ top:
 			if (prg->s->p < prg->s->code.length()) {
 				prg->s->p++;
 			}
+		}
+		else if (tok == "!") {
+			_is_deref = true;
 		}
 		else if (tok == "function") {
 			std::string func_name = token(prg, tt);
@@ -1274,6 +1285,7 @@ top:
 			bool is_param = true;
 			bool finished = false;
 			bool param_is_ref = false;
+			bool is_deref = false;
 			while ((tok = token(prg, tt)) != "") {
 func_top:
 				func.s->line = prg->s->line;
@@ -1286,6 +1298,9 @@ func_top:
 					if (prg->s->p < prg->s->code.length()) {
 						prg->s->p++;
 					}
+				}
+				else if (tok == "!") {
+					is_deref = true;
 				}
 				else if (tok == "{") {
 					is_param = false;
@@ -1312,6 +1327,8 @@ func_top:
 					t.i = var_i;
 					t.s = tok2;
 					t.token = tok2;
+					t.dereference = false;
+					is_deref = false;
 					func.s->program[func.s->program.size()-1].data.push_back(t);
 
 					if (pass == PASS1) {
@@ -1326,7 +1343,7 @@ func_top:
 					}
 					var_i++;
 				}
-				else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map") {
+				else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map" || tok == "pointer") {
 					Statement s;
 					s.method = library_map[tok];
 					func.s->program.push_back(s);
@@ -1360,8 +1377,11 @@ func_top:
 						else if (tok == "vector") {
 							v.type = Variable::VECTOR;
 						}
-						else { // map
+						else if (tok == "map") {
 							v.type = Variable::MAP;
+						}
+						else { // pointer
+							v.type = Variable::POINTER;
 						}
 						std::map<std::string, int>::iterator it;
 						it = prg->variables_map.find(tok2);
@@ -1381,6 +1401,8 @@ func_top:
 						}
 						t.s = tok2;
 						t.token = tok2;
+						t.dereference = false;
+						is_deref = false;
 						func.s->program[func.s->program.size()-1].data.push_back(t);
 					}
 				}
@@ -1409,6 +1431,8 @@ func_top:
 					if (pass == PASS2) {
 						t.i = prg->variables_map[v.name];
 					}
+					t.dereference = is_deref;
+					is_deref = false;
 
 					func.s->program[func.s->program.size()-1].data.push_back(t);
 				}
@@ -1437,6 +1461,8 @@ func_top:
 					if (pass == PASS2) {
 						t.i = prg->variables_map[v.name];
 					}
+					t.dereference = is_deref;
+					is_deref = false;
 
 					func.s->program[func.s->program.size()-1].data.push_back(t);
 				}
@@ -1445,6 +1471,7 @@ func_top:
 					s.method = library_map[tok];
 					func.s->program.push_back(s);
 					func.s->line_numbers.push_back(prg->s->line);
+					is_deref = false;
 				}
 				else if (is_param) {
 					if (tok == "~") {
@@ -1467,6 +1494,7 @@ func_top:
 						func.params.push_back(param_i);
 						func.ref.push_back(param_is_ref);
 						param_is_ref = false;
+						is_deref = false;
 					}
 				}
 				else {
@@ -1493,6 +1521,8 @@ func_top:
 							t.n = atof(tok.c_str());
 							break;
 					}
+					t.dereference = is_deref;
+					is_deref = false;
 					func.s->program[func.s->program.size()-1].data.push_back(t);
 				}
 			}
@@ -1535,6 +1565,8 @@ func_top:
 			t.i = var_i;
 			t.s = tok2;
 			t.token = tok2;
+			t.dereference = false;
+			_is_deref = false;
 			prg->s->program[prg->s->program.size()-1].data.push_back(t);
 
 			if (pass == PASS1 && prg->variables_map.find(tok2) != prg->variables_map.end()) {
@@ -1546,7 +1578,7 @@ func_top:
 			prg->variables_map[tok2] = var_i;
 			var_i++;
 		}
-		else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map") {
+		else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map" || tok == "pointer") {
 			Statement s;
 			s.method = library_map[tok];
 			prg->s->program.push_back(s);
@@ -1578,8 +1610,11 @@ func_top:
 				else if (tok == "vector") {
 					v.type = Variable::VECTOR;
 				}
-				else { // map
+				else if (tok == "map") {
 					v.type = Variable::MAP;
+				}
+				else { // pointer
+					v.type = Variable::POINTER;
 				}
 				if (pass == PASS1) {
 					prg->variables.push_back(v);
@@ -1591,6 +1626,8 @@ func_top:
 				}
 				t.s = tok2;
 				t.token = tok2;
+				t.dereference = false;
+				_is_deref = false;
 				prg->s->program[prg->s->program.size()-1].data.push_back(t);
 			}
 		}
@@ -1617,6 +1654,8 @@ func_top:
 			if (pass == PASS2) {
 				t.i = prg->variables_map[v.name];
 			}
+			t.dereference = _is_deref;
+			_is_deref = false;
 
 			prg->s->program[prg->s->program.size()-1].data.push_back(t);
 		}
@@ -1643,6 +1682,8 @@ func_top:
 			if (pass == PASS2) {
 				t.i = prg->variables_map[v.name];
 			}
+			t.dereference = _is_deref;
+			_is_deref = false;
 
 			prg->s->program[prg->s->program.size()-1].data.push_back(t);
 		}
@@ -1651,6 +1692,7 @@ func_top:
 			s.method = library_map[tok];
 			prg->s->program.push_back(s);
 			prg->s->line_numbers.push_back(prg->s->line);
+			_is_deref = false;
 		}
 		else if (prg->s->program.size() == 0) {
 			throw Error("Expected keyword at " + get_error_info(prg));
@@ -1676,6 +1718,8 @@ func_top:
 					t.n = atof(tok.c_str());
 					break;
 			}
+			t.dereference = _is_deref;
+			_is_deref = false;
 			prg->s->program[prg->s->program.size()-1].data.push_back(t);
 		}
 	}
@@ -1884,38 +1928,64 @@ bool corefunc_map(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+bool corefunc_pointer(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(1)
+	return true;
+}
+
 bool corefunc_set(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable_inline(prg, v[0]);
+	Variable *v1;
 
-	if (IS_NUMBER(v1)) {
-		v1.n = as_number_inline(prg, v[1]);
-	}
-	else if (IS_STRING(v1)) {
-		v1.s = as_string_inline(prg, v[1]);
-	}
-	else if (IS_VECTOR(v1)) {
-		Variable v2 = as_variable_resolve_inline(prg, v[1]);
-		if (IS_VECTOR(v2)) {
-			v1.v = v2.v;
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-		}
-	}
-	else if (IS_MAP(v1)) {
-		Variable v2 = as_variable_resolve_inline(prg, v[1]);
-		if (IS_MAP(v2)) {
-			v1.m = v2.m;
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-		}
+	if (v[0].dereference) {
+		v1 = as_variable_inline(prg, v[0]).p;
 	}
 	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+		v1 = &as_variable_inline(prg, v[0]);
+	}
+
+	if (v[1].type == Token::NUMBER) {
+		v1->n = as_number_inline(prg, v[1]);
+	}
+	else if (v[1].type == Token::STRING) {
+		v1->s = as_string_inline(prg, v[1]);
+	}
+	else {
+		Variable &v2 = as_variable_inline(prg, v[1]);
+
+		if (IS_NUMBER(v2)) {
+			v1->n = as_number_inline(prg, v[1]);
+		}
+		else if (IS_STRING(v2)) {
+			v1->s = as_string_inline(prg, v[1]);
+		}
+		else if (IS_VECTOR(v2)) {
+			Variable v2 = as_variable_resolve_inline(prg, v[1]);
+			if (IS_VECTOR(v2)) {
+				v1->v = v2.v;
+			}
+			else {
+				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+			}
+		}
+		else if (IS_MAP(v2)) {
+			Variable v2 = as_variable_resolve_inline(prg, v[1]);
+			if (IS_MAP(v2)) {
+				v1->m = v2.m;
+			}
+			else {
+				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+			}
+		}
+		else if (IS_POINTER(v2)) {
+			v1->p = v2.p;
+		}
+		else {
+			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
+		}
 	}
 
 	return true;
@@ -2203,6 +2273,9 @@ static std::string typeof_var(Variable &v1)
 	else if (IS_LABEL(v1)) {
 		res = "label";
 	}
+	else if (IS_POINTER(v1)) {
+		res = "pointer";
+	}
 	else {
 		res = "unknown";
 	}
@@ -2378,6 +2451,21 @@ bool corefunc_if(Program *prg, const std::vector<Token> &v)
 		unsigned int end_block = as_label_inline(prg, v[v.size()-1]);
 		prg->s->pc = end_block;
 	}
+
+	return true;
+}
+
+bool corefunc_address(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &var = as_variable_inline(prg, v[0]);
+
+	if (IS_POINTER(var) == false) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected pointer at " + get_error_info(prg));
+	}
+
+	var.p = &as_variable_inline(prg, v[1]);
 
 	return true;
 }
@@ -3383,6 +3471,7 @@ static void init_token_map()
 	add_token_handler('>', tokenfunc_rightshift);
 	add_token_handler('#', tokenfunc_hex);
 	add_token_handler('~', tokenfunc_ref);
+	add_token_handler('!', tokenfunc_deref);
 }
 
 void start()
@@ -3432,6 +3521,7 @@ void start()
 	add_instruction("string", corefunc_string);
 	add_instruction("vector", corefunc_vector);
 	add_instruction("map", corefunc_map);
+	add_instruction("pointer", corefunc_pointer);
 	
 	add_instruction("=", corefunc_set);
 	add_instruction("+", corefunc_add);
@@ -3455,6 +3545,8 @@ void start()
 	
 	add_instruction("for", corefunc_for);
 	add_instruction("if", corefunc_if);
+	
+	add_instruction("address", corefunc_address);
 	
 	return_code = 0;
 }

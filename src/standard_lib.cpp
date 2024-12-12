@@ -121,27 +121,33 @@ bool corefunc_print(Program *prg, const std::vector<Token> &v)
 			val = buf;
 		}
 		else {
-			Variable &v1 = as_variable_inline(prg, v[_tok]);
-			if (IS_NUMBER(v1)) {
+			Variable *v1;
+			if (v[_tok].dereference) {
+				v1 = as_variable_inline(prg, v[_tok]).p;
+			}
+			else {
+				v1 = &as_variable_inline(prg, v[_tok]);
+			}
+			if (IS_NUMBER(*v1)) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
-				snprintf(buf, 1000, ("%" + format).c_str(), v1.n);
+				snprintf(buf, 1000, ("%" + format).c_str(), v1->n);
 				val = buf;
 			}
-			else if (IS_STRING(v1)) {
+			else if (IS_STRING(*v1)) {
 				format = (format == "") ? "s" : format;
 				char buf[1000];
-				snprintf(buf, 1000, ("%" + format).c_str(), v1.s.c_str());
+				snprintf(buf, 1000, ("%" + format).c_str(), v1->s.c_str());
 				val = buf;
 			}
-			else if (IS_EXPRESSION(v1)) {
+			else if (IS_EXPRESSION(*v1)) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
-				snprintf(buf, 1000, ("%" + format).c_str(), evaluate_expression(prg, v1.e).n);
+				snprintf(buf, 1000, ("%" + format).c_str(), evaluate_expression(prg, v1->e).n);
 				val = buf;
 			}
-			else if (IS_FISH(v1)) {
-				Variable &var = go_fish(prg, v1.f);
+			else if (IS_FISH(*v1)) {
+				Variable &var = go_fish(prg, v1->f);
 				if (IS_NUMBER(var)) {
 					format = (format == "") ? "g" : format;
 					char buf[1000];
@@ -174,17 +180,20 @@ bool corefunc_print(Program *prg, const std::vector<Token> &v)
 				}
 			}
 			else {
-				if (IS_VECTOR(v1)) {
+				if (IS_VECTOR(*v1)) {
 					val = "-vector-";
 				}
-				else if (IS_MAP(v1)) {
+				else if (IS_MAP(*v1)) {
 					val = "-map-";
 				}
-				else if (IS_FUNCTION(v1)) {
+				else if (IS_FUNCTION(*v1)) {
 					val = "-function-";
 				}
-				else if (IS_LABEL(v1)) {
+				else if (IS_LABEL(*v1)) {
 					val = "-label-";
+				}
+				else if (IS_POINTER(*v1)) {
+					val = "-pointer-";
 				}
 				else {
 					val = "-unknown-";
@@ -1093,7 +1102,12 @@ static bool vectorfunc_set(Program *prg, const std::vector<Token> &v)
 		p = &id.v;
 	}
 
-	(*p)[indices[indices.size()-1]] = var;
+	if (v[0].dereference) {
+		*((*p)[indices[indices.size()-1]]).p = var;
+	}
+	else {
+		(*p)[indices[indices.size()-1]] = var;
+	}
 
 	return true;
 }
@@ -1254,7 +1268,12 @@ static bool mapfunc_set(Program *prg, const std::vector<Token> &v)
 		}
 	}
 
-	(*p)[key] = var;
+	if (v[0].dereference) {
+		*((*p)[key]).p = var;
+	}
+	else {
+		(*p)[key] = var;
+	}
 
 	return true;
 }

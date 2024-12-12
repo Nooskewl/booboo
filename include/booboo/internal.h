@@ -99,7 +99,25 @@ inline double as_number_inline(Program *prg, const Token &t)
 		return t.n;
 	}
 	else if (t.type == Token::SYMBOL) {
-		Variable *v = &prg->variables[t.i];
+		Variable *v;
+		if (t.dereference) {
+			printf("HERE\n");
+			if (prg->variables[t.i].type == Variable::EXPRESSION) {
+				Variable var = evaluate_expression(prg, v->e);
+				v = var.p;
+			}
+			else if (prg->variables[t.i].type == Variable::FISH) {
+				Variable &var = go_fish(prg, v->f);
+				v = var.p;
+			}
+			else {
+				v = prg->variables[t.i].p;
+			}
+		}
+		else {
+			printf("NO\n");
+			v = &prg->variables[t.i];
+		}
 		if (v->type == Variable::NUMBER) {
 			return v->n;
 		}
@@ -150,7 +168,23 @@ inline std::string as_string_inline(Program *prg, const Token &t)
 		return buf;
 	}
 	else if (t.type == Token::SYMBOL) {
-		Variable *v = &prg->variables[t.i];
+		Variable *v;
+		if (t.dereference) {
+			if (prg->variables[t.i].type == Variable::EXPRESSION) {
+				Variable var = evaluate_expression(prg, v->e);
+				v = var.p;
+			}
+			else if (prg->variables[t.i].type == Variable::FISH) {
+				Variable &var = go_fish(prg, v->f);
+				v = var.p;
+			}
+			else {
+				v = prg->variables[t.i].p;
+			}
+		}
+		else {
+			v = &prg->variables[t.i];
+		}
 		if (v->type == Variable::STRING) {
 			return v->s;
 		}
@@ -190,7 +224,23 @@ inline int as_label_inline(Program *prg, const Token &t)
 	if (t.type != Token::SYMBOL) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
-	Variable *v = &prg->variables[t.i];
+	Variable *v;
+	if (t.dereference) {
+		if (prg->variables[t.i].type == Variable::EXPRESSION) {
+			Variable var = evaluate_expression(prg, v->e);
+			v = var.p;
+		}
+		else if (prg->variables[t.i].type == Variable::FISH) {
+			Variable &var = go_fish(prg, v->f);
+			v = var.p;
+		}
+		else {
+			v = prg->variables[t.i].p;
+		}
+	}
+	else {
+		v = &prg->variables[t.i];
+	}
 	if (v->type == Variable::FISH) {
 		Variable &var = go_fish(prg, v->f);
 		if (var.type != Variable::LABEL) {
@@ -209,7 +259,23 @@ inline int as_function_inline(Program *prg, const Token &t)
 	if (t.type != Token::SYMBOL) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
-	Variable *v = &prg->variables[t.i];
+	Variable *v;
+	if (t.dereference) {
+		if (prg->variables[t.i].type == Variable::EXPRESSION) {
+			Variable var = evaluate_expression(prg, v->e);
+			v = var.p;
+		}
+		else if (prg->variables[t.i].type == Variable::FISH) {
+			Variable &var = go_fish(prg, v->f);
+			v = var.p;
+		}
+		else {
+			v = prg->variables[t.i].p;
+		}
+	}
+	else {
+		v = &prg->variables[t.i];
+	}
 	if (v->type == Variable::FISH) {
 		Variable &var = go_fish(prg, v->f);
 		if (var.type != Variable::FUNCTION) {
