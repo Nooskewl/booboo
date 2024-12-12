@@ -23,16 +23,19 @@ function start_gui
 	map_set c_right "event" null_event
 	call_result ll mklabel "IN"
 	call_result lr mklabel "OUT"
-	call_result l1 mkradio 0 0 "Enlarge"
-	call_result l2 mkradio 0 1 "Shrink"
-	call_result l3 mkradio 0 2 "Appear"
-	call_result l4 mkradio 0 3 "Slide"
-	call_result l5 mkradio 0 4 "V. Slide"
-	call_result r1 mkradio 1 0 "Enlarge"
-	call_result r2 mkradio 1 1 "Shrink"
-	call_result r3 mkradio 1 2 "Appear"
-	call_result r4 mkradio 1 3 "Slide"
-	call_result r5 mkradio 1 4 "V. Slide"
+	pointer g1 g2
+	address g1 [groups 0]
+	address g2 [groups 1]
+	call_result l1 mkradio g1 0 "Enlarge"
+	call_result l2 mkradio g1 1 "Shrink"
+	call_result l3 mkradio g1 2 "Appear"
+	call_result l4 mkradio g1 3 "Slide"
+	call_result l5 mkradio g1 4 "V. Slide"
+	call_result r1 mkradio g2 0 "Enlarge"
+	call_result r2 mkradio g2 1 "Shrink"
+	call_result r3 mkradio g2 2 "Appear"
+	call_result r4 mkradio g2 3 "Slide"
+	call_result r5 mkradio g2 4 "V. Slide"
 	call_result bcycle mkbutton "Cycle GUI" cycle_gui
 
 	widget_create wll 1 30 ll
@@ -169,9 +172,13 @@ function draw_radio x y w h focussed data
 
 	circle 255 255 255 255 (+ xx 10) cy 7 1 -1
 
-	if (== [groups [data "group"]] [data "index"]) check
+	if (== `[data "group"] [data "index"]) check
 		filled_circle 255 255 255 255 (+ xx 10) cy 5 -1
 	:check
+	
+	if (== focussed 1) draw_focus
+		rectangle 255 255 0 255 x y w h 2
+	:draw_focus
 }
 
 function null_event type a b c d x y w h focussed ~data
@@ -197,10 +204,10 @@ function button_event type a b c d x y w h focussed ~data
 		map_set data "down" FALSE
 	:up
 
-	if (&& (== TRUE focussed) (== FALSE b) (|| (&& (== type EVENT_KEY_DOWN) (== KEY_RETURN a)) (&& (== type EVENT_JOY_DOWN) (== a JOY_A)))) down2
+	if (&& (== TRUE focussed) (== FALSE b) (|| (&& (== type EVENT_KEY_DOWN) (== KEY_RETURN a)) (&& (== type EVENT_JOY_DOWN) (== b JOY_A)))) down2
 		map_set data "down" TRUE
 	:down2
-	if (&& (== [data "down"] TRUE) (== TRUE focussed) (|| (&& (== type EVENT_KEY_UP) (== KEY_RETURN a)) (&& (== type EVENT_JOY_UP) (== a JOY_A)))) play_it
+	if (&& (== [data "down"] TRUE) (== TRUE focussed) (|| (&& (== type EVENT_KEY_UP) (== KEY_RETURN a)) (&& (== type EVENT_JOY_UP) (== b JOY_A)))) play_it
 		call [data "callback"]
 		map_set data "down" FALSE
 	:play_it
@@ -212,9 +219,12 @@ function radio_event type a b c d x y w h focussed ~data
 		number on_button
 		call_result on_button owned x y w h c d
 		if (== on_button TRUE) really_down
-			= [groups [data "group"]] [data "index"]
+			= `[data "group"] [data "index"]
 		:really_down
 	:down
+	if (&& (== TRUE focussed) (== FALSE b) (|| (&& (== type EVENT_KEY_DOWN) (== KEY_RETURN a)) (&& (== type EVENT_JOY_DOWN) (== b JOY_A)))) down2
+		= `[data "group"] [data "index"]
+	:down2
 }
 
 function mkbutton text callback
