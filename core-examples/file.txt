@@ -1,3 +1,0 @@
-apples=good
-oranges=bad
-bananas=ok

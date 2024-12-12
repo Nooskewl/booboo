@@ -3,7 +3,7 @@ number a b c
 = b 8
 = c 9
 string s
-print "Enter a number (7,8,9 are special, so is everything else!\n"
+print "Enter a number (7,8,9 are special, so is everything else!)\n"
 input s
 if (== a s) the_if (== b s) elseif (== c s) elseif2 else
 print "the_if\n"
