@@ -337,6 +337,7 @@ void handle_event(TGUI_Event *event)
 	Token t;
 	t.type = Token::NUMBER;
 	t.n = (int)event->type;
+	t.dereference = false;
 	args.push_back(t);
 
 	for (int i = 0; i < 4; i++) {

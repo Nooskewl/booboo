@@ -344,7 +344,7 @@ static std::string tokenfunc_ref(Program *prg)
 static std::string tokenfunc_deref(Program *prg)
 {
 	prg->s->p++;
-	return "!";
+	return "`";
 }
 
 static std::string token(Program *prg, Token::Token_Type &ret_type)
@@ -652,6 +652,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			}
 			tok.token = str;
 			tok.n = atof(str.c_str());
+			tok.dereference = false;
 		}
 		else if (c == '"') {
 			tok.type = Token::STRING;
@@ -701,6 +702,8 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 		else {
 			throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg));
 		}
+
+		tok.dereference = false;
 
 		e.v.push_back(tok);
 	}
@@ -873,6 +876,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			}
 			tok.token = str;
 			tok.n = atof(str.c_str());
+			tok.dereference = false;
 		}
 		else if (c == '"') {
 			tok.type = Token::STRING;
@@ -922,6 +926,8 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 		else {
 			throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg));
 		}
+
+		tok.dereference = false;
 
 		e.v.push_back(tok);
 	}
@@ -1252,7 +1258,7 @@ top:
 				prg->s->p++;
 			}
 		}
-		else if (tok == "!") {
+		else if (tok == "`") {
 			_is_deref = true;
 		}
 		else if (tok == "function") {
@@ -1299,7 +1305,7 @@ func_top:
 						prg->s->p++;
 					}
 				}
-				else if (tok == "!") {
+				else if (tok == "`") {
 					is_deref = true;
 				}
 				else if (tok == "{") {
@@ -1954,16 +1960,15 @@ bool corefunc_set(Program *prg, const std::vector<Token> &v)
 		v1->s = as_string_inline(prg, v[1]);
 	}
 	else {
-		Variable &v2 = as_variable_inline(prg, v[1]);
+		Variable v2 = as_variable_resolve_inline(prg, v[1]);
 
 		if (IS_NUMBER(v2)) {
-			v1->n = as_number_inline(prg, v[1]);
+			v1->n = v2.n;
 		}
 		else if (IS_STRING(v2)) {
-			v1->s = as_string_inline(prg, v[1]);
+			v1->s = v2.s;
 		}
 		else if (IS_VECTOR(v2)) {
-			Variable v2 = as_variable_resolve_inline(prg, v[1]);
 			if (IS_VECTOR(v2)) {
 				v1->v = v2.v;
 			}
@@ -1972,7 +1977,6 @@ bool corefunc_set(Program *prg, const std::vector<Token> &v)
 			}
 		}
 		else if (IS_MAP(v2)) {
-			Variable v2 = as_variable_resolve_inline(prg, v[1]);
 			if (IS_MAP(v2)) {
 				v1->m = v2.m;
 			}
@@ -3471,7 +3475,7 @@ static void init_token_map()
 	add_token_handler('>', tokenfunc_rightshift);
 	add_token_handler('#', tokenfunc_hex);
 	add_token_handler('~', tokenfunc_ref);
-	add_token_handler('!', tokenfunc_deref);
+	add_token_handler('`', tokenfunc_deref);
 }
 
 void start()
@@ -3638,6 +3642,7 @@ Token token_number(std::string token, double n)
 	t.type = Token::NUMBER;
 	t.token = token;
 	t.n = n;
+	t.dereference = false;
 	return t;
 }
 
@@ -3647,6 +3652,7 @@ Token token_string(std::string token, std::string s)
 	t.type = Token::STRING;
 	t.token = token;
 	t.s = s;
+	t.dereference = false;
 	return t;
 }
 

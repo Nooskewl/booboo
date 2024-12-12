@@ -101,7 +101,6 @@ inline double as_number_inline(Program *prg, const Token &t)
 	else if (t.type == Token::SYMBOL) {
 		Variable *v;
 		if (t.dereference) {
-			printf("HERE\n");
 			if (prg->variables[t.i].type == Variable::EXPRESSION) {
 				Variable var = evaluate_expression(prg, v->e);
 				v = var.p;
@@ -115,7 +114,6 @@ inline double as_number_inline(Program *prg, const Token &t)
 			}
 		}
 		else {
-			printf("NO\n");
 			v = &prg->variables[t.i];
 		}
 		if (v->type == Variable::NUMBER) {

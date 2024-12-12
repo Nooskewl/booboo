@@ -2,17 +2,17 @@ number n
 = n 10
 pointer p
 address p n
-= !p 20
+= `p 20
 print "%\n" n
-print "%\n" !p
+print "%\n" `p
 
 map m
 = [m "foo"] p
-= ![m "foo"] 30
+= `[m "foo"] 30
 print "%\n" n
 = [m "foo"] 40
 print "%\n" [m "foo"]
 
 address p [m "foo"]
-= !p 50
+= `p 50
 print "%\n" [m "foo"]

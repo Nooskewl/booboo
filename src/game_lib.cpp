@@ -1961,6 +1961,7 @@ static void sprite_callback(void *data)
 	Token t;
 	t.type = Token::NUMBER;
 	t.n = d->id;
+	t.dereference = false;
 	v.push_back(t);
 	call_void_function(d->prg, d->function, v, 0);
 	delete d;
@@ -3321,6 +3322,7 @@ static void model_callback(void *data)
 	Token t;
 	t.type = Token::NUMBER;
 	t.n = d->id;
+	t.dereference = false;
 	v.push_back(t);
 	call_void_function(d->prg, d->function, v, 0);
 	delete d;
@@ -4054,6 +4056,7 @@ void BooBoo_Widget::draw()
 
 	t.type = Token::NUMBER;
 	t.n = id;
+	t.dereference = false;
 	tmp.push_back(t);
 
 	t.type = Token::NUMBER;
@@ -4088,6 +4091,7 @@ void BooBoo_Widget::handle_event(TGUI_Event *event)
 
 	t.type = Token::NUMBER;
 	t.n = id;
+	t.dereference = false;
 	tmp.push_back(t);
 
 	t.type = Token::NUMBER;
