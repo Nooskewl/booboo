@@ -12,3 +12,7 @@ map m
 print "%\n" n
 = [m "foo"] 40
 print "%\n" [m "foo"]
+
+address p [m "foo"]
+= !p 50
+print "%\n" [m "foo"]
