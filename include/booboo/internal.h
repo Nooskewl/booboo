@@ -102,11 +102,11 @@ inline double as_number_inline(Program *prg, const Token &t)
 		Variable *v;
 		if (t.dereference) {
 			if (prg->variables[t.i].type == Variable::EXPRESSION) {
-				Variable var = evaluate_expression(prg, v->e);
+				Variable var = evaluate_expression(prg, prg->variables[t.i].e);
 				v = var.p;
 			}
 			else if (prg->variables[t.i].type == Variable::FISH) {
-				Variable &var = go_fish(prg, v->f);
+				Variable &var = go_fish(prg, prg->variables[t.i].f);
 				v = var.p;
 			}
 			else {
@@ -169,11 +169,11 @@ inline std::string as_string_inline(Program *prg, const Token &t)
 		Variable *v;
 		if (t.dereference) {
 			if (prg->variables[t.i].type == Variable::EXPRESSION) {
-				Variable var = evaluate_expression(prg, v->e);
+				Variable var = evaluate_expression(prg, prg->variables[t.i].e);
 				v = var.p;
 			}
 			else if (prg->variables[t.i].type == Variable::FISH) {
-				Variable &var = go_fish(prg, v->f);
+				Variable &var = go_fish(prg, prg->variables[t.i].f);
 				v = var.p;
 			}
 			else {
@@ -225,11 +225,11 @@ inline int as_label_inline(Program *prg, const Token &t)
 	Variable *v;
 	if (t.dereference) {
 		if (prg->variables[t.i].type == Variable::EXPRESSION) {
-			Variable var = evaluate_expression(prg, v->e);
+			Variable var = evaluate_expression(prg, prg->variables[t.i].e);
 			v = var.p;
 		}
 		else if (prg->variables[t.i].type == Variable::FISH) {
-			Variable &var = go_fish(prg, v->f);
+			Variable &var = go_fish(prg, prg->variables[t.i].f);
 			v = var.p;
 		}
 		else {
@@ -260,11 +260,11 @@ inline int as_function_inline(Program *prg, const Token &t)
 	Variable *v;
 	if (t.dereference) {
 		if (prg->variables[t.i].type == Variable::EXPRESSION) {
-			Variable var = evaluate_expression(prg, v->e);
+			Variable var = evaluate_expression(prg, prg->variables[t.i].e);
 			v = var.p;
 		}
 		else if (prg->variables[t.i].type == Variable::FISH) {
-			Variable &var = go_fish(prg, v->f);
+			Variable &var = go_fish(prg, prg->variables[t.i].f);
 			v = var.p;
 		}
 		else {
