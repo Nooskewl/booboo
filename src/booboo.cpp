@@ -1989,10 +1989,22 @@ bool corefunc_set(Program *prg, const std::vector<Token> &v)
 		Variable v2 = as_variable_resolve_inline(prg, v[1]);
 
 		if (IS_NUMBER(v2)) {
-			v1->n = v2.n;
+			if (v1->type == Variable::NUMBER) {
+				v1->n = v2.n;
+			}
+			else { // string
+				char buf[1000];
+				snprintf(buf, 1000, "%d", v2.n);
+				v1->s = buf;
+			}
 		}
 		else if (IS_STRING(v2)) {
-			v1->s = v2.s;
+			if (v1->type == Variable::NUMBER) {
+				v1->n = atof(v2.s.c_str());
+			}
+			else { // string
+				v1->s = v2.s;
+			}
 		}
 		else if (IS_VECTOR(v2)) {
 			if (IS_VECTOR(v2)) {
