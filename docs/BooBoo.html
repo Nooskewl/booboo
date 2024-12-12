@@ -61,6 +61,12 @@ Sections:
 	e.g. map m
 </pre>
 
+<h3>pointer</h3>
+<pre>
+	declare a pointer or pointers
+	e.g. pointer p1 p2
+</pre>
+
 <h3>reset</h3>
 <pre>
 	load a different BooBoo script
@@ -146,6 +152,20 @@ Sections:
 	A reference. Function parameters preceded by a ~ can be modified
 	by a function
 	e.g. function foo a b ~c
+</pre>
+
+<h3>address</h3>
+<pre>
+	Take the address of a variable into a pointer
+	e.g. address my_pointer my_var
+</pre>
+
+<h3>!</h3>
+<pre>
+	Dereference operator. This is used to get/set the value pointed
+	to by a pointer
+	e.g. address p some_num
+	e.g. = !p 10
 </pre>
 
 <a id="Flow"><h2>Flow Control</h2></a>
