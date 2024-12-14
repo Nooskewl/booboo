@@ -1,3 +1,5 @@
+resize 100 100
+
 number iv ih it
 image_load iv "vert.png"
 image_load ih "horiz.png"
