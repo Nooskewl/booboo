@@ -14,6 +14,7 @@ using namespace noo;
 
 #include "booboo/booboo.h"
 #include "booboo/internal.h"
+#include "booboo/game_lib.h"
 
 static std::map<std::string, int> library_map;
 static std::map<char, booboo::token_func> token_map;
@@ -1264,11 +1265,12 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "JOY_D", TGUI_B_D, pass, var_i);
 	insert_constant(prg, "JOY_L", TGUI_B_L, pass, var_i);
 	insert_constant(prg, "JOY_R", TGUI_B_R, pass, var_i);
-	insert_constant(prg, "TRANSITION_ENLARGE", 0, pass, var_i);
-	insert_constant(prg, "TRANSITION_SHRINK", 1, pass, var_i);
-	insert_constant(prg, "TRANSITION_APPEAR", 2, pass, var_i);
-	insert_constant(prg, "TRANSITION_SLIDE", 3, pass, var_i);
-	insert_constant(prg, "TRANSITION_SLIDE_VERTICAL", 4, pass, var_i);
+	insert_constant(prg, "TRANSITION_NONE", TRANSITION_NONE, pass, var_i);
+	insert_constant(prg, "TRANSITION_ENLARGE", TRANSITION_ENLARGE, pass, var_i);
+	insert_constant(prg, "TRANSITION_SHRINK", TRANSITION_SHRINK, pass, var_i);
+	insert_constant(prg, "TRANSITION_SLIDE", TRANSITION_SLIDE, pass, var_i);
+	insert_constant(prg, "TRANSITION_SLIDE_VERTICAL", TRANSITION_SLIDE_VERTICAL, pass, var_i);
+	insert_constant(prg, "TRANSITION_FADE", TRANSITION_FADE, pass, var_i);
 #endif
 
 	bool _is_deref = false;

@@ -2,14 +2,14 @@ number exited
 = exited FALSE
 
 vector groups
-vector_add groups 0
-vector_add groups 1
+vector_add groups TRANSITION_ENLARGE
+vector_add groups TRANSITION_SHRINK
 
 number font
 font_load font "vga.ttf" 12 1
 
-map c c_both c_left c_right ll lr l1 l2 l3 l4 l5 r1 r2 r3 r4 r5 bcycle ; widget userdata
-number wc wc_both wc_left wc_right wll wlr wl1 wl2 wl3 wl4 wl5 wr1 wr2 wr3 wr4 wr5 wbcycle ; widgets
+map c c_both c_left c_right ll lr l1 l2 l3 l4 l5 l6 r1 r2 r3 r4 r5 r6 bcycle ; widget userdata
+number wc wc_both wc_left wc_right wll wlr wl1 wl2 wl3 wl4 wl5 wl6 wr1 wr2 wr3 wr4 wr5 wr6 wbcycle ; widgets
 
 function start_gui
 {
@@ -26,16 +26,18 @@ function start_gui
 	pointer g1 g2
 	address g1 [groups 0]
 	address g2 [groups 1]
-	call_result l1 mkradio g1 0 "Enlarge"
-	call_result l2 mkradio g1 1 "Shrink"
-	call_result l3 mkradio g1 2 "Appear"
-	call_result l4 mkradio g1 3 "Slide"
-	call_result l5 mkradio g1 4 "V. Slide"
-	call_result r1 mkradio g2 0 "Enlarge"
-	call_result r2 mkradio g2 1 "Shrink"
-	call_result r3 mkradio g2 2 "Appear"
-	call_result r4 mkradio g2 3 "Slide"
-	call_result r5 mkradio g2 4 "V. Slide"
+	call_result l1 mkradio g1 TRANSITION_NONE "None"
+	call_result l2 mkradio g1 TRANSITION_ENLARGE "Enlarge"
+	call_result l3 mkradio g1 TRANSITION_SHRINK "Shrink"
+	call_result l4 mkradio g1 TRANSITION_SLIDE "Slide"
+	call_result l5 mkradio g1 TRANSITION_SLIDE_VERTICAL "V. Slide"
+	call_result l6 mkradio g1 TRANSITION_FADE "Fade"
+	call_result r1 mkradio g2 TRANSITION_NONE "None"
+	call_result r2 mkradio g2 TRANSITION_ENLARGE "Enlarge"
+	call_result r3 mkradio g2 TRANSITION_SHRINK "Shrink"
+	call_result r4 mkradio g2 TRANSITION_SLIDE "Slide"
+	call_result r5 mkradio g2 TRANSITION_SLIDE_VERTICAL "V. Slide"
+	call_result r6 mkradio g2 TRANSITION_FADE "Fade"
 	call_result bcycle mkbutton "Cycle GUI" cycle_gui
 
 	widget_create wll 1 30 ll
@@ -45,7 +47,8 @@ function start_gui
 	widget_create wl3 200 30 l3
 	widget_create wl4 200 30 l4
 	widget_create wl5 200 30 l5
-	widget_create wc_left 200 100 c_left
+	widget_create wl6 200 30 l6
+	widget_create wc_left 200 210 c_left
 	widget_set_accepts_focus wc_left FALSE
 	widget_set_parent wll wc_left
 	widget_set_parent wl1 wc_left
@@ -53,6 +56,7 @@ function start_gui
 	widget_set_parent wl3 wc_left
 	widget_set_parent wl4 wc_left
 	widget_set_parent wl5 wc_left
+	widget_set_parent wl6 wc_left
 
 	widget_create wlr 1 30 lr
 	widget_set_accepts_focus wlr FALSE
@@ -61,7 +65,8 @@ function start_gui
 	widget_create wr3 200 30 r3
 	widget_create wr4 200 30 r4
 	widget_create wr5 200 30 r5
-	widget_create wc_right 200 150 c_right
+	widget_create wr6 200 30 r6
+	widget_create wc_right 200 210 c_right
 	widget_set_accepts_focus wc_right FALSE
 	widget_set_parent wlr wc_right
 	widget_set_parent wr1 wc_right
@@ -69,13 +74,14 @@ function start_gui
 	widget_set_parent wr3 wc_right
 	widget_set_parent wr4 wc_right
 	widget_set_parent wr5 wc_right
+	widget_set_parent wr6 wc_right
 
-	widget_create wc_both 400 180 c_both
+	widget_create wc_both 400 210 c_both
 	widget_set_accepts_focus wc_both FALSE
 	widget_set_parent wc_left wc_both
 	widget_set_parent wc_right wc_both
 
-	widget_create wc 400 210 c
+	widget_create wc 400 240 c
 	widget_set_accepts_focus wc FALSE
 	widget_set_parent wc_both wc
 	widget_create wbcycle 400 30 bcycle

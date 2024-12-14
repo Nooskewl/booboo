@@ -4504,7 +4504,7 @@ private:
 BooBoo_GUI::BooBoo_GUI(BooBoo_Widget *root) :
 	done_transition_in(false)
 {
-	transition = true;
+	transition = transition_in_type != TRANSITION_NONE;
 
 	switch (transition_in_type) {
 		case TRANSITION_ENLARGE:
@@ -4513,14 +4513,13 @@ BooBoo_GUI::BooBoo_GUI(BooBoo_Widget *root) :
 		case TRANSITION_SHRINK:
 			transition_is_shrink = true;
 			break;
-		case TRANSITION_APPEAR:
-			transition_is_appear = true;
-			break;
 		case TRANSITION_SLIDE:
 			transition_is_slide = true;
 			break;
 		case TRANSITION_SLIDE_VERTICAL:
 			transition_is_slide_vertical = true;
+			break;
+		case TRANSITION_FADE:
 			break;
 	}
 
@@ -4540,8 +4539,6 @@ BooBoo_GUI::~BooBoo_GUI()
 
 void BooBoo_GUI::update()
 {
-	gui::GUI::update();
-
 	if (transitioning_in == false && done_transition_in == false) {
 		switch (transition_in_type) {
 			case TRANSITION_ENLARGE:
@@ -4550,14 +4547,13 @@ void BooBoo_GUI::update()
 			case TRANSITION_SHRINK:
 				transition_is_shrink = false;
 				break;
-			case TRANSITION_APPEAR:
-				transition_is_appear = false;
-				break;
 			case TRANSITION_SLIDE:
 				transition_is_slide = false;
 				break;
 			case TRANSITION_SLIDE_VERTICAL:
 				transition_is_slide_vertical = false;
+				break;
+			case TRANSITION_FADE:
 				break;
 		}
 		switch (transition_out_type) {
@@ -4567,18 +4563,20 @@ void BooBoo_GUI::update()
 			case TRANSITION_SHRINK:
 				transition_is_shrink = true;
 				break;
-			case TRANSITION_APPEAR:
-				transition_is_appear = true;
-				break;
 			case TRANSITION_SLIDE:
 				transition_is_slide = true;
 				break;
 			case TRANSITION_SLIDE_VERTICAL:
 				transition_is_slide_vertical = true;
 				break;
+			case TRANSITION_FADE:
+				break;
 		}
+		transition = transition_out_type != TRANSITION_NONE;
 		done_transition_in = true;
 	}
+
+	gui::GUI::update();
 }
 
 static bool widgetfunc_gui_start(Program *prg, const std::vector<Token> &v)
