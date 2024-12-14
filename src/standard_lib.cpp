@@ -1227,6 +1227,20 @@ static bool vectorfunc_clear(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool vectorfunc_reserve(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &id = as_variable(prg, v[0]);
+	int n = as_number(prg, v[1]);
+
+	CHECK_VECTOR(id)
+
+	id.v.reserve(n);
+
+	return true;
+}
+
 static bool mapfunc_set(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(3)
@@ -1802,6 +1816,7 @@ void start_lib_standard()
 	add_instruction("vector_get", vectorfunc_get);
 	add_instruction("vector_erase", vectorfunc_erase);
 	add_instruction("vector_clear", vectorfunc_clear);
+	add_instruction("vector_reserve", vectorfunc_reserve);
 
 	add_instruction("map_set", mapfunc_set);
 	add_instruction("map_get", mapfunc_get);
