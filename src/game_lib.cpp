@@ -15,6 +15,7 @@ GUI_Transition_Type transition_in_type = TRANSITION_ENLARGE;
 GUI_Transition_Type transition_out_type = TRANSITION_SHRINK;
 
 extern bool quit;
+extern Program *prg;
 
 struct MML_Info {
 	unsigned int mml_id;
@@ -3290,6 +3291,25 @@ static void found_device_callback()
 	}
 }
 
+static void black_bars_callback(gfx::Black_Bar_Type type, int x, int y, int w, int h)
+{
+	std::vector<Token> v;
+	Token t;
+	t.type = Token::NUMBER;
+	t.dereference = false;
+	t.n = (int)type;
+	v.push_back(t);
+	t.n = x;
+	v.push_back(t);
+	t.n = y;
+	v.push_back(t);
+	t.n = w;
+	v.push_back(t);
+	t.n = h;
+	v.push_back(t);
+	call_void_function(prg, "draw_black_bar", v, 0);
+}
+
 static bool modelfunc_set_2d(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -4641,6 +4661,7 @@ static bool widgetfunc_gui_set_transition_types(Program *prg, const std::vector<
 void start_lib_game()
 {
 	gfx::register_lost_device_callbacks(nullptr, found_device_callback);
+	gfx::register_black_bars_callback(black_bars_callback);
 
 	add_instruction("inspect", miscfunc_inspect);
 	add_instruction("delay", miscfunc_delay);

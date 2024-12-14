@@ -32,6 +32,16 @@ generic input events, which are described in the <a href="#GUI">GUI</a> and
 </p>
 
 <p>
+There is another global callback you can define, draw_black_bar:
+</p>
+<pre>
+	function draw_black_bar type x y w h
+</pre>
+<p>x, y are the top left coordinate of where to draw, w/h are the width and
+height in pixels. See BAR_* in constants for the bar types.
+</p>
+
+<p>
 At startup, global code is run. Then the above mentioned callbacks get called
 at intervals or shutdown.
 </p>
@@ -1585,6 +1595,15 @@ GUI constants:
 	<li>TRANSITION_SLIDE</li>
 	<li>TRANSITION_SLIDE_VERTICAL</li>
 	<li>TRANSITION_FADE</li>
+</ul>
+
+<p>For drawing custom black bars:</p>
+
+<ul>
+	<li>BAR_TOP</li>
+	<li>BAR_BOTTOM</li>
+	<li>BAR_LEFT</li>
+	<li>BAR_RIGHT</li>
 </ul>
 
 <a id="Events"><h2>Events</h2></a>

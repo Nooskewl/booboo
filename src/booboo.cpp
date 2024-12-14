@@ -1271,6 +1271,10 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "TRANSITION_SLIDE", TRANSITION_SLIDE, pass, var_i);
 	insert_constant(prg, "TRANSITION_SLIDE_VERTICAL", TRANSITION_SLIDE_VERTICAL, pass, var_i);
 	insert_constant(prg, "TRANSITION_FADE", TRANSITION_FADE, pass, var_i);
+	insert_constant(prg, "BAR_TOP", gfx::BAR_TOP, pass, var_i);
+	insert_constant(prg, "BAR_BOTTOM", gfx::BAR_BOTTOM, pass, var_i);
+	insert_constant(prg, "BAR_LEFT", gfx::BAR_LEFT, pass, var_i);
+	insert_constant(prg, "BAR_RIGHT", gfx::BAR_RIGHT, pass, var_i);
 #endif
 
 	bool _is_deref = false;
