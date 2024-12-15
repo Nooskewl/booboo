@@ -930,7 +930,7 @@ gui_draw widget_id x y w h focussed ~userdata
 </p>
 
 <p>
-a, b, c and d are the same as for the global 'event' callback, described in
+type, a, b, c and d are the same as for the global 'event' callback, described in
 <a href="#Events">Events</a>. x, y, w
 and h are the calculated position and size of the widget in pixels.
 </p>
@@ -938,7 +938,8 @@ and h are the calculated position and size of the widget in pixels.
 <h3>widget_create</h3>
 <pre>
 	Create a widget
-	Sizes less than 1 are taken as a percentage of the remaining size
+	Sizes less than equal to 1 are taken as a percentage of the remaining size
+	of the container
 	e.g. widget_create result w h userdata
 </pre>
 
