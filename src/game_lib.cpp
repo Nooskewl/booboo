@@ -3293,6 +3293,87 @@ static void found_device_callback()
 
 static void black_bars_callback(gfx::Black_Bar_Type type, int x, int y, int w, int h)
 {
+	SDL_Colour c[4];
+
+	// draw a default
+	switch (type) {
+		case gfx::BAR_TOP:
+			c[0].r = 255;
+			c[0].g = 0;
+			c[0].b = 216;
+			c[0].a = 255;
+			c[1].r = 255;
+			c[1].g = 0;
+			c[1].b = 216;
+			c[1].a = 255;
+			c[2].r = 0;
+			c[2].g = 0;
+			c[2].b = 0;
+			c[2].a = 255;
+			c[3].r = 0;
+			c[3].g = 0;
+			c[3].b = 0;
+			c[3].a = 255;
+			break;
+		case gfx::BAR_BOTTOM:
+			c[0].r = 0;
+			c[0].g = 0;
+			c[0].b = 0;
+			c[0].a = 255;
+			c[1].r = 0;
+			c[1].g = 0;
+			c[1].b = 0;
+			c[1].a = 255;
+			c[2].r = 255;
+			c[2].g = 0;
+			c[2].b = 216;
+			c[2].a = 255;
+			c[3].r = 255;
+			c[3].g = 0;
+			c[3].b = 216;
+			c[3].a = 255;
+			break;
+		case gfx::BAR_LEFT:
+			c[0].r = 255;
+			c[0].g = 0;
+			c[0].b = 216;
+			c[0].a = 255;
+			c[1].r = 0;
+			c[1].g = 0;
+			c[1].b = 0;
+			c[1].a = 255;
+			c[2].r = 0;
+			c[2].g = 0;
+			c[2].b = 0;
+			c[2].a = 255;
+			c[3].r = 255;
+			c[3].g = 0;
+			c[3].b =  216;
+			c[3].a = 255;
+			break;
+		case gfx::BAR_RIGHT:
+			c[0].r = 0;
+			c[0].g = 0;
+			c[0].b = 0;
+			c[0].a = 255;
+			c[1].r = 255;
+			c[1].g = 0;
+			c[1].b = 216;
+			c[1].a = 255;
+			c[2].r = 255;
+			c[2].g = 0;
+			c[2].b = 216;
+			c[2].a = 255;
+			c[3].r = 0;
+			c[3].g = 0;
+			c[3].b = 0;
+			c[3].a = 255;
+			break;
+	}
+
+	gfx::draw_filled_rectangle(c, util::Point<int>(x, y), util::Size<int>(w, h));
+
+	// now user can draw theirs
 	std::vector<Token> v;
 	Token t;
 	t.type = Token::NUMBER;
