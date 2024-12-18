@@ -25,7 +25,9 @@
 			"vsync": true,
 			"show_fps": false,
 			"cursor_hotspot.x": 0,
-			"cursor_hotspot.y": 0
+			"cursor_hotspot.y": 0,
+			"multisampling": true,
+			"samples": 4
 		},
 		"misc": {
 			"window_title": "BooBoo",
