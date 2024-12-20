@@ -2905,6 +2905,32 @@ static bool shaderfunc_set_matrix(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool shaderfunc_set_matrix_array(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	Variable &vec = as_variable(prg, v[2]);
+	
+	Shader_Info *info = shader_info(prg);
+	gfx::Shader *shader = info->shaders[id];
+
+	glm::mat4 mat[vec.v.size()];
+
+	for (size_t i = 0; i < vec.v.size(); i++) {
+		for (size_t j = 0; j < vec.v[i].v.size(); j++) {
+			for (size_t k = 0; k < vec.v[i].v[j].v.size(); k++) {
+				mat[i][j][k] = vec.v[i].v[j].v[k].n;
+			}
+		}
+	}
+
+	shader->set_matrix_array(name, vec.v.size(), mat);
+
+	return true;
+}
+
 static bool shaderfunc_set_colour(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(6)

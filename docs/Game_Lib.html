@@ -714,7 +714,14 @@ The following sections describe the API:
 <h3>shader_set_matrix</h3>
 <pre>
 	Set a matrix uniform value in a shader
+	Matrices here are 2d vectors of numbers
 	e.g. shader_set_matrix shader "mymat" m
+</pre>
+
+<h3>shader_set_matrix_array</h3>
+<pre>
+	Set an array of matrices in a shader
+	e.g. shader_set_matrix_array shader "mats" my_vec_of_mats
 </pre>
 
 <h3>shader_set_float_vector</h3>
