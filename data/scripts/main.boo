@@ -471,8 +471,24 @@ function event type a b c d
 	if (== type EVENT_MOUSE_WHEEL) is_wheel
 		if (> b 0) is_up (< b 0) is_down
 			call sel_up b
+			- top 1
+			if (< top 0) equal_0
+				= top 0
+			:equal_0
 		:is_up
 			call sel_down (* b -1)
+			+ top 1
+			number sz
+			vector_size filenames sz
+			if (<= (+ top num) selected) adjust
+				= top (- selected (- num 1))
+			:adjust
+			if (>= (+ top num) sz) adjust2
+				= top (- sz num)
+				if (< top 0) zero
+					= top 0
+				:zero
+			:adjust2
 		:is_down
 	:is_wheel
 
