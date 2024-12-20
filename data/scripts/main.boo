@@ -24,9 +24,7 @@ image_load more_down "ui/more_down.png"
 number go_ok
 = go_ok 0
 
-number old_u old_d old_a old_b
-= old_u 0
-= old_d 0
+number old_a old_b
 = old_a 0
 = old_b 0
 
@@ -41,9 +39,7 @@ number old_b1 old_b3
 number old_esc
 = old_esc 0
 
-number old_pgup old_pgdn old_home old_end
-= old_pgup 0
-= old_pgdn 0
+number old_home old_end
 = old_home 0
 = old_end 0
 
@@ -382,12 +378,6 @@ function run
 	mouse_get_buttons b1 b2 b3 wheel
 	mouse_get_position mx my
 
-	if (== wheel 1) wheel_up (== wheel -1) wheel_down
-		call sel_up 1
-	:wheel_up
-		call sel_down 1
-	:wheel_down
-
 	if (&& (== b1 1) (== old_b1 0)) mouse_b1 (&& (== b3 1) (== old_b3 0)) mouse_b3
 		if (&& (>= my TOP) (< my (+ TOP (* num fh)))) check_click
 			number sel
@@ -432,28 +422,9 @@ function run
 
 	= old_esc kesc
 
-	number pgup pgdn home _end
-	key_get pgup KEY_PAGEUP
-	key_get pgdn KEY_PAGEDOWN
+	number home _end
 	key_get home KEY_HOME
 	key_get _end KEY_END
-
-	if (&& (== pgup 1) (== old_pgup 0)) do_pgup (&& (== pgdn 1) (== old_pgdn 0)) do_pgdn
-		number i
-		mml_play widget 1 0
-		for i 0 (< i num) 1 pgup_slowly
-			call sel_up 0
-		:pgup_slowly
-	:do_pgup
-		number i
-		mml_play widget 1 0
-		for i 0 (< i num) 1 pgdn_slowly
-			call sel_down 0
-		:pgdn_slowly
-	:do_pgdn
-
-	= old_pgup pgup
-	= old_pgdn pgdn
 
 	number sz
 	vector_size filenames sz
@@ -474,12 +445,6 @@ function run
 	= old_home home
 	= old_end _end
 
-	if (&& (== joy_u 1) (== old_u 0)) do_up (&& (== joy_d 1) (== old_d 0)) do_down
-		call sel_up 1
-	:do_up
-		call sel_down 1
-	:do_down
-
 	if (&& (== joy_a 1) (== old_a 0)) dig
 		call navigate
 	:dig
@@ -488,28 +453,6 @@ function run
 		call launch
 	:go
 
-	if (== joy_u 1) check_u_repeat zero_u_repeat
-		+ u_time 1
-		if (> u_time 10) repeat_u
-			= u_time 0
-			call sel_up 1
-		:repeat_u
-	:check_u_repeat
-		= u_time 0
-	:zero_u_repeat
-
-	if (== joy_d 1) check_d_repeat zero_d_repeat
-		+ d_time 1
-		if (> d_time 10) repeat_d
-			= d_time 0
-			call sel_down 1
-		:repeat_d
-	:check_d_repeat
-		= d_time 0
-	:zero_d_repeat
-
-	= old_u joy_u
-	= old_d joy_d
 	= old_a joy_a
 	= old_b joy_b
 
@@ -519,3 +462,46 @@ function run
 		call rsz TRUE
 	:do_rsz
 }
+
+function event type a b c d
+{
+	number wheel
+	= wheel 0
+
+	if (== type EVENT_MOUSE_WHEEL) is_wheel
+		if (> b 0) is_up (< b 0) is_down
+			call sel_up b
+		:is_up
+			call sel_down (* b -1)
+		:is_down
+	:is_wheel
+
+	if (== type EVENT_JOY_DOWN) is_joy_b
+		if (== b JOY_U) is_joy_up (== b JOY_D) is_joy_down
+			call sel_up 1
+		:is_joy_up
+			call sel_down 1
+		:is_joy_down
+	:is_joy_b
+
+	if (== type EVENT_KEY_DOWN) is_key_b
+		if (== a KEY_UP) is_key_up (== a KEY_DOWN) is_key_down (== a KEY_PAGEUP) do_pgup (== a KEY_PAGEDOWN) do_pgdn
+			call sel_up 1
+		:is_key_up
+			call sel_down 1
+		:is_key_down
+			number i
+			mml_play widget 1 0
+			for i 0 (< i num) 1 pgup_slowly
+				call sel_up 0
+			:pgup_slowly
+		:do_pgup
+			number i
+			mml_play widget 1 0
+			for i 0 (< i num) 1 pgdn_slowly
+				call sel_down 0
+			:pgdn_slowly
+		:do_pgdn
+ 	:is_key_b
+}
+
