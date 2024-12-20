@@ -27,7 +27,8 @@
 			"cursor_hotspot.x": 0,
 			"cursor_hotspot.y": 0,
 			"multisampling": true,
-			"samples": 4
+			"samples": 4,
+			"linear_filtering": false
 		},
 		"misc": {
 			"window_title": "BooBoo",
