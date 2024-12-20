@@ -382,6 +382,9 @@ static std::string token(Program *prg, Token::Token_Type &ret_type)
 	if (c == '(' || c == '[') {
 		ret_type = Token::SYMBOL;
 	}
+	else if (c == '#') {
+		ret_type = Token::NUMBER;
+	}
 	else {
 		ret_type = Token::STRING;
 	}
