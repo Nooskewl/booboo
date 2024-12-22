@@ -247,26 +247,9 @@ static Widget_Info *widget_info(Program *prg)
 	return info;
 }
 
-static std::string save_dir()
-{
-	std::string path;
-
-#ifdef ANDROID
-	path = util::get_standard_path(util::SAVED_GAMES, true);
-#elif defined _WIN32
-	path = util::get_standard_path(util::SAVED_GAMES, true);
-	path += "/" + shim::game_name;
-	util::mkdir(path);
-#else
-	path = util::get_appdata_dir();
-#endif
-
-	return path;
-}
-
 static std::string cfg_path(std::string cfg_name)
 {
-	std::string path = save_dir() + "/" + cfg_name + ".txt";
+	std::string path = util::get_savegames_dir() + "/" + cfg_name + ".txt";
 	return path;
 }
 
