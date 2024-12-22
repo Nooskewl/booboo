@@ -2351,7 +2351,7 @@ static std::string typeof_var(Variable &v1)
 
 bool corefunc_typeof(Program *prg, const std::vector<Token> &v)
 {
-	MIN_ARGS(2)
+	COUNT_ARGS(2)
 
 	std::string res;
 
