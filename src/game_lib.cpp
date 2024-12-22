@@ -717,7 +717,7 @@ static bool primfunc_end_primitives(Program *prg, const std::vector<Token> &v)
 
 static bool primfunc_line(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(9)
+	MIN_ARGS(8)
 
 	SDL_Colour c;
 	c.r = as_number(prg, v[0]);
@@ -732,7 +732,13 @@ static bool primfunc_line(Program *prg, const std::vector<Token> &v)
 	p2.x = as_number(prg, v[6]);
 	p2.y = as_number(prg, v[7]);
 
-	float thick = as_number(prg, v[8]);
+	float thick;
+	if (v.size() > 8) {
+		thick = as_number(prg, v[8]);
+	}
+	else {
+		thick = 1.0f;
+	}
 
 	gfx::draw_line(c, p1, p2, thick);
 
@@ -741,7 +747,7 @@ static bool primfunc_line(Program *prg, const std::vector<Token> &v)
 
 static bool primfunc_triangle(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(11)
+	MIN_ARGS(10)
 
 	SDL_Colour c;
 	c.r = as_number(prg, v[0]);
@@ -754,7 +760,14 @@ static bool primfunc_triangle(Program *prg, const std::vector<Token> &v)
 	double y2 = as_number(prg, v[7]);
 	double x3 = as_number(prg, v[8]);
 	double y3 = as_number(prg, v[9]);
-	double thick = as_number(prg, v[10]);
+
+	double thick;
+	if (v.size() > 10) {
+		thick = as_number(prg, v[10]);
+	}
+	else {
+		thick = 1.0f;
+	}
 
 	gfx::draw_triangle(c, util::Point<float>(x1, y1), util::Point<float>(x2, y2), util::Point<float>(x3, y3), thick);
 
@@ -795,7 +808,7 @@ static bool primfunc_filled_triangle(Program *prg, const std::vector<Token> &v)
 
 static bool primfunc_rectangle(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(9)
+	MIN_ARGS(8)
 
 	SDL_Colour c;
 	c.r = as_number(prg, v[0]);
@@ -811,7 +824,13 @@ static bool primfunc_rectangle(Program *prg, const std::vector<Token> &v)
 	sz.w = as_number(prg, v[6]);
 	sz.h = as_number(prg, v[7]);
 
-	float thick = as_number(prg, v[8]);
+	float thick;
+	if (v.size() > 8) {
+		thick = as_number(prg, v[8]);
+	}
+	else {
+		thick = 1.0f;
+	}
 
 	gfx::draw_rectangle(c, p, sz, thick);
 
@@ -857,7 +876,7 @@ static bool primfunc_filled_rectangle(Program *prg, const std::vector<Token> &v)
 
 static bool primfunc_ellipse(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(10)
+	MIN_ARGS(8)
 
 	SDL_Colour c;
 	c.r = as_number(prg, v[0]);
@@ -870,12 +889,27 @@ static bool primfunc_ellipse(Program *prg, const std::vector<Token> &v)
 	p.x = as_number(prg, v[4]);
 	p.y = as_number(prg, v[5]);
 
-	double _rx = as_number(prg, v[6]);
-	double _ry = as_number(prg, v[7]);
-	double thick = as_number(prg, v[8]);
-	double _sections = as_number(prg, v[9]);
+	double rx = as_number(prg, v[6]);
+	double ry = as_number(prg, v[7]);
 
-	gfx::draw_ellipse(c, p, _rx, _ry, thick, _sections);
+	double thick;
+	double sections;
+
+	if (v.size() > 8) {
+		thick = as_number(prg, v[8]);
+	}
+	else {
+		thick = 1.0f;
+	}
+
+	if (v.size() > 9) {
+		sections = as_number(prg, v[9]);
+	}
+	else {
+		sections = -1;
+	}
+
+	gfx::draw_ellipse(c, p, rx, ry, thick, sections);
 
 	return true;
 }
@@ -906,7 +940,7 @@ static bool primfunc_filled_ellipse(Program *prg, const std::vector<Token> &v)
 
 static bool primfunc_circle(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(9)
+	MIN_ARGS(7)
 
 	SDL_Colour c;
 	c.r = as_number(prg, v[0]);
@@ -918,11 +952,26 @@ static bool primfunc_circle(Program *prg, const std::vector<Token> &v)
 
 	p.x = as_number(prg, v[4]);
 	p.y = as_number(prg, v[5]);
-	float _r = as_number(prg, v[6]);
-	float thick = as_number(prg, v[7]);
-	int _sections = as_number(prg, v[8]);
+	float r = as_number(prg, v[6]);
 
-	gfx::draw_circle(c, p, _r, thick, _sections);
+	double thick;
+	double sections;
+
+	if (v.size() > 7) {
+		thick = as_number(prg, v[7]);
+	}
+	else {
+		thick = 1.0f;
+	}
+
+	if (v.size() > 8) {
+		sections = as_number(prg, v[8]);
+	}
+	else {
+		sections = -1;
+	}
+
+	gfx::draw_circle(c, p, r, thick, sections);
 
 	return true;
 }
@@ -1005,11 +1054,26 @@ static bool mmlfunc_load(Program *prg, const std::vector<Token> &v)
 
 static bool mmlfunc_play(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	MIN_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	double volume = as_number(prg, v[1]);
-	bool loop = as_number(prg, v[2]);
+
+	double volume;
+	bool loop;
+
+	if (v.size() > 1) {
+		volume = as_number(prg, v[1]);
+	}
+	else {
+		volume = 1.0;
+	}
+
+	if (v.size() > 2) {
+		loop = as_number(prg, v[2]);
+	}
+	else {
+		loop = false;
+	}
 
 	MML_Info *info = mml_info(prg);
 
@@ -1081,11 +1145,26 @@ static bool samplefunc_destroy(Program *prg, const std::vector<Token> &v)
 
 static bool samplefunc_play(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	MIN_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	double volume = as_number(prg, v[1]);
-	bool loop = as_number(prg, v[2]);
+
+	double volume;
+	bool loop;
+
+	if (v.size() > 1) {
+		volume = as_number(prg, v[1]);
+	}
+	else {
+		volume = 1.0;
+	}
+
+	if (v.size() > 2) {
+		loop = as_number(prg, v[2]);
+	}
+	else {
+		loop = false;
+	}
 
 	Sample_Info *info = sample_info(prg);
 
@@ -1179,7 +1258,7 @@ static bool imagefunc_destroy(Program *prg, const std::vector<Token> &v)
 
 static bool imagefunc_draw(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(9)
+	MIN_ARGS(7)
 
 	int id = as_number(prg, v[0]);
 	double r = as_number(prg, v[1]);
@@ -1188,8 +1267,23 @@ static bool imagefunc_draw(Program *prg, const std::vector<Token> &v)
 	double a = as_number(prg, v[4]);
 	double x = as_number(prg, v[5]);
 	double y = as_number(prg, v[6]);
-	double flip_h = as_number(prg, v[7]);
-	double flip_v = as_number(prg, v[8]);
+
+	double flip_h;
+	double flip_v;
+
+	if (v.size() > 7) {
+		flip_h = as_number(prg, v[7]);
+	}
+	else {
+		flip_h = false;
+	}
+
+	if (v.size() > 8) {
+		flip_v = as_number(prg, v[8]);
+	}
+	else {
+		flip_v = false;
+	}
 
 	Image_Info *info = image_info(prg);
 
@@ -1222,7 +1316,7 @@ static bool imagefunc_draw(Program *prg, const std::vector<Token> &v)
 
 static bool imagefunc_stretch_region(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(15)
+	MIN_ARGS(13)
 
 	int id = as_number(prg, v[0]);
 	double r = as_number(prg, v[1]);
@@ -1237,8 +1331,23 @@ static bool imagefunc_stretch_region(Program *prg, const std::vector<Token> &v)
 	double dy = as_number(prg, v[10]);
 	double dw = as_number(prg, v[11]);
 	double dh = as_number(prg, v[12]);
-	double flip_h = as_number(prg, v[13]);
-	double flip_v = as_number(prg, v[14]);
+
+	double flip_h;
+	double flip_v;
+
+	if (v.size() > 13) {
+		flip_h = as_number(prg, v[13]);
+	}
+	else {
+		flip_h = false;
+	}
+
+	if (v.size() > 14) {
+		flip_v = as_number(prg, v[14]);
+	}
+	else {
+		flip_v = false;
+	}
 	
 	Image_Info *info = image_info(prg);
 
@@ -1271,7 +1380,7 @@ static bool imagefunc_stretch_region(Program *prg, const std::vector<Token> &v)
 
 static bool imagefunc_draw_rotated_scaled(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(14)
+	MIN_ARGS(12)
 
 	int id = as_number(prg, v[0]);
 	double r = as_number(prg, v[1]);
@@ -1285,8 +1394,23 @@ static bool imagefunc_draw_rotated_scaled(Program *prg, const std::vector<Token>
 	double angle = as_number(prg, v[9]);
 	double scale_x = as_number(prg, v[10]);
 	double scale_y = as_number(prg, v[11]);
-	double flip_h = as_number(prg, v[12]);
-	double flip_v = as_number(prg, v[13]);
+
+	double flip_h;
+	double flip_v;
+
+	if (v.size() > 12) {
+		flip_h = as_number(prg, v[12]);
+	}
+	else {
+		flip_h = false;
+	}
+
+	if (v.size() > 13) {
+		flip_v = as_number(prg, v[13]);
+	}
+	else {
+		flip_v = false;
+	}
 
 	Image_Info *info = image_info(prg);
 
@@ -2107,7 +2231,7 @@ static bool spritefunc_current_frame_size(Program *prg, const std::vector<Token>
 
 static bool spritefunc_draw(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(9)
+	MIN_ARGS(7)
 
 	int id = as_number(prg, v[0]);
 	int r = as_number(prg, v[1]);
@@ -2116,8 +2240,23 @@ static bool spritefunc_draw(Program *prg, const std::vector<Token> &v)
 	int a = as_number(prg, v[4]);
 	double dx = as_number(prg, v[5]);
 	double dy = as_number(prg, v[6]);
-	int flip_h = as_number(prg, v[7]);
-	int flip_v = as_number(prg, v[8]);
+
+	int flip_h;
+	int flip_v;
+
+	if (v.size() > 7) {
+		flip_h = as_number(prg, v[7]);
+	}
+	else {
+		flip_h = false;
+	}
+
+	if (v.size() > 8) {
+		flip_v = as_number(prg, v[8]);
+	}
+	else {
+		flip_v = false;
+	}
 	
 	Sprite_Info *info = sprite_info(prg);
 
@@ -3298,106 +3437,6 @@ static void found_device_callback()
 	else {
 		set_2d();
 	}
-}
-
-static void black_bars_callback(gfx::Black_Bar_Type type, int x, int y, int w, int h)
-{
-	SDL_Colour c[4];
-
-	// draw a default
-	switch (type) {
-		case gfx::BAR_TOP:
-			c[0].r = 255;
-			c[0].g = 0;
-			c[0].b = 216;
-			c[0].a = 255;
-			c[1].r = 255;
-			c[1].g = 0;
-			c[1].b = 216;
-			c[1].a = 255;
-			c[2].r = 0;
-			c[2].g = 0;
-			c[2].b = 0;
-			c[2].a = 255;
-			c[3].r = 0;
-			c[3].g = 0;
-			c[3].b = 0;
-			c[3].a = 255;
-			break;
-		case gfx::BAR_BOTTOM:
-			c[0].r = 0;
-			c[0].g = 0;
-			c[0].b = 0;
-			c[0].a = 255;
-			c[1].r = 0;
-			c[1].g = 0;
-			c[1].b = 0;
-			c[1].a = 255;
-			c[2].r = 255;
-			c[2].g = 0;
-			c[2].b = 216;
-			c[2].a = 255;
-			c[3].r = 255;
-			c[3].g = 0;
-			c[3].b = 216;
-			c[3].a = 255;
-			break;
-		case gfx::BAR_LEFT:
-			c[0].r = 255;
-			c[0].g = 0;
-			c[0].b = 216;
-			c[0].a = 255;
-			c[1].r = 0;
-			c[1].g = 0;
-			c[1].b = 0;
-			c[1].a = 255;
-			c[2].r = 0;
-			c[2].g = 0;
-			c[2].b = 0;
-			c[2].a = 255;
-			c[3].r = 255;
-			c[3].g = 0;
-			c[3].b =  216;
-			c[3].a = 255;
-			break;
-		case gfx::BAR_RIGHT:
-			c[0].r = 0;
-			c[0].g = 0;
-			c[0].b = 0;
-			c[0].a = 255;
-			c[1].r = 255;
-			c[1].g = 0;
-			c[1].b = 216;
-			c[1].a = 255;
-			c[2].r = 255;
-			c[2].g = 0;
-			c[2].b = 216;
-			c[2].a = 255;
-			c[3].r = 0;
-			c[3].g = 0;
-			c[3].b = 0;
-			c[3].a = 255;
-			break;
-	}
-
-	gfx::draw_filled_rectangle(c, util::Point<int>(x, y), util::Size<int>(w, h));
-
-	// now user can draw theirs
-	std::vector<Token> v;
-	Token t;
-	t.type = Token::NUMBER;
-	t.dereference = false;
-	t.n = (int)type;
-	v.push_back(t);
-	t.n = x;
-	v.push_back(t);
-	t.n = y;
-	v.push_back(t);
-	t.n = w;
-	v.push_back(t);
-	t.n = h;
-	v.push_back(t);
-	call_void_function(prg, "draw_black_bar", v, 0);
 }
 
 static bool modelfunc_set_2d(Program *prg, const std::vector<Token> &v)
@@ -4748,6 +4787,106 @@ static bool widgetfunc_gui_set_transition_types(Program *prg, const std::vector<
 	return true;
 }
 
+static void black_bars_callback(gfx::Black_Bar_Type type, int x, int y, int w, int h)
+{
+	SDL_Colour c[4];
+
+	// draw a default
+	switch (type) {
+		case gfx::BAR_TOP:
+			c[0].r = 255;
+			c[0].g = 0;
+			c[0].b = 216;
+			c[0].a = 255;
+			c[1].r = 255;
+			c[1].g = 0;
+			c[1].b = 216;
+			c[1].a = 255;
+			c[2].r = 0;
+			c[2].g = 0;
+			c[2].b = 0;
+			c[2].a = 255;
+			c[3].r = 0;
+			c[3].g = 0;
+			c[3].b = 0;
+			c[3].a = 255;
+			break;
+		case gfx::BAR_BOTTOM:
+			c[0].r = 0;
+			c[0].g = 0;
+			c[0].b = 0;
+			c[0].a = 255;
+			c[1].r = 0;
+			c[1].g = 0;
+			c[1].b = 0;
+			c[1].a = 255;
+			c[2].r = 255;
+			c[2].g = 0;
+			c[2].b = 216;
+			c[2].a = 255;
+			c[3].r = 255;
+			c[3].g = 0;
+			c[3].b = 216;
+			c[3].a = 255;
+			break;
+		case gfx::BAR_LEFT:
+			c[0].r = 255;
+			c[0].g = 0;
+			c[0].b = 216;
+			c[0].a = 255;
+			c[1].r = 0;
+			c[1].g = 0;
+			c[1].b = 0;
+			c[1].a = 255;
+			c[2].r = 0;
+			c[2].g = 0;
+			c[2].b = 0;
+			c[2].a = 255;
+			c[3].r = 255;
+			c[3].g = 0;
+			c[3].b =  216;
+			c[3].a = 255;
+			break;
+		case gfx::BAR_RIGHT:
+			c[0].r = 0;
+			c[0].g = 0;
+			c[0].b = 0;
+			c[0].a = 255;
+			c[1].r = 255;
+			c[1].g = 0;
+			c[1].b = 216;
+			c[1].a = 255;
+			c[2].r = 255;
+			c[2].g = 0;
+			c[2].b = 216;
+			c[2].a = 255;
+			c[3].r = 0;
+			c[3].g = 0;
+			c[3].b = 0;
+			c[3].a = 255;
+			break;
+	}
+
+	gfx::draw_filled_rectangle(c, util::Point<int>(x, y), util::Size<int>(w, h));
+
+	// now user can draw theirs
+	std::vector<Token> v;
+	Token t;
+	t.type = Token::NUMBER;
+	t.dereference = false;
+	t.n = (int)type;
+	v.push_back(t);
+	t.n = x;
+	v.push_back(t);
+	t.n = y;
+	v.push_back(t);
+	t.n = w;
+	v.push_back(t);
+	t.n = h;
+	v.push_back(t);
+	call_void_function(prg, "draw_black_bar", v, 0);
+}
+
 void start_lib_game()
 {
 	gfx::register_lost_device_callbacks(nullptr, found_device_callback);
@@ -4867,6 +5006,7 @@ void start_lib_game()
 	add_instruction("shader_set_texture", shaderfunc_set_texture);
 	add_instruction("shader_set_float_vector", shaderfunc_set_float_vector);
 	add_instruction("shader_set_matrix", shaderfunc_set_matrix);
+	add_instruction("shader_set_matrix_array", shaderfunc_set_matrix_array);
 	add_instruction("json_load", jsonfunc_load);
 	add_instruction("json_destroy", jsonfunc_destroy);
 	add_instruction("json_get_string", jsonfunc_get_string);
