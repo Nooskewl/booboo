@@ -1,6 +1,7 @@
 number scanline_skip scanline_alpha
 = scanline_skip 2
-= scanline_alpha 128
+;= scanline_alpha 128
+= scanline_alpha 0 ; disable the effect
 
 number TOP
 = TOP 20
