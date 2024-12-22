@@ -41,6 +41,8 @@ File_Info *file_info(Program *prg)
 
 bool corefunc_getenv(Program *prg, const std::vector<Token> &v)
 {
+	COUNT_ARGS(2)
+
 	Variable &v1 = as_variable(prg, v[0]);
 	std::string get = as_string(prg, v[1]);
 
@@ -964,7 +966,9 @@ bool mathfunc_min(Program *prg, const std::vector<Token> &v)
 
 	CHECK_NUMBER(v1)
 
-	for (size_t i = 1; i < v.size(); i++) {
+	v1.n = as_number(prg, v[1]);
+
+	for (size_t i = 2; i < v.size(); i++) {
 		v1.n = MIN(v1.n, as_number(prg, v[i]));
 	}
 
@@ -979,7 +983,9 @@ bool mathfunc_max(Program *prg, const std::vector<Token> &v)
 
 	CHECK_NUMBER(v1)
 
-	for (size_t i = 1; i < v.size(); i++) {
+	v1.n = as_number(prg, v[1]);
+
+	for (size_t i = 2; i < v.size(); i++) {
 		v1.n = MAX(v1.n, as_number(prg, v[i]));
 	}
 
