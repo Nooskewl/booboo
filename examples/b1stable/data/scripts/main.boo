@@ -63,5 +63,5 @@ function draw
 	= x (/ (- 640 sz) 2)
 	= y (/ (- 360 sz) 2)
 
-	image_stretch_region img r g b 255 0 0 16 16 x y sz sz 0 0
+	image_stretch_region img r g b 255 0 0 8 8 x y sz sz 0 0
 }
