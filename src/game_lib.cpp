@@ -916,7 +916,7 @@ static bool primfunc_ellipse(Program *prg, const std::vector<Token> &v)
 
 static bool primfunc_filled_ellipse(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(9)
+	MIN_ARGS(8)
 
 	SDL_Colour c;
 	c.r = as_number(prg, v[0]);
@@ -929,11 +929,18 @@ static bool primfunc_filled_ellipse(Program *prg, const std::vector<Token> &v)
 	p.x = as_number(prg, v[4]);
 	p.y = as_number(prg, v[5]);
 
-	double _rx = as_number(prg, v[6]);
-	double _ry = as_number(prg, v[7]);
-	double _sections = as_number(prg, v[8]);
+	double rx = as_number(prg, v[6]);
+	double ry = as_number(prg, v[7]);
+	double sections;
 
-	gfx::draw_filled_ellipse(c, p, _rx, _ry, _sections);
+ 	if (v.size() > 8) {
+		sections = as_number(prg, v[8]);
+	}
+	else {
+		sections = -1;
+	}	
+
+	gfx::draw_filled_ellipse(c, p, rx, ry, sections);
 
 	return true;
 }
@@ -978,7 +985,7 @@ static bool primfunc_circle(Program *prg, const std::vector<Token> &v)
 
 static bool primfunc_filled_circle(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(8)
+	MIN_ARGS(7)
 
 	SDL_Colour c;
 	c.r = as_number(prg, v[0]);
@@ -990,10 +997,18 @@ static bool primfunc_filled_circle(Program *prg, const std::vector<Token> &v)
 
 	p.x = as_number(prg, v[4]);
 	p.y = as_number(prg, v[5]);
-	double _r = as_number(prg, v[6]);
-	int _sections = as_number(prg, v[7]);
+	double r = as_number(prg, v[6]);
 
-	gfx::draw_filled_circle(c, p, _r, _sections);
+	int sections;
+
+	if (v.size() > 7) {
+		sections = as_number(prg, v[7]);
+	}
+	else {
+		sections = -1;
+	}
+
+	gfx::draw_filled_circle(c, p, r, sections);
 
 	return true;
 }
