@@ -4668,6 +4668,7 @@ BooBoo_GUI::BooBoo_GUI(BooBoo_Widget *root) :
 		case TRANSITION_SLIDE_VERTICAL:
 			transition_is_slide_vertical = true;
 			break;
+		case TRANSITION_NONE:
 		case TRANSITION_FADE:
 			break;
 	}
@@ -4702,6 +4703,7 @@ void BooBoo_GUI::update()
 			case TRANSITION_SLIDE_VERTICAL:
 				transition_is_slide_vertical = false;
 				break;
+			case TRANSITION_NONE:
 			case TRANSITION_FADE:
 				break;
 		}
@@ -4718,6 +4720,7 @@ void BooBoo_GUI::update()
 			case TRANSITION_SLIDE_VERTICAL:
 				transition_is_slide_vertical = true;
 				break;
+			case TRANSITION_NONE:
 			case TRANSITION_FADE:
 				break;
 		}
