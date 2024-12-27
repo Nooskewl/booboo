@@ -466,30 +466,35 @@ function run
 
 function event type a b c d
 {
-	number wheel
-	= wheel 0
-
 	if (== type EVENT_MOUSE_WHEEL) is_wheel
+		number old_top
+		= old_top top
+		number i
 		if (> b 0) is_up (< b 0) is_down
-			call sel_up b
-			- top 1
-			if (< top 0) equal_0
-				= top 0
-			:equal_0
-		:is_up
-			call sel_down (* b -1)
-			+ top 1
-			number sz
-			vector_size filenames sz
-			if (<= (+ top num) selected) adjust
-				= top (- selected (- num 1))
-			:adjust
-			if (>= (+ top num) sz) adjust2
-				= top (- sz num)
-				if (< top 0) zero
+			for i 0 (< i b) 1 do_up
+				call sel_up (== i 0)
+			:do_up
+			if (== top old_top) dec_top
+				- top b
+				if (< top 0) equal_0
 					= top 0
-				:zero
-			:adjust2
+				:equal_0
+			:dec_top
+		:is_up
+			for i 0 (< i (* b -1)) 1 do_down
+				call sel_down (== i 0)
+			:do_down
+			if (== top old_top) inc_top
+				+ top (* b -1)
+				number sz
+				vector_size filenames sz
+				if (> (+ top num) sz) adjust2
+					= top (- sz num)
+					if (< top 0) zero
+						= top 0
+					:zero
+				:adjust2
+			:inc_top
 		:is_down
 	:is_wheel
 
