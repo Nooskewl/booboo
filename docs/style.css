@@ -40,6 +40,13 @@ img {
 	border: 1px solid #ccc;
 }
 .header {
-	border: 8px solid black;
+	border: 5px solid rgba(0, 0, 0, 0.5);
 	box-sizing: border-box;
+	border-radius: 10px;
+}
+.index {
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 10px;
+	background-color: black;
 }
