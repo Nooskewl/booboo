@@ -237,13 +237,18 @@ Sections:
 <pre>
 	compare and jump
 	e.g. if (expr1) the_if (expr2) elseif1 (expr3) elseif2 the_else
-	...
+		; expr1 true code
 	:the_if
-	...
-	...
+		; expr2 true code
+	:elseif1
+		; expr3 true code
+	:elseif2
+		; else code
 	:the_else
+
 	the_if elseif1 elseif2 and the_else are labels that are the bottom of
-	their code blocks
+	their code blocks. The else block is optional. Labels need to be in
+	order of appearance in the if statement or behaviour is undefined.
 </pre>
 
 <h3>for</h3>
