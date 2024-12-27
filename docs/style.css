@@ -1,11 +1,11 @@
 html {
 	color: #ccc;
 	background-color: black;
-	background-image: url("bg.png");
-	image-rendering: pixelated;
+	background-image: url("/media/bg.png");
 	background-attachment: fixed;
 	background-repeat: repeat-x;
 	background-size: 100% 100%;
+	image-rendering: pixelated;
 	height: 100%;
 	font-family: "Abel", sans-serif;
 	max-width: 1280px;
@@ -26,4 +26,20 @@ hr {
 }
 pre {
 	white-space: pre-wrap;
+}
+img {
+	max-width: 100%;
+}
+.logo {
+	height: 48px;
+}
+.ill {
+	background-color: black;
+	padding: 5px;
+	border-radius: 5px;
+	border: 1px solid #ccc;
+}
+.header {
+	border: 8px solid black;
+	box-sizing: border-box;
 }
