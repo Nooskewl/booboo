@@ -114,7 +114,7 @@ Sections:
 <pre>
 	define a function
 	References can be defined by prefixing a parameter name by a tilde (~)
-	e.g. function foo param1 param2 { ... }
+	e.g. function foo param1 param2 ~param3 { ... }
 </pre>
 
 <h3>typeof</h3>
@@ -151,7 +151,7 @@ Sections:
 <pre>
 	A reference. Function parameters preceded by a ~ can be modified
 	by a function
-	e.g. call my_func a b ~c d e ~f ; c and f can be modified by my_func
+	e.g. function foo a b ~c d ~e { ... } ; c and e can be modified
 </pre>
 
 <h3>address</h3>
