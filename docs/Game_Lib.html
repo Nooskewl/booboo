@@ -38,7 +38,9 @@ There is another global callback you can define, draw_black_bar:
 	function draw_black_bar type x y w h
 </pre>
 <p>x, y are the top left coordinate of where to draw, w/h are the width and
-height in pixels. See BAR_* in constants for the bar types.
+height in pixels. See BAR_* in constants for the bar types. This is used to
+draw a letterbox when the window size and aspect ratio you requested don't
+match.
 </p>
 
 <p>
