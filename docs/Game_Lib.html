@@ -104,9 +104,12 @@ audio/mml etc.</p>
 data/ or data.cpa:
 	gfx
 		images
+			misc
+			tiles
 		textures
 		models
 		sprites
+		palettes
 		shaders
 			glsl
 			hlsl
@@ -214,12 +217,17 @@ The following sections describe the API:
 <h3>resize</h3>
 <pre>
 	resize the drawing area projection
+	Letterboxing will be applied if the window aspect ratio is
+	different from what you supply here
 	e.g. resize 240 160 ; make a GBA game!
 </pre>
 
 <h3>get_screen_size</h3>
 <pre>
-	Get the actual (unscaled) size of the screen/window
+	Get the size of the window in pixels. This
+	includes "black bars" and scaling, this is
+	the raw pixel-for-pixel size of the window
+	(or fullscreen window)
 	e.g. get_screen_size scr_w scr_h
 </pre>
 
@@ -233,10 +241,11 @@ The following sections describe the API:
 <h3>get_screen_offset</h3>
 <pre>
 	The BooBoo window is managed in a way that resizing the screen in
-	any way produces a working game with a correct image. Sometimes
-	this requires "black bars". screen_offset gives you the position of
-	the top left of the drawing given any black bars. This is mainly
-	useful for some shaders.
+	any way produces a scaled version of the game at the maximum size
+	the window will fit. Sometimes this requires "black bars".
+	screen_offset gives you the position of	the top left of the drawing
+	given any black bars. This is mainly useful for some shaders (for
+	example shaders that use gl_FragCoord.)
 	e.g. get_screen_offset ox oy
 </pre>
 
@@ -263,7 +272,7 @@ The following sections describe the API:
 
 <h3>toggle_fullscreen</h3>
 <pre>
-	Change from fullscreen to windows or vice versa depending on the
+	Change from fullscreen to windowed or vice versa depending on the
 	current windowed/fullscreen state.
 	e.g. toggle_fullscreen
 </pre>
@@ -277,15 +286,15 @@ The following sections describe the API:
 
 <h3>get_refresh_rate</h3>
 <pre>
-	Query the refresh rate
+	Query the refresh rate of the monitor
 	e.g. get_refresh_rate r
 </pre>
 
 <h3>set_scissor</h3>
 <pre>
-	Set a scissor rectangle. This is based on the projection you're
-	using, not actual pixel coordinates to make it easier. Anything
-	drawn outside of this will not be drawn.
+	Set a scissor rectangle. This is based on the projection (buffer size)
+	you're using, not actual window size/coordinates/black bars to make it
+	easier.	Anything drawn outside of this will not be drawn.
 	e.g. set_scissor x y w h
 </pre>
 
@@ -306,6 +315,8 @@ The following sections describe the API:
 <h3>end_primitives</h3>
 <pre>
 	batch primitives for speed
+	When this is called, anything between this and
+	the previous start_primitives gets drawn at once
 	e.g. end_primitives
 </pre>
 
@@ -341,7 +352,8 @@ The following sections describe the API:
 
 <h3>ellipse</h3>
 <pre>
-	draw a outline ellipse with give number of pie slices (-1 for auto)
+	draw a outline ellipse with given number of pie slices making up the circle
+	(4 is the minimum, -1 for auto)
 	e.g. ellipse r g b a x y radius_x radius_y ^ thickness sections
 </pre>
 
@@ -650,12 +662,16 @@ The following sections describe the API:
 <pre>
 	Get group info about groups in a tilemap
 	e.g. tilemap_get_groups tilemap vec
-	The vector be stuffed with type/x/y/w/h vectors
+	The vector will be stuffed with type/x/y/w/h vectors
+	See AshEdit for the meaning of groups. They're basically
+	arbitrary integers/bitmasks that rectangles of a tilemap
+	can be defined as. For example you could define a group
+	with number 74 to be a question block in your platformer.
 </pre>
 
 <h3>tilemap_set_animated_tiles</h3>
 <pre>
-	Tile groups can be animated. The delay is in milliseconds. Width
+	Tiles can be animated. The delay is in milliseconds. Width
 	and height are the width and height of the area to animate. Then
 	the vector contains the topleft tile position of each frame of
 	animation (should be width by height) as a vector of vectors of
@@ -667,8 +683,9 @@ The following sections describe the API:
 <pre>
 	A* pathfinding using the tilemap solids and your own supplied points.
 	The path returned is a vector of vectors of x/y values
+	extra is a 2d vector of x/y values to use as extra solids
 	e.g. tilemap_find_path tilemap path extra start_x start_y end_x end_y
-	path will be empty if no path is found
+	path will be empty if there is no path
 </pre>
 
 <h3>tilemap_set_solid</h3>
@@ -709,7 +726,7 @@ The following sections describe the API:
 
 <h3>shader_use</h3>
 <pre>
-	Use a shader
+	Start using a shader
 	e.g. shader_use shader
 </pre>
 
@@ -776,18 +793,6 @@ The following sections describe the API:
 
 <a id="3D"><h2>3D Functions</h2></a>
 
-<h3>model_load</h3>
-<pre>
-	Load a model with an optional armature an animations from .x file
-	e.g. model_load model_id "filename.x"
-</pre>
-
-<h3>model_draw</h3>
-<pre>
-	Draw a model with its transforms applied
-	e.g. model_draw model r_tint g_tint b_tint a_tint
-</pre>
-
 <h3>set_2d</h3>
 <pre>
 	Revert back to 2d drawing
@@ -800,6 +805,18 @@ The following sections describe the API:
 	e.g. set_3d
 </pre>
 
+<h3>model_load</h3>
+<pre>
+	Load a model with an optional armature an animations from .x file
+	e.g. model_load model_id "filename.x"
+</pre>
+
+<h3>model_draw</h3>
+<pre>
+	Draw a model with its transforms applied
+	e.g. model_draw model r_tint g_tint b_tint a_tint
+</pre>
+
 <h3>model_identity</h3>
 <pre>
 	Set model transform to identity
@@ -808,23 +825,19 @@ The following sections describe the API:
 
 <h3>model_scale</h3>
 <pre>
-	Alter the scale of a model. It starts at 1 across the board. These
-	numbers get added to that.
+	Alter the scale of a model
 	e.g. model_scale model add_sx add_sy add_sz
 </pre>
 
 <h3>model_rotate</h3>
 <pre>
-	Alter the rotation of a model. These numbers are angles about each
-	axis and get added to the default of 0 and accumulate with each
-	call.
+	Rotate a model.
 	e.g. model_rotate model angle axisx axisy axisz
 </pre>
 
 <h3>model_translate</h3>
 <pre>
-	Translate (move) a model. This sticks like rotation and scaling.
-	The numbers you supply get added to the current position of the model.
+	Translate (move) a model
 	e.g. model_translate model add_x add_y add_z
 </pre>
 
@@ -832,6 +845,38 @@ The following sections describe the API:
 <pre>
 	Retrieve the models current position
 	e.g. model_get_translate model x y z
+</pre>
+
+<h3>model_set_animation</h3>
+<pre>
+	Set the animation to the one named. You can optionally pass a BooBoo
+	function that takes and returns no arguments that will be called
+	when the animation finishes.
+	e.g. model_set_animation model "attack" done_attack
+</pre>
+
+<h3>model_stop</h3>
+<pre>
+	Stop a models animation
+	e.g. model_stop model
+</pre>
+
+<h3>model_reset</h3>
+<pre>
+	Reset a models animation to the beginning
+	e.g. model_reset model
+</pre>
+
+<h3>model_size</h3>
+<pre>
+	Get the dimensions of a model
+	e.g. model_size model szx szy szz
+</pre>
+
+<h3>model_destroy</h3>
+<pre>
+	Free a model
+	e.g. model_destroy model
 </pre>
 
 <h3>identity_3d</h3>
@@ -856,32 +901,6 @@ The following sections describe the API:
 <pre>
 	Translate the modelview matrix
 	e.g. translate_3d x y z
-</pre>
-
-<h3>model_set_animation</h3>
-<pre>
-	Set the animation to the one named. You can optionally pass a BooBoo
-	function that takes and returns no arguments that will be called
-	when the animation finishes.
-	e.g. model_set_animation model "attack" done_attack
-</pre>
-
-<h3>model_stop</h3>
-<pre>
-	Stop a models animation
-	e.g. model_stop model
-</pre>
-
-<h3>model_reset</h3>
-<pre>
-	Reset a models animation
-	e.g. model_reset model
-</pre>
-
-<h3>model_size</h3>
-<pre>
-	Get the dimensions of a model
-	e.g. model_size model szx szy szz
 </pre>
 
 <h3>draw_3d</h3>
@@ -937,12 +956,6 @@ The following sections describe the API:
 <pre>
 	Scale a billboard
 	e.g. billboard_scale b sx sy
-</pre>
-
-<h3>model_destroy</h3>
-<pre>
-	Free a model
-	e.g. model_destroy model
 </pre>
 
 <h3>billboard_destroy</h3>
