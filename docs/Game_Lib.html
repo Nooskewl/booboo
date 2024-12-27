@@ -1,6 +1,17 @@
 <html>
-<head><title>BooBoo Documentation</title></head>
+<head>
+	<title>BooBoo Documentation</title>
+	<link rel="icon" type="image/x-icon" href="/favicon.ico">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="stylesheet" type="text/css" href="/style.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Abel&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9849813265096313" crossorigin="anonymous"></script>
+</head>
 <body>
+
+<p><a href="/"><img style="height: 64px;" src="/cmyk.png"/></a></p>
 
 <p>Jump to:</p>
 
@@ -145,7 +156,8 @@ The following sections describe the API:
 <li><a href="#Events">Events</a></li>
 </ul>
 
-<a id="Core"><h2>Core Functions</h2></a>
+<a id="Core"></a>
+<h2>Core Functions</h2>
 
 <h3>inspect</h3>
 <pre>
@@ -197,7 +209,8 @@ The following sections describe the API:
 	e.g. file_list vec
 </pre>
 
-<a id="Graphics"><h2>Graphics Functions</h2></a>
+<a id="Graphics"></a>
+<h2>Graphics Functions</h2>
 
 <h3>clear</h3>
 <pre>
@@ -304,7 +317,8 @@ The following sections describe the API:
 	e.g. unset_scissor
 </pre>
 
-<a id="Primitives"><h2>Primitive Functions</h2></a>
+<a id="Primitives"></a>
+<h2>Primitive Functions</h2>
 
 <h3>start_primitives</h3>
 <pre>
@@ -375,7 +389,8 @@ The following sections describe the API:
 	e.g. filled_circle r g b a x y radius ^ sections
 </pre>
 
-<a id="Image"><h2>Image Functions</h2></a>
+<a id="Image"></a>
+<h2>Image Functions</h2>
 
 <h3>image_create</h3>
 <pre>
@@ -451,7 +466,8 @@ The following sections describe the API:
 	e.g. image_destroy img
 </pre>
 
-<a id="Sprite"><h2>Sprite Functions</h2></a>
+<a id="Sprite"></a>
+<h2>Sprite Functions</h2>
 
 <h3>sprite_load</h3>
 <pre>
@@ -570,7 +586,8 @@ The following sections describe the API:
 	e.g. sprite_destroy s
 </pre>
 
-<a id="Font"><h2>Font Functions</h2></a>
+<a id="Font"></a>
+<h2>Font Functions</h2>
 
 <h3>font_load</h3>
 <pre>
@@ -615,7 +632,8 @@ The following sections describe the API:
 	e.g. font_destroy f
 </pre>
 
-<a id="Tilemap"><h2>Tilemap Functions</h2></a>
+<a id="Tilemap"></a>
+<h2>Tilemap Functions</h2>
 
 <h3>set_tile_size</h3>
 <pre>
@@ -713,7 +731,8 @@ The following sections describe the API:
 	e.g. tilemap_destroy tilemap
 </pre>
 
-<a id="Shader"><h2>Shader Functions</h2></a>
+<a id="Shader"></a>
+<h2>Shader Functions</h2>
 
 <h3>shader_load</h3>
 <pre>
@@ -791,7 +810,8 @@ The following sections describe the API:
 	e.g. shader_destroy shader
 </pre>
 
-<a id="3D"><h2>3D Functions</h2></a>
+<a id="3D"></a>
+<h2>3D Functions</h2>
 
 <h3>set_2d</h3>
 <pre>
@@ -964,7 +984,8 @@ The following sections describe the API:
 	e.g. billboard_destroy b
 </pre>
 
-<a id="GUI"><h2>GUI Functions</h2></a>
+<a id="GUI"></a>
+<h2>GUI Functions</h2>
 
 <p>
 Widgets are generic rectangles with a userdata attached to them to supply
@@ -1140,7 +1161,8 @@ and h are the calculated position and size of the widget in pixels.
 	; this is the default
 </pre>
 
-<a id="Collision"><h2>Collision Detection Functions</h2></a>
+<a id="Collision"></a>
+<h2>Collision Detection Functions</h2>
 
 <h3>cd_model_point</h3>
 <pre>
@@ -1162,7 +1184,8 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. cd_sphere_sphere result x y z r x2 y2 z2 r2
 </pre>
 
-<a id="Audio"><h2>Audio Functions</h2></a>
+<a id="Audio"></a>
+<h2>Audio Functions</h2>
 
 <h3>mml_create</h3>
 <pre>
@@ -1219,7 +1242,8 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. sample_destroy sample
 </pre>
 
-<a id="Input"><h2>Input Functions</h2></a>
+<a id="Input"></a>
+<h2>Input Functions</h2>
 
 <h3>joystick_poll</h3>
 <pre>
@@ -1273,7 +1297,8 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. key_get dest KEY_SPACE
 </pre>
 
-<a id="JSON"><h2>JSON Functions</h2></a>
+<a id="JSON"></a>
+<h2>JSON Functions</h2>
 
 <h3>json_load</h3>
 <pre>
@@ -1303,7 +1328,8 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. json_destroy json
 </pre>
 
-<a id="CFG"><h2>Configuration Functions</h2></a>
+<a id="CFG"></a>
+<h2>Configuration Functions</h2>
 
 <h3>cfg_load</h3>
 <pre>
@@ -1363,7 +1389,8 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. cfg_destroy cfg
 </pre>
 
-<a id="Constants"><h2>Constants</h2></a>
+<a id="Constants"></a>
+<h2>Constants</h2>
 
 <p>
 The following keyboard constants are used with key_get:
@@ -1668,7 +1695,8 @@ GUI constants:
 	<li>BAR_RIGHT</li>
 </ul>
 
-<a id="Events"><h2>Events</h2></a>
+<a id="Events"></a>
+<h2>Events</h2>
 
 <p>
 You can receive events so you're sure you don't miss anything. Define a
