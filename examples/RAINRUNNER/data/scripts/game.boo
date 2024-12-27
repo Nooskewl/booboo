@@ -35,7 +35,7 @@ image_load img "game_gfx/x.png"
 vector_add numeral_imgs img
 
 number font
-font_load font "font.ttf" 48 1
+font_load font "font.ttf" 32 1
 
 number hit_sfx
 number jump_sfx

@@ -10,7 +10,7 @@ number dx dy
 = dy 0
 
 number font
-font_load font "vga.ttf" 16 0
+font_load font "vga.ttf" 16 1
 
 number is_clicked
 = is_clicked 0
@@ -31,7 +31,7 @@ function draw
 {
 	tilemap_draw tilemap 0 (- layers 1) dx dy
 
-	font_draw font 0 0 0 255 "Click twice!" 16 (- 360 40)
+	font_draw font 255 255 0 255 "Click twice!" 16 (- 360 40)
 
 	number sz
 	vector_size path sz

@@ -2,7 +2,7 @@ number img
 image_load img "misc/window.png"
 
 number font
-font_load font "vga.ttf" 16 0
+font_load font "vga.ttf" 16 1
 
 resize 240 135
 

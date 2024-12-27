@@ -22,7 +22,7 @@ model_scale model scale scale scale
 model_set_animation model "ArmatureAction" cb
 
 number font
-font_load font "font.ttf" 48 0
+font_load font "font.ttf" 48 1
 
 function cb
 {

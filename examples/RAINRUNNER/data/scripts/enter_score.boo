@@ -1,7 +1,7 @@
 number font
 font_load font "font.ttf" 96 1
 number small_font
-font_load small_font "font.ttf" 48 1
+font_load small_font "font.ttf" 32 1
 
 number drip_sfx
 number drop_ground_sfx

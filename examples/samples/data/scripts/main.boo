@@ -1,5 +1,5 @@
 number font
-font_load font "vga.ttf" 32 0
+font_load font "vga.ttf" 32 1
 
 number sample
 sample_load sample "blip.wav"

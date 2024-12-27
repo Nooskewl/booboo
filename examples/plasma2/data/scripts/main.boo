@@ -2,7 +2,7 @@ number TSZ
 = TSZ 16 ; should be a power of 2
 
 number font
-font_load font "vga.ttf" 32 0
+font_load font "vga.ttf" 32 1
 
 clear 0 0 0
 number fw fh

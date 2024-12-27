@@ -5080,7 +5080,7 @@ Frame Root {
              96.078431;
              0.500000; 0.500000; 0.500000;;
              0.000000; 0.000000; 0.000000;;
-            TextureFilename {"zeus.tga";}
+            TextureFilename {"zeus.png";}
           }
         } // End of Model material list
         MeshVertexColors { // Model vertex colors

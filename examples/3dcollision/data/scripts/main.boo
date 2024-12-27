@@ -27,7 +27,7 @@ model_translate sphere 0 0 -2.5
 model_scale sphere 0.01 0.01 0.01
 
 number font
-font_load font "font.ttf" 48 0
+font_load font "font.ttf" 48 1
 
 function cb
 {

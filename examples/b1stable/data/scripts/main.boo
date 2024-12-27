@@ -1,5 +1,5 @@
 number img
-image_load img "b1stable.tga"
+image_load img "b1stable.png"
 
 number r g b
 = r 0

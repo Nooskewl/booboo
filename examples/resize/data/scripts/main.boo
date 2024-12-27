@@ -1,5 +1,5 @@
 number img
-image_load img "misc/kingalbert.tga"
+image_load img "misc/kingalbert.png"
 
 resize 240 160
 

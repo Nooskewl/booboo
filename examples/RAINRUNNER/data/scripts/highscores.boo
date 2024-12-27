@@ -3,7 +3,7 @@ clear 0 0 0
 number font
 font_load font "font.ttf" 96 1
 number small_font
-font_load small_font "font.ttf" 48 1
+font_load small_font "font.ttf" 32 1
 
 number highlight
 = highlight -1
@@ -89,7 +89,7 @@ font_draw font 0 216 255 255 text dx dy
 number dy
 = dy 50
 + dy th
-+ dy 30
++ dy 20
 number w
 number h
 = w 256
@@ -161,7 +161,7 @@ jl draw_next_score2
 number dy
 = dy 50
 + dy th
-+ dy 30
++ dy 20
 
 number i
 = i 0

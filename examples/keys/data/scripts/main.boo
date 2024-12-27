@@ -1,5 +1,5 @@
 number font
-font_load font "vga.ttf" 14 0
+font_load font "vga.ttf" 16 1
 
 number sfx
 mml_create sfx "@PO0 = { 0 100 }\n@PO1 = { 0 200 }\n@PO2 = { 0 300 }\nA l16 @PO0a@PO0 @PO1a@PO1 @PO2a@PO2"

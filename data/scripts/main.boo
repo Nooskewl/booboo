@@ -506,24 +506,42 @@ function event type a b c d
 		:is_joy_down
 	:is_joy_b
 
+	number _do_pgup _do_pgdn
+	= _do_pgup FALSE
+	= _do_pgdn FALSE
+
 	if (== type EVENT_KEY_DOWN) is_key_b
 		if (== a KEY_UP) is_key_up (== a KEY_DOWN) is_key_down (== a KEY_PAGEUP) do_pgup (== a KEY_PAGEDOWN) do_pgdn
 			call sel_up 1
 		:is_key_up
 			call sel_down 1
 		:is_key_down
-			number i
-			mml_play widget 1 0
-			for i 0 (< i num) 1 pgup_slowly
-				call sel_up 0
-			:pgup_slowly
+			= _do_pgup TRUE
 		:do_pgup
-			number i
-			mml_play widget 1 0
-			for i 0 (< i num) 1 pgdn_slowly
-				call sel_down 0
-			:pgdn_slowly
+			= _do_pgdn TRUE
 		:do_pgdn
  	:is_key_b
+
+	if (== type EVENT_JOY_DOWN) do_joy_down
+		if (== b JOY_LB) joy_pgup (== b JOY_RB) joy_pgdn
+			= _do_pgup TRUE
+		:joy_pgup
+			= _do_pgdn TRUE
+		:joy_pgdn
+	:do_joy_down
+
+	if (== 1 _do_pgup) pgup (== 1 _do_pgdn) pgdn
+		number i
+		mml_play widget 1 0
+		for i 0 (< i num) 1 pgup_slowly
+			call sel_up 0
+		:pgup_slowly
+	:pgup
+		number i
+		mml_play widget 1 0
+		for i 0 (< i num) 1 pgdn_slowly
+			call sel_down 0
+		:pgdn_slowly
+	:pgdn
 }
 

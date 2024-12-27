@@ -1,5 +1,5 @@
 number font
-font_load font "vga.ttf" 14 0
+font_load font "vga.ttf" 16 1
 
 number mx my
 number b1 b2 b3 wheel

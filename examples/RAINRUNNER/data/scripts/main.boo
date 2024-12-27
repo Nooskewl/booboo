@@ -1,7 +1,7 @@
 number font
 font_load font "font.ttf" 96 1
 number small_font
-font_load small_font "font.ttf" 48 1
+font_load small_font "font.ttf" 32 1
 
 number drip_sfx
 mml_create drip_sfx "@PO0 = { 0 1000 }\nA o3 @TYPE3 @PO0 g32 @PO0"

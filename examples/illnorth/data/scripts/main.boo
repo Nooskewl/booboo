@@ -1,7 +1,7 @@
 number outer
 number inner
-image_load outer "misc/outer.tga"
-image_load inner "misc/inner.tga"
+image_load outer "misc/outer.png"
+image_load inner "misc/inner.png"
 
 number angle
 = angle 0.0
