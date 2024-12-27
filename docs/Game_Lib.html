@@ -1167,7 +1167,8 @@ and h are the calculated position and size of the widget in pixels.
 <h3>mml_create</h3>
 <pre>
 	create an MML from a string
-	e.g. mml_create dest "A @TYPE1 abcdefg"
+	e.g. mml_create dest "A @TYPE3 abcdefg"
+	; this plays a b c d e f g notes with a sine wave generator
 </pre>
 
 <h3>mml_load</h3>
@@ -1241,7 +1242,6 @@ and h are the calculated position and size of the widget in pixels.
 <h3>mouse_get_position</h3>
 <pre>
 	Get the mouse position scaled relative to the projection
-	The full window starts mapped to 640x360.
 	e.g. mouse_get_position mx my
 </pre>
 
@@ -1268,8 +1268,8 @@ and h are the calculated position and size of the widget in pixels.
 
 <h3>key_get</h3>
 <pre>
-	Read if a key is pressed or not. Please use or modify keycodes.inc
-	From the 'keys' example for keycode constants.
+	Read if a key is pressed or not.
+	See constants for key names
 	e.g. key_get dest KEY_SPACE
 </pre>
 
@@ -1284,17 +1284,17 @@ and h are the calculated position and size of the widget in pixels.
 <h3>json_get_string</h3>
 <pre>
 	Read a string from JSON
-	You can dig down into the file by separating keys with ">"
+	You can dig down into the file by separating keys with "&gt;"
 	"[0]" "[1]" etc can be used to access arrays.
-	e.g. json_get_string json s "settings>profile>name"
+	e.g. json_get_string json s "settings&gt;profile&gt;name"
 </pre>
 
 <h3>json_get_number</h3>
 <pre>
 	Read a number from JSON
-	You can dig down into the file by separating keys with ">"
+	You can dig down into the file by separating keys with "&gt;"
 	"[0]" "[1]" etc can be used to access arrays.
-	e.g. json_get_number json n "settings>mouse>sensitivity"
+	e.g. json_get_number json n "settings&gt;mouse&gt;sensitivity"
 </pre>
 
 <h3>json_destroy</h3>
@@ -1308,6 +1308,9 @@ and h are the calculated position and size of the widget in pixels.
 <h3>cfg_load</h3>
 <pre>
 	load a config file
+	These files are saved in Saved Games\BooBoo along with
+	every BooBoo app, so you should use a domain name or
+	unique name
 	e.g. cfg_load cfg "com.illnorth.example"
 </pre>
 
