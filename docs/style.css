@@ -41,6 +41,7 @@ img {
 }
 .illumni {
 	color: white;
+	font-weight: bold;
 }
 .header {
 	border: 5px solid rgba(0, 108, 128, 128);
