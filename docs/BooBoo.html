@@ -618,9 +618,10 @@ Sections:
 <h3>file_open</h3>
 <pre>
 	open a file, mode can be either "a" "r" or "w"
-	number f file_open f "input.txt" "r"
+	"a" means append, "w" means write (overwrite)
+	and "r" means read mode.
+	e.g. number f file_open f "out.txt "w"
 	f will be -1 on failure
-	e.g. file_open f "out.txt "w"
 </pre>
 
 <h3>file_close</h3>
