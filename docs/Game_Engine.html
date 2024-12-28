@@ -1702,18 +1702,18 @@ GUI constants:
 <h2>Events</h2>
 
 <p>
-You can receive events so you're sure you don't miss anything. Define a
-function called event with 5 arguments:
+You can receive events so you're sure you don't miss anything.
+Mouse and joystick button down events automatically generate repeat
+events, which are marked specially so you can know the difference.
+</p>
+
+<p>
+To receive events, define a function called event with 5 arguments:
 </p>
 
 <pre>
 function event type a b c d { ... }
 </pre>
-
-<p>
-Mouse and joystick button down events automatically generate repeat
-events, which are marked specially so you can know the difference.
-</p>
 
 <p>
 type will be one of the EVENT_* constants listed in the Constants section.
