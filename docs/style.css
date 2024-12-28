@@ -1,3 +1,7 @@
+@font-face {
+	font-family: "Abel";
+	src: url("Abel-Regular.ttf");
+}
 html {
 	color: #ccc;
 	background-color: black;
