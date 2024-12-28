@@ -35,6 +35,28 @@ img {
 	box-sizing: border-box;
 	border-radius: 10px;
 }
+#cmyk {
+	width: 75px;
+}
+#outer {
+	position: relative;
+	top: -38px;
+}
+#inner {
+	position: relative;
+	top: 54px;"
+}
+@media screen and (min-width: 1280px) {
+	#cmyk {
+		width: 125px;
+	}
+	#outer {
+		top: -63px;
+	}
+	#inner {
+		top: 79px;"
+	}
+}
 .index {
 	padding: 10px;
 	border: 1px solid #ccc;
