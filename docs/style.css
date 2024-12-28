@@ -1,7 +1,7 @@
 html {
 	color: #ccc;
 	background-color: black;
-	background-image: url("/media/bg.png");
+	background-image: url("bg.png");
 	background-attachment: fixed;
 	background-repeat: repeat-x;
 	background-size: 100% 100%;
@@ -29,19 +29,6 @@ pre {
 }
 img {
 	max-width: 100%;
-}
-.logo {
-	height: 48px;
-}
-.ill {
-	background-color: black;
-	padding: 5px;
-	border-radius: 5px;
-	border: 1px solid #ccc;
-}
-.illumni {
-	color: white;
-	font-weight: bold;
 }
 .header {
 	border: 5px solid rgba(0, 108, 128, 128);
