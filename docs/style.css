@@ -67,3 +67,10 @@ img {
 	border-radius: 10px;
 	background-color: black;
 }
+.box {
+	border: 5px solid rgba(0, 108, 128, 0.5);
+	box-sizing: border-box;
+	border-radius: 10px;
+	background-color: rgba(0, 108, 128, 0.5);
+	padding: 10px;
+}
