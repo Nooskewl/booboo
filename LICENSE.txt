@@ -1,0 +1,8 @@
+You can freely use and redistribute BooBoo, as long as you include one of the
+following attributions in your game or documentation:
+
+	BooBoo © ILLUMINATI NORTH
+	Made with BooBoo!
+
+You can also opt to keep the filename and icon unchanged, or include a BooBoo
+logo splash screen.
