@@ -27,7 +27,7 @@
 			"cursor_hotspot.x": 0,
 			"cursor_hotspot.y": 0,
 			"multisampling": true,
-			"samples": 4,
+			"aa_samples": 4,
 			"linear_filtering": false
 		},
 		"misc": {
