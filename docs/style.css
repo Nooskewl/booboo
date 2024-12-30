@@ -68,7 +68,7 @@ video {
 }
 h1, h2, h3 {
 	border: 5px solid #00d8ff;
-	background-color: #006c80;
+	background-color: rgba(0, 108, 128, 0.5);
 	color: white;
 	padding: 10px;
 	border-radius: 10px;
