@@ -67,8 +67,9 @@ video {
 	text-align: center;
 }
 h1, h2, h3 {
-	background-color: #00d8ff;
-	color: black;
+	border: 5px solid #00d8ff;
+	background-color: #006c80;
+	color: white;
 	padding: 10px;
 	border-radius: 10px;
 }
