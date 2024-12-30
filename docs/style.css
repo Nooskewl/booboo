@@ -1,11 +1,11 @@
 @font-face {
 	font-family: "Abel";
-	src: url("Abel-Regular.ttf");
+	src: url("/media/Abel-Regular.ttf");
 }
 html {
 	color: #ccc;
 	background-color: black;
-	background-image: url("bg.png");
+	background-image: url("/media/bg.png");
 	background-attachment: fixed;
 	background-repeat: repeat-x;
 	background-size: 100% 100%;
@@ -31,11 +31,7 @@ img {
 	max-width: 100%;
 }
 .logo {
-	height: 64px;
-}
-.illumni {
-	color: white;
-	font-weight: bold;
+	height: 75px;
 }
 #cmyk {
 	width: 250px;
@@ -55,7 +51,13 @@ img {
 	margin: 5px;
 	outline: 2.5px solid #ffd800;
 	font-weight: bold;
-	box-shadow: 0px 0px 10x #ffd800;
+}
+.ill {
+	background-color: black;
+}
+.illumni {
+	color: white;
+	font-weight: bold;
 }
 video {
 	max-width: 100%;
@@ -72,6 +74,7 @@ h1, h2, h3 {
 	color: white;
 	padding: 10px;
 	border-radius: 10px;
+	box-shadow: 0px 0px 10px #003640;
 }
 #outer {
 	padding: 10px;
@@ -120,7 +123,6 @@ input[type=submit] {
 	border: 5px solid #ffd800;
 	border-radius: 10px;
 	background-color: #006c80;
-	box-shadow: 0px 0px 10px #003640;
 	padding: 10px;
 	display: inline-block;
 	margin-top: 5px;
@@ -128,7 +130,6 @@ input[type=submit] {
 	color: #ffd800;
 	cursor: pointer;
 	font-size: 100%;
-	box-shadow: 0px 0px 10x #ffd800;
 }
 #footer {
 	text-align: center;
@@ -136,4 +137,6 @@ input[type=submit] {
 	padding: 25px;
 	background-color: #00d8ff;
 	color: black;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.75);
+    clip-path: inset(-25px 0 0 0);
 }
