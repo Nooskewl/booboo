@@ -10,14 +10,15 @@ html {
 	background-repeat: repeat-x;
 	background-size: 100% 100%;
 	image-rendering: pixelated;
-	height: 100%;
 	font-family: "Abel", sans-serif;
+	padding-left: 10px;
+	padding-right: 10px;
 	max-width: 1280px;
 	margin-left: auto;
 	margin-right: auto;
-	padding: 10px;
 }
 body {
+	margin: 0;
 	image-rendering: auto;
 }
 a, a:visited {
@@ -52,4 +53,10 @@ img {
 }
 h1, h2, h3 {
 	text-shadow: 0px 0px 5px #003640;
+}
+@media screen and (min-width: 1280px) {
+	#outer {
+		padding: 25px;
+		background: rgba(0, 0, 0, 0.25);
+	}
 }
