@@ -142,7 +142,7 @@ Sections:
 <pre>
 	an expression
 	e.g. (+ x (* y (* z w 2))) in C would be x+(y*(z*w*2))
-	Supported operators are: + - * / % &amp;&amp; || &gt; < >= <= == != | ^ & &lt;&lt; &gt;&gt;
+	Supported operators are: + - * / % &amp;&amp; || &gt; &lt; &gt;= <= == != | ^ & &lt;&lt; &gt;&gt;
 	The boolean operators return 1 or 0
 	Your own functions can be supplied as operators
 </pre>
@@ -197,7 +197,7 @@ Sections:
 	Comparison
 	e.g. ? x 1
 	You can also evaluate an expression
-	? 1 (&amp;&amp; (&gt; a b) (< x y)) je true jne false
+	? 1 (&amp;&amp; (&gt; a b) (&lt; x y)) je true jne false
 </pre>
 
 <h3>je</h3>
