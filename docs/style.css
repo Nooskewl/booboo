@@ -88,6 +88,8 @@ h1, h2, h3 {
 		background: rgba(0, 216, 255, 0.25);
 		border-left: 5px solid rgba(0, 108, 128, 0.5);
 		border-right: 5px solid rgba(0, 108, 128, 0.5);
+		box-shadow: 0px 0px 25px #003640;
+		clip-path: inset(0 -25px 0 -25px);
 	}
 }
 input:not([type=submit]) {
