@@ -82,6 +82,14 @@ number NUM_ENEMIES
 number num_stars
 = num_stars 1024
 
+number refresh
+get_refresh_rate refresh
+if (<= refresh 0) sixty
+	= refresh 60
+:sixty
+inspect refresh
+set_logic_rate refresh
+
 call start_game
 
 function start_game
@@ -1011,7 +1019,7 @@ function run
 
 	? ship_acc 0
 	jne done_vel_damp
-	- ship_vel 0.1
+	- ship_vel (/ 6 refresh)
 	? ship_vel 0
 	jge done_vel_damp
 	= ship_vel 0
@@ -1067,7 +1075,7 @@ function run
 	= ship_acc 0
 	? joy_a 0
 	je done_thrust
-	= ship_acc 0.1
+	= ship_acc (/ 6 refresh)
 :done_thrust
 
 	call calc_real_a
