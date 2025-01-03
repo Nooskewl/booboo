@@ -4,10 +4,10 @@ you will not use twinkle and will usually use wedge too.
 
 1) sudo apt install libsdl2-dev libfreetype-dev libglm-dev cmake git libflac-dev libogg-dev libvorbis-dev libpng-dev
 
-2) git clone https://codeberg.org/CMYKilluminatiNetwork/tgui6.git
-   git clone https://codeberg.org/CMYKilluminatiNetwork/shim5.git
-   git clone https://codeberg.org/CMYKilluminatiNetwork/booboo.git
-   git clone https://codeberg.org/CMYKilluminatiNetwork/twinkle.git
+2) git clone https://git.cmykilluminati.net/CMYKilluminatiNetwork/tgui6.git
+   git clone https://git.cmykilluminati.net/CMYKilluminatiNetwork/shim5.git
+   git clone https://git.cmykilluminati.net/CMYKilluminatiNetwork/booboo.git
+   git clone https://git.cmykilluminati.net/CMYKilluminatiNetwork/twinkle.git
 
 3) cd twinkle
    g++ -c -O2 twinkle.cpp
@@ -54,7 +54,7 @@ Windows specifics:
 You can download all the dependencies (this has everything for all our games
 on Codeberg too) from:
 
-https://cmykilluminati.net/files/mingw32-deps-20241018.zip
+https://cmykilluminati.net/downloads/win-lib-include-mingw32-20240917.zip
 
 This has a build.sh like above that's a little different. Change the paths
 as relevant.
