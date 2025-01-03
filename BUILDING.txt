@@ -51,14 +51,16 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DUSER_INCLUDE_PATH="/home/trent/code/tgui6/
 
 Windows specifics:
 
+build.sh:
+
+cmake .. -DCMAKE_TOOLCHAIN_FILE=/home/trent/code/Toolchain-mingw32.cmake -DCMAKE_BUILD_TYPE=Release -DUSER_INCLUDE_PATH="/home/trent/code/twinkle:/home/trent/code/win-include:/home/trent/code/tgui6/include:/home/trent/code/shim5/include:/home/trent/code/shim5/external:/home/trent/code/shim5/external/SDL2_ttf-2.0.14:/home/trent/code/win-include/SDL2" -DUSER_LIBRARY_PATH="/home/trent/code/twinkle:/home/trent/code/win-lib:/home/trent/code/tgui6/build:/home/trent/code/shim5/build" -DGAME_LAUNCHER=on -G "Unix Makefiles"
+
 You can download all the dependencies (this has everything for all our games too) from:
 
 https://cmykilluminati.net/downloads/win-lib-include-mingw32-20240917.zip
 
-This has a build.sh like above that's a little different. Change the paths
-as relevant.
+This also has a file called Toolchain-mingw32.cmake that you will need to have present.
 
-You will also need to setup an MSYS2 MinGW32 environment which is something
-I haven't documented yet. You specifically need to install the packages
-prefixed with mingw32 like gcc and cmake.
+You can install all the required tools into the MSYS2 MinGW32 environment with:
 
+pacman -S git mingw32/mingw-w64-i686-gcc mingw32/mingw-w64-i686-cmake msys/make 

@@ -12,6 +12,8 @@ option(RASPBERRYPI "Build for Raspberry Pi" OFF)
 set(USER_INCLUDE_PATH "" CACHE FILEPATH "Any extra include directories you want")
 set(USER_LIBRARY_PATH "" CACHE FILEPATH "Any extra library directories you want")
 
+set(CMAKE_RC_COMPILER "/mingw32/bin/windres.exe")
+
 include_directories("include")
 include_directories(${USER_INCLUDE_PATH})
 link_directories(${USER_LIBRARY_PATH})
