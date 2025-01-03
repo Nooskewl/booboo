@@ -51,8 +51,7 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DUSER_INCLUDE_PATH="/home/trent/code/tgui6/
 
 Windows specifics:
 
-You can download all the dependencies (this has everything for all our games
-on Codeberg too) from:
+You can download all the dependencies (this has everything for all our games too) from:
 
 https://cmykilluminati.net/downloads/win-lib-include-mingw32-20240917.zip
 
