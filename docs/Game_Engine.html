@@ -438,8 +438,16 @@ The following sections describe the API:
 
 <h3>image_save</h3>
 <pre>
-	Save an image (currently on TGA save is supported)
+	Save an image. TGA and PNG are supported.
 	e.g. image_save img "c:/foo.tga"
+</pre>
+
+<h3>screenshot</h3>
+<pre>
+	Save a screenshot of the backbuffer. TGA and PNG are supported.
+	The optional boolean toggles whether or not the letterbox is saved
+	(default TRUE)
+	e.g. screenshot "screenshot.png" FALSE
 </pre>
 
 <h3>image_draw</h3>
