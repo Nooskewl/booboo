@@ -1287,9 +1287,46 @@ static bool imagefunc_save(Program *prg, const std::vector<Token> &v)
 
 	unsigned char *buf = gfx::Image::read_texture(img);
 
-	gfx::Image::save_tga(filename, buf, img->size);
+	if (filename.find(".tga") != std::string::npos) {
+		gfx::Image::save_tga(filename, buf, img->size);
+	}
+	else {
+		gfx::Image::save_png(filename, buf, img->size);
+	}
 
 	delete[] buf;
+
+	return true;
+}
+
+static bool imagefunc_screenshot(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(1)
+
+	std::string filename = as_string(prg, v[0]);
+
+	util::Size<int> size;
+
+	bool include_black_bars = true;
+	if (v.size() > 1) {
+		include_black_bars = as_number(prg, v[1]);
+	}
+
+	unsigned char *buf = gfx::Image::read_backbuffer(include_black_bars, &size.w, &size.h);
+
+	if (buf != nullptr) {
+		if (filename.find(".tga") != std::string::npos) {
+			gfx::Image::save_tga(filename, buf, size);
+		}
+		else {
+			gfx::Image::save_png(filename, buf, size);
+		}
+
+		delete[] buf;
+	}
+	else {
+		// Error!
+	}
 
 	return true;
 }
@@ -5061,6 +5098,7 @@ void start_lib_game()
 	add_instruction("image_create", imagefunc_create);
 	add_instruction("image_load", imagefunc_load);
 	add_instruction("image_save", imagefunc_save);
+	add_instruction("screenshot", imagefunc_screenshot);
 	add_instruction("image_destroy", imagefunc_destroy);
 	add_instruction("image_draw", imagefunc_draw);
 	add_instruction("image_stretch_region", imagefunc_stretch_region);
