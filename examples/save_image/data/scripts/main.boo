@@ -67,7 +67,7 @@ function draw
 		:get_home
 		string filename
 		string_format filename "%/save_image_screenshot.png" home
-		screenshot filename FALSE
+		screenshot filename
 		string n
 		string_format n "% saved!" filename
 		add_notification n
