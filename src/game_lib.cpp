@@ -2070,6 +2070,22 @@ static bool spritefunc_destroy(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool spritefunc_set_animation_lazy(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string anim = as_string(prg, v[1]);
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	sprite->set_animation_lazy(anim);
+
+	return true;
+}
+
 struct Sprite_Callback_Data
 {
 	Program *prg;
@@ -2088,22 +2104,6 @@ static void sprite_callback(void *data)
 	v.push_back(t);
 	call_void_function(d->prg, d->function, v, 0);
 	delete d;
-}
-
-static bool spritefunc_set_animation_lazy(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(2)
-
-	int id = as_number(prg, v[0]);
-	std::string anim = as_string(prg, v[1]);
-	
-	Sprite_Info *info = sprite_info(prg);
-
-	gfx::Sprite *sprite = info->sprites[id];
-
-	sprite->set_animation_lazy(anim);
-
-	return true;
 }
 
 static bool spritefunc_set_animation(Program *prg, const std::vector<Token> &v)
