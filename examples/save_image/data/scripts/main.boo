@@ -21,9 +21,6 @@ vector_add pts v
 number font
 font_load font "font.ttf" 16 1
 
-number buf
-image_create buf 640 360
-
 number s
 = s 0
 
@@ -50,6 +47,14 @@ function run
 :too_down
 		= [pts i] v
 :update
+}
+
+function draw
+{
+	clear 0 0 0
+	triangle 255 0 216 255 [pts 0 0] [pts 0 1] [pts 1 0] [pts 1 1] [pts 2 0] [pts 2 1] 5
+
+	font_draw font 255 255 255 255 "Press S to save screenshot" 15 15
 
 	number k
 	key_get k KEY_s
@@ -61,24 +66,12 @@ function run
 			getenv home "HOME"
 		:get_home
 		string filename
-		string_format filename "%/save_image_screenshot.tga" home
-		image_save buf filename
+		string_format filename "%/save_image_screenshot.png" home
+		screenshot filename FALSE
 		string n
 		string_format n "% saved!" filename
 		add_notification n
 	:save_it
 		= s 0
 	:clear_it
-}
-
-function draw
-{
-	set_target buf
-	clear 0 0 0
-	triangle 255 0 216 255 [pts 0 0] [pts 0 1] [pts 1 0] [pts 1 1] [pts 2 0] [pts 2 1] 5
-
-	set_target_backbuffer
-	image_draw buf 255 255 255 255 0 0
-
-	font_draw font 255 255 255 255 "Press S to save image" 15 15
 }
