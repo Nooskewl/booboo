@@ -1049,7 +1049,7 @@ static bool mmlfunc_destroy(Program *prg, const std::vector<Token> &v)
 
 static bool mmlfunc_load(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
 	Variable &v1 = as_variable(prg, v[0]);
 	std::string name = as_string(prg, v[1]);
@@ -1060,7 +1060,12 @@ static bool mmlfunc_load(Program *prg, const std::vector<Token> &v)
 	
 	v1.n = info->mml_id;
 
-	audio::MML *mml = new audio::MML(name);
+	bool load_from_filesystem = false;
+	if (v.size() > 2) {
+		load_from_filesystem = as_number(prg, v[2]);
+	}
+
+	audio::MML *mml = new audio::MML(name, load_from_filesystem);
 
 	info->mmls[info->mml_id++] = mml;
 
@@ -1128,7 +1133,7 @@ static bool mmlfunc_stop(Program *prg, const std::vector<Token> &v)
 
 static bool samplefunc_load(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
 	Variable &v1 = as_variable(prg, v[0]);
 	std::string name = as_string(prg, v[1]);
@@ -1139,7 +1144,12 @@ static bool samplefunc_load(Program *prg, const std::vector<Token> &v)
 		
 	v1.n = info->sample_id;
 
-	audio::Sample *sample = new audio::Sample(name);
+	bool load_from_filesystem = false;
+	if (v.size() > 2) {
+		load_from_filesystem = as_number(prg, v[2]);
+	}
+
+	audio::Sample *sample = new audio::Sample(name, load_from_filesystem);
 
 	info->samples[info->sample_id++] = sample;
 
@@ -1241,7 +1251,7 @@ static bool imagefunc_create(Program *prg, const std::vector<Token> &v)
 
 static bool imagefunc_load(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
 	Variable &v1 = as_variable(prg, v[0]);
 	std::string name = as_string(prg, v[1]);
@@ -1252,7 +1262,12 @@ static bool imagefunc_load(Program *prg, const std::vector<Token> &v)
 	
 	v1.n = info->image_id;
 
-	gfx::Image *img = new gfx::Image(name);
+	bool load_from_filesystem = false;
+	if (v.size() > 2) {
+		load_from_filesystem = as_number(prg, v[2]);
+	}
+
+	gfx::Image *img = new gfx::Image(name, FALSE, load_from_filesystem);
 
 	info->images[info->image_id++] = img;
 
@@ -1584,7 +1599,7 @@ static bool imagefunc_draw_9patch(Program *prg, const std::vector<Token> &v)
 
 static bool fontfunc_load(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(4)
+	MIN_ARGS(4)
 
 	std::string name = as_string(prg, v[1]);
 	int size = as_number(prg, v[2]);
@@ -1598,7 +1613,12 @@ static bool fontfunc_load(Program *prg, const std::vector<Token> &v)
 	
 	v1.n = info->font_id;
 
-	gfx::TTF *font = new gfx::TTF(name, size, 1024);
+	bool load_from_filesystem = false;
+	if (v.size() > 4) {
+		load_from_filesystem = as_number(prg, v[4]);
+	}
+
+	gfx::TTF *font = new gfx::TTF(name, size, 1024, load_from_filesystem);
 	font->set_smooth(smooth);
 
 	info->fonts[info->font_id++] = font;
@@ -1731,7 +1751,7 @@ static bool tilemapfunc_set_tile_size(Program *prg, const std::vector<Token> &v)
 
 static bool tilemapfunc_load(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
 	Variable &v1 = as_variable(prg, v[0]);
 	std::string name = as_string(prg, v[1]);
@@ -1742,7 +1762,12 @@ static bool tilemapfunc_load(Program *prg, const std::vector<Token> &v)
 	
 	v1.n = info->tilemap_id;
 
-	gfx::Tilemap *tilemap = new gfx::Tilemap(name);
+	bool load_from_filesystem = false;
+	if (v.size() > 2) {
+		load_from_filesystem = as_number(prg, v[2]);
+	}
+
+	gfx::Tilemap *tilemap = new gfx::Tilemap(name, load_from_filesystem);
 
 	info->tilemaps[info->tilemap_id++] = tilemap;
 
@@ -2060,7 +2085,7 @@ static bool tilemapfunc_get_tile(Program *prg, const std::vector<Token> &v)
 
 static bool spritefunc_load(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
 	Variable &v1 = as_variable(prg, v[0]);
 	std::string name = as_string(prg, v[1]);
@@ -2071,7 +2096,12 @@ static bool spritefunc_load(Program *prg, const std::vector<Token> &v)
 	
 	v1.n = info->sprite_id;
 
-	gfx::Sprite *sprite = new gfx::Sprite(name, name);
+	bool load_from_filesystem = false;
+	if (v.size() > 2) {
+		load_from_filesystem = as_number(prg, v[2]);
+	}
+
+	gfx::Sprite *sprite = new gfx::Sprite(name, name, load_from_filesystem);
 
 	info->sprites[info->sprite_id++] = sprite;
 
@@ -2891,7 +2921,7 @@ static bool cfgfunc_erase(Program *prg, const std::vector<Token> &v)
 
 static bool shaderfunc_load(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	MIN_ARGS(3)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
@@ -2906,19 +2936,31 @@ static bool shaderfunc_load(Program *prg, const std::vector<Token> &v)
 
 	gfx::Shader *shader = nullptr;
 
+	bool load_from_filesystem = false;
+	if (v.size() > 3) {
+		load_from_filesystem = as_number(prg, v[3]);
+	}
+
 	if (shim::opengl) {
 		std::string vs, fs;
+		std::string (*load_text)(std::string filename);
+		if (load_from_filesystem) {
+			load_text = util::load_text_from_filesystem;
+		}
+		else {
+			load_text = util::load_text;
+		}
 		if (vname == "") {
 			vs = DEFAULT_GLSL_VERTEX_SHADER;
 		}
 		else {
-			vs = util::load_text("gfx/shaders/glsl/" + vname + ".txt");
+			vs = load_text("gfx/shaders/glsl/" + vname + ".txt");
 		}
 		if (fname == "") {
 			fs = DEFAULT_GLSL_TEXTURED_FRAGMENT_SHADER;
 		}
 		else {
-			fs = util::load_text("gfx/shaders/glsl/" + fname + ".txt");
+			fs = load_text("gfx/shaders/glsl/" + fname + ".txt");
 		}
 
 		gfx::Shader::OpenGL_Shader *vert = gfx::Shader::load_opengl_vertex_shader(vs, gfx::Shader::HIGH);
@@ -2931,16 +2973,16 @@ static bool shaderfunc_load(Program *prg, const std::vector<Token> &v)
 		gfx::Shader::D3D_Vertex_Shader *vert;
 		gfx::Shader::D3D_Fragment_Shader *frag;
 		if (vname == "") {
-			vert = gfx::Shader::load_d3d_vertex_shader("default_vertex");
+			vert = gfx::Shader::load_d3d_vertex_shader("default_vertex", load_from_filesystem);
 		}
 		else {
-			vert = gfx::Shader::load_d3d_vertex_shader(vname);
+			vert = gfx::Shader::load_d3d_vertex_shader(vname, load_from_filesystem);
 		}
 		if (fname == "") {
-			frag = gfx::Shader::load_d3d_fragment_shader("default_fragment");
+			frag = gfx::Shader::load_d3d_fragment_shader("default_fragment", load_from_filesystem);
 		}
 		else {
-			frag = gfx::Shader::load_d3d_fragment_shader(fname);
+			frag = gfx::Shader::load_d3d_fragment_shader(fname, load_from_filesystem);
 		}
 
 		shader = new gfx::Shader(vert, frag);
@@ -3156,7 +3198,7 @@ static bool shaderfunc_set_colour(Program *prg, const std::vector<Token> &v)
 
 static bool jsonfunc_load(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
 	Variable &v1 = as_variable(prg, v[0]);
 
@@ -3168,7 +3210,12 @@ static bool jsonfunc_load(Program *prg, const std::vector<Token> &v)
 	
 	v1.n = info->json_id;
 
-	util::JSON *json = new util::JSON(name);
+	bool load_from_filesystem = false;
+	if (v.size() > 2) {
+		load_from_filesystem = as_number(prg, v[2]);
+	}
+
+	util::JSON *json = new util::JSON(name, load_from_filesystem);
 
 	info->jsons[info->json_id++] = json;
 
@@ -3252,7 +3299,7 @@ void set_2d()
 
 static bool modelfunc_load(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
 	Variable &v1 = as_variable(prg, v[0]);
 	std::string name = as_string(prg, v[1]);
@@ -3263,7 +3310,12 @@ static bool modelfunc_load(Program *prg, const std::vector<Token> &v)
 	
 	v1.n = info->model_id;
 
-	gfx::Model *model = new gfx::Model(name);
+	bool load_from_filesystem = false;
+	if (v.size() > 2) {
+		load_from_filesystem = as_number(prg, v[2]);
+	}
+
+	gfx::Model *model = new gfx::Model(name, load_from_filesystem);
 
 	Model *m = new Model;
 	m->mat = glm::mat4();
