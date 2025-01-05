@@ -2628,6 +2628,47 @@ static bool joyfunc_rumble(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool joyfunc_get_button(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	int index = as_number(prg, v[0]);
+	Variable &v1 = as_variable(prg, v[1]);
+	int n = as_number(prg, v[2]);
+
+	CHECK_NUMBER(v1)
+
+	SDL_JoystickID id = input::get_controller_id(index);
+	SDL_GameController *gc = input::get_sdl_gamecontroller(id);
+	v1.n = SDL_GameControllerGetButton(gc, (SDL_GameControllerButton)n);
+
+	return true;
+}
+
+static bool joyfunc_get_axis(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	int index = as_number(prg, v[0]);
+	Variable &v1 = as_variable(prg, v[1]);
+	int n = as_number(prg, v[2]);
+
+	CHECK_NUMBER(v1)
+
+	SDL_JoystickID id = input::get_controller_id(index);
+	SDL_GameController *gc = input::get_sdl_gamecontroller(id);
+	v1.n = SDL_GameControllerGetAxis(gc, (SDL_GameControllerAxis)n);
+
+	if (v1.n < 0) {
+		v1.n /= 32768.0f;
+	}
+	else {
+		v1.n /= 32767;
+	}
+
+	return true;
+}
+
 static bool cfgfunc_load(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -5004,6 +5045,8 @@ void start_lib_game()
 	add_instruction("joystick_poll", joyfunc_poll);
 	add_instruction("joystick_count", joyfunc_count);
 	add_instruction("rumble", joyfunc_rumble);
+	add_instruction("joystick_get_button", joyfunc_get_button);
+	add_instruction("joystick_get_axis", joyfunc_get_axis);
 	add_instruction("cfg_load", cfgfunc_load);
 	add_instruction("cfg_destroy", cfgfunc_destroy);
 	add_instruction("cfg_save", cfgfunc_save);

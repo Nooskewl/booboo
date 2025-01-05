@@ -1276,6 +1276,20 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. rumble duration_in_ms ^ index
 </pre>
 
+<h3>joystick_get_button</h3>
+<pre>
+	Get the state of a joystick button listed in constants
+	Result is 0 or 1
+	e.g. joystick_get_button joy_num result JOY_A
+</pre>
+
+<h3>joystick_get_axis</h3>
+<pre>
+	Get the state of a joystick axis listed in constants
+	Results or -1 to 1 except for triggers which are 0 to 1
+	e.g. joystick_get_axis joy_num result JOY_LEFTX
+</pre>
+
 <h3>mouse_get_position</h3>
 <pre>
 	Get the mouse position scaled relative to the projection
@@ -1665,7 +1679,7 @@ Event types:
 </ul>
 
 <p>
-Joystick buttons for events:
+Joystick buttons:
 </p>
 
 <ul>
@@ -1684,6 +1698,17 @@ Joystick buttons for events:
 <li>JOY_D</li>
 <li>JOY_L</li>
 <li>JOY_R</li>
+</ul>
+
+<p>Joystick axes:</p>
+
+<ul>
+	<li>JOY_LEFTX</li>
+	<li>JOY_LEFTY</li>
+	<li>JOY_RIGHTX</li>
+	<li>JOY_RIGHTY</li>
+	<li>JOY_TRIGGERLEFT</li>
+	<li>JOY_TRIGGERRIGHT</li>
 </ul>
 
 <p>

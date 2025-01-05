@@ -1268,6 +1268,12 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "JOY_D", TGUI_B_D, pass, var_i);
 	insert_constant(prg, "JOY_L", TGUI_B_L, pass, var_i);
 	insert_constant(prg, "JOY_R", TGUI_B_R, pass, var_i);
+	insert_constant(prg, "JOY_LEFTX", SDL_CONTROLLER_AXIS_LEFTX, pass, var_i);
+	insert_constant(prg, "JOY_LEFTY", SDL_CONTROLLER_AXIS_LEFTY, pass, var_i);
+	insert_constant(prg, "JOY_RIGHTX", SDL_CONTROLLER_AXIS_RIGHTX, pass, var_i);
+	insert_constant(prg, "JOY_RIGHTY", SDL_CONTROLLER_AXIS_RIGHTY, pass, var_i);
+	insert_constant(prg, "JOY_TRIGGERLEFT", SDL_CONTROLLER_AXIS_TRIGGERLEFT, pass, var_i);
+	insert_constant(prg, "JOY_TRIGGERRIGHT", SDL_CONTROLLER_AXIS_TRIGGERRIGHT, pass, var_i);
 	insert_constant(prg, "TRANSITION_NONE", TRANSITION_NONE, pass, var_i);
 	insert_constant(prg, "TRANSITION_ENLARGE", TRANSITION_ENLARGE, pass, var_i);
 	insert_constant(prg, "TRANSITION_SHRINK", TRANSITION_SHRINK, pass, var_i);
