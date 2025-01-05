@@ -1259,6 +1259,26 @@ static bool imagefunc_load(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool imagefunc_save(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string filename = as_string(prg, v[1]);
+
+	Image_Info *info = image_info(prg);
+
+	gfx::Image *img = info->images[id];
+
+	unsigned char *buf = gfx::Image::read_texture(img);
+
+	gfx::Image::save_tga(filename, buf, img->size);
+
+	delete[] buf;
+
+	return true;
+}
+
 static bool imagefunc_destroy(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -4988,6 +5008,7 @@ void start_lib_game()
 	add_instruction("filled_circle", primfunc_filled_circle);
 	add_instruction("image_create", imagefunc_create);
 	add_instruction("image_load", imagefunc_load);
+	add_instruction("image_save", imagefunc_save);
 	add_instruction("image_destroy", imagefunc_destroy);
 	add_instruction("image_draw", imagefunc_draw);
 	add_instruction("image_stretch_region", imagefunc_stretch_region);
