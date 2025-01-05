@@ -1267,7 +1267,7 @@ static bool imagefunc_load(Program *prg, const std::vector<Token> &v)
 		load_from_filesystem = as_number(prg, v[2]);
 	}
 
-	gfx::Image *img = new gfx::Image(name, FALSE, load_from_filesystem);
+	gfx::Image *img = new gfx::Image(name, false, load_from_filesystem);
 
 	info->images[info->image_id++] = img;
 
