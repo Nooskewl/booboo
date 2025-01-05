@@ -48,7 +48,8 @@ bool corefunc_getenv(Program *prg, const std::vector<Token> &v)
 
 	CHECK_STRING(v1)
 
-	v1.s = getenv(get.c_str());
+	char *ptr = getenv(get.c_str());
+	v1.s = ptr == nullptr ? "" : ptr;
 
 	return true;
 }
