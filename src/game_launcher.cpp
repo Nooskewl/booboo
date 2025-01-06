@@ -38,6 +38,8 @@ static int mouse_dx;
 static int mouse_dy;
 static bool delta_got;
 
+static int exit_key = TGUIK_F12;
+
 static bool mousefunc_set_relative(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -241,6 +243,9 @@ bool start()
 	}
 
 	TGUI::set_focus_sloppiness(0);
+	
+	util::JSON::Node *root = shim::shim_json->get_root();
+	exit_key = root->get_nested_int("booboo>input>exit_key", &exit_key, TGUIK_F12);
 
 	return true;
 }
@@ -250,7 +255,7 @@ void handle_event(TGUI_Event *event)
 	if (event->type == TGUI_UNKNOWN) {
 		return;
 	}
-	else if (event->type == TGUI_QUIT || (event->type == TGUI_KEY_DOWN && event->keyboard.code == TGUIK_F12)) {
+	else if (event->type == TGUI_QUIT || (event->type == TGUI_KEY_DOWN && event->keyboard.code == exit_key)) {
 		quit = true;
 	}
 	else if (event->type == TGUI_MOUSE_AXIS) {
