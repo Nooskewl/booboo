@@ -27,9 +27,15 @@ struct Sample_Info {
 	std::map<int, audio::Sample *> samples;
 };
 
+struct Image {
+	gfx::Image *image;
+	util::Size<int> size;
+	bool created;
+};
+
 struct Image_Info {
 	unsigned int image_id;
-	std::map<int, gfx::Image *> images;
+	std::map<int, Image *> images;
 };
 
 struct Font_Info {
@@ -598,13 +604,7 @@ static bool gfxfunc_set_target(Program *prg, const std::vector<Token> &v)
 
 	Image_Info *info = image_info(prg);
 
-#ifdef DEBUG
-	if (info->images.find(id) == info->images.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid Image at " + get_error_info(prg));
-	}
-#endif
-
-	gfx::Image *img = info->images[id];
+	gfx::Image *img = info->images[id]->image;
 
 	gfx::set_target_image(img);
 
@@ -1097,12 +1097,6 @@ static bool mmlfunc_play(Program *prg, const std::vector<Token> &v)
 
 	MML_Info *info = mml_info(prg);
 
-#ifdef DEBUG
-	if (info->mmls.find(id) == info->mmls.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid MML at " + get_error_info(prg));
-	}
-#endif
-
 	audio::MML *mml = info->mmls[id];
 
 	mml->play(shim::music_volume*volume, loop);
@@ -1117,12 +1111,6 @@ static bool mmlfunc_stop(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 
 	MML_Info *info = mml_info(prg);
-
-#ifdef DEBUG
-	if (info->mmls.find(id) == info->mmls.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid MML at " + get_error_info(prg));
-	}
-#endif
 
 	audio::MML *mml = info->mmls[id];
 
@@ -1193,12 +1181,6 @@ static bool samplefunc_play(Program *prg, const std::vector<Token> &v)
 
 	Sample_Info *info = sample_info(prg);
 
-#ifdef DEBUG
-	if (info->samples.find(id) == info->samples.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid Sample at " + get_error_info(prg));
-	}
-#endif
-
 	audio::Sample *sample = info->samples[id];
 
 	sample->play(shim::music_volume * volume, loop);
@@ -1213,12 +1195,6 @@ static bool samplefunc_stop(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 
 	Sample_Info *info = sample_info(prg);
-
-#ifdef DEBUG
-	if (info->samples.find(id) == info->samples.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid Sample at " + get_error_info(prg));
-	}
-#endif
 
 	audio::Sample *sample = info->samples[id];
 
@@ -1244,7 +1220,12 @@ static bool imagefunc_create(Program *prg, const std::vector<Token> &v)
 
 	gfx::Image *img = new gfx::Image(util::Size<int>(w, h));
 
-	info->images[info->image_id++] = img;
+	Image *i = new Image;
+	i->image = img;
+	i->created = true;
+	i->size = util::Size<int>(w, h);
+
+	info->images[info->image_id++] = i;
 
 	return true;
 }
@@ -1269,7 +1250,11 @@ static bool imagefunc_load(Program *prg, const std::vector<Token> &v)
 
 	gfx::Image *img = new gfx::Image(name, false, load_from_filesystem);
 
-	info->images[info->image_id++] = img;
+	Image *i = new Image;
+	i->image = img;
+	i->created = false;
+
+	info->images[info->image_id++] = i;
 
 	return true;
 }
@@ -1283,7 +1268,7 @@ static bool imagefunc_save(Program *prg, const std::vector<Token> &v)
 
 	Image_Info *info = image_info(prg);
 
-	gfx::Image *img = info->images[id];
+	gfx::Image *img = info->images[id]->image;
 
 	unsigned char *buf = gfx::Image::read_texture(img);
 
@@ -1337,7 +1322,7 @@ static bool imagefunc_destroy(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v[0]);
 	Image_Info *info = image_info(prg);
-	delete info->images[id];
+	delete info->images[id]->image;
 	info->images.erase(id);
 
 	return true;
@@ -1374,13 +1359,7 @@ static bool imagefunc_draw(Program *prg, const std::vector<Token> &v)
 
 	Image_Info *info = image_info(prg);
 
-#ifdef DEBUG
-	if (info->images.find(id) == info->images.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid Image at " + get_error_info(prg));
-	}
-#endif
-
-	gfx::Image *img = info->images[id];
+	gfx::Image *img = info->images[id]->image;
 
 	SDL_Colour c;
 	c.r = r;
@@ -1438,13 +1417,7 @@ static bool imagefunc_stretch_region(Program *prg, const std::vector<Token> &v)
 	
 	Image_Info *info = image_info(prg);
 
-#ifdef DEBUG
-	if (info->images.find(id) == info->images.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid Image at " + get_error_info(prg));
-	}
-#endif
-
-	gfx::Image *img = info->images[id];
+	gfx::Image *img = info->images[id]->image;
 
 	SDL_Colour c;
 	c.r = r;
@@ -1501,13 +1474,7 @@ static bool imagefunc_draw_rotated_scaled(Program *prg, const std::vector<Token>
 
 	Image_Info *info = image_info(prg);
 
-#ifdef DEBUG
-	if (info->images.find(id) == info->images.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid Image at " + get_error_info(prg));
-	}
-#endif
-
-	gfx::Image *img = info->images[id];
+	gfx::Image *img = info->images[id]->image;
 
 	SDL_Colour c;
 	c.r = r;
@@ -1536,13 +1503,7 @@ static bool imagefunc_start(Program *prg, const std::vector<Token> &v)
 
 	Image_Info *info = image_info(prg);
 
-#ifdef DEBUG
-	if (info->images.find(img) == info->images.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Unknown image at " + get_error_info(prg));
-	}
-#endif
-
-	gfx::Image *image = info->images[img];
+	gfx::Image *image = info->images[img]->image;
 
 	image->start_batch();
 
@@ -1557,13 +1518,7 @@ static bool imagefunc_end(Program *prg, const std::vector<Token> &v)
 
 	Image_Info *info = image_info(prg);
 
-#ifdef DEBUG
-	if (info->images.find(img) == info->images.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Unknown image at " + get_error_info(prg));
-	}
-#endif
-
-	gfx::Image *image = info->images[img];
+	gfx::Image *image = info->images[img]->image;
 
 	image->end_batch();
 
@@ -1581,13 +1536,7 @@ static bool imagefunc_size(Program *prg, const std::vector<Token> &v)
 	
 	Image_Info *info = image_info(prg);
 
-#ifdef DEBUG
-	if (info->images.find(id) == info->images.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid image at " + get_error_info(prg));
-	}
-#endif
-
-	gfx::Image *img = info->images[id];
+	gfx::Image *img = info->images[id]->image;
 
 	CHECK_NUMBER(v1)
 	CHECK_NUMBER(v2)
@@ -1614,13 +1563,7 @@ static bool imagefunc_draw_9patch(Program *prg, const std::vector<Token> &v)
 
 	Image_Info *info = image_info(prg);
 
-#ifdef DEBUG
-	if (info->images.find(id) == info->images.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid image at " + get_error_info(prg));
-	}
-#endif
-
-	gfx::Image *img = info->images[id];
+	gfx::Image *img = info->images[id]->image;
 
 	SDL_Colour c;
 	c.r = r;
@@ -1698,12 +1641,6 @@ static bool fontfunc_draw(Program *prg, const std::vector<Token> &v)
 
 	Font_Info *info = font_info(prg);
 
-#ifdef DEBUG
-	if (info->fonts.find(id) == info->fonts.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid Font at " + get_error_info(prg));
-	}
-#endif
-
 	gfx::TTF *font = info->fonts[id];
 
 	SDL_Colour c;
@@ -1770,7 +1707,7 @@ static bool fontfunc_add_extra_glyph(Program *prg, const std::vector<Token> &v)
 	gfx::TTF *font = info->fonts[id];
 
 	Image_Info *iinfo = image_info(prg);
-	gfx::Image *image = iinfo->images[image_id];
+	gfx::Image *image = iinfo->images[image_id]->image;
 
 	font->add_extra_glyph(glyph_id, image);
 
@@ -2815,12 +2752,6 @@ static bool cfgfunc_get_number(Program *prg, const std::vector<Token> &v)
 
 	CHECK_NUMBER(v2)
 
-#ifdef DEBUG
-	if (info->cfgs.find(id) == info->cfgs.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid CFG Value at " + get_error_info(prg));
-	}
-#endif
-	       	
 	if (info->cfgs[id].find(name) == info->cfgs[id].end()) {
 		return true;
 	}
@@ -2842,12 +2773,6 @@ static bool cfgfunc_get_string(Program *prg, const std::vector<Token> &v)
 
 	CHECK_STRING(v2)
 
-#ifdef DEBUG
-	if (info->cfgs.find(id) == info->cfgs.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid CFG Value at " + get_error_info(prg));
-	}
-#endif
-
 	if (info->cfgs[id].find(name) == info->cfgs[id].end()) {
 		return true;
 	}
@@ -2866,12 +2791,6 @@ static bool cfgfunc_set_number(Program *prg, const std::vector<Token> &v)
 	double val = as_number(prg, v[2]);
 
 	CFG_Info *info = cfg_info(prg);
-
-#ifdef DEBUG
-	if (info->cfgs.find(id) == info->cfgs.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid CFG Value at " + get_error_info(prg));
-	}
-#endif
 
 	Config_Value value;
 	value.type = Variable::NUMBER;
@@ -2892,12 +2811,6 @@ static bool cfgfunc_set_string(Program *prg, const std::vector<Token> &v)
 
 	CFG_Info *info = cfg_info(prg);
 
-#ifdef DEBUG
-	if (info->cfgs.find(id) == info->cfgs.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid CFG Value at " + get_error_info(prg));
-	}
-#endif
-
 	Config_Value value;
 	value.type = Variable::STRING;
 	value.s = val;
@@ -2917,12 +2830,6 @@ static bool cfgfunc_exists(Program *prg, const std::vector<Token> &v)
 
 	CFG_Info *info = cfg_info(prg);
 
-#ifdef DEBUG
-	if (info->cfgs.find(id) == info->cfgs.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid CFG Value at " + get_error_info(prg));
-	}
-#endif
-
 	bool found = info->cfgs[id].find(name) != info->cfgs[id].end();
 
 	CHECK_NUMBER(v1)
@@ -2940,12 +2847,6 @@ static bool cfgfunc_erase(Program *prg, const std::vector<Token> &v)
 	std::string name = as_string(prg, v[1]);
 
 	CFG_Info *info = cfg_info(prg);
-
-#ifdef DEBUG
-	if (info->cfgs.find(id) == info->cfgs.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid CFG Value at " + get_error_info(prg));
-	}
-#endif
 
 	std::map<std::string, Config_Value>::iterator it;
 	if ((it = info->cfgs[id].find(name)) == info->cfgs[id].end()) {
@@ -3130,7 +3031,7 @@ static bool shaderfunc_set_texture(Program *prg, const std::vector<Token> &v)
 	gfx::Shader *shader = info->shaders[id];
 
 	Image_Info *info2 = image_info(prg);
-	gfx::Image *img = info2->images[t];
+	gfx::Image *img = info2->images[t]->image;
 
 	shader->set_texture(name, img);
 
@@ -3594,14 +3495,46 @@ static bool modelfunc_translate_3d(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static void lost_device_callback()
+{
+#ifdef _WIN32
+	if (shim::opengl == false) {
+		Image_Info *info = image_info(prg);
+		for (size_t i = 0; i < info->images.size(); i++) {
+			if (info->images[i]->created) {
+				delete info->images[i]->image;
+				info->images[i]->image = nullptr;
+			}
+		}
+	}
+#endif
+	
+	std::vector<Token> v;
+	call_void_function(prg, "lost_device", v, 0);
+}
+
 static void found_device_callback()
 {
+#ifdef _WIN32
+	if (shim::opengl == false) {
+		Image_Info *info = image_info(prg);
+		for (size_t i = 0; i < info->images.size(); i++) {
+			if (info->images[i]->created) {
+				info->images[i]->image = new gfx::Image(info->images[i]->size);
+			}
+		}
+	}
+#endif
+
 	if (is_3d) {
 		set_3d();
 	}
 	else {
 		set_2d();
 	}
+	
+	std::vector<Token> v;
+	call_void_function(prg, "found_device", v, 0);
 }
 
 static bool modelfunc_set_2d(Program *prg, const std::vector<Token> &v)
@@ -3896,7 +3829,7 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 */
 
 	Image_Info *iinfo = image_info(prg);
-	gfx::Image *image = iinfo->images[tex];
+	gfx::Image *image = iinfo->images[tex]->image;
 	if (shim::opengl) {
 		GLuint texture = image->get_opengl_texture();
 		glBindTexture_ptr(GL_TEXTURE_2D, texture);
@@ -3980,7 +3913,7 @@ static bool modelfunc_billboard_create(Program *prg, const std::vector<Token> &v
 	CHECK_NUMBER(result)
 	
 	Image_Info *info = image_info(prg);
-	gfx::Image *image = info->images[image_id];
+	gfx::Image *image = info->images[image_id]->image;
 	
 	Billboard_Info *info2 = billboard_info(prg);
 	Billboard *billboard = new Billboard;
@@ -5057,7 +4990,7 @@ static void black_bars_callback(gfx::Black_Bar_Type type, int x, int y, int w, i
 
 void start_lib_game()
 {
-	gfx::register_lost_device_callbacks(nullptr, found_device_callback);
+	gfx::register_lost_device_callbacks(lost_device_callback, found_device_callback);
 	gfx::register_black_bars_callback(black_bars_callback);
 
 	add_instruction("inspect", miscfunc_inspect);
@@ -5255,6 +5188,7 @@ void game_lib_destroy_program(Program *prg)
 	}
 	Image_Info *image_i = image_info(prg);
 	for (size_t i = 0; i < image_i->images.size(); i++) {
+		delete image_i->images[i]->image;
 		delete image_i->images[i];
 	}
 	Font_Info *font_i = font_info(prg);
