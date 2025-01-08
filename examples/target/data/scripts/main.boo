@@ -23,5 +23,7 @@ function draw
 ; This is only required for D3D, otherwise image will be blank on a lost/found event
 function found_device
 {
-	call draw_img
+	if (== 1 D3D9) redraw
+		call draw_img
+	:redraw
 }
