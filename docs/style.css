@@ -53,11 +53,11 @@ h1, h2, h3 {
 }
 #outer {
 	padding: 10px;
-	max-width: 1280px;
+	max-width: 1200px;
 	margin-left: auto;
 	margin-right: auto;
 }
-@media screen and (min-width: 1280px) {
+@media screen and (min-width: 1200px) {
 	#outer {
 		padding: 25px;
 		background: rgba(0, 216, 255, 0.25);
