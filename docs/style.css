@@ -1,11 +1,11 @@
 @font-face {
 	font-family: "Abel";
-	src: url("Abel-Regular.ttf");
+	src: url("/Abel-Regular.ttf");
 }
 html {
 	color: #ccc;
 	background-color: black;
-	background-image: url("bg.png");
+	background-image: url("https://f1.minus0.org/1-20250211143214-4a0e4c3e50b571287331bcdcc9a9285e.png");
 	background-attachment: fixed;
 	background-repeat: repeat-x;
 	background-size: 100% 100%;
