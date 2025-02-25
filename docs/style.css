@@ -1,6 +1,6 @@
 @font-face {
 	font-family: "Abel";
-	src: url("/Abel-Regular.ttf");
+	src: url("https://f1.minus0.org/1-20250225082651-1052d6ca3993ae24a932304560a4c8b4.ttf");
 }
 html {
 	color: #ccc;
@@ -80,4 +80,10 @@ h1, h2, h3 {
 }
 .pad {
 	padding: 10px;
+}
+video {
+	width: 100%;
+	border: 5px solid rgba(0, 108, 128, 0.5);
+	box-sizing: border-box;
+	border-radius: 10px;
 }
