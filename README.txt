@@ -1,4 +1,4 @@
-Copyright 2022-2024 ILLUMINATI NORTH
+Copyright 2022-2025 ILLUMINATI NORTH
 
 BooBoo is a mini language with a simple, but powerful game API.
 
@@ -28,9 +28,6 @@ those by placing one in:
 Windows:
 	%USERPROFILE%\Saved Games\BooBoo
 
-Linux:
-	~/.config/ILLUMINATI NORTH/BooBoo
-
 --
 
-Please visit https://cmykilluminati.net for updates!
+Please visit https://illnorth.ca for updates!
