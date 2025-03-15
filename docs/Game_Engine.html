@@ -117,7 +117,8 @@ All colours use premultiplied alpha.
 <p>
 Most load function can take an optional boolean parameter at the end, which
 Tells BooBoo to load it from the filesystem rather than from the data/
-directory or data.cpa. For example image_load, mml_load, font_load etc.
+directory or data.cpa. For example image_load, mml_load, font_load etc. It
+is called lffs below.
 </p>
 
 <p>For no particular reason, I'm marking OPTIONAL PARAMETERS with a ^</p>
@@ -429,7 +430,7 @@ The following sections describe the API:
 <h3>image_load</h3>
 <pre>
 	load an image
-	e.g. image_load dest filename
+	e.g. image_load dest filename ^ lffs
 </pre>
 
 <h3>image_save</h3>
@@ -504,7 +505,7 @@ The following sections describe the API:
 	Basically, each animation in a sprite is a sprite sheet exported
 	from Aseprite. Then there is a sprite.json which has a list of
 	animation names.
-	e.g. sprite_load sprite "my_sprite"
+	e.g. sprite_load sprite "my_sprite" ^ lffs
 </pre>
 
 <h3>sprite_draw</h3>
@@ -622,7 +623,7 @@ The following sections describe the API:
 <pre>
 	load a TTF font
 	All of the font functions support UTF8
-	e.g. font_load font "DejaVuSans.ttf" px_size smooth_flag
+	e.g. font_load font "DejaVuSans.ttf" px_size smooth_flag ^ lffs
 </pre>
 
 <h3>font_draw</h3>
@@ -677,7 +678,7 @@ The following sections describe the API:
 	data/gfx/images/tiles and named tiles0.png, tiles1.png and so on
 	(.tga is also supported.) See AshEdit for more details on maps
 	and creating them.
-	e.g. tilemap_load a_number "map.wm2"
+	e.g. tilemap_load a_number "map.wm2" ^ lffs
 </pre>
 
 <h3>tilemap_draw</h3>
@@ -766,7 +767,7 @@ The following sections describe the API:
 <h3>shader_load</h3>
 <pre>
 	Load a shader
-	e.g. shader_load n "my_vert" "my_frag"
+	e.g. shader_load n "my_vert" "my_frag" ^ lffs
 	When running on OpenGL this will load from
 	data/gfx/shaders/glsl/my_vert.txt. D3D will load
 	data/gfx/shaders/hlsl/my_vert.shader
@@ -857,7 +858,7 @@ The following sections describe the API:
 <h3>model_load</h3>
 <pre>
 	Load a model with an optional armature an animations from .x file
-	e.g. model_load model_id "filename.x"
+	e.g. model_load model_id "filename.x" ^ lffs
 </pre>
 
 <h3>model_draw</h3>
@@ -1226,7 +1227,7 @@ and h are the calculated position and size of the widget in pixels.
 <h3>mml_load</h3>
 <pre>
 	load an MML from file
-	e.g. mml_load dest "sfx/blast.mml"
+	e.g. mml_load dest "sfx/blast.mml" ^ lffs
 </pre>
 
 <h3>mml_play</h3>
@@ -1244,7 +1245,7 @@ and h are the calculated position and size of the widget in pixels.
 <h3>sample_load</h3>
 <pre>
 	load a sample
-	e.g. sample_load s "example.wav"
+	e.g. sample_load s "example.wav" ^ lffs
 </pre>
 
 <h3>sample_play</h3>
@@ -1346,7 +1347,7 @@ and h are the calculated position and size of the widget in pixels.
 <h3>json_load</h3>
 <pre>
 	Load a JSON file
-	e.g. json_load j "file.json"
+	e.g. json_load j "file.json" ^ lffs
 </pre>
 
 <h3>json_get_string</h3>
