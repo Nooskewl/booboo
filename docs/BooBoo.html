@@ -86,6 +86,11 @@ Sections:
 <h3>reset</h3>
 <pre>
 	load a different BooBoo script
+	This is seamless and more or less instant. If you start drawing
+	the same thing in the next script, the player may not know the
+	script changed. It's useful for different game modes, menus,
+	high scores etc... state information can be passed between scripts
+	using the configuration API.
 	e.g. reset "next_slide.boo"
 </pre>
 
