@@ -1299,7 +1299,7 @@ function run
 	number speed
 	= speed 16
 	number step
-	= step 8
+	= step 1
 :next_step
 	+ bx (* c step)
 	+ by (* s step)
