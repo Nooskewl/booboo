@@ -117,8 +117,8 @@ function draw
 
 	string sc1 sc2
 	number sc2w fh
-	string_format sc1 "%" score1
-	string_format sc2 "%" score2
+	= sc1 score1
+	= sc2 score2
 	font_width font sc2w sc2
 	font_height font fh
 	font_draw font 255 255 255 255 sc1 GUTTER (- (+ (- SCR_H BOTTOM) (/ BOTTOM 2)) (/ fh 2))

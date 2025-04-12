@@ -2026,7 +2026,7 @@ bool corefunc_set(Program *prg, const std::vector<Token> &v)
 			}
 			else { // string
 				char buf[1000];
-				snprintf(buf, 1000, "%d", v2.n);
+				snprintf(buf, 1000, "%g", v2.n);
 				v1->s = buf;
 			}
 		}
