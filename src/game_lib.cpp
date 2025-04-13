@@ -17,6 +17,10 @@ GUI_Transition_Type transition_out_type = TRANSITION_SHRINK;
 extern bool quit;
 extern Program *prg;
 
+#define INFO_EXISTS(m, i) if (m.find(i) == m.end()) { \
+	throw Error(std::string(__FUNCTION__) + ": " + "Invalid handle at " + get_error_info(prg)); \
+}
+
 struct MML_Info {
 	unsigned int mml_id;
 	std::map<int, audio::MML *> mmls;
@@ -604,6 +608,8 @@ static bool gfxfunc_set_target(Program *prg, const std::vector<Token> &v)
 
 	Image_Info *info = image_info(prg);
 
+	INFO_EXISTS(info->images, id)
+
 	gfx::Image *img = info->images[id]->image;
 
 	gfx::set_target_image(img);
@@ -1041,8 +1047,9 @@ static bool mmlfunc_destroy(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v[0]);
 	MML_Info *info = mml_info(prg);
+	INFO_EXISTS(info->mmls, id)
 	delete info->mmls[id];
-	info->mmls[id] = nullptr;
+	info->mmls.erase(id);
 
 	return true;
 }
@@ -1097,6 +1104,8 @@ static bool mmlfunc_play(Program *prg, const std::vector<Token> &v)
 
 	MML_Info *info = mml_info(prg);
 
+	INFO_EXISTS(info->mmls, id)
+
 	audio::MML *mml = info->mmls[id];
 
 	mml->play(shim::music_volume*volume, loop);
@@ -1111,6 +1120,8 @@ static bool mmlfunc_stop(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 
 	MML_Info *info = mml_info(prg);
+
+	INFO_EXISTS(info->mmls, id)
 
 	audio::MML *mml = info->mmls[id];
 
@@ -1150,8 +1161,9 @@ static bool samplefunc_destroy(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v[0]);
 	Sample_Info *info = sample_info(prg);
+	INFO_EXISTS(info->samples, id)
 	delete info->samples[id];
-	info->samples[id] = nullptr;
+	info->samples.erase(id);
 
 	return true;
 }
@@ -1181,6 +1193,8 @@ static bool samplefunc_play(Program *prg, const std::vector<Token> &v)
 
 	Sample_Info *info = sample_info(prg);
 
+	INFO_EXISTS(info->samples, id)
+
 	audio::Sample *sample = info->samples[id];
 
 	sample->play(shim::music_volume * volume, loop);
@@ -1195,6 +1209,8 @@ static bool samplefunc_stop(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 
 	Sample_Info *info = sample_info(prg);
+
+	INFO_EXISTS(info->samples, id)
 
 	audio::Sample *sample = info->samples[id];
 
@@ -1268,6 +1284,8 @@ static bool imagefunc_save(Program *prg, const std::vector<Token> &v)
 
 	Image_Info *info = image_info(prg);
 
+	INFO_EXISTS(info->images, id)
+
 	gfx::Image *img = info->images[id]->image;
 
 	unsigned char *buf = gfx::Image::read_texture(img);
@@ -1322,8 +1340,9 @@ static bool imagefunc_destroy(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v[0]);
 	Image_Info *info = image_info(prg);
+	INFO_EXISTS(info->images, id)
 	delete info->images[id]->image;
-	info->images[id] = nullptr;
+	info->images.erase(id);
 
 	return true;
 }
@@ -1358,6 +1377,8 @@ static bool imagefunc_draw(Program *prg, const std::vector<Token> &v)
 	}
 
 	Image_Info *info = image_info(prg);
+
+	INFO_EXISTS(info->images, id)
 
 	gfx::Image *img = info->images[id]->image;
 
@@ -1417,6 +1438,8 @@ static bool imagefunc_stretch_region(Program *prg, const std::vector<Token> &v)
 	
 	Image_Info *info = image_info(prg);
 
+	INFO_EXISTS(info->images, id)
+
 	gfx::Image *img = info->images[id]->image;
 
 	SDL_Colour c;
@@ -1474,6 +1497,8 @@ static bool imagefunc_draw_rotated_scaled(Program *prg, const std::vector<Token>
 
 	Image_Info *info = image_info(prg);
 
+	INFO_EXISTS(info->images, id)
+
 	gfx::Image *img = info->images[id]->image;
 
 	SDL_Colour c;
@@ -1503,6 +1528,8 @@ static bool imagefunc_start(Program *prg, const std::vector<Token> &v)
 
 	Image_Info *info = image_info(prg);
 
+	INFO_EXISTS(info->images, img)
+
 	gfx::Image *image = info->images[img]->image;
 
 	image->start_batch();
@@ -1517,6 +1544,8 @@ static bool imagefunc_end(Program *prg, const std::vector<Token> &v)
 	double img = as_number(prg, v[0]);
 
 	Image_Info *info = image_info(prg);
+
+	INFO_EXISTS(info->images, img)
 
 	gfx::Image *image = info->images[img]->image;
 
@@ -1535,6 +1564,8 @@ static bool imagefunc_size(Program *prg, const std::vector<Token> &v)
 	Variable &v2 = as_variable(prg, v[2]);
 	
 	Image_Info *info = image_info(prg);
+
+	INFO_EXISTS(info->images, id)
 
 	gfx::Image *img = info->images[id]->image;
 
@@ -1562,6 +1593,8 @@ static bool imagefunc_draw_9patch(Program *prg, const std::vector<Token> &v)
 	int h = as_number(prg, v[8]);
 
 	Image_Info *info = image_info(prg);
+
+	INFO_EXISTS(info->images, id)
 
 	gfx::Image *img = info->images[id]->image;
 
@@ -1612,8 +1645,9 @@ static bool fontfunc_destroy(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v[0]);
 	Font_Info *info = font_info(prg);
+	INFO_EXISTS(info->fonts, id)
 	delete info->fonts[id];
-	info->fonts[id] = nullptr;
+	info->fonts.erase(id);
 
 	return true;
 }
@@ -1641,6 +1675,8 @@ static bool fontfunc_draw(Program *prg, const std::vector<Token> &v)
 
 	Font_Info *info = font_info(prg);
 
+	INFO_EXISTS(info->fonts, id)
+
 	gfx::TTF *font = info->fonts[id];
 
 	SDL_Colour c;
@@ -1664,6 +1700,8 @@ static bool fontfunc_width(Program *prg, const std::vector<Token> &v)
 	
 	Font_Info *info = font_info(prg);
 
+	INFO_EXISTS(info->fonts, id)
+
 	gfx::TTF *font = info->fonts[id];
 
 	int w = font->get_text_width(text);
@@ -1683,6 +1721,8 @@ static bool fontfunc_height(Program *prg, const std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[1]);
 	
 	Font_Info *info = font_info(prg);
+
+	INFO_EXISTS(info->fonts, id)
 
 	gfx::TTF *font = info->fonts[id];
 
@@ -1704,9 +1744,11 @@ static bool fontfunc_add_extra_glyph(Program *prg, const std::vector<Token> &v)
 	int image_id = as_number(prg, v[2]);
 	
 	Font_Info *info = font_info(prg);
+	INFO_EXISTS(info->fonts, id)
 	gfx::TTF *font = info->fonts[id];
 
 	Image_Info *iinfo = image_info(prg);
+	INFO_EXISTS(iinfo->images, image_id)
 	gfx::Image *image = iinfo->images[image_id]->image;
 
 	font->add_extra_glyph(glyph_id, image);
@@ -1754,8 +1796,9 @@ static bool tilemapfunc_destroy(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v[0]);
 	Tilemap_Info *info = tilemap_info(prg);
+	INFO_EXISTS(info->tilemaps, id)
 	delete info->tilemaps[id];
-	info->tilemaps[id] = nullptr;
+	info->tilemaps.erase(id);
 
 	return true;
 }
@@ -1772,6 +1815,8 @@ static bool tilemapfunc_draw(Program *prg, const std::vector<Token> &v)
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
+	INFO_EXISTS(info->tilemaps, id)
+
 	gfx::Tilemap *tilemap = info->tilemaps[id];
 	
 	tilemap->draw(start_layer, end_layer, util::Point<float>(x, y));
@@ -1786,9 +1831,11 @@ static bool tilemapfunc_num_layers(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
 	
+	CHECK_NUMBER(v1)
+
 	Tilemap_Info *info = tilemap_info(prg);
 
-	CHECK_NUMBER(v1)
+	INFO_EXISTS(info->tilemaps, id)
 
 	gfx::Tilemap *tilemap = info->tilemaps[id];
 
@@ -1805,10 +1852,12 @@ static bool tilemapfunc_size(Program *prg, const std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[1]);
 	Variable &v2 = as_variable(prg, v[2]);
 	
-	Tilemap_Info *info = tilemap_info(prg);
-
 	CHECK_NUMBER(v1)
 	CHECK_NUMBER(v2)
+
+	Tilemap_Info *info = tilemap_info(prg);
+
+	INFO_EXISTS(info->tilemaps, id)
 
 	gfx::Tilemap *tilemap = info->tilemaps[id];
 
@@ -1829,9 +1878,11 @@ static bool tilemapfunc_is_solid(Program *prg, const std::vector<Token> &v)
 	int x = as_number(prg, v[2]);
 	int y = as_number(prg, v[3]);
 	
+	CHECK_NUMBER(v1)
+
 	Tilemap_Info *info = tilemap_info(prg);
 
-	CHECK_NUMBER(v1)
+	INFO_EXISTS(info->tilemaps, id)
 
 	gfx::Tilemap *tilemap = info->tilemaps[id];
 
@@ -1850,6 +1901,8 @@ static bool tilemapfunc_get_groups(Program *prg, const std::vector<Token> &v)
 	CHECK_VECTOR(vec)
 	
 	Tilemap_Info *info = tilemap_info(prg);
+
+	INFO_EXISTS(info->tilemaps, id)
 
 	gfx::Tilemap *tilemap = info->tilemaps[id];
 
@@ -1901,9 +1954,11 @@ static bool tilemapfunc_set_animated_tiles(Program *prg, const std::vector<Token
 	int h = (int)as_number(prg, v[3]);
 	Variable v1 = as_variable_resolve(prg, v[4]);
 	
+	CHECK_VECTOR(v1)
+
 	Tilemap_Info *info = tilemap_info(prg);
 
-	CHECK_VECTOR(v1)
+	INFO_EXISTS(info->tilemaps, id)
 
 	gfx::Tilemap *tilemap = info->tilemaps[id];
 	
@@ -1942,6 +1997,8 @@ static bool tilemapfunc_find_path(Program *prg, const std::vector<Token> &v)
 	CHECK_VECTOR(entity_solids)	
 
 	Tilemap_Info *info = tilemap_info(prg);
+
+	INFO_EXISTS(info->tilemaps, id)
 
 	gfx::Tilemap *tilemap = info->tilemaps[id];
 
@@ -1997,6 +2054,8 @@ static bool tilemapfunc_set_solid(Program *prg, const std::vector<Token> &v)
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
+	INFO_EXISTS(info->tilemaps, id)
+
 	gfx::Tilemap *tilemap = info->tilemaps[id];
 
 	tilemap->set_solid(-1, util::Point<int>(x, y), util::Size<int>(1, 1), solid);
@@ -2017,6 +2076,8 @@ static bool tilemapfunc_set_tile(Program *prg, const std::vector<Token> &v)
 	bool solid = as_number(prg, v[6]);
 	
 	Tilemap_Info *info = tilemap_info(prg);
+
+	INFO_EXISTS(info->tilemaps, id)
 
 	gfx::Tilemap *tilemap = info->tilemaps[id];
 
@@ -2042,6 +2103,8 @@ static bool tilemapfunc_get_tile(Program *prg, const std::vector<Token> &v)
 	CHECK_NUMBER(vs)
 	
 	Tilemap_Info *info = tilemap_info(prg);
+
+	INFO_EXISTS(info->tilemaps, id)
 
 	gfx::Tilemap *tilemap = info->tilemaps[id];
 
@@ -2088,8 +2151,9 @@ static bool spritefunc_destroy(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v[0]);
 	Sprite_Info *info = sprite_info(prg);
+	INFO_EXISTS(info->sprites, id)
 	delete info->sprites[id];
-	info->sprites[id] = nullptr;
+	info->sprites.erase(id);
 
 	return true;
 }
@@ -2102,6 +2166,8 @@ static bool spritefunc_set_animation_lazy(Program *prg, const std::vector<Token>
 	std::string anim = as_string(prg, v[1]);
 	
 	Sprite_Info *info = sprite_info(prg);
+	
+	INFO_EXISTS(info->sprites, id)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -2138,6 +2204,8 @@ static bool spritefunc_set_animation(Program *prg, const std::vector<Token> &v)
 	std::string anim = as_string(prg, v[1]);
 	
 	Sprite_Info *info = sprite_info(prg);
+	
+	INFO_EXISTS(info->sprites, id)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -2162,9 +2230,11 @@ static bool spritefunc_get_animation(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
 	
-	Sprite_Info *info = sprite_info(prg);
-
 	CHECK_STRING(v1)
+
+	Sprite_Info *info = sprite_info(prg);
+	
+	INFO_EXISTS(info->sprites, id)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -2180,10 +2250,12 @@ static bool spritefunc_get_previous_animation(Program *prg, const std::vector<To
 	int id = as_number(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
 	
-	Sprite_Info *info = sprite_info(prg);
-
 	CHECK_STRING(v1)
 
+	Sprite_Info *info = sprite_info(prg);
+
+	INFO_EXISTS(info->sprites, id)
+	
 	gfx::Sprite *sprite = info->sprites[id];
 
 	v1.s = sprite->get_previous_animation();
@@ -2198,9 +2270,11 @@ static bool spritefunc_current_frame(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
 	
+	CHECK_NUMBER(v1)
+
 	Sprite_Info *info = sprite_info(prg);
 
-	CHECK_NUMBER(v1)
+	INFO_EXISTS(info->sprites, id)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -2216,9 +2290,11 @@ static bool spritefunc_num_frames(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
 	
+	CHECK_NUMBER(v1)
+
 	Sprite_Info *info = sprite_info(prg);
 
-	CHECK_NUMBER(v1)
+	INFO_EXISTS(info->sprites, id)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -2234,9 +2310,11 @@ static bool spritefunc_length(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
 	
-	Sprite_Info *info = sprite_info(prg);
-
 	CHECK_NUMBER(v1)
+
+	Sprite_Info *info = sprite_info(prg);
+	
+	INFO_EXISTS(info->sprites, id)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -2253,10 +2331,12 @@ static bool spritefunc_current_frame_size(Program *prg, const std::vector<Token>
 	Variable &v1 = as_variable(prg, v[1]);
 	Variable &v2 = as_variable(prg, v[2]);
 	
-	Sprite_Info *info = sprite_info(prg);
-
 	CHECK_NUMBER(v1)
 	CHECK_NUMBER(v2)
+
+	Sprite_Info *info = sprite_info(prg);
+
+	INFO_EXISTS(info->sprites, id)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -2299,6 +2379,8 @@ static bool spritefunc_draw(Program *prg, const std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
+	INFO_EXISTS(info->sprites, id)
+
 	gfx::Sprite *sprite = info->sprites[id];
 
 	gfx::Image *img = sprite->get_current_image();
@@ -2330,6 +2412,8 @@ static bool spritefunc_start(Program *prg, const std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
+	INFO_EXISTS(info->sprites, id)
+
 	gfx::Sprite *sprite = info->sprites[id];
 
 	sprite->start();
@@ -2345,6 +2429,8 @@ static bool spritefunc_stop(Program *prg, const std::vector<Token> &v)
 	
 	Sprite_Info *info = sprite_info(prg);
 
+	INFO_EXISTS(info->sprites, id)
+
 	gfx::Sprite *sprite = info->sprites[id];
 
 	sprite->stop();
@@ -2359,6 +2445,8 @@ static bool spritefunc_reset(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	
 	Sprite_Info *info = sprite_info(prg);
+
+	INFO_EXISTS(info->sprites, id)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -2377,12 +2465,14 @@ static bool spritefunc_bounds(Program *prg, const std::vector<Token> &v)
 	Variable &v3 = as_variable(prg, v[3]);
 	Variable &v4 = as_variable(prg, v[4]);
 	
-	Sprite_Info *info = sprite_info(prg);
-
 	CHECK_NUMBER(v1)
 	CHECK_NUMBER(v2)
 	CHECK_NUMBER(v3)
 	CHECK_NUMBER(v4)
+
+	Sprite_Info *info = sprite_info(prg);
+
+	INFO_EXISTS(info->sprites, id)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -2406,9 +2496,11 @@ static bool spritefunc_elapsed(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
 	
+	CHECK_NUMBER(v1)
+
 	Sprite_Info *info = sprite_info(prg);
 
-	CHECK_NUMBER(v1)
+	INFO_EXISTS(info->sprites, id)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -2427,6 +2519,8 @@ static bool spritefunc_frame_times(Program *prg, const std::vector<Token> &v)
 	CHECK_VECTOR(vec)	
 
 	Sprite_Info *info = sprite_info(prg);
+
+	INFO_EXISTS(info->sprites, id)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -2450,9 +2544,11 @@ static bool spritefunc_is_started(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Variable &v1 = as_variable(prg, v[1]);
 	
+	CHECK_NUMBER(v1)
+
 	Sprite_Info *info = sprite_info(prg);
 
-	CHECK_NUMBER(v1)
+	INFO_EXISTS(info->sprites, id)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
@@ -2700,10 +2796,10 @@ static bool cfgfunc_load(Program *prg, const std::vector<Token> &v)
 	Variable &v1 = as_variable(prg, v[0]);
 	std::string cfg_name = as_string(prg, v[1]);
 
-	CFG_Info *info = cfg_info(prg);
-
 	CHECK_NUMBER(v1)
 	
+	CFG_Info *info = cfg_info(prg);
+
 	std::map<std::string, Config_Value> val = load_cfg(prg, cfg_name);
 	int id = info->cfg_id++;
 	v1.n = id;
@@ -2718,7 +2814,8 @@ static bool cfgfunc_destroy(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v[0]);
 	CFG_Info *info = cfg_info(prg);
-	info->cfgs[id] = nullptr;
+	INFO_EXISTS(info->cfgs, id)
+	info->cfgs.erase(id);
 
 	return true;
 }
@@ -2748,9 +2845,11 @@ static bool cfgfunc_get_number(Program *prg, const std::vector<Token> &v)
 	Variable &v2 = as_variable(prg, v[1]);
 	std::string name = as_string(prg, v[2]);
 
-	CFG_Info *info = cfg_info(prg);
-
 	CHECK_NUMBER(v2)
+
+	CFG_Info *info = cfg_info(prg);
+	
+	INFO_EXISTS(info->cfgs, id)
 
 	if (info->cfgs[id].find(name) == info->cfgs[id].end()) {
 		return true;
@@ -2769,9 +2868,11 @@ static bool cfgfunc_get_string(Program *prg, const std::vector<Token> &v)
 	Variable &v2 = as_variable(prg, v[1]);
 	std::string name = as_string(prg, v[2]);
 
-	CFG_Info *info = cfg_info(prg);
-
 	CHECK_STRING(v2)
+
+	CFG_Info *info = cfg_info(prg);
+	
+	INFO_EXISTS(info->cfgs, id)
 
 	if (info->cfgs[id].find(name) == info->cfgs[id].end()) {
 		return true;
@@ -2791,6 +2892,8 @@ static bool cfgfunc_set_number(Program *prg, const std::vector<Token> &v)
 	double val = as_number(prg, v[2]);
 
 	CFG_Info *info = cfg_info(prg);
+	
+	INFO_EXISTS(info->cfgs, id)
 
 	Config_Value value;
 	value.type = Variable::NUMBER;
@@ -2810,6 +2913,8 @@ static bool cfgfunc_set_string(Program *prg, const std::vector<Token> &v)
 	std::string val = as_string(prg, v[2]);
 
 	CFG_Info *info = cfg_info(prg);
+	
+	INFO_EXISTS(info->cfgs, id)
 
 	Config_Value value;
 	value.type = Variable::STRING;
@@ -2830,6 +2935,8 @@ static bool cfgfunc_exists(Program *prg, const std::vector<Token> &v)
 
 	CFG_Info *info = cfg_info(prg);
 
+	INFO_EXISTS(info->cfgs, id)
+
 	bool found = info->cfgs[id].find(name) != info->cfgs[id].end();
 
 	CHECK_NUMBER(v1)
@@ -2847,6 +2954,8 @@ static bool cfgfunc_erase(Program *prg, const std::vector<Token> &v)
 	std::string name = as_string(prg, v[1]);
 
 	CFG_Info *info = cfg_info(prg);
+	
+	INFO_EXISTS(info->cfgs, id)
 
 	std::map<std::string, Config_Value>::iterator it;
 	if ((it = info->cfgs[id].find(name)) == info->cfgs[id].end()) {
@@ -2938,8 +3047,9 @@ static bool shaderfunc_destroy(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v[0]);
 	Shader_Info *info = shader_info(prg);
+	INFO_EXISTS(info->shaders, id)
 	delete info->shaders[id];
-	info->shaders[id] = nullptr;
+	info->shaders.erase(id);
 
 	return true;
 }
@@ -2951,6 +3061,7 @@ static bool shaderfunc_use(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	
 	Shader_Info *info = shader_info(prg);
+	INFO_EXISTS(info->shaders, id)
 	gfx::Shader *shader = info->shaders[id];
 
 	shim::current_shader = shader;
@@ -2980,6 +3091,7 @@ static bool shaderfunc_set_bool(Program *prg, const std::vector<Token> &v)
 	bool b = as_number(prg, v[2]);
 	
 	Shader_Info *info = shader_info(prg);
+	INFO_EXISTS(info->shaders, id)
 	gfx::Shader *shader = info->shaders[id];
 
 	shader->set_bool(name, b);
@@ -2996,6 +3108,7 @@ static bool shaderfunc_set_int(Program *prg, const std::vector<Token> &v)
 	int i = as_number(prg, v[2]);
 	
 	Shader_Info *info = shader_info(prg);
+	INFO_EXISTS(info->shaders, id)
 	gfx::Shader *shader = info->shaders[id];
 
 	shader->set_int(name, i);
@@ -3012,6 +3125,7 @@ static bool shaderfunc_set_float(Program *prg, const std::vector<Token> &v)
 	double f = as_number(prg, v[2]);
 	
 	Shader_Info *info = shader_info(prg);
+	INFO_EXISTS(info->shaders, id)
 	gfx::Shader *shader = info->shaders[id];
 
 	shader->set_float(name, f);
@@ -3028,9 +3142,11 @@ static bool shaderfunc_set_texture(Program *prg, const std::vector<Token> &v)
 	double t = as_number(prg, v[2]);
 	
 	Shader_Info *info = shader_info(prg);
+	INFO_EXISTS(info->shaders, id)
 	gfx::Shader *shader = info->shaders[id];
 
 	Image_Info *info2 = image_info(prg);
+	INFO_EXISTS(info2->images, t)
 	gfx::Image *img = info2->images[t]->image;
 
 	shader->set_texture(name, img);
@@ -3047,6 +3163,7 @@ static bool shaderfunc_set_float_vector(Program *prg, const std::vector<Token> &
 	Variable &vec = as_variable(prg, v[2]);
 	
 	Shader_Info *info = shader_info(prg);
+	INFO_EXISTS(info->shaders, id)
 	gfx::Shader *shader = info->shaders[id];
 
 	std::vector<float> floats;
@@ -3068,6 +3185,7 @@ static bool shaderfunc_set_matrix(Program *prg, const std::vector<Token> &v)
 	Variable &vec = as_variable(prg, v[2]);
 	
 	Shader_Info *info = shader_info(prg);
+	INFO_EXISTS(info->shaders, id)
 	gfx::Shader *shader = info->shaders[id];
 
 	glm::mat4 mat;
@@ -3092,6 +3210,7 @@ static bool shaderfunc_set_matrix_array(Program *prg, const std::vector<Token> &
 	Variable &vec = as_variable(prg, v[2]);
 	
 	Shader_Info *info = shader_info(prg);
+	INFO_EXISTS(info->shaders, id)
 	gfx::Shader *shader = info->shaders[id];
 
 	glm::mat4 mat[vec.v.size()];
@@ -3121,6 +3240,7 @@ static bool shaderfunc_set_colour(Program *prg, const std::vector<Token> &v)
 	int a = as_number(prg, v[5]);
 	
 	Shader_Info *info = shader_info(prg);
+	INFO_EXISTS(info->shaders, id)
 	gfx::Shader *shader = info->shaders[id];
 
 	SDL_Colour c;
@@ -3166,8 +3286,9 @@ static bool jsonfunc_destroy(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v[0]);
 	JSON_Info *info = json_info(prg);
+	INFO_EXISTS(info->jsons, id)
 	delete info->jsons[id];
-	info->jsons[id] = nullptr;
+	info->jsons.erase(id);
 
 	return true;
 }
@@ -3181,6 +3302,7 @@ static bool jsonfunc_get_string(Program *prg, const std::vector<Token> &v)
 	std::string name = as_string(prg, v[2]);
 	
 	JSON_Info *info = json_info(prg);
+	INFO_EXISTS(info->jsons, id)
 	util::JSON *json = info->jsons[id];
 
 	CHECK_STRING(v1)
@@ -3200,6 +3322,7 @@ static bool jsonfunc_get_number(Program *prg, const std::vector<Token> &v)
 	std::string name = as_string(prg, v[2]);
 	
 	JSON_Info *info = json_info(prg);
+	INFO_EXISTS(info->jsons, id)
 	util::JSON *json = info->jsons[id];
 
 	CHECK_NUMBER(v1)
@@ -3271,11 +3394,12 @@ static bool modelfunc_destroy(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v[0]);
 	Model_Info *info = model_info(prg);
+	INFO_EXISTS(info->models, id)
 	if (info->models[id]->is_clone == false) {
 		delete info->models[id]->model;
 	}
 	delete info->models[id];
-	info->models[id] = nullptr;
+	info->models.erase(id);
 
 	return true;
 }
@@ -3291,6 +3415,7 @@ static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
 	int a = as_number(prg, v[4]);
 
 	Model_Info *info = model_info(prg);
+	INFO_EXISTS(info->models, model_id)
 	Model *model = info->models[model_id];
 
 	SDL_Colour c;
@@ -3341,7 +3466,7 @@ static bool modelfunc_identity(Program *prg, const std::vector<Token> &v)
 	int model_id = as_number(prg, v[0]);
 
 	Model_Info *info = model_info(prg);
-
+	INFO_EXISTS(info->models, model_id)
 	Model *model = info->models[model_id];
 
 	model->mat = glm::mat4();
@@ -3359,7 +3484,7 @@ static bool modelfunc_scale(Program *prg, const std::vector<Token> &v)
 	double sz = as_number(prg, v[3]);
 
 	Model_Info *info = model_info(prg);
-
+	INFO_EXISTS(info->models, model_id)
 	Model *model = info->models[model_id];
 
 	model->mat = glm::scale(model->mat, glm::vec3(sx, sy, sz));
@@ -3378,7 +3503,7 @@ static bool modelfunc_rotate(Program *prg, const std::vector<Token> &v)
 	double az = as_number(prg, v[4]);
 
 	Model_Info *info = model_info(prg);
-
+	INFO_EXISTS(info->models, model_id)
 	Model *model = info->models[model_id];
 
 	model->mat = glm::rotate(model->mat, (float)angle, glm::vec3(ax, ay, az));
@@ -3396,7 +3521,7 @@ static bool modelfunc_translate(Program *prg, const std::vector<Token> &v)
 	double z = as_number(prg, v[3]);
 
 	Model_Info *info = model_info(prg);
-
+	INFO_EXISTS(info->models, model_id)
 	Model *model = info->models[model_id];
 
 	model->mat = glm::translate(model->mat, glm::vec3(x, y, z));
@@ -3419,7 +3544,7 @@ static bool modelfunc_get_position(Program *prg, const std::vector<Token> &v)
 	CHECK_NUMBER(z)
 
 	Model_Info *info = model_info(prg);
-
+	INFO_EXISTS(info->models, model_id)
 	Model *model = info->models[model_id];
 
 	glm::vec3 pos = glm::vec3(model->mat[3]);
@@ -3500,10 +3625,12 @@ static void lost_device_callback()
 #ifdef _WIN32
 	if (shim::opengl == false) {
 		Image_Info *info = image_info(prg);
-		for (size_t i = 0; i < info->images.size(); i++) {
-			if (info->images[i]->created) {
-				delete info->images[i]->image;
-				info->images[i]->image = nullptr;
+		std::map< int, Image * >::iterator it;
+		for (it = info->images.begin(); it != info->images.end(); it++) {
+			Image *img = *it;
+			if (img->created) {
+				delete img->image;
+				img->image = nullptr;
 			}
 		}
 	}
@@ -3518,9 +3645,11 @@ static void found_device_callback()
 #ifdef _WIN32
 	if (shim::opengl == false) {
 		Image_Info *info = image_info(prg);
-		for (size_t i = 0; i < info->images.size(); i++) {
-			if (info->images[i]->created) {
-				info->images[i]->image = new gfx::Image(info->images[i]->size);
+		std::map< int, Image * >::iterator it;
+		for (it = info->images.begin(); it != info->images.end(); it++) {
+			Image *img = *it;
+			if (img->created) {
+				img->image = new gfx::Image(img->size);
 			}
 		}
 	}
@@ -3583,7 +3712,7 @@ static bool modelfunc_set_animation(Program *prg, const std::vector<Token> &v)
 	std::string anim = as_string(prg, v[1]);
 	
 	Model_Info *info = model_info(prg);
-
+	INFO_EXISTS(info->models, id)
 	Model *model = info->models[id];
 
 	if (v.size() > 2) {
@@ -3609,7 +3738,7 @@ static bool modelfunc_stop(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	
 	Model_Info *info = model_info(prg);
-
+	INFO_EXISTS(info->models, id)
 	Model *model = info->models[id];
 
 	model->model->stop();
@@ -3624,7 +3753,7 @@ static bool modelfunc_reset(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	
 	Model_Info *info = model_info(prg);
-
+	INFO_EXISTS(info->models, id)
 	Model *model = info->models[id];
 
 	model->model->reset();
@@ -3647,7 +3776,7 @@ static bool modelfunc_size(Program *prg, const std::vector<Token> &v)
 	CHECK_NUMBER(out_z)
 	
 	Model_Info *info = model_info(prg);
-
+	INFO_EXISTS(info->models, id)
 	Model *model = info->models[id];
 
 	gfx::Model::Node *n = model->model->find("Model");
@@ -3829,6 +3958,7 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 */
 
 	Image_Info *iinfo = image_info(prg);
+	INFO_EXISTS(iinfo->images, tex)
 	gfx::Image *image = iinfo->images[tex]->image;
 	if (shim::opengl) {
 		GLuint texture = image->get_opengl_texture();
@@ -3887,6 +4017,7 @@ static bool modelfunc_clone(Program *prg, const std::vector<Token> &v)
 	CHECK_NUMBER(result)
 	
 	Model_Info *info = model_info(prg);
+	INFO_EXISTS(info->models, id)
 	Model *model = new Model;
 	Model *orig = info->models[id];
 	model->model = orig->model;
@@ -3913,6 +4044,7 @@ static bool modelfunc_billboard_create(Program *prg, const std::vector<Token> &v
 	CHECK_NUMBER(result)
 	
 	Image_Info *info = image_info(prg);
+	INFO_EXISTS(info->images, image_id)
 	gfx::Image *image = info->images[image_id]->image;
 	
 	Billboard_Info *info2 = billboard_info(prg);
@@ -3941,8 +4073,9 @@ static bool modelfunc_billboard_destroy(Program *prg, const std::vector<Token> &
 
 	int id = as_number(prg, v[0]);
 	Billboard_Info *info = billboard_info(prg);
+	INFO_EXISTS(info->billboards, id)
 	delete info->billboards[id];
-	info->billboards[id] = nullptr;
+	info->billboards.erase(id);
 
 	return true;
 }
@@ -3963,6 +4096,7 @@ static bool modelfunc_billboard_from_sprite(Program *prg, const std::vector<Toke
 	CHECK_NUMBER(result)
 	
 	Sprite_Info *info = sprite_info(prg);
+	INFO_EXISTS(info->sprites, sprite_id)
 	gfx::Sprite *sprite = info->sprites[sprite_id];
 	
 	Billboard_Info *info2 = billboard_info(prg);
@@ -3996,6 +4130,7 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 	int a = as_number(prg, v[4]);
 
 	Billboard_Info *info = billboard_info(prg);
+	INFO_EXISTS(info->billboards, billboard_id)
 	Billboard *billboard = info->billboards[billboard_id];
 
 	const float verts[] = {
@@ -4100,6 +4235,7 @@ static bool modelfunc_billboard_translate(Program *prg, const std::vector<Token>
 	double z = as_number(prg, v[3]);
 
 	Billboard_Info *info = billboard_info(prg);
+	INFO_EXISTS(info->billboards, billboard_id)
 	Billboard *billboard = info->billboards[billboard_id];
 
 	billboard->tx += x;
@@ -4118,6 +4254,7 @@ static bool modelfunc_billboard_scale(Program *prg, const std::vector<Token> &v)
 	double sy = as_number(prg, v[2]);
 
 	Billboard_Info *info = billboard_info(prg);
+	INFO_EXISTS(info->billboards, billboard_id)
 	Billboard *billboard = info->billboards[billboard_id];
 
 	billboard->sx *= sx;
@@ -4139,6 +4276,7 @@ static bool cdfunc_model_point(Program *prg, const std::vector<Token> &v)
 	CHECK_NUMBER(result)
 	
 	Model_Info *info = model_info(prg);
+	INFO_EXISTS(info->models, model_id)
 	Model *model = info->models[model_id];
 			
 	result.n = cd::model_point(model->model, model->mat, glm::vec3(x, y, z));
@@ -4168,6 +4306,7 @@ static bool cdfunc_model_line_segment(Program *prg, const std::vector<Token> &v)
 	CHECK_NUMBER(out_z)
 	
 	Model_Info *info = model_info(prg);
+	INFO_EXISTS(info->models, model_id)
 	Model *model = info->models[model_id];
 			
 	glm::vec3 out;
@@ -4296,6 +4435,7 @@ void BooBoo_Widget::draw()
 	TGUI_Widget::draw();
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, id)
 	BooBoo_Widget *widget = info->widgets[id]->widget;
 
 	std::vector<Token> tmp;
@@ -4331,6 +4471,7 @@ void BooBoo_Widget::handle_event(TGUI_Event *event)
 	TGUI_Widget::handle_event(event);
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, id)
 	BooBoo_Widget *widget = info->widgets[id]->widget;
 
 	std::vector<Token> tmp;
@@ -4416,10 +4557,10 @@ static bool widgetfunc_create(Program *prg, const std::vector<Token> &v)
 	double h = as_number(prg, v[2]);
 	Variable &data = as_variable(prg, v[3]);
 	
-	Widget_Info *info = widget_info(prg);
-
 	CHECK_NUMBER(v1)
 	
+	Widget_Info *info = widget_info(prg);
+
 	v1.n = info->widget_id;
 
 	Widget *widget = new Widget;
@@ -4453,6 +4594,9 @@ static bool widgetfunc_set_parent(Program *prg, const std::vector<Token> &v)
 	unsigned int parent = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	
+	INFO_EXISTS(info->widgets, child)
+	INFO_EXISTS(info->widgets, parent)
 
 	info->widgets[child]->widget->set_parent(info->widgets[parent]->widget);
 
@@ -4468,6 +4612,9 @@ static bool widgetfunc_set_left_widget(Program *prg, const std::vector<Token> &v
 
 	Widget_Info *info = widget_info(prg);
 
+	INFO_EXISTS(info->widgets, widget)
+	INFO_EXISTS(info->widgets, left)
+
 	info->widgets[widget]->widget->set_left_widget(info->widgets[left]->widget);
 
 	return true;
@@ -4481,6 +4628,9 @@ static bool widgetfunc_set_right_widget(Program *prg, const std::vector<Token> &
 	unsigned int right = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	
+	INFO_EXISTS(info->widgets, widget)
+	INFO_EXISTS(info->widgets, right)
 
 	info->widgets[widget]->widget->set_right_widget(info->widgets[right]->widget);
 
@@ -4495,6 +4645,9 @@ static bool widgetfunc_set_up_widget(Program *prg, const std::vector<Token> &v)
 	unsigned int up = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	
+	INFO_EXISTS(info->widgets, widget)
+	INFO_EXISTS(info->widgets, up)
 
 	info->widgets[widget]->widget->set_up_widget(info->widgets[up]->widget);
 
@@ -4509,6 +4662,9 @@ static bool widgetfunc_set_down_widget(Program *prg, const std::vector<Token> &v
 	unsigned int down = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	
+	INFO_EXISTS(info->widgets, widget)
+	INFO_EXISTS(info->widgets, down)
 
 	info->widgets[widget]->widget->set_down_widget(info->widgets[down]->widget);
 
@@ -4523,6 +4679,7 @@ static bool widgetfunc_set_float_left(Program *prg, const std::vector<Token> &v)
 	bool val = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, widget)
 
 	info->widgets[widget]->widget->set_float_left(val);
 
@@ -4537,6 +4694,7 @@ static bool widgetfunc_set_float_right(Program *prg, const std::vector<Token> &v
 	bool val = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, widget)
 
 	info->widgets[widget]->widget->set_float_right(val);
 
@@ -4551,6 +4709,7 @@ static bool widgetfunc_set_float_bottom(Program *prg, const std::vector<Token> &
 	bool val = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, widget)
 
 	info->widgets[widget]->widget->set_float_bottom(val);
 
@@ -4565,6 +4724,7 @@ static bool widgetfunc_set_centre_x(Program *prg, const std::vector<Token> &v)
 	bool val = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, widget)
 
 	info->widgets[widget]->widget->set_centre_x(val);
 
@@ -4579,6 +4739,7 @@ static bool widgetfunc_set_centre_y(Program *prg, const std::vector<Token> &v)
 	bool val = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, widget)
 
 	info->widgets[widget]->widget->set_centre_y(val);
 
@@ -4593,6 +4754,7 @@ static bool widgetfunc_set_clear_float_x(Program *prg, const std::vector<Token> 
 	bool val = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, widget)
 
 	info->widgets[widget]->widget->set_clear_float_x(val);
 
@@ -4607,6 +4769,7 @@ static bool widgetfunc_set_clear_float_y(Program *prg, const std::vector<Token> 
 	bool val = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, widget)
 
 	info->widgets[widget]->widget->set_clear_float_y(val);
 
@@ -4621,6 +4784,7 @@ static bool widgetfunc_set_break_line(Program *prg, const std::vector<Token> &v)
 	bool val = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, widget)
 
 	info->widgets[widget]->widget->set_break_line(val);
 
@@ -4635,6 +4799,7 @@ static bool widgetfunc_set_accepts_focus(Program *prg, const std::vector<Token> 
 	bool val = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, widget)
 
 	info->widgets[widget]->widget->set_accepts_focus(val);
 
@@ -4649,6 +4814,7 @@ static bool widgetfunc_set_padding(Program *prg, const std::vector<Token> &v)
 	double val = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, widget)
 
 	if (val <= 1.0) {
 		info->widgets[widget]->widget->set_padding((float)val);
@@ -4668,6 +4834,7 @@ static bool widgetfunc_set_padding_left(Program *prg, const std::vector<Token> &
 	double val = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, widget)
 
 	if (val <= 1.0) {
 		info->widgets[widget]->widget->set_padding_left((float)val);
@@ -4687,6 +4854,7 @@ static bool widgetfunc_set_padding_right(Program *prg, const std::vector<Token> 
 	double val = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, widget)
 
 	if (val <= 1.0) {
 		info->widgets[widget]->widget->set_padding_right((float)val);
@@ -4706,6 +4874,7 @@ static bool widgetfunc_set_padding_top(Program *prg, const std::vector<Token> &v
 	double val = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, widget)
 
 	if (val <= 1.0) {
 		info->widgets[widget]->widget->set_padding_top((float)val);
@@ -4725,6 +4894,7 @@ static bool widgetfunc_set_padding_bottom(Program *prg, const std::vector<Token>
 	double val = as_number(prg, v[1]);
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, widget)
 
 	if (val <= 1.0) {
 		info->widgets[widget]->widget->set_padding_bottom((float)val);
@@ -4836,6 +5006,7 @@ static bool widgetfunc_gui_start(Program *prg, const std::vector<Token> &v)
 	unsigned int id = as_number(prg, v[0]);
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, id)
 
 	BooBoo_GUI *g = new BooBoo_GUI(info->widgets[id]->widget);
 
@@ -4864,9 +5035,11 @@ static bool widgetfunc_gui_set_focus(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
+	unsigned int id = as_number(prg, v[0]);
+
 	Widget_Info *info = widget_info(prg);
 
-	unsigned int id = as_number(prg, v[0]);
+	INFO_EXISTS(info->widgets, id)
 
 	if (shim::guis.size() > 0) {
 		shim::guis[shim::guis.size()-1]->gui->set_focus(info->widgets[id]->widget);
