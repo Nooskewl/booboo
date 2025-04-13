@@ -1042,7 +1042,7 @@ static bool mmlfunc_destroy(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	MML_Info *info = mml_info(prg);
 	delete info->mmls[id];
-	info->mmls.erase(id);
+	info->mmls[id] = nullptr;
 
 	return true;
 }
@@ -1151,7 +1151,7 @@ static bool samplefunc_destroy(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Sample_Info *info = sample_info(prg);
 	delete info->samples[id];
-	info->samples.erase(id);
+	info->samples[id] = nullptr;
 
 	return true;
 }
@@ -1323,7 +1323,7 @@ static bool imagefunc_destroy(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Image_Info *info = image_info(prg);
 	delete info->images[id]->image;
-	info->images.erase(id);
+	info->images[id] = nullptr;
 
 	return true;
 }
@@ -1613,7 +1613,7 @@ static bool fontfunc_destroy(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Font_Info *info = font_info(prg);
 	delete info->fonts[id];
-	info->fonts.erase(id);
+	info->fonts[id] = nullptr;
 
 	return true;
 }
@@ -1755,7 +1755,7 @@ static bool tilemapfunc_destroy(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Tilemap_Info *info = tilemap_info(prg);
 	delete info->tilemaps[id];
-	info->tilemaps.erase(id);
+	info->tilemaps[id] = nullptr;
 
 	return true;
 }
@@ -2089,7 +2089,7 @@ static bool spritefunc_destroy(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Sprite_Info *info = sprite_info(prg);
 	delete info->sprites[id];
-	info->sprites.erase(id);
+	info->sprites[id] = nullptr;
 
 	return true;
 }
@@ -2718,7 +2718,7 @@ static bool cfgfunc_destroy(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v[0]);
 	CFG_Info *info = cfg_info(prg);
-	info->cfgs.erase(id);
+	info->cfgs[id] = nullptr;
 
 	return true;
 }
@@ -2939,7 +2939,7 @@ static bool shaderfunc_destroy(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	Shader_Info *info = shader_info(prg);
 	delete info->shaders[id];
-	info->shaders.erase(id);
+	info->shaders[id] = nullptr;
 
 	return true;
 }
@@ -3167,7 +3167,7 @@ static bool jsonfunc_destroy(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	JSON_Info *info = json_info(prg);
 	delete info->jsons[id];
-	info->jsons.erase(id);
+	info->jsons[id] = nullptr;
 
 	return true;
 }
@@ -3275,7 +3275,7 @@ static bool modelfunc_destroy(Program *prg, const std::vector<Token> &v)
 		delete info->models[id]->model;
 	}
 	delete info->models[id];
-	info->models.erase(id);
+	info->models[id] = nullptr;
 
 	return true;
 }
@@ -3942,7 +3942,7 @@ static bool modelfunc_billboard_destroy(Program *prg, const std::vector<Token> &
 	int id = as_number(prg, v[0]);
 	Billboard_Info *info = billboard_info(prg);
 	delete info->billboards[id];
-	info->billboards.erase(id);
+	info->billboards[id] = nullptr;
 
 	return true;
 }
