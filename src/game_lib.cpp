@@ -3627,7 +3627,7 @@ static void lost_device_callback()
 		Image_Info *info = image_info(prg);
 		std::map< int, Image * >::iterator it;
 		for (it = info->images.begin(); it != info->images.end(); it++) {
-			Image *img = *it;
+			Image *img = (*it).second;
 			if (img->created) {
 				delete img->image;
 				img->image = nullptr;
@@ -3647,7 +3647,7 @@ static void found_device_callback()
 		Image_Info *info = image_info(prg);
 		std::map< int, Image * >::iterator it;
 		for (it = info->images.begin(); it != info->images.end(); it++) {
-			Image *img = *it;
+			Image *img = (*it).second;
 			if (img->created) {
 				img->image = new gfx::Image(img->size);
 			}
