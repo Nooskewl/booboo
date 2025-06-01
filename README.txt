@@ -1,4 +1,4 @@
-Copyright 2022-2025 ILLUMINATI NORTH
+Copyright 2022-2025 Nooskewl
 
 BooBoo is a mini language with a simple, but powerful game API.
 
@@ -30,4 +30,4 @@ Windows:
 
 --
 
-Please visit https://illnorth.ca for updates!
+Please visit https://nooskewl.com for updates!

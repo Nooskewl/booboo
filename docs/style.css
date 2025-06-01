@@ -1,11 +1,11 @@
 @font-face {
 	font-family: "Abel";
-	src: url("https://illnorth.ca/media/Abel-Regular.ttf");
+	src: url("https://nooskewl.com/media/Abel-Regular.ttf");
 }
 html {
 	color: #ccc;
 	background-color: black;
-	background-image: url("https://illnorth.ca/media/bg.png");
+	background-image: url("https://nooskewl.com/media/bg.png");
 	background-attachment: fixed;
 	background-repeat: repeat-x;
 	background-size: 100% 100%;
