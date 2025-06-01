@@ -30,9 +30,6 @@ pre {
 img {
 	max-width: 100%;
 }
-#ill {
-	width: 250px;
-}
 .box {
 	border: 5px solid rgba(0, 108, 128, 0.5);
 	box-sizing: border-box;
@@ -86,4 +83,7 @@ video {
 	border: 5px solid rgba(0, 108, 128, 0.5);
 	box-sizing: border-box;
 	border-radius: 10px;
+}
+#noo {
+	height: 200px;
 }
