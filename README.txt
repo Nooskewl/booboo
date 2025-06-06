@@ -28,6 +28,11 @@ those by placing one in:
 Windows:
 	%USERPROFILE%\Saved Games\BooBoo
 
+
+https://codeberg.org/nooskewl/shim5/src/branch/master/misc/io_scene_x_goobliata
+
+is a model import/export for blender 2.73 which supports armatures/animations. Unfortunately I don't have one for recent Blender yet.
+
 --
 
 Please visit https://nooskewl.com for updates!
