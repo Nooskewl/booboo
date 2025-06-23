@@ -504,7 +504,7 @@ static bool gfxfunc_clear(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	SDL_Colour c;
+	SDL_Color c;
 	c.r = as_number(prg, v[0]);
 	c.g = as_number(prg, v[1]);
 	c.b = as_number(prg, v[2]);
@@ -725,7 +725,7 @@ static bool primfunc_line(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(8)
 
-	SDL_Colour c;
+	SDL_Color c;
 	c.r = as_number(prg, v[0]);
 	c.g = as_number(prg, v[1]);
 	c.b = as_number(prg, v[2]);
@@ -755,7 +755,7 @@ static bool primfunc_triangle(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(10)
 
-	SDL_Colour c;
+	SDL_Color c;
 	c.r = as_number(prg, v[0]);
 	c.g = as_number(prg, v[1]);
 	c.b = as_number(prg, v[2]);
@@ -784,7 +784,7 @@ static bool primfunc_filled_triangle(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(18)
 
-	SDL_Colour c[3];
+	SDL_Color c[3];
 	c[0].r = as_number(prg, v[0]);
 	c[0].g = as_number(prg, v[1]);
 	c[0].b = as_number(prg, v[2]);
@@ -816,7 +816,7 @@ static bool primfunc_rectangle(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(8)
 
-	SDL_Colour c;
+	SDL_Color c;
 	c.r = as_number(prg, v[0]);
 	c.g = as_number(prg, v[1]);
 	c.b = as_number(prg, v[2]);
@@ -847,7 +847,7 @@ static bool primfunc_filled_rectangle(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(20)
 
-	SDL_Colour c[4];
+	SDL_Color c[4];
 	c[0].r = as_number(prg, v[0]);
 	c[0].g = as_number(prg, v[1]);
 	c[0].b = as_number(prg, v[2]);
@@ -884,7 +884,7 @@ static bool primfunc_ellipse(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(8)
 
-	SDL_Colour c;
+	SDL_Color c;
 	c.r = as_number(prg, v[0]);
 	c.g = as_number(prg, v[1]);
 	c.b = as_number(prg, v[2]);
@@ -924,7 +924,7 @@ static bool primfunc_filled_ellipse(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(8)
 
-	SDL_Colour c;
+	SDL_Color c;
 	c.r = as_number(prg, v[0]);
 	c.g = as_number(prg, v[1]);
 	c.b = as_number(prg, v[2]);
@@ -955,7 +955,7 @@ static bool primfunc_circle(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(7)
 
-	SDL_Colour c;
+	SDL_Color c;
 	c.r = as_number(prg, v[0]);
 	c.g = as_number(prg, v[1]);
 	c.b = as_number(prg, v[2]);
@@ -993,7 +993,7 @@ static bool primfunc_filled_circle(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(7)
 
-	SDL_Colour c;
+	SDL_Color c;
 	c.r = as_number(prg, v[0]);
 	c.g = as_number(prg, v[1]);
 	c.b = as_number(prg, v[2]);
@@ -1033,7 +1033,7 @@ static bool mmlfunc_create(Program *prg, const std::vector<Token> &v)
 	v1.n = info->mml_id;
 
 	Uint8 *bytes = (Uint8 *)str.c_str();
-	SDL_RWops *file = SDL_RWFromMem(bytes, str.length());
+	SDL_IOStream *file = SDL_IOFromMem(bytes, str.length());
 	audio::MML *mml = new audio::MML(file); // this closes the file
 
 	info->mmls[info->mml_id++] = mml;
@@ -1382,7 +1382,7 @@ static bool imagefunc_draw(Program *prg, const std::vector<Token> &v)
 
 	gfx::Image *img = info->images[id]->image;
 
-	SDL_Colour c;
+	SDL_Color c;
 	c.r = r;
 	c.g = g;
 	c.b = b;
@@ -1442,7 +1442,7 @@ static bool imagefunc_stretch_region(Program *prg, const std::vector<Token> &v)
 
 	gfx::Image *img = info->images[id]->image;
 
-	SDL_Colour c;
+	SDL_Color c;
 	c.r = r;
 	c.g = g;
 	c.b = b;
@@ -1501,7 +1501,7 @@ static bool imagefunc_draw_rotated_scaled(Program *prg, const std::vector<Token>
 
 	gfx::Image *img = info->images[id]->image;
 
-	SDL_Colour c;
+	SDL_Color c;
 	c.r = r;
 	c.g = g;
 	c.b = b;
@@ -1598,7 +1598,7 @@ static bool imagefunc_draw_9patch(Program *prg, const std::vector<Token> &v)
 
 	gfx::Image *img = info->images[id]->image;
 
-	SDL_Colour c;
+	SDL_Color c;
 	c.r = r;
 	c.g = g;
 	c.b = b;
@@ -1679,7 +1679,7 @@ static bool fontfunc_draw(Program *prg, const std::vector<Token> &v)
 
 	gfx::TTF *font = info->fonts[id];
 
-	SDL_Colour c;
+	SDL_Color c;
 	c.r = r;
 	c.g = g;
 	c.b = b;
@@ -2393,7 +2393,7 @@ static bool spritefunc_draw(Program *prg, const std::vector<Token> &v)
 		flags |= gfx::Image::FLIP_V;
 	}
 
-	SDL_Colour tint;
+	SDL_Color tint;
 	tint.r = r;
 	tint.g = g;
 	tint.b = b;
@@ -2593,7 +2593,7 @@ static bool joyfunc_poll(Program *prg, const std::vector<Token> &v)
 	int start = v[20].i;
 
 	SDL_JoystickID id = input::get_controller_id(num);
-	SDL_GameController *gc = input::get_sdl_gamecontroller(id);
+	SDL_Gamepad *gc = input::get_sdl_gamecontroller(id);
 	bool connected = gc != nullptr;
 
 	if (connected == false) {
@@ -2620,12 +2620,12 @@ static bool joyfunc_poll(Program *prg, const std::vector<Token> &v)
 	}
 	else {
 
-		Sint16 si_x1 = SDL_GameControllerGetAxis(gc, SDL_CONTROLLER_AXIS_LEFTX);
-		Sint16 si_y1 = SDL_GameControllerGetAxis(gc, SDL_CONTROLLER_AXIS_LEFTY);
-		Sint16 si_x2 = SDL_GameControllerGetAxis(gc, SDL_CONTROLLER_AXIS_RIGHTX);
-		Sint16 si_y2 = SDL_GameControllerGetAxis(gc, SDL_CONTROLLER_AXIS_RIGHTY);
-		Sint16 si_x3 = SDL_GameControllerGetAxis(gc, SDL_CONTROLLER_AXIS_TRIGGERLEFT);
-		Sint16 si_y3 = SDL_GameControllerGetAxis(gc, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
+		Sint16 si_x1 = SDL_GetGamepadAxis(gc, SDL_GAMEPAD_AXIS_LEFTX);
+		Sint16 si_y1 = SDL_GetGamepadAxis(gc, SDL_GAMEPAD_AXIS_LEFTY);
+		Sint16 si_x2 = SDL_GetGamepadAxis(gc, SDL_GAMEPAD_AXIS_RIGHTX);
+		Sint16 si_y2 = SDL_GetGamepadAxis(gc, SDL_GAMEPAD_AXIS_RIGHTY);
+		Sint16 si_x3 = SDL_GetGamepadAxis(gc, SDL_GAMEPAD_AXIS_LEFT_TRIGGER);
+		Sint16 si_y3 = SDL_GetGamepadAxis(gc, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER);
 
 		double x1f;
 		double y1f;
@@ -2685,20 +2685,20 @@ static bool joyfunc_poll(Program *prg, const std::vector<Token> &v)
 		set_string_or_number(prg, x3, x3f);
 		set_string_or_number(prg, y3, y3f);
 
-		double ab = SDL_GameControllerGetButton(gc, (SDL_GameControllerButton)TGUI_B_A);
-		double bb = SDL_GameControllerGetButton(gc, (SDL_GameControllerButton)TGUI_B_B);
-		double xb = SDL_GameControllerGetButton(gc, (SDL_GameControllerButton)TGUI_B_X);
-		double yb = SDL_GameControllerGetButton(gc, (SDL_GameControllerButton)TGUI_B_Y);
-		double lbb = SDL_GameControllerGetButton(gc, (SDL_GameControllerButton)TGUI_B_LB);
-		double rbb = SDL_GameControllerGetButton(gc, (SDL_GameControllerButton)TGUI_B_RB);
-		double backb = SDL_GameControllerGetButton(gc, (SDL_GameControllerButton)TGUI_B_BACK);
-		double startb = SDL_GameControllerGetButton(gc, (SDL_GameControllerButton)TGUI_B_START);
-		double lsb = SDL_GameControllerGetButton(gc, (SDL_GameControllerButton)TGUI_B_LS);
-		double rsb = SDL_GameControllerGetButton(gc, (SDL_GameControllerButton)TGUI_B_RS);
-		double _lb = SDL_GameControllerGetButton(gc, (SDL_GameControllerButton)TGUI_B_L);
-		double _rb = SDL_GameControllerGetButton(gc, (SDL_GameControllerButton)TGUI_B_R);
-		double ub = SDL_GameControllerGetButton(gc, (SDL_GameControllerButton)TGUI_B_U);
-		double db = SDL_GameControllerGetButton(gc, (SDL_GameControllerButton)TGUI_B_D);
+		double ab = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_A);
+		double bb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_B);
+		double xb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_X);
+		double yb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_Y);
+		double lbb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_LB);
+		double rbb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_RB);
+		double backb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_BACK);
+		double startb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_START);
+		double lsb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_LS);
+		double rsb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_RS);
+		double _lb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_L);
+		double _rb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_R);
+		double ub = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_U);
+		double db = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_D);
 
 		set_string_or_number(prg, l, _lb);
 		set_string_or_number(prg, r, _rb);
@@ -2759,8 +2759,8 @@ static bool joyfunc_get_button(Program *prg, const std::vector<Token> &v)
 	CHECK_NUMBER(v1)
 
 	SDL_JoystickID id = input::get_controller_id(index);
-	SDL_GameController *gc = input::get_sdl_gamecontroller(id);
-	v1.n = SDL_GameControllerGetButton(gc, (SDL_GameControllerButton)n);
+	SDL_Gamepad *gc = input::get_sdl_gamecontroller(id);
+	v1.n = SDL_GetGamepadButton(gc, (SDL_GamepadButton)n);
 
 	return true;
 }
@@ -2776,8 +2776,8 @@ static bool joyfunc_get_axis(Program *prg, const std::vector<Token> &v)
 	CHECK_NUMBER(v1)
 
 	SDL_JoystickID id = input::get_controller_id(index);
-	SDL_GameController *gc = input::get_sdl_gamecontroller(id);
-	v1.n = SDL_GameControllerGetAxis(gc, (SDL_GameControllerAxis)n);
+	SDL_Gamepad *gc = input::get_sdl_gamecontroller(id);
+	v1.n = SDL_GetGamepadAxis(gc, (SDL_GamepadAxis)n);
 
 	if (v1.n < 0) {
 		v1.n /= 32768.0f;
@@ -3243,7 +3243,7 @@ static bool shaderfunc_set_colour(Program *prg, const std::vector<Token> &v)
 	INFO_EXISTS(info->shaders, id)
 	gfx::Shader *shader = info->shaders[id];
 
-	SDL_Colour c;
+	SDL_Color c;
 	c.r = r;
 	c.g = g;
 	c.b = b;
@@ -3418,7 +3418,7 @@ static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
 	INFO_EXISTS(info->models, model_id)
 	Model *model = info->models[model_id];
 
-	SDL_Colour c;
+	SDL_Color c;
 	c.r = r;
 	c.g = g;
 	c.b = b;
@@ -5063,7 +5063,7 @@ static bool widgetfunc_gui_set_transition_types(Program *prg, const std::vector<
 
 static void black_bars_callback(gfx::Black_Bar_Type type, int x, int y, int w, int h)
 {
-	SDL_Colour c[4];
+	SDL_Color c[4];
 
 	// draw a default
 	switch (type) {

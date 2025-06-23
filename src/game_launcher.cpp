@@ -46,7 +46,7 @@ static bool mousefunc_set_relative(Program *prg, const std::vector<Token> &v)
 
 	bool onoff = as_number(prg, v[0]);
 
-	SDL_SetRelativeMouseMode((SDL_bool)onoff);
+	SDL_SetRelativeMouseMode((bool)onoff);
 
 	return true;
 }
@@ -449,7 +449,7 @@ static void loop()
 			}
 
 			if (e == nullptr) {
-				if (sdl_event.type == SDL_QUIT) {
+				if (sdl_event.type == SDL_EVENT_QUIT) {
 					if (can_logic == false) {
 						shim::handle_event(&sdl_event);
 						quit = true;
@@ -464,7 +464,7 @@ static void loop()
 				event = e;
 			}
 			else {
-				if (sdl_event.type == SDL_QUIT) {
+				if (sdl_event.type == SDL_EVENT_QUIT) {
 					static TGUI_Event quit_event;
 					quit_event.type = TGUI_QUIT;
 					event = &quit_event;
