@@ -30,11 +30,11 @@ struct File_Info {
 
 File_Info *file_info(Program *prg)
 {
-	File_Info *info = (File_Info *)get_black_box(prg, "com.illnorth.booboo.files");
+	File_Info *info = (File_Info *)get_black_box(prg, "com.nooskewl.booboo.files");
 	if (info == nullptr) {
 		info = new File_Info;
 		info->file_id = 0;
-		set_black_box(prg, "com.illnorth.booboo.files", info);
+		set_black_box(prg, "com.nooskewl.booboo.files", info);
 	}
 	return info;
 }
@@ -1863,5 +1863,5 @@ void standard_lib_destroy_program(Program *prg)
 	}
 	delete file_i;
 
-	set_black_box(prg, "com.illnorth.booboo.files", nullptr);
+	set_black_box(prg, "com.nooskewl.booboo.files", nullptr);
 }

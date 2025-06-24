@@ -127,132 +127,132 @@ struct Widget_Info
 
 static MML_Info *mml_info(Program *prg)
 {
-	MML_Info *info = (MML_Info *)booboo::get_black_box(prg, "com.illnorth.booboo.mml");
+	MML_Info *info = (MML_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.mml");
 	if (info == nullptr) {
 		info = new MML_Info;
 		info->mml_id = 0;
-		booboo::set_black_box(prg, "com.illnorth.booboo.mml", info);
+		booboo::set_black_box(prg, "com.nooskewl.booboo.mml", info);
 	}
 	return info;
 }
 
 static Sample_Info *sample_info(Program *prg)
 {
-	Sample_Info *info = (Sample_Info *)booboo::get_black_box(prg, "com.illnorth.booboo.sample");
+	Sample_Info *info = (Sample_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.sample");
 	if (info == nullptr) {
 		info = new Sample_Info;
 		info->sample_id = 0;
-		booboo::set_black_box(prg, "com.illnorth.booboo.sample", info);
+		booboo::set_black_box(prg, "com.nooskewl.booboo.sample", info);
 	}
 	return info;
 }
 
 static Image_Info *image_info(Program *prg)
 {
-	Image_Info *info = (Image_Info *)booboo::get_black_box(prg, "com.illnorth.booboo.image");
+	Image_Info *info = (Image_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.image");
 	if (info == nullptr) {
 		info = new Image_Info;
 		info->image_id = 0;
-		booboo::set_black_box(prg, "com.illnorth.booboo.image", info);
+		booboo::set_black_box(prg, "com.nooskewl.booboo.image", info);
 	}
 	return info;
 }
 
 static Font_Info *font_info(Program *prg)
 {
-	Font_Info *info = (Font_Info *)booboo::get_black_box(prg, "com.illnorth.booboo.font");
+	Font_Info *info = (Font_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.font");
 	if (info == nullptr) {
 		info = new Font_Info;
 		info->font_id = 0;
-		booboo::set_black_box(prg, "com.illnorth.booboo.font", info);
+		booboo::set_black_box(prg, "com.nooskewl.booboo.font", info);
 	}
 	return info;
 }
 
 static Tilemap_Info *tilemap_info(Program *prg)
 {
-	Tilemap_Info *info = (Tilemap_Info *)booboo::get_black_box(prg, "com.illnorth.booboo.tilemap");
+	Tilemap_Info *info = (Tilemap_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.tilemap");
 	if (info == nullptr) {
 		info = new Tilemap_Info;
 		info->tilemap_id = 0;
-		booboo::set_black_box(prg, "com.illnorth.booboo.tilemap", info);
+		booboo::set_black_box(prg, "com.nooskewl.booboo.tilemap", info);
 	}
 	return info;
 }
 
 static Sprite_Info *sprite_info(Program *prg)
 {
-	Sprite_Info *info = (Sprite_Info *)booboo::get_black_box(prg, "com.illnorth.booboo.sprite");
+	Sprite_Info *info = (Sprite_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.sprite");
 	if (info == nullptr) {
 		info = new Sprite_Info;
 		info->sprite_id = 0;
-		booboo::set_black_box(prg, "com.illnorth.booboo.sprite", info);
+		booboo::set_black_box(prg, "com.nooskewl.booboo.sprite", info);
 	}
 	return info;
 }
 
 static CFG_Info *cfg_info(Program *prg)
 {
-	CFG_Info *info = (CFG_Info *)booboo::get_black_box(prg, "com.illnorth.booboo.cfg");
+	CFG_Info *info = (CFG_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.cfg");
 	if (info == nullptr) {
 		info = new CFG_Info;
 		info->cfg_id = 0;
-		booboo::set_black_box(prg, "com.illnorth.booboo.cfg", info);
+		booboo::set_black_box(prg, "com.nooskewl.booboo.cfg", info);
 	}
 	return info;
 }
 
 static Shader_Info *shader_info(Program *prg)
 {
-	Shader_Info *info = (Shader_Info *)booboo::get_black_box(prg, "com.illnorth.booboo.shader");
+	Shader_Info *info = (Shader_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.shader");
 	if (info == nullptr) {
 		info = new Shader_Info;
 		info->shader_id = 0;
-		booboo::set_black_box(prg, "com.illnorth.booboo.shader", info);
+		booboo::set_black_box(prg, "com.nooskewl.booboo.shader", info);
 	}
 	return info;
 }
 
 static JSON_Info *json_info(Program *prg)
 {
-	JSON_Info *info = (JSON_Info *)booboo::get_black_box(prg, "com.illnorth.booboo.json");
+	JSON_Info *info = (JSON_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.json");
 	if (info == nullptr) {
 		info = new JSON_Info;
 		info->json_id = 0;
-		booboo::set_black_box(prg, "com.illnorth.booboo.json", info);
+		booboo::set_black_box(prg, "com.nooskewl.booboo.json", info);
 	}
 	return info;
 }
 
 static Model_Info *model_info(Program *prg)
 {
-	Model_Info *info = (Model_Info *)booboo::get_black_box(prg, "com.illnorth.booboo.model");
+	Model_Info *info = (Model_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.model");
 	if (info == nullptr) {
 		info = new Model_Info;
 		info->model_id = 0;
-		booboo::set_black_box(prg, "com.illnorth.booboo.model", info);
+		booboo::set_black_box(prg, "com.nooskewl.booboo.model", info);
 	}
 	return info;
 }
 
 static Billboard_Info *billboard_info(Program *prg)
 {
-	Billboard_Info *info = (Billboard_Info *)booboo::get_black_box(prg, "com.illnorth.booboo.billboard");
+	Billboard_Info *info = (Billboard_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.billboard");
 	if (info == nullptr) {
 		info = new Billboard_Info;
 		info->billboard_id = 0;
-		booboo::set_black_box(prg, "com.illnorth.booboo.billboard", info);
+		booboo::set_black_box(prg, "com.nooskewl.booboo.billboard", info);
 	}
 	return info;
 }
 
 static Widget_Info *widget_info(Program *prg)
 {
-	Widget_Info *info = (Widget_Info *)booboo::get_black_box(prg, "com.illnorth.booboo.widget");
+	Widget_Info *info = (Widget_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.widget");
 	if (info == nullptr) {
 		info = new Widget_Info;
 		info->widget_id = 0;
-		booboo::set_black_box(prg, "com.illnorth.booboo.widget", info);
+		booboo::set_black_box(prg, "com.nooskewl.booboo.widget", info);
 	}
 	return info;
 }
@@ -5413,16 +5413,16 @@ void game_lib_destroy_program(Program *prg)
 	delete widget_i;
 	delete cfg_i;
 
-	booboo::set_black_box(prg, "com.illnorth.booboo.mml", nullptr);
-	booboo::set_black_box(prg, "com.illnorth.booboo.sample", nullptr);
-	booboo::set_black_box(prg, "com.illnorth.booboo.image", nullptr);
-	booboo::set_black_box(prg, "com.illnorth.booboo.font", nullptr);
-	booboo::set_black_box(prg, "com.illnorth.booboo.tilemap", nullptr);
-	booboo::set_black_box(prg, "com.illnorth.booboo.sprite", nullptr);
-	booboo::set_black_box(prg, "com.illnorth.booboo.cfg", nullptr);
-	booboo::set_black_box(prg, "com.illnorth.booboo.shader", nullptr);
-	booboo::set_black_box(prg, "com.illnorth.booboo.json", nullptr);
-	booboo::set_black_box(prg, "com.illnorth.booboo.model", nullptr);
-	booboo::set_black_box(prg, "com.illnorth.booboo.billboard", nullptr);
-	booboo::set_black_box(prg, "com.illnorth.booboo.widget", nullptr);
+	booboo::set_black_box(prg, "com.nooskewl.booboo.mml", nullptr);
+	booboo::set_black_box(prg, "com.nooskewl.booboo.sample", nullptr);
+	booboo::set_black_box(prg, "com.nooskewl.booboo.image", nullptr);
+	booboo::set_black_box(prg, "com.nooskewl.booboo.font", nullptr);
+	booboo::set_black_box(prg, "com.nooskewl.booboo.tilemap", nullptr);
+	booboo::set_black_box(prg, "com.nooskewl.booboo.sprite", nullptr);
+	booboo::set_black_box(prg, "com.nooskewl.booboo.cfg", nullptr);
+	booboo::set_black_box(prg, "com.nooskewl.booboo.shader", nullptr);
+	booboo::set_black_box(prg, "com.nooskewl.booboo.json", nullptr);
+	booboo::set_black_box(prg, "com.nooskewl.booboo.model", nullptr);
+	booboo::set_black_box(prg, "com.nooskewl.booboo.billboard", nullptr);
+	booboo::set_black_box(prg, "com.nooskewl.booboo.widget", nullptr);
 }
