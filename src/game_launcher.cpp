@@ -46,7 +46,7 @@ static bool mousefunc_set_relative(Program *prg, const std::vector<Token> &v)
 
 	bool onoff = as_number(prg, v[0]);
 
-	SDL_SetRelativeMouseMode((bool)onoff);
+	SDL_SetWindowRelativeMouseMode(gfx::internal::gfx_context.window, (bool)onoff);
 
 	return true;
 }
@@ -180,7 +180,9 @@ bool start()
 	int adapter_i = util::check_args(shim::argc, shim::argv, "+adapter");
 	if (adapter_i >= 0) {
 		shim::adapter = atoi(shim::argv[adapter_i+1]);
-		if (shim::adapter >= SDL_GetNumVideoDisplays()-1) {
+		int count;
+		SDL_DisplayID *disp = SDL_GetDisplays(&count);
+		if (shim::adapter >= count) {
 			shim::adapter = 0;
 		}
 	}
@@ -729,10 +731,6 @@ int main(int argc, char **argv)
 	}
 
 	try {
-
-#ifdef _WIN32
-	SDL_RegisterApp("BooBoo", 0, 0);
-#endif
 
 	orig_argc = argc;
 	orig_argv = argv;

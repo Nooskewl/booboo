@@ -2593,7 +2593,7 @@ static bool joyfunc_poll(Program *prg, const std::vector<Token> &v)
 	int start = v[20].i;
 
 	SDL_JoystickID id = input::get_controller_id(num);
-	SDL_Gamepad *gc = input::get_sdl_gamecontroller(id);
+	SDL_Gamepad *gc = input::get_sdl_gamepad(id);
 	bool connected = gc != nullptr;
 
 	if (connected == false) {
@@ -2759,7 +2759,7 @@ static bool joyfunc_get_button(Program *prg, const std::vector<Token> &v)
 	CHECK_NUMBER(v1)
 
 	SDL_JoystickID id = input::get_controller_id(index);
-	SDL_Gamepad *gc = input::get_sdl_gamecontroller(id);
+	SDL_Gamepad *gc = input::get_sdl_gamepad(id);
 	v1.n = SDL_GetGamepadButton(gc, (SDL_GamepadButton)n);
 
 	return true;
@@ -2776,7 +2776,7 @@ static bool joyfunc_get_axis(Program *prg, const std::vector<Token> &v)
 	CHECK_NUMBER(v1)
 
 	SDL_JoystickID id = input::get_controller_id(index);
-	SDL_Gamepad *gc = input::get_sdl_gamecontroller(id);
+	SDL_Gamepad *gc = input::get_sdl_gamepad(id);
 	v1.n = SDL_GetGamepadAxis(gc, (SDL_GamepadAxis)n);
 
 	if (v1.n < 0) {
