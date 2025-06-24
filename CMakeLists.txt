@@ -38,10 +38,10 @@ set(CORE_LAUNCHER_SOURCES
 	src/launcher.cpp
 )
 
-if(WIN32)
-	list(APPEND GAME_LAUNCHER_SOURCES misc/booboo.manifest misc/versioninfo.rc.res misc/windows_icons.rc.res)
+if(MINGW)
 	add_custom_command(OUTPUT "${PROJECT_SOURCE_DIR}/misc/versioninfo.rc.res" COMMAND "/mingw64/bin/windres" ARGS "-O" "coff" "${PROJECT_SOURCE_DIR}/misc/versioninfo.rc" "${PROJECT_SOURCE_DIR}/misc/versioninfo.rc.res")
 	add_custom_command(OUTPUT "${PROJECT_SOURCE_DIR}/misc/windows_icons.rc.res" COMMAND "/mingw64/bin/windres" ARGS "-O" "coff" "${PROJECT_SOURCE_DIR}/misc/windows_icons.rc" "${PROJECT_SOURCE_DIR}/misc/windows_icons.rc.res")
+	list(APPEND GAME_LAUNCHER_SOURCES misc/booboo.manifest)
 endif()
 
 # Outputs
@@ -79,7 +79,7 @@ if(MINGW)
 		set_target_properties("gamelibrary" PROPERTIES COMPILE_FLAGS "${FLAGS}")
 		set_target_properties("gamelibrary" PROPERTIES OUTPUT_NAME "BooBooGame")
 		set_target_properties("gamelauncher" PROPERTIES COMPILE_FLAGS "${FLAGS}")
-		set_target_properties("gamelauncher" PROPERTIES LINK_FLAGS "${LFLAGS_WIN32}")
+		set_target_properties("gamelauncher" PROPERTIES LINK_FLAGS "${LFLAGS_WIN32}" "${PROJECT_SOURCE_DIR}/misc/versioninfo.rc.res" "${PROJECT_SOURCE_DIR}/misc/windows_icons.rc.res")
 		set_target_properties("gamelauncher" PROPERTIES OUTPUT_NAME "BooBoo")
 	endif()
 	if(LUA)
@@ -103,7 +103,8 @@ elseif(WIN32)
 	#set(FLAGS "${FLAGS} /DUSE_TTF")
 	set_target_properties("gamelauncher" PROPERTIES COMPILE_FLAGS "${FLAGS}")
 	set_target_properties("gamelauncher" PROPERTIES OUTPUT_NAME "BooBoo")
-	set(LIBS ${LIBS} twinkle ${SHIM5_LIB} util ${TGUI6_LIB} SDL3.dll SDL3_ttf.dll libpng16_static ogg libvorbis_static FLAC freetype zlibstatic d3d9 winmm dbghelp shcore msvcrt)# lua54)
+	set(LIBS ${LIBS} twinkle ${SHIM5_LIB} util ${TGUI6_LIB} SDL3.dll SDL3_ttf.dll libpng16_static ogg libvorbis_static FLAC freetype zlibstatic d3d9 winmm dbghelp shcore msvcrt)
+
 elseif(APPLE)
 	SET(FLAGS "-Wall -Wno-extern-c-compat -Wno-c++11-narrowing -Wno-overloaded-virtual -DTGUI6_STATIC -DSHIM5_STATIC")
 	set(FLAGS "${FLAGS} -stdlib=libc++ -std=c++11")
@@ -160,5 +161,5 @@ endif()
 target_link_libraries("corelauncher" ${CORE_LAUNCHER_LIBS})
 
 if(GAME_LAUNCHER)
-	target_link_libraries("gamelauncher" ${GAME_LAUNCHER_LIBS})
+	target_link_libraries("gamelauncher" ${GAME_LAUNCHER_LIBS} "${PROJECT_SOURCE_DIR}/misc/versioninfo.rc.res" "${PROJECT_SOURCE_DIR}/misc/windows_icons.rc.res")
 endif()
