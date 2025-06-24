@@ -4,6 +4,9 @@ you will not use twinkle and will usually use wedge too.
 
 1) sudo apt install libsdl2-dev libfreetype-dev libglm-dev cmake git libflac-dev libogg-dev libvorbis-dev libpng-dev
 
+*1.1*) Most distros don't ship with SDL3 yet, so compile and install SDL3
+and SDL3_ttf from source
+
 2) git clone https://codeberg.org/nooskewl/tgui6.git
    git clone https://codeberg.org/nooskewl/shim5.git
    git clone https://codeberg.org/nooskewl/booboo.git
@@ -21,7 +24,7 @@ to suit your paths.
 
 build.sh:
 
-cmake .. -DCMAKE_BUILD_TYPE=Release -DUSER_INCLUDE_PATH="/home/trent/code/tgui6/include;/home/trent/code/shim5/include;/usr/include/SDL2;/usr/include/freetype2;/home/trent/code/shim5/external/SDL2_ttf-2.0.14;/home/trent/code/twinkle" -DUSER_LIBRARY_PATH="/home/trent/code/tgui6/build;/home/trent/code/shim5/build;/home/trent/code/twinkle"
+cmake .. -DCMAKE_BUILD_TYPE=Release -DUSER_INCLUDE_PATH="/home/trent/code/tgui6/include;/home/trent/code/shim5/include;/usr/local/include/SDL3;/usr/local/include/SDL3_ttf;/usr/include/freetype2;/home/trent/code/twinkle" -DUSER_LIBRARY_PATH="/home/trent/code/tgui6/build;/home/trent/code/shim5/build;/home/trent/code/twinkle"
 
 --
 
