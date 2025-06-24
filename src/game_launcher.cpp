@@ -759,7 +759,7 @@ int main(int argc, char **argv)
 #endif
 
 	shim::window_title = "BooBoo";
-	shim::organisation_name = "ILLUMINATI NORTH";
+	shim::organisation_name = "Nooskewl";
 	shim::game_name = "BooBoo";
 	//
 	shim::logging = true;
