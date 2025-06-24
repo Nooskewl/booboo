@@ -26,7 +26,7 @@ number cpu2_speed
 call_result cpu2_speed rand_speed
 
 number cfg
-cfg_load cfg "com.illnorth.pong"
+cfg_load cfg "com.nooskewl.pong"
 cfg_get_number cfg score1 "score1"
 cfg_get_number cfg score2 "score2"
 
@@ -423,7 +423,7 @@ function end
 	cfg_set_number cfg "score2" score2
 
 	number save_result
-	cfg_save cfg save_result "com.illnorth.pong"
+	cfg_save cfg save_result "com.nooskewl.pong"
 }
 
 call reset_ball

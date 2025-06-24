@@ -46,7 +46,7 @@ static bool mousefunc_set_relative(Program *prg, const std::vector<Token> &v)
 
 	bool onoff = as_number(prg, v[0]);
 
-	SDL_SetRelativeMouseMode((SDL_bool)onoff);
+	SDL_SetWindowRelativeMouseMode(gfx::internal::gfx_context.window, (bool)onoff);
 
 	return true;
 }
@@ -180,7 +180,9 @@ bool start()
 	int adapter_i = util::check_args(shim::argc, shim::argv, "+adapter");
 	if (adapter_i >= 0) {
 		shim::adapter = atoi(shim::argv[adapter_i+1]);
-		if (shim::adapter >= SDL_GetNumVideoDisplays()-1) {
+		int count;
+		SDL_DisplayID *disp = SDL_GetDisplays(&count);
+		if (shim::adapter >= count) {
 			shim::adapter = 0;
 		}
 	}
@@ -449,7 +451,7 @@ static void loop()
 			}
 
 			if (e == nullptr) {
-				if (sdl_event.type == SDL_QUIT) {
+				if (sdl_event.type == SDL_EVENT_QUIT) {
 					if (can_logic == false) {
 						shim::handle_event(&sdl_event);
 						quit = true;
@@ -464,7 +466,7 @@ static void loop()
 				event = e;
 			}
 			else {
-				if (sdl_event.type == SDL_QUIT) {
+				if (sdl_event.type == SDL_EVENT_QUIT) {
 					static TGUI_Event quit_event;
 					quit_event.type = TGUI_QUIT;
 					event = &quit_event;
@@ -730,10 +732,6 @@ int main(int argc, char **argv)
 
 	try {
 
-#ifdef _WIN32
-	SDL_RegisterApp("BooBoo", 0, 0);
-#endif
-
 	orig_argc = argc;
 	orig_argv = argv;
 
@@ -761,7 +759,7 @@ int main(int argc, char **argv)
 #endif
 
 	shim::window_title = "BooBoo";
-	shim::organisation_name = "ILLUMINATI NORTH";
+	shim::organisation_name = "Nooskewl";
 	shim::game_name = "BooBoo";
 	//
 	shim::logging = true;

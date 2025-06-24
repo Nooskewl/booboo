@@ -9,7 +9,7 @@ mml_create sfx "@PO0 = { 0 -100 }\nA @PO0 c32 @PO0"
 mml_create enter_sfx "@PO0 = { 0 -100 0 100 0 -100 0 }\nA @PO0 a4 @PO0"
 
 number cfg
-cfg_load cfg "com.illnorth.coinhunt"
+cfg_load cfg "com.nooskewl.coinhunt"
 vector names
 vector scores
 string n
@@ -117,7 +117,7 @@ function write_scores name
 	jl write_next_score
 
 	number success
-	cfg_save cfg success "com.illnorth.coinhunt"
+	cfg_save cfg success "com.nooskewl.coinhunt"
 	reset "highscores.boo"
 }
 
