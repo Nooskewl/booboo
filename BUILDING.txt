@@ -4,10 +4,10 @@ you will not use twinkle and will usually use wedge too.
 
 1) sudo apt install libsdl2-dev libfreetype-dev libglm-dev cmake git libflac-dev libogg-dev libvorbis-dev libpng-dev
 
-2) git clone https://git.cmykilluminati.net/CMYKilluminatiNetwork/tgui6.git
-   git clone https://git.cmykilluminati.net/CMYKilluminatiNetwork/shim5.git
-   git clone https://git.cmykilluminati.net/CMYKilluminatiNetwork/booboo.git
-   git clone https://git.cmykilluminati.net/CMYKilluminatiNetwork/twinkle.git
+2) git clone https://codeberg.org/nooskewl/tgui6.git
+   git clone https://codeberg.org/nooskewl/shim5.git
+   git clone https://codeberg.org/nooskewl/booboo.git
+   git clone https://codeberg.org/nooskewl/twinkle.git
 
 3) cd twinkle
    g++ -c -O2 twinkle.cpp
@@ -53,14 +53,12 @@ Windows specifics:
 
 build.sh:
 
-cmake .. -DCMAKE_TOOLCHAIN_FILE=/home/trent/code/Toolchain-mingw32.cmake -DCMAKE_BUILD_TYPE=Release -DUSER_INCLUDE_PATH="/home/trent/code/twinkle:/home/trent/code/win-include:/home/trent/code/tgui6/include:/home/trent/code/shim5/include:/home/trent/code/shim5/external:/home/trent/code/shim5/external/SDL2_ttf-2.0.14:/home/trent/code/win-include/SDL2" -DUSER_LIBRARY_PATH="/home/trent/code/twinkle:/home/trent/code/win-lib:/home/trent/code/tgui6/build:/home/trent/code/shim5/build" -DGAME_LAUNCHER=on -G "Unix Makefiles"
+cmake .. -DCMAKE_TOOLCHAIN_FILE=/home/trent/code/Toolchain-mingw64.cmake -DCMAKE_BUILD_TYPE=Release -DUSER_INCLUDE_PATH="/home/trent/code/twinkle:/home/trent/code/win-include64:/home/trent/code/tgui6/include:/home/trent/code/shim5/include:/home/trent/code/shim5/external:/home/trent/code/win-include64/SDL3" -DUSER_LIBRARY_PATH="/home/trent/code/twinkle:/home/trent/code/win-lib64:/home/trent/code/tgui6/build:/home/trent/code/shim5/build" -DGAME_LAUNCHER=on -G "Unix Makefiles"
 
 You can download all the dependencies (this has everything for all our games too) from:
 
-https://cmykilluminati.net/downloads/win-lib-include-mingw32-20240917.zip
+https://nooskewl.com/files/win-deps64-20250624.zip
 
-This also has a file called Toolchain-mingw32.cmake that you will need to have present.
+This also has a file called Toolchain-mingw64.cmake that you will need to have present.
 
-You can install all the required tools into the MSYS2 MinGW32 environment with:
-
-pacman -S git mingw32/mingw-w64-i686-gcc mingw32/mingw-w64-i686-cmake msys/make 
+You need 64 bit MSYS2 shell, 64 bit gcc/cmake and msys/make from pacman.
