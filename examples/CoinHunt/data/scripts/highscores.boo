@@ -23,7 +23,7 @@ number highlight
 = highlight -1
 
 number cfg
-cfg_load cfg "com.illnorth.coinhunt"
+cfg_load cfg "com.nooskewl.coinhunt"
 number exists
 cfg_exists cfg exists "last_score"
 ? exists 0
@@ -297,5 +297,5 @@ flip
 delay 10000
 cfg_set_number cfg "last_score" -1
 number success
-cfg_save cfg success "com.illnorth.coinhunt"
+cfg_save cfg success "com.nooskewl.coinhunt"
 reset "main.boo"

@@ -9,7 +9,7 @@ mml_create drip_sfx "@PO0 = { 0 1000 0 1000 0 }\nA o3 @TYPE3 @PO0 g32 @PO0"
 mml_create drop_ground_sfx "@PO0 = { 0 1000 0 1000 0 }\nA o4 @TYPE3 @PO0 g32 @PO0"
 
 number cfg
-cfg_load cfg "com.illnorth.doomed"
+cfg_load cfg "com.nooskewl.doomed"
 vector names
 vector scores
 string n
@@ -117,7 +117,7 @@ function write_scores name
 	jl write_next_score
 
 	number success
-	cfg_save cfg success "com.illnorth.doomed"
+	cfg_save cfg success "com.nooskewl.doomed"
 	reset "highscores.boo"
 }
 

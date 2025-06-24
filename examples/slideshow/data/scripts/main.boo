@@ -180,5 +180,5 @@ function end
 	cfg_set_number __cfg__ "enabled" __do_slideshow__
 	cfg_set_number __cfg__ "delay" __slideshow_delay__
 	number save_result
-	cfg_save __cfg__ save_result "com.illnorth.slideshow"
+	cfg_save __cfg__ save_result "com.nooskewl.slideshow"
 }

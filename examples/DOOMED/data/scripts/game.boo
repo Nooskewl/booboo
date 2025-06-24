@@ -687,7 +687,7 @@ function do_enemy_attack e
 function write_config
 {
 	number cfg
-	cfg_load cfg "com.illnorth.doomed"
+	cfg_load cfg "com.nooskewl.doomed"
 	number exists
 	cfg_exists cfg exists "last_score"
 	? exists 0
@@ -706,6 +706,6 @@ function write_config
 	floor score
 	cfg_set_number cfg "last_score" score
 	number success
-	cfg_save cfg success "com.illnorth.doomed"
+	cfg_save cfg success "com.nooskewl.doomed"
 }
 

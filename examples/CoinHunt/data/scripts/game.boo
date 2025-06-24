@@ -910,7 +910,7 @@ function draw
 function write_config score
 {
 	number cfg
-	cfg_load cfg "com.illnorth.coinhunt"
+	cfg_load cfg "com.nooskewl.coinhunt"
 	number exists
 	cfg_exists cfg exists "last_score"
 	? exists 0
@@ -929,7 +929,7 @@ function write_config score
 	floor score
 	cfg_set_number cfg "last_score" score
 	number success
-	cfg_save cfg success "com.illnorth.coinhunt"
+	cfg_save cfg success "com.nooskewl.coinhunt"
 }
 
 function run
