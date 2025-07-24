@@ -1,11 +1,8 @@
-@font-face {
-	font-family: "Abel";
-	src: url("https://nooskewl.com/media/Abel-Regular.ttf");
-}
 html {
+	font-family: serif;
 	color: #ccc;
 	background-color: black;
-	background-image: url("https://nooskewl.com/media/bg.png");
+	background-image: url("bg.png");
 	background-attachment: fixed;
 	background-repeat: repeat-x;
 	background-size: 100% 100%;
