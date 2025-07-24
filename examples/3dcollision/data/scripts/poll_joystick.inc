@@ -28,8 +28,8 @@ key_get _key_l KEY_LEFT
 key_get _key_r KEY_RIGHT
 key_get _key_u KEY_UP
 key_get _key_d KEY_DOWN
-key_get _key_a KEY_z
-key_get _key_b KEY_x
+key_get _key_a KEY_Z
+key_get _key_b KEY_X
 key_get _key_back KEY_ESCAPE
 
 = joy_l (|| (== _key_l 1) (== joy_l 1))

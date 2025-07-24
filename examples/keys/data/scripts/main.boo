@@ -15,7 +15,7 @@ function draw
 function run
 {
 	number f
-	key_get f KEY_f
+	key_get f KEY_F
 
 	if (&& (== 1 f) (== pressed 0)) on (&& (== 0 f) (== pressed 1)) off
 	= pressed 1

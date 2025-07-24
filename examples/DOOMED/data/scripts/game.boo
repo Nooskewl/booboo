@@ -382,10 +382,10 @@ function run
 	:set_y2
 
 	number w a s d
-	key_get w KEY_w
-	key_get a KEY_a
-	key_get s KEY_s
-	key_get d KEY_d
+	key_get w KEY_W
+	key_get a KEY_A
+	key_get s KEY_S
+	key_get d KEY_D
 	if (!= 0 w) set_forward
 		= joy_y1 -1
 	:set_forward

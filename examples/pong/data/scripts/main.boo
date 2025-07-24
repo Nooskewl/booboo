@@ -70,10 +70,10 @@ function run
 
 	; Read the keyboard
 	number kq ka ko kl
-	key_get kq KEY_q
-	key_get ka KEY_a
-	key_get ko KEY_o
-	key_get kl KEY_l
+	key_get kq KEY_Q
+	key_get ka KEY_A
+	key_get ko KEY_O
+	key_get kl KEY_L
 
 	; Move paddles based on keys
 	if (&& (> pad1y 0) (== kq TRUE)) p1up (&& (< pad1y (- SCR_H BOTTOM PAD_H)) (== ka TRUE)) p1dn (&& (> pad2y 0) (== ko TRUE)) p2up (&& (< pad2y (- SCR_H BOTTOM PAD_H)) (== kl TRUE)) p2dn

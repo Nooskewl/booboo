@@ -57,7 +57,7 @@ function draw
 	font_draw font 255 255 255 255 "Press S to save screenshot" 15 15
 
 	number k
-	key_get k KEY_s
+	key_get k KEY_S
 	if (&& (!= k 0) (== s 0)) save_it (== k 0) clear_it
 		= s 1
 		string home
