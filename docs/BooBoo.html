@@ -172,6 +172,9 @@ Sections:
 <pre>
 	A reference. Function parameters preceded by a ~ can be modified
 	by a function
+	References are faked so the function will operate on a temporary value,
+	not directly on the reference passed, and then the correct value will
+	be placed back into the reference when the function ends
 	e.g. function foo a b ~c d ~e { ... } ; c and e can be modified
 </pre>
 
