@@ -398,22 +398,6 @@ static bool miscfunc_get_ticks(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool miscfunc_rand(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(3)
-
-	Variable &v1 = as_variable(prg, v[0]);
-
-	int min_incl = as_number(prg, v[1]);
-	int max_incl = as_number(prg, v[2]);
-
-	CHECK_NUMBER(v1)
-
-	v1.n = util::rand(min_incl, max_incl);
-
-	return true;
-}
-
 static bool miscfunc_args(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -5169,7 +5153,6 @@ void start_lib_game()
 	add_instruction("inspect", miscfunc_inspect);
 	add_instruction("delay", miscfunc_delay);
 	add_instruction("get_ticks", miscfunc_get_ticks);
-	add_instruction("rand", miscfunc_rand);
 	add_instruction("args", miscfunc_args);
 	add_instruction("get_logic_rate", miscfunc_get_logic_rate);
 	add_instruction("set_logic_rate", miscfunc_set_logic_rate);

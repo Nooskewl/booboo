@@ -2564,6 +2564,22 @@ bool corefunc_address(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool corefunc_rand(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	Variable &v1 = as_variable(prg, v[0]);
+
+	int min_incl = as_number(prg, v[1]);
+	int max_incl = as_number(prg, v[2]);
+
+	CHECK_NUMBER(v1)
+
+	v1.n = util::rand(min_incl, max_incl);
+
+	return true;
+}
+
 Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 {
 	Variable ret;
@@ -3641,6 +3657,8 @@ void start()
 	add_instruction("if", corefunc_if);
 	
 	add_instruction("address", corefunc_address);
+	
+	add_instruction("rand", corefunc_rand);
 	
 	return_code = 0;
 }
