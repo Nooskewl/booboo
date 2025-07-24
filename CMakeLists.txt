@@ -12,8 +12,6 @@ option(RASPBERRYPI "Build for Raspberry Pi" OFF)
 set(USER_INCLUDE_PATH "" CACHE FILEPATH "Any extra include directories you want")
 set(USER_LIBRARY_PATH "" CACHE FILEPATH "Any extra library directories you want")
 
-set(CMAKE_RC_COMPILER "/mingw32/bin/windres.exe")
-
 include_directories("include")
 include_directories(${USER_INCLUDE_PATH})
 link_directories(${USER_LIBRARY_PATH})
@@ -38,10 +36,8 @@ set(CORE_LAUNCHER_SOURCES
 	src/launcher.cpp
 )
 
-if(MINGW)
-	add_custom_command(OUTPUT "${PROJECT_SOURCE_DIR}/misc/versioninfo.rc.res" COMMAND "/mingw64/bin/windres" ARGS "-O" "coff" "${PROJECT_SOURCE_DIR}/misc/versioninfo.rc" "${PROJECT_SOURCE_DIR}/misc/versioninfo.rc.res")
-	add_custom_command(OUTPUT "${PROJECT_SOURCE_DIR}/misc/windows_icons.rc.res" COMMAND "/mingw64/bin/windres" ARGS "-O" "coff" "${PROJECT_SOURCE_DIR}/misc/windows_icons.rc" "${PROJECT_SOURCE_DIR}/misc/windows_icons.rc.res")
-	list(APPEND GAME_LAUNCHER_SOURCES misc/booboo.manifest)
+if (MINGW)
+	LIST(APPEND GAME_LAUNCHER_SOURCES misc/versioninfo.rc misc/booboo.manifest misc/windows_icons.rc)
 endif()
 
 # Outputs
@@ -79,7 +75,7 @@ if(MINGW)
 		set_target_properties("gamelibrary" PROPERTIES COMPILE_FLAGS "${FLAGS}")
 		set_target_properties("gamelibrary" PROPERTIES OUTPUT_NAME "BooBooGame")
 		set_target_properties("gamelauncher" PROPERTIES COMPILE_FLAGS "${FLAGS}")
-		set_target_properties("gamelauncher" PROPERTIES LINK_FLAGS "${LFLAGS_WIN32}" "${PROJECT_SOURCE_DIR}/misc/versioninfo.rc.res" "${PROJECT_SOURCE_DIR}/misc/windows_icons.rc.res")
+		set_target_properties("gamelauncher" PROPERTIES LINK_FLAGS "${LFLAGS_WIN32}")
 		set_target_properties("gamelauncher" PROPERTIES OUTPUT_NAME "BooBoo")
 	endif()
 	if(LUA)
@@ -162,7 +158,7 @@ target_link_libraries("corelauncher" ${CORE_LAUNCHER_LIBS})
 
 if(GAME_LAUNCHER)
 	if(MINGW)
-		target_link_libraries("gamelauncher" ${GAME_LAUNCHER_LIBS} "${PROJECT_SOURCE_DIR}/misc/versioninfo.rc.res" "${PROJECT_SOURCE_DIR}/misc/windows_icons.rc.res")
+		target_link_libraries("gamelauncher" ${GAME_LAUNCHER_LIBS})
 	else()
 		target_link_libraries("gamelauncher" ${GAME_LAUNCHER_LIBS})
 	endif()
