@@ -47,9 +47,10 @@ struct Program {
 	std::map<std::string, int> function_name_map;
 	std::vector<Program> functions;
 	std::vector<int> params;
+	std::vector<std::string> param_names;
 	std::vector<bool> ref;
 	std::vector< std::map<std::string, int> > locals;
-	std::map<std::string, int> backup;
+	std::vector< std::map<std::string, int> > backup;
 
 	std::vector<int> real_line_numbers;
 	std::vector<std::string> real_file_names;
