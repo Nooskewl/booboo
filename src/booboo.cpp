@@ -3642,6 +3642,17 @@ Variable exprfunc_transpose(Program *prg, const std::vector<Token> &v)
 	return from_glm_mat4(m);
 }
 
+Variable exprfunc_address(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable var;
+	var.type = Variable::POINTER;
+	var.p = &as_variable(prg, v[0]);
+
+	return var;
+}
+
 static void init_token_map()
 {
 	add_token_handler(':', tokenfunc_label);
@@ -3706,6 +3717,7 @@ void start()
 	add_expression_handler("sub", exprfunc_vsub);
 	add_expression_handler("inverse", exprfunc_inverse);
 	add_expression_handler("transpose", exprfunc_transpose);
+	add_expression_handler("@", exprfunc_address);
 
 	add_instruction("reset", breaker_reset);
 	add_instruction("exit", breaker_exit);
