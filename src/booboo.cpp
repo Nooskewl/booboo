@@ -1807,47 +1807,6 @@ func_top:
 	prg->complete_pass = pass;
 }
 
-static void sub_fish(Program *prg, Variable *f, std::string name, int value, int param, std::vector<Variable *> &subs, std::vector<int> &subs_i);
-
-static void sub_expr(Program *prg, Variable *e, std::string name, int value, int param, std::vector<Variable *> &subs, std::vector<int> &subs_i)
-{
-	for (size_t i = 0; i < e->e.v.size(); i++) {
-		if (e->e.v[i].type == Token::SYMBOL) {
-			if (prg->variables[e->e.v[i].i].type == Variable::EXPRESSION) {
-				sub_expr(prg, &prg->variables[e->e.v[i].i], name, value, param, subs, subs_i);
-			}
-			else if (prg->variables[e->e.v[i].i].type == Variable::FISH) {
-				sub_fish(prg, &prg->variables[e->e.v[i].i], name, value, param, subs, subs_i);
-			}
-			else if (e->e.v[i].token == name) {
-				e->e.v[i].i = value;
-			}
-		}
-	}
-}
-
-static void sub_fish(Program *prg, Variable *f, std::string name, int value, int param, std::vector<Variable *> &subs, std::vector<int> &subs_i)
-{
-	if (f->f.c_i == param) {
-		subs.push_back(f);
-		subs_i.push_back(f->f.c_i);
-		f->f.c_i = value;
-	}
-	for (size_t i = 0; i < f->f.v.size(); i++) {
-		if (f->f.v[i].type == Token::SYMBOL) {
-			if (prg->variables[f->f.v[i].i].type == Variable::EXPRESSION) {
-				sub_expr(prg, &prg->variables[f->f.v[i].i], name, value, param, subs, subs_i);
-			}
-			else if (prg->variables[f->f.v[i].i].type == Variable::FISH) {
-				sub_fish(prg, &prg->variables[f->f.v[i].i], name, value, param, subs, subs_i);
-			}
-			else if (f->f.v[i].token == name) {
-				f->f.v[i].i = value;
-			}
-		}
-	}
-}
-
 void call_function(Program *prg, int function, const std::vector<Token> &params, Variable &result, int ignore_params)
 {
 	Program &func = prg->functions[function];
@@ -1858,25 +1817,6 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 	for (size_t j = 0; j < func.params.size(); j++) {
 		const Token &param = params[j+ignore_params];
 
-		if (func.ref[j]) {
-			for (size_t k = 0; k < func.s->program.size(); k++) {
-				for (size_t l = 0; l < func.s->program[k].data.size(); l++) {
-					if (func.s->program[k].data[l].type == Token::SYMBOL) {
-						if (prg->variables[func.s->program[k].data[l].i].type == Variable::EXPRESSION) {
-							sub_expr(prg, &prg->variables[func.s->program[k].data[l].i], func.param_names[j], params[j+ignore_params].i, func.params[j], fish_subs, fish_subs_i);
-						}
-						else if (prg->variables[func.s->program[k].data[l].i].type == Variable::FISH) {
-							sub_fish(prg, &prg->variables[func.s->program[k].data[l].i], func.param_names[j], params[j+ignore_params].i, func.params[j], fish_subs, fish_subs_i);
-						}
-						else if (func.s->program[k].data[l].token == func.param_names[j]) {
-							func.s->program[k].data[l].i = params[j+ignore_params].i;
-						}
-					}
-				}
-			}
-			continue;
-		}
-		
 		Variable &var = prg->variables[func.params[j]];
 
 		if (param.type == Token::NUMBER) {
@@ -1922,7 +1862,6 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 	}
 
 	// keep values for references
-	/*
 	for (size_t j = 0; j < func.params.size(); j++) {
 		const Token &param = params[j+ignore_params];
 		
@@ -1937,7 +1876,6 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 			}
 		}
 	}
-	*/
 
 	prg->s = bak2;
 }
