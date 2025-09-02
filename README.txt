@@ -7,6 +7,9 @@ to get a launcher (point the launcher to where there is a data/
 directory from a BooBoo game or a data.cpa from one.) Press F12 to
 exit, F11 to toggle fullscreen.
 
+Many of the games only read joystick input, but fudge some keys into
+joystick events... so the keys are arrows and z/x.
+
 Your data/ directory can be compressed into data.cpa with compress_dir.
 Just enter data/ and run it, and it will create ../data.cpa.
 

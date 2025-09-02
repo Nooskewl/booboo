@@ -64,4 +64,16 @@ https://nooskewl.com/files/win-deps64-20250624.zip
 
 This also has a file called Toolchain-mingw64.cmake that you will need to have present.
 
-You need 64 bit MSYS2 shell, 64 bit gcc/cmake and msys/make from pacman.
+You need 64 bit MSYS2 shell, 64 bit gcc and cmake and "msys/make" from pacman.
+
+To find the right gcc/cmake packages for example:
+
+> pacman -Ss cmake
+
+Will produce among others:
+
+mingw64/mingw-w64-x86_64-cmake 4.1.0-1
+
+So to install it run:
+
+> pacman -S mingw-w64-x86_64-cmake
