@@ -1,5 +1,5 @@
 pointer p
-address p bar
+= p (@ bar)
 goto `p
 
 :foo

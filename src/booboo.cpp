@@ -2603,21 +2603,6 @@ bool corefunc_if(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_address(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(2)
-
-	Variable &var = as_variable(prg, v[0]);
-
-	if (IS_POINTER(var) == false) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Expected pointer at " + get_error_info(prg));
-	}
-
-	var.p = &as_variable(prg, v[1]);
-
-	return true;
-}
-
 static bool corefunc_rand(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
@@ -3716,13 +3701,10 @@ void start()
 	add_instruction("jge", corefunc_jge);
 	add_instruction("call", corefunc_call);
 	add_instruction("call_result", corefunc_call_result);
-	
 	add_instruction("typeof", corefunc_typeof);
-	
+
 	add_instruction("for", corefunc_for);
 	add_instruction("if", corefunc_if);
-	
-	add_instruction("address", corefunc_address);
 	
 	add_instruction("rand", corefunc_rand);
 	

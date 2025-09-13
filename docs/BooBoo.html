@@ -124,6 +124,12 @@ Sections:
 	e.g. = x 1 ; assign 1 to x
 </pre>
 
+<h3>/* */</h3>
+<pre>
+	A multiline comment
+	e.g. call foo bar /* foo bar */ baz
+</pre>
+
 <h3>""</h3>
 <pre>
 	a string
@@ -174,10 +180,12 @@ Sections:
 	e.g. function foo a b ~c d ~e { ... } ; c and e can be modified
 </pre>
 
-<h3>address</h3>
+<h3>@</h3>
 <pre>
-	Take the address of a variable into a pointer
-	e.g. address my_pointer my_var
+	The address operator
+	e.g. = my_pointer (@ my_var)
+	or
+	call foo (@ bar) ; where foo is expecting a pointer
 </pre>
 
 <h3>`</h3>

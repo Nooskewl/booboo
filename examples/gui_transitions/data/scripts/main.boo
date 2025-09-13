@@ -24,8 +24,8 @@ function start_gui
 	call_result ll mklabel "IN"
 	call_result lr mklabel "OUT"
 	pointer g1 g2
-	address g1 [groups 0]
-	address g2 [groups 1]
+	= g1 (@ [groups 0])
+	= g2 (@ [groups 1])
 	call_result l1 mkradio g1 TRANSITION_NONE "None"
 	call_result l2 mkradio g1 TRANSITION_ENLARGE "Enlarge"
 	call_result l3 mkradio g1 TRANSITION_SHRINK "Shrink"

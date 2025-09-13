@@ -4,7 +4,7 @@ function foo
 }
 
 pointer p
-address p foo
+= p (@ foo)
 call `p
 
 call bar foo
