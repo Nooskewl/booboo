@@ -198,12 +198,20 @@ static std::string tokenfunc_compare(Program *prg)
 static std::string tokenfunc_multiply(Program *prg)
 {
 	prg->s->p++;
+	if (prg->s->p < prg->s->code.length() && prg->s->code[prg->s->p] == '/') {
+		prg->s->p++;
+		return "*/";
+	}
 	return "*";
 }
 
 static std::string tokenfunc_divide(Program *prg)
 {
 	prg->s->p++;
+	if (prg->s->p < prg->s->code.length() && prg->s->code[prg->s->p] == '*') {
+		prg->s->p++;
+		return "/*";
+	}
 	return "/";
 }
 
@@ -391,7 +399,23 @@ static std::string token(Program *prg, Token::Token_Type &ret_type)
 
 	std::map<char, token_func>::iterator it = token_map.find(prg->s->code[prg->s->p]);
 	if (it != token_map.end()) {
-		return (*it).second(prg);
+		std::string tok = (*it).second(prg);
+		if (tok == "/*") {
+			while ((tok = token(prg, ret_type)) != "*/") {
+			}
+			return token(prg, ret_type);
+		}
+		else if (tok == ";") {
+			while (prg->s->p < prg->s->code.length() && prg->s->code[prg->s->p] != '\n') {
+				prg->s->p++;
+			}
+			prg->s->line++;
+			if (prg->s->p < prg->s->code.length()) {
+				prg->s->p++;
+			}
+			return token(prg, ret_type);
+		}
+		return tok;
 	}
 
 	throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg));
@@ -419,16 +443,7 @@ bool process_includes(Program *prg)
 	Token::Token_Type tt;
 
 	while ((tok = token(prg, tt)) != "") {
-		if (tok == ";") {
-			while (prg->s->p < prg->s->code.length() && prg->s->code[prg->s->p] != '\n') {
-				prg->s->p++;
-			}
-			prg->s->line++;
-			if (prg->s->p < prg->s->code.length()) {
-				prg->s->p++;
-			}
-		}
-		else if (tok == "include") {
+		if (tok == "include") {
 			int start_line = prg->s->line;
 
 			std::string name = token(prg, tt);
@@ -577,7 +592,25 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 		}
 		char c = expr[p];
 		Token tok;
-		if (c == '(') {
+		if (c == ';') {
+			p++;
+			while (expr[p] != '\n' && p < (int)expr.length()) {
+				p++;
+			}
+			if (p < (int)expr.length()) {
+				p++;
+			}
+		}
+		else if (c == '/' && p+1 < (int)expr.length() && expr[p+1] == '*') {
+			p++;
+			while (p < (int)expr.length() && (expr[p] != '/' || (p > 0 && expr[p-1] != '*'))) {
+				p++;
+			}
+			if (p < (int)expr.length()) {
+				p++;
+			}
+		}
+		else if (c == '(') {
 			tok.type = Token::SYMBOL;
 			int open = 0;
 			std::string new_expr;
@@ -814,7 +847,25 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 		}
 		char c = expr[p];
 		Token tok;
-		if (c == '(') {
+		if (c == ';') {
+			p++;
+			while (expr[p] != '\n' && p < (int)expr.length()) {
+				p++;
+			}
+			if (p < (int)expr.length()) {
+				p++;
+			}
+		}
+		else if (c == '/' && p+1 < (int)expr.length() && expr[p+1] == '*') {
+			p++;
+			while (p < (int)expr.length() && (expr[p] != '/' || (p > 0 && expr[p-1] != '*'))) {
+				p++;
+			}
+			if (p < (int)expr.length()) {
+				p++;
+			}
+		}
+		else if (c == '(') {
 			tok.type = Token::SYMBOL;
 			int open = 0;
 			std::string new_expr;
@@ -1319,16 +1370,7 @@ static void compile(Program *prg, Pass pass)
 
 	while ((tok = token(prg, tt)) != "") {
 top:
-		if (tok == ";") {
-			while (prg->s->p < prg->s->code.length() && prg->s->code[prg->s->p] != '\n') {
-				prg->s->p++;
-			}
-			prg->s->line++;
-			if (prg->s->p < prg->s->code.length()) {
-				prg->s->p++;
-			}
-		}
-		else if (tok == "`") {
+		if (tok == "`") {
 			_is_deref = true;
 		}
 		else if (tok == "function") {
@@ -1365,17 +1407,7 @@ top:
 			while ((tok = token(prg, tt)) != "") {
 func_top:
 				func.s->line = prg->s->line;
-				if (tok == ";") {
-					while (prg->s->p < prg->s->code.length() && prg->s->code[prg->s->p] != '\n') {
-						prg->s->p++;
-					}
-					prg->s->line++;
-					func.s->line = prg->s->line;
-					if (prg->s->p < prg->s->code.length()) {
-						prg->s->p++;
-					}
-				}
-				else if (tok == "`") {
+				if (tok == "`") {
 					is_deref = true;
 				}
 				else if (tok == "{") {
@@ -1427,7 +1459,7 @@ func_top:
 					int count = 0;
 					while (true) {
 						std::string tok2 = token(prg, tt);
-						if (tok2 == "" || (count != 0 && (tok2 == ";" || tok2 == "{" || tok2 == "}" || tok2 == ":" || tok2 == "function" || tok2[0] == '(' || tok2[0] == '[' || library_map.find(tok2) != library_map.end()))) {
+						if (tok2 == "" || (count != 0 && (tok2 == "{" || tok2 == "}" || tok2 == ":" || tok2 == "function" || tok2[0] == '(' || tok2[0] == '[' || library_map.find(tok2) != library_map.end()))) {
 							tok = tok2;
 							goto func_top;
 						}
@@ -1663,7 +1695,7 @@ func_top:
 			int count = 0;
 			while (true) {
 				std::string tok2 = token(prg, tt);
-				if (tok2 == "" || (count != 0 && (tok2 == ";" || tok2 == "{" || tok2 == "}" || tok2 == ":" || tok2 == "function" || tok2[0] == '(' || tok2[0] == '[' || library_map.find(tok2) != library_map.end()))) {
+				if (tok2 == "" || (count != 0 && (tok2 == "{" || tok2 == "}" || tok2 == ":" || tok2 == "function" || tok2[0] == '(' || tok2[0] == '[' || library_map.find(tok2) != library_map.end()))) {
 					tok = tok2;
 					goto top;
 				}
