@@ -2802,6 +2802,17 @@ Variable exprfunc_or(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
+Variable exprfunc_not(Program *prg, const std::vector<Token> &v)
+{
+	bool b = !(bool)as_number(prg, v[0]);
+
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.name = "-booboo-";
+	var.n = b;
+	return var;
+}
+
 Variable exprfunc_greater(Program *prg, const std::vector<Token> &v)
 {
 	bool b = true;
@@ -3647,6 +3658,7 @@ void start()
 	add_expression_handler("%", exprfunc_modulus);
 	add_expression_handler("&&", exprfunc_and);
 	add_expression_handler("||", exprfunc_or);
+	add_expression_handler("!", exprfunc_not);
 	add_expression_handler(">", exprfunc_greater);
 	add_expression_handler("<", exprfunc_less);
 	add_expression_handler(">=", exprfunc_greaterequal);
