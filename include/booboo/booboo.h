@@ -76,6 +76,8 @@ struct Variable
 	std::map<std::string, Variable> m;
 	Expression e;
 	Fish f;
+
+	std::string obfuscated;
 };
 
 typedef bool (*library_func)(Program *prg, const std::vector<Token> &v);
@@ -129,6 +131,8 @@ int as_function(Program *prg, const Token &t);
 // The black box allows you to store anything you want
 void *get_black_box(Program *prg, std::string id);
 void set_black_box(Program *prg, std::string id, void *data);
+
+void obfuscate(Program *prg);
 
 // If you have a variable of type SYMBOL then 'i' is the index you pass here to retrive the variable
 Variable &get_variable(Program *prg, int index);

@@ -879,11 +879,26 @@ again:
 
 	prg = create_program(code);
 
-	while (interpret(prg)) {
+	register_game_callbacks();
+
+	bool ob = false;
+	for (int i = 1; i < argc; i++) {
+		if (std::string(argv[i]) == "+obfuscate") {
+			ob = true;
+			break;
+		}
 	}
 
-	if (reset_game_name == "") {
-		go();
+	if (ob) {
+		booboo::obfuscate(prg);
+	}
+	else {
+		while (interpret(prg)) {
+		}
+
+		if (reset_game_name == "") {
+			go();
+		}
 	}
 
 	std::vector<Token> tmp;

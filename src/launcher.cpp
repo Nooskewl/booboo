@@ -138,7 +138,20 @@ again:
 
 	prg = booboo::create_program(code);
 
-	while (booboo::interpret(prg)) {
+	bool ob = false;
+	for (int i = 1; i < argc; i++) {
+		if (std::string(argv[i]) == "+obfuscate") {
+			ob = true;
+			break;
+		}
+	}
+
+	if (ob) {
+		booboo::obfuscate(prg);
+	}
+	else {
+		while (booboo::interpret(prg)) {
+		}
 	}
 
 	standard_lib_destroy_program(prg);

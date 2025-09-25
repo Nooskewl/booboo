@@ -5145,11 +5145,14 @@ static void black_bars_callback(gfx::Black_Bar_Type type, int x, int y, int w, i
 	call_void_function(prg, "draw_black_bar", v, 0);
 }
 
-void start_lib_game()
+void register_game_callbacks()
 {
 	gfx::register_lost_device_callbacks(lost_device_callback, found_device_callback);
 	gfx::register_black_bars_callback(black_bars_callback);
+}
 
+void start_lib_game()
+{
 	add_instruction("inspect", miscfunc_inspect);
 	add_instruction("delay", miscfunc_delay);
 	add_instruction("get_ticks", miscfunc_get_ticks);
