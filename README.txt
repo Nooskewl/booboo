@@ -38,4 +38,11 @@ is a model import/export for blender 2.73 which supports armatures/animations. U
 
 --
 
+You can obfuscate code with the +obfuscate switch. Examples:
+
+> ./BooBooCLI dragonslayer.boo +obfuscate
+> ./BooBoo town +obfuscate > foo.boo
+
+--
+
 Please visit https://nooskewl.com for updates!
