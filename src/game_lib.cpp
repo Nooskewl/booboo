@@ -3606,6 +3606,10 @@ static bool modelfunc_translate_3d(Program *prg, const std::vector<Token> &v)
 
 static void lost_device_callback()
 {
+	if (prg == nullptr) {
+		return;
+	}
+
 #ifdef _WIN32
 	if (shim::opengl == false) {
 		Image_Info *info = image_info(prg);
@@ -3620,16 +3624,16 @@ static void lost_device_callback()
 	}
 #endif
 
-	if (prg == nullptr) {
-		return;
-	}
-
 	std::vector<Token> v;
 	call_void_function(prg, "lost_device", v, 0);
 }
 
 static void found_device_callback()
 {
+	if (prg == nullptr) {
+		return;
+	}
+
 #ifdef _WIN32
 	if (shim::opengl == false) {
 		Image_Info *info = image_info(prg);
@@ -3650,10 +3654,6 @@ static void found_device_callback()
 		set_2d();
 	}
 	
-	if (prg == nullptr) {
-		return;
-	}
-
 	std::vector<Token> v;
 	call_void_function(prg, "found_device", v, 0);
 }

@@ -915,10 +915,12 @@ again:
 	fprintf(f, "volume=%d\n", int(shim::music_volume*255));
 	fclose(f);
 
-	game_lib_destroy_program(prg);
-	standard_lib_destroy_program(prg);
-	destroy_program(prg);
+	Program *tmp_prg = prg;
 	prg = nullptr;
+
+	game_lib_destroy_program(tmp_prg);
+	standard_lib_destroy_program(tmp_prg);
+	destroy_program(tmp_prg);
 
 	if (reset_game_name != "") {
 		fn = "";
