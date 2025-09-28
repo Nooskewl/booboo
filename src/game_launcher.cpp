@@ -918,6 +918,7 @@ again:
 	game_lib_destroy_program(prg);
 	standard_lib_destroy_program(prg);
 	destroy_program(prg);
+	prg = nullptr;
 
 	if (reset_game_name != "") {
 		fn = "";

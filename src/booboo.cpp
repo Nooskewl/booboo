@@ -71,6 +71,9 @@ static std::string escape_string(std::string s)
 		if (s[i] == '\n') {
 			ret += "\\n";
 		}
+		else if (s[i] == '\\') {
+			ret += "\\\\";
+		}
 		else {
 			char c[2];
 			c[0] = s[i];
@@ -612,6 +615,12 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 
 	if (expression_map.find(name) == expression_map.end()) {
 		e.i = -1;
+		for (size_t i = 0; i < prg->orig_function_names.size(); i++) {
+			if (prg->orig_function_names[i] == name) {
+				e.name = prg->function_names[i];
+				break;
+			}
+		}
 	}
 	else {
 		e.i = expression_map[name];
@@ -1424,6 +1433,7 @@ top:
 
 			std::string nm = is_special(func_name) ? func_name : obfuscated_name(prg);
 
+			prg->orig_function_names.push_back(func_name);
 			prg->function_names.push_back(nm);
 
 			Variable v;
@@ -4229,17 +4239,20 @@ std::string itos(int i)
 Variable evaluate_expression(Program *prg, const Variable::Expression &e)
 {
 	if (e.i == -1) {
-		std::map<std::string, int>::iterator it = prg->variables_map.find(e.name);
-		if (it == prg->variables_map.end()) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Unknown expression function '" + e.name + "' at " + get_error_info(prg));
-
+		int i;
+		for (i = 0; i < (int)prg->function_names.size(); i++) {
+			if (prg->function_names[i] == e.name) {
+				break;
+			}
 		}
 
-		Variable &func = prg->variables[it->second];
+		if (i >= (int)prg->function_names.size()) {
+			throw Error(std::string(__FUNCTION__) + ": " + "Unknown expression function '" + e.name + "' at " + get_error_info(prg));
+		}
 
 		Variable result;
 
-		call_function(prg, func.n, e.v, result);
+		call_function(prg, i, e.v, result);
 
 		return result;
 	}

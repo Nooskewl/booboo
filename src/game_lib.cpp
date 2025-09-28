@@ -3619,7 +3619,11 @@ static void lost_device_callback()
 		}
 	}
 #endif
-	
+
+	if (prg == nullptr) {
+		return;
+	}
+
 	std::vector<Token> v;
 	call_void_function(prg, "lost_device", v, 0);
 }
@@ -3646,6 +3650,10 @@ static void found_device_callback()
 		set_2d();
 	}
 	
+	if (prg == nullptr) {
+		return;
+	}
+
 	std::vector<Token> v;
 	call_void_function(prg, "found_device", v, 0);
 }
