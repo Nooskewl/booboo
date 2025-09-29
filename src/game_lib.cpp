@@ -3625,7 +3625,7 @@ static void lost_device_callback()
 #endif
 
 	std::vector<Token> v;
-	call_void_function(prg, "lost_device", v, 0);
+	call_void_function_obfuscated(prg, "lost_device", v, 0);
 }
 
 static void found_device_callback()
@@ -3655,7 +3655,7 @@ static void found_device_callback()
 	}
 	
 	std::vector<Token> v;
-	call_void_function(prg, "found_device", v, 0);
+	call_void_function_obfuscated(prg, "found_device", v, 0);
 }
 
 static bool modelfunc_set_2d(Program *prg, const std::vector<Token> &v)
@@ -4455,7 +4455,7 @@ void BooBoo_Widget::draw()
 	t.i = prg->variables_map[info->widgets[id]->data->name];
 	tmp.push_back(t);
 
-	call_void_function(prg, "gui_draw", tmp);
+	call_void_function_obfuscated(prg, "gui_draw", tmp);
 }
 
 void BooBoo_Widget::handle_event(TGUI_Event *event)
@@ -4536,7 +4536,7 @@ void BooBoo_Widget::handle_event(TGUI_Event *event)
 	}
 	
 	if (go) {
-		call_void_function(prg, "gui_event", tmp);
+		call_void_function_obfuscated(prg, "gui_event", tmp);
 	}
 }
 
@@ -5150,7 +5150,7 @@ static void black_bars_callback(gfx::Black_Bar_Type type, int x, int y, int w, i
 	v.push_back(t);
 	t.n = h;
 	v.push_back(t);
-	call_void_function(prg, "draw_black_bar", v, 0);
+	call_void_function_obfuscated(prg, "draw_black_bar", v, 0);
 }
 
 void register_game_callbacks()
@@ -5337,6 +5337,16 @@ void start_lib_game()
 	add_instruction("gui_exit", widgetfunc_gui_exit);
 	add_instruction("gui_set_focus", widgetfunc_gui_set_focus);
 	add_instruction("gui_set_transition_types", widgetfunc_gui_set_transition_types);
+
+	add_special_function("end");
+	add_special_function("run");
+	add_special_function("draw");
+	add_special_function("lost_device");
+	add_special_function("found_device");
+	add_special_function("event");
+	add_special_function("gui_event");
+	add_special_function("gui_draw");
+	add_special_function("draw_black_bar");
 }
 
 void end_lib_game()

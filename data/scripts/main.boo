@@ -366,10 +366,10 @@ function launch
 		return
 	:cant
 	number cfg
-	cfg_load cfg "com.illnorth.launcher.reload"
+	cfg_load cfg "com.nooskewl.launcher.reload"
 	cfg_set_string cfg "launch" dir
 	number success
-	cfg_save cfg success "com.illnorth.launcher.reload"
+	cfg_save cfg success "com.nooskewl.launcher.reload"
 	exit 0
 }
 

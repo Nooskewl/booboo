@@ -14,7 +14,7 @@ function draw
 function run
 {
 	number f
-	key_get f KEY_f
+	key_get f KEY_F
 
 	if (&& (== f 1) (== old 0)) toggle
 		toggle_fullscreen

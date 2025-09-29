@@ -254,11 +254,16 @@ bool start()
 
 void handle_event(TGUI_Event *event)
 {
+	if (quit == true) {
+		return;
+	}
+
 	if (event->type == TGUI_UNKNOWN) {
 		return;
 	}
 	else if (event->type == TGUI_QUIT || (event->type == TGUI_KEY_DOWN && event->keyboard.code == exit_key)) {
 		quit = true;
+		return;
 	}
 	else if (event->type == TGUI_MOUSE_AXIS) {
 		if (event->mouse.normalised) {
@@ -337,6 +342,7 @@ void handle_event(TGUI_Event *event)
 	else if (event->type == TGUI_JOY_DOWN) {
 		if (event->joystick.button == TGUI_B_GUIDE) {
 			quit = true;
+			return;
 		}
 	}
 
@@ -388,7 +394,7 @@ void handle_event(TGUI_Event *event)
 	}
 	
 	if (go) {
-		call_void_function(prg, "event", args);
+		call_void_function_obfuscated(prg, "event", args);
 	}
 }
 
@@ -399,7 +405,7 @@ void draw_all()
 	gfx::set_cull_mode(gfx::NO_FACE);
 	
 	std::vector<Token> tmp;
-	call_void_function(prg, "draw", tmp);
+	call_void_function_obfuscated(prg, "draw", tmp);
 
 	glm::mat4 _mv, _proj;
 	gfx::get_matrices(_mv, _proj);
@@ -477,6 +483,13 @@ static void loop()
 			}
 
 			handle_event(event);
+			if (quit) {
+				break;
+			}
+		}
+
+		if (quit) {
+			break;
 		}
 
 		// Logic rate can change in devsettings
@@ -506,9 +519,12 @@ static void loop()
 			sdl_event.type = shim::timer_event_id;
 			TGUI_Event *event = shim::handle_event(&sdl_event);
 			handle_event(event);
+			if (quit) {
+				break;
+			}
 
 			std::vector<Token> tmp;
-			call_void_function(prg, "run", tmp);
+			call_void_function_obfuscated(prg, "run", tmp);
 
 			mouse_wheel_y = 0;
 
@@ -517,6 +533,10 @@ static void loop()
 			}
 
 			logic_frames++;
+		}
+
+		if (quit) {
+			break;
 		}
 
 		// LOGIC
@@ -530,10 +550,6 @@ static void loop()
 		// DRAWING
 		if (skip_drawing == false && can_draw) {
 			draw_all();
-		}
-
-		if (quit) {
-			break;
 		}
 
 		drawing_frames++;
@@ -801,7 +817,7 @@ int main(int argc, char **argv)
 
 	try {
 		std::string path = save_dir();
-		std::string cfg_text = util::load_text_from_filesystem(path + "/com.illnorth.booboo.launcher.txt");
+		std::string cfg_text = util::load_text_from_filesystem(path + "/com.nooskewl.booboo.launcher.txt");
 		util::Tokenizer t(cfg_text, '\n');
 		std::string line;
 		while ((line = t.next()) != "") {
@@ -879,8 +895,6 @@ again:
 
 	prg = create_program(code);
 
-	register_game_callbacks();
-
 	bool ob = false;
 	for (int i = 1; i < argc; i++) {
 		if (std::string(argv[i]) == "+obfuscate") {
@@ -893,22 +907,24 @@ again:
 		booboo::obfuscate(prg);
 	}
 	else {
+		register_game_callbacks();
+
 		while (interpret(prg)) {
 		}
 
 		if (reset_game_name == "") {
 			go();
 		}
+
+		std::vector<Token> tmp;
+		call_void_function_obfuscated(prg, "end", tmp);
 	}
 
-	std::vector<Token> tmp;
-	call_void_function(prg, "end", tmp);
-	
 	shim::current_shader = shim::default_shader;
 	shim::current_shader->use();
 	gfx::update_projection();
 
-	std::string out_path = save_dir() + "/com.illnorth.booboo.launcher.txt";
+	std::string out_path = save_dir() + "/com.nooskewl.booboo.launcher.txt";
 	FILE *f = fopen(out_path.c_str(), "w");
 	fprintf(f, "fullscreen=%d\n", gfx::is_fullscreen_window());
 	fprintf(f, "invert_mouse_wheel=%d\n", invert_mouse_wheel);
@@ -917,6 +933,8 @@ again:
 
 	Program *tmp_prg = prg;
 	prg = nullptr;
+
+	SDL_Delay(100);
 
 	game_lib_destroy_program(tmp_prg);
 	standard_lib_destroy_program(tmp_prg);
@@ -948,7 +966,7 @@ again:
 	bool relaunch = false;
 	std::string dir;
 	try {
-		std::string cfg_path = path + "/" + "com.illnorth.launcher.reload.txt";
+		std::string cfg_path = path + "/" + "com.nooskewl.launcher.reload.txt";
 		text = util::load_text_from_filesystem(cfg_path);
 
 		util::Tokenizer t(text, '=');

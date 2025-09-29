@@ -20,6 +20,7 @@ static std::map<std::string, int> library_map;
 static std::map<char, booboo::token_func> token_map;
 static std::map<std::string, int> expression_map;
 static std::vector<booboo::expression_func> expression_handlers;
+static std::vector<std::string> special_functions;
 
 // First off maybe 10 utility functions taken from Nooskewl Shim
 
@@ -46,8 +47,10 @@ std::vector<booboo::library_func> library;
 
 static bool is_special(std::string func)
 {
-	if (func == "end" || func == "run" || func == "draw" || func == "lost_device" || func == "found_device" || func == "draw_black_bar" || func == "event" || func == "gui_event" || func == "gui_draw") {
-		return true;
+	for (size_t i = 0; i < special_functions.size(); i++) {
+		if (func == special_functions[i]) {
+			return true;
+		}
 	}
 	return false;
 }
@@ -1436,10 +1439,12 @@ top:
 				backup(prg, func_index, false);
 			}
 
-			std::string nm = is_special(func_name) ? func_name : obfuscated_name(prg);
+			std::string nm = obfuscated_name(prg);
 
-			prg->orig_function_names.push_back(func_name);
-			prg->function_names.push_back(nm);
+			if (pass == PASS1) {
+				prg->orig_function_names.push_back(func_name);
+				prg->function_names.push_back(nm);
+			}
 
 			Variable v;
 			v.name = func_name;
@@ -1915,6 +1920,11 @@ func_top:
 	prg->complete_pass = pass;
 }
 
+void add_special_function(std::string name)
+{
+	special_functions.push_back(name);
+}
+
 void call_function(Program *prg, int function, const std::vector<Token> &params, Variable &result, int ignore_params)
 {
 	Program &func = prg->functions[function];
@@ -1990,6 +2000,26 @@ void call_function(Program *prg, std::string function_name, const std::vector<To
 		return;
 	}
 	call_function(prg, (*it).second, params, result, ignore_params);
+}
+
+void call_function_obfuscated(Program *prg, std::string function_name, const std::vector<Token> &params, Variable &result, int ignore_params)
+{
+	int i;
+	for (i = 0; i < (int)prg->orig_function_names.size(); i++) {
+		if (function_name == prg->orig_function_names[i]) {
+			break;
+		}
+	}
+	if (i >= (int)prg->orig_function_names.size()) {
+		return;
+	}
+	call_function(prg, i, params, result, ignore_params);
+}
+
+void call_void_function_obfuscated(Program *prg, std::string function, const std::vector<Token> &params, int ignore_params)
+{
+	static Variable tmp;
+	call_function_obfuscated(prg, function, params, tmp, ignore_params);
 }
 
 void call_void_function(Program *prg, int function, const std::vector<Token> &params, int ignore_params)
@@ -3797,6 +3827,7 @@ void start()
 void end()
 {
 	library_map.clear();
+	special_functions.clear();
 }
 
 Program *create_program(std::string code)
@@ -3981,7 +4012,7 @@ void obfuscate(Program *prg)
 		printf("function %s ", prg->function_names[i].c_str());
 		for (size_t j = 0; j < prg->functions[i].params.size(); j++) {
 			Variable &var = prg->variables[prg->functions[i].params[j]];
-			printf("%s ", var.obfuscated.c_str());
+			printf("%s%s ", prg->functions[i].ref[j] ? "~" : "", var.obfuscated.c_str());
 		}
 		printf("{");
 		for (size_t j = 0; j < prg->functions[i].s->program.size(); j++) {
