@@ -918,6 +918,8 @@ again:
 
 		std::vector<Token> tmp;
 		call_void_function_obfuscated(prg, "end", tmp);
+
+		unregister_game_callbacks();
 	}
 
 	shim::current_shader = shim::default_shader;

@@ -16,6 +16,7 @@ void start_lib_game();
 void end_lib_game();
 void game_lib_destroy_program(booboo::Program *prg);
 void register_game_callbacks();
+void unregister_game_callbacks();
 
 extern bool is_3d;
 void set_2d();

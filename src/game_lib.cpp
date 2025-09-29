@@ -5055,6 +5055,10 @@ static bool widgetfunc_gui_set_transition_types(Program *prg, const std::vector<
 
 static void black_bars_callback(gfx::Black_Bar_Type type, int x, int y, int w, int h)
 {
+	if (prg == nullptr) {
+		return;
+	}
+
 	SDL_Color c[4];
 
 	// draw a default
@@ -5157,6 +5161,12 @@ void register_game_callbacks()
 {
 	gfx::register_lost_device_callbacks(lost_device_callback, found_device_callback);
 	gfx::register_black_bars_callback(black_bars_callback);
+}
+
+void unregister_game_callbacks()
+{
+	gfx::register_lost_device_callbacks(nullptr, nullptr);
+	gfx::register_black_bars_callback(nullptr);
 }
 
 void start_lib_game()
@@ -5356,52 +5366,52 @@ void end_lib_game()
 void game_lib_destroy_program(Program *prg)
 {
 	MML_Info *mml_i = mml_info(prg);
-	for (size_t i = 0; i < mml_i->mmls.size(); i++) {
-		delete mml_i->mmls[i];
+	for (std::map<int, audio::MML *>::iterator i = mml_i->mmls.begin(); i != mml_i->mmls.end(); i++) {
+		delete mml_i->mmls[(*i).first];
 	}
 	Sample_Info *sample_i = sample_info(prg);
-	for (size_t i = 0; i < sample_i->samples.size(); i++) {
-		delete sample_i->samples[i];
+	for (std::map<int, audio::Sample *>::iterator i = sample_i->samples.begin(); i != sample_i->samples.end(); i++) {
+		delete sample_i->samples[(*i).first];
 	}
 	Image_Info *image_i = image_info(prg);
-	for (size_t i = 0; i < image_i->images.size(); i++) {
-		delete image_i->images[i]->image;
-		delete image_i->images[i];
+	for (std::map<int, Image *>::iterator i = image_i->images.begin(); i != image_i->images.end(); i++) {
+		delete image_i->images[(*i).first]->image;
+		delete image_i->images[(*i).first];
 	}
 	Font_Info *font_i = font_info(prg);
-	for (size_t i = 0; i < font_i->fonts.size(); i++) {
-		delete font_i->fonts[i];
+	for (std::map<int, gfx::TTF *>::iterator i = font_i->fonts.begin(); i != font_i->fonts.end(); i++) {
+		delete font_i->fonts[(*i).first];
 	}
 	Tilemap_Info *tilemap_i = tilemap_info(prg);
-	for (size_t i = 0; i < tilemap_i->tilemaps.size(); i++) {
-		delete tilemap_i->tilemaps[i];
+	for (std::map<int, gfx::Tilemap *>::iterator i = tilemap_i->tilemaps.begin(); i != tilemap_i->tilemaps.end(); i++) {
+		delete tilemap_i->tilemaps[(*i).first];
 	}
 	Sprite_Info *sprite_i = sprite_info(prg);
-	for (size_t i = 0; i < sprite_i->sprites.size(); i++) {
-		delete sprite_i->sprites[i];
+	for (std::map<int, gfx::Sprite *>::iterator i = sprite_i->sprites.begin(); i != sprite_i->sprites.end(); i++) {
+		delete sprite_i->sprites[(*i).first];
 	}
 	Shader_Info *shader_i = shader_info(prg);
-	for (size_t i = 0; i < shader_i->shaders.size(); i++) {
-		delete shader_i->shaders[i];
+	for (std::map<int, gfx::Shader *>::iterator i = shader_i->shaders.begin(); i != shader_i->shaders.end(); i++) {
+		delete shader_i->shaders[(*i).first];
 	}
 	JSON_Info *json_i = json_info(prg);
-	for (size_t i = 0; i < json_i->jsons.size(); i++) {
-		delete json_i->jsons[i];
+	for (std::map<int, util::JSON *>::iterator i = json_i->jsons.begin(); i != json_i->jsons.end(); i++) {
+		delete json_i->jsons[(*i).first];
 	}
 	Model_Info *model_i = model_info(prg);
-	for (size_t i = 0; i < model_i->models.size(); i++) {
-		if (model_i->models[i]->is_clone == false) {
-			delete model_i->models[i]->model;
+	for (std::map<int, Model *>::iterator i = model_i->models.begin(); i != model_i->models.end(); i++) {
+		if (model_i->models[(*i).first]->is_clone == false) {
+			delete model_i->models[(*i).first]->model;
 		}
-		delete model_i->models[i];
+		delete model_i->models[(*i).first];
 	}
 	Billboard_Info *billboard_i = billboard_info(prg);
-	for (size_t i = 0; i < billboard_i->billboards.size(); i++) {
-		delete billboard_i->billboards[i];
+	for (std::map<int, Billboard *>::iterator i = billboard_i->billboards.begin(); i != billboard_i->billboards.end(); i++) {
+		delete billboard_i->billboards[(*i).first];
 	}
 	Widget_Info *widget_i = widget_info(prg);
-	for (size_t i = 0; i < widget_i->widgets.size(); i++) {
-		delete widget_i->widgets[i];
+	for (std::map<int, Widget *>::iterator i = widget_i->widgets.begin(); i != widget_i->widgets.end(); i++) {
+		delete widget_i->widgets[(*i).first];
 	}
 	CFG_Info *cfg_i = cfg_info(prg);
 
