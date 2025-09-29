@@ -1439,7 +1439,7 @@ top:
 				backup(prg, func_index, false);
 			}
 
-			std::string nm = obfuscated_name(prg);
+			std::string nm = is_special(func_name) ? func_name : obfuscated_name(prg);
 
 			if (pass == PASS1) {
 				prg->orig_function_names.push_back(func_name);
