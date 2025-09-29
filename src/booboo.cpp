@@ -46,7 +46,7 @@ std::vector<booboo::library_func> library;
 
 static bool is_special(std::string func)
 {
-	if (func == "run" || func == "draw" || func == "lost_device" || func == "found_device" || func == "draw_black_bar" || func == "event" || func == "gui_event" || func == "gui_draw") {
+	if (func == "end" || func == "run" || func == "draw" || func == "lost_device" || func == "found_device" || func == "draw_black_bar" || func == "event" || func == "gui_event" || func == "gui_draw") {
 		return true;
 	}
 	return false;
