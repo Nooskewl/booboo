@@ -3980,6 +3980,9 @@ static void obfuscate_tokens(Program *prg, std::vector<Token> &v)
 				printf("\"%s\" ", escape_string(v[j].s).c_str());
 				break;
 			case Token::SYMBOL:
+				if (v[j].dereference) {
+					printf("`");
+				}
 				Variable &var = prg->variables[v[j].i];
 				if (var.type == Variable::EXPRESSION) {
 					printf("(%s ", var.e.name.c_str());
