@@ -696,7 +696,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			else if (pass == PASS2) {
 				prg->variables_map[v1.name] = tok.i;
 			}
-
+			
 			prg->variables[tok.i].e = parse_expression(prg, func, new_expr, var_i, expression_i, fish_i, pass);
 		}
 		else if (c == ')') {
@@ -2612,7 +2612,7 @@ bool corefunc_for(Program *prg, const std::vector<Token> &v)
 
 	count.n = as_number(prg, v[1]);
 	Variable &expr = as_variable(prg, v[2]);
-	int increment = as_number(prg, v[3]);
+	double increment = as_number(prg, v[3]);
 	unsigned int end_label = as_label(prg, v[4]);
 
 	CHECK_EXPRESSION(expr)
@@ -2749,16 +2749,20 @@ Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 	}
 	else {
 		Variable &var = get_variable(prg, v[0].i);
+		Variable var2;
 
 		if (IS_EXPRESSION(var)) {
-			var = evaluate_expression(prg, var.e);
+			var2 = evaluate_expression(prg, var.e);
 		}
 		else if (IS_FISH(var)) {
-			var = go_fish(prg, var.f);
+			var2 = go_fish(prg, var.f);
+		}
+		else {
+			var2 = var;
 		}
 
-		if (var.type  == Variable::NUMBER) {
-			double n = var.n;
+		if (var2.type == Variable::NUMBER) {
+			double n = var2.n;
 
 			for (size_t i = 1; i < v.size(); i++) {
 				n += as_number(prg, v[i]);
@@ -2768,8 +2772,8 @@ Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 			ret.n = n;
 			return ret;
 		}
-		else if (IS_STRING(var)) {
-			std::string s = var.s;
+		else if (IS_STRING(var2)) {
+			std::string s = var2.s;
 
 			for (size_t i = 1; i < v.size(); i++) {
 				s += as_string(prg, v[i]);
@@ -2779,8 +2783,8 @@ Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 			ret.s = s;
 			return ret;
 		}
-		else if (IS_VECTOR(var)) {
-			std::vector<Variable> vec = var.v;
+		else if (IS_VECTOR(var2)) {
+			std::vector<Variable> vec = var2.v;
 
 			for (size_t i = 1; i < v.size(); i++) {
 				Variable v2 = as_variable_resolve(prg, v[i]);
@@ -2794,8 +2798,8 @@ Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 			ret.v = vec;
 			return ret;
 		}
-		else if (IS_MAP(var)) {
-			std::map<std::string, Variable> m = var.m;
+		else if (IS_MAP(var2)) {
+			std::map<std::string, Variable> m = var2.m;
 
 			for (size_t i = 1; i < v.size(); i++) {
 				Variable v2 = as_variable_resolve(prg, v[i]);
