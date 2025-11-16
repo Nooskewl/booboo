@@ -1667,6 +1667,8 @@ static bool imagefunc_to_texture(Program *prg, const std::vector<Token> &v)
 
 	gfx::Image *img = new gfx::Image(util::Size<int>(w, h), pixels);
 
+	delete[] pixels;
+
 	Image *i = new Image;
 	i->image = img;
 	i->created = true;
