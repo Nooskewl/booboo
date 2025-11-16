@@ -436,6 +436,23 @@ The following sections describe the API:
 	e.g. image_save img "c:/foo.tga"
 </pre>
 
+<h3>image_read_texture</h3>
+<pre>
+	Read a texture into a vector of colour components
+	e.g. image_read_texture img v
+	e.g. = green [v y x 1]
+</pre>
+
+<h3>image_to_texture</h3>
+<pre>
+	Convert a vector of colour components to a image
+	This uses the same format returned by image_read_texture
+	e.g. image_read_texture img v
+	e.g. = [v y x 3] 255 ; change alpha of a pixel
+	e.g. image_destroy img
+	e.g. image_to_texture img v
+</pre>
+
 <h3>screenshot</h3>
 <pre>
 	Save a screenshot of the backbuffer. TGA and PNG are supported.
