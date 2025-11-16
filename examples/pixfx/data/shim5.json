@@ -1,0 +1,8 @@
+{
+	"shim": {
+		"gfx": {
+			"cursor_hotspot.x": 16,
+			"cursor_hotspot.y": 16
+		}
+	}
+}
