@@ -453,6 +453,14 @@ The following sections describe the API:
 	e.g. image_to_texture img v
 </pre>
 
+<h3>image_update</h3>
+<pre>
+	Update the pixels of an existing texture, rather than creating a
+	new one. It's faster.
+	e.g. image_update img v /* v is in the same format as
+	image_read_texture describes */
+</pre>
+
 <h3>screenshot</h3>
 <pre>
 	Save a screenshot of the backbuffer. TGA and PNG are supported.

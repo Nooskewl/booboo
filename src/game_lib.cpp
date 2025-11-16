@@ -1679,6 +1679,40 @@ static bool imagefunc_to_texture(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool imagefunc_update(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	Variable &v1 = as_variable(prg, v[1]);
+
+	Image_Info *info = image_info(prg);
+
+	INFO_EXISTS(info->images, id)
+
+	gfx::Image *img = info->images[id]->image;
+
+	int w = v1.v.size();
+	int h = v1.v[0].v.size();
+
+	unsigned char *pixels = new unsigned char[w*h*4];
+
+	for (int y = 0; y < h; y++) {
+		for (int x = 0; x < w; x++) {
+			pixels[y*w*4+x*4+0] = v1.v[y].v[x].v[0].n;
+			pixels[y*w*4+x*4+1] = v1.v[y].v[x].v[1].n;
+			pixels[y*w*4+x*4+2] = v1.v[y].v[x].v[2].n;
+			pixels[y*w*4+x*4+3] = v1.v[y].v[x].v[3].n;
+		}
+	}
+
+	img->update(pixels);
+
+	delete[] pixels;
+
+	return true;
+}
+
 static bool fontfunc_load(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(4)
@@ -5304,6 +5338,7 @@ void start_lib_game()
 	add_instruction("image_draw_9patch", imagefunc_draw_9patch);
 	add_instruction("image_read_texture", imagefunc_read_texture);
 	add_instruction("image_to_texture", imagefunc_to_texture);
+	add_instruction("image_update", imagefunc_update);
 	add_instruction("font_load", fontfunc_load);
 	add_instruction("font_destroy", fontfunc_destroy);
 	add_instruction("font_draw", fontfunc_draw);
