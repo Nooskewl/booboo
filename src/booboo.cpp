@@ -3722,6 +3722,19 @@ Variable exprfunc_address(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
+Variable exprfunc_toptr(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	std::string s = as_string(prg, v[0]);
+
+	Variable var;
+	var.type = Variable::POINTER;
+	var.p = &prg->variables[prg->variables_map[s]];
+
+	return var;
+}
+
 static void init_token_map()
 {
 	add_token_handler(':', tokenfunc_label);
@@ -3788,6 +3801,7 @@ void start()
 	add_expression_handler("inverse", exprfunc_inverse);
 	add_expression_handler("transpose", exprfunc_transpose);
 	add_expression_handler("@", exprfunc_address);
+	add_expression_handler("toptr", exprfunc_toptr);
 
 	add_instruction("reset", breaker_reset);
 	add_instruction("exit", breaker_exit);

@@ -9,8 +9,4 @@ data/ directory.
 
 play_mml is an MML music/SFX player.
 
-pack_shader needed for d3d only makes a binary shader from source, as the D3DX library for compiling shaders online isn't used. Requires DirectX 9 SDK in the path.
-
-hlsl/ is the required shaders for D3D usage
-
-These tools need SDL2.dll, located in the root of the BooBoo installation.
+These tools need SDL3.dll, located in the root of the BooBoo installation.
