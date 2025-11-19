@@ -19,11 +19,3 @@ function draw
 {
 	image_stretch_region img 255 255 255 255 0 0 20 20 0 0 640 360 0 0
 }
-
-; This is only required for D3D, otherwise image will be blank on a lost/found event
-function found_device
-{
-	if (== 1 D3D9) redraw
-		call draw_img
-	:redraw
-}
