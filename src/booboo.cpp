@@ -1420,8 +1420,6 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "BAR_BOTTOM", gfx::BAR_BOTTOM, pass, var_i);
 	insert_constant(prg, "BAR_LEFT", gfx::BAR_LEFT, pass, var_i);
 	insert_constant(prg, "BAR_RIGHT", gfx::BAR_RIGHT, pass, var_i);
-	insert_constant(prg, "D3D9", shim::opengl == false, pass, var_i);
-	insert_constant(prg, "OPENGL2", shim::opengl == true, pass, var_i);
 #endif
 
 	bool _is_deref = false;

@@ -1658,10 +1658,11 @@ static bool imagefunc_to_texture(Program *prg, const std::vector<Token> &v)
 
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
-			pixels[y*w*4+x*4+0] = v2.v[y].v[x].v[0].n;
-			pixels[y*w*4+x*4+1] = v2.v[y].v[x].v[1].n;
-			pixels[y*w*4+x*4+2] = v2.v[y].v[x].v[2].n;
-			pixels[y*w*4+x*4+3] = v2.v[y].v[x].v[3].n;
+			int yy = y;
+			pixels[yy*w*4+x*4+0] = v2.v[y].v[x].v[0].n;
+			pixels[yy*w*4+x*4+1] = v2.v[y].v[x].v[1].n;
+			pixels[yy*w*4+x*4+2] = v2.v[y].v[x].v[2].n;
+			pixels[yy*w*4+x*4+3] = v2.v[y].v[x].v[3].n;
 		}
 	}
 
@@ -3091,53 +3092,31 @@ static bool shaderfunc_load(Program *prg, const std::vector<Token> &v)
 		load_from_filesystem = as_number(prg, v[3]);
 	}
 
-	if (shim::opengl) {
-		std::string vs, fs;
-		std::string (*load_text)(std::string filename);
-		if (load_from_filesystem) {
-			load_text = util::load_text_from_filesystem;
-		}
-		else {
-			load_text = util::load_text;
-		}
-		if (vname == "") {
-			vs = DEFAULT_GLSL_VERTEX_SHADER;
-		}
-		else {
-			vs = load_text("gfx/shaders/glsl/" + vname + ".txt");
-		}
-		if (fname == "") {
-			fs = DEFAULT_GLSL_TEXTURED_FRAGMENT_SHADER;
-		}
-		else {
-			fs = load_text("gfx/shaders/glsl/" + fname + ".txt");
-		}
-
-		gfx::Shader::OpenGL_Shader *vert = gfx::Shader::load_opengl_vertex_shader(vs, gfx::Shader::HIGH);
-		gfx::Shader::OpenGL_Shader *frag = gfx::Shader::load_opengl_fragment_shader(fs, gfx::Shader::HIGH);
-
-		shader = new gfx::Shader(vert, frag);
+	std::string vs, fs;
+	std::string (*load_text)(std::string filename);
+	if (load_from_filesystem) {
+		load_text = util::load_text_from_filesystem;
 	}
-#ifdef _WIN32
 	else {
-		gfx::Shader::D3D_Vertex_Shader *vert;
-		gfx::Shader::D3D_Fragment_Shader *frag;
-		if (vname == "") {
-			vert = gfx::Shader::load_d3d_vertex_shader("default_vertex", load_from_filesystem);
-		}
-		else {
-			vert = gfx::Shader::load_d3d_vertex_shader(vname, load_from_filesystem);
-		}
-		if (fname == "") {
-			frag = gfx::Shader::load_d3d_fragment_shader("default_fragment", load_from_filesystem);
-		}
-		else {
-			frag = gfx::Shader::load_d3d_fragment_shader(fname, load_from_filesystem);
-		}
-
-		shader = new gfx::Shader(vert, frag);
+		load_text = util::load_text;
 	}
-#endif
+	if (vname == "") {
+		vs = DEFAULT_GLSL_VERTEX_SHADER;
+	}
+	else {
+		vs = load_text("gfx/shaders/glsl/" + vname + ".txt");
+	}
+	if (fname == "") {
+		fs = DEFAULT_GLSL_TEXTURED_FRAGMENT_SHADER;
+	}
+	else {
+		fs = load_text("gfx/shaders/glsl/" + fname + ".txt");
+	}
+
+	gfx::Shader::OpenGL_Shader *vert = gfx::Shader::load_opengl_vertex_shader(vs, gfx::Shader::HIGH);
+	gfx::Shader::OpenGL_Shader *frag = gfx::Shader::load_opengl_fragment_shader(fs, gfx::Shader::HIGH);
+
+	shader = new gfx::Shader(vert, frag);
 
 	info->shaders[info->shader_id++] = shader;
 
@@ -3540,16 +3519,6 @@ static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
 
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
-/*
-	if (shim::opengl) {
-		glDisable_ptr(GL_SCISSOR_TEST);
-	}
-#ifdef _WIN32
-	else {
-		shim::d3d_device->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
-	}
-#endif
-*/
 
 	model->model->draw_tinted_textured(c);
 
@@ -3729,20 +3698,6 @@ static void lost_device_callback()
 		return;
 	}
 
-#ifdef _WIN32
-	if (shim::opengl == false) {
-		Image_Info *info = image_info(prg);
-		std::map< int, Image * >::iterator it;
-		for (it = info->images.begin(); it != info->images.end(); it++) {
-			Image *img = (*it).second;
-			if (img->created) {
-				delete img->image;
-				img->image = nullptr;
-			}
-		}
-	}
-#endif
-
 	std::vector<Token> v;
 	call_void_function_obfuscated(prg, "lost_device", v, 0);
 }
@@ -3752,19 +3707,6 @@ static void found_device_callback()
 	if (prg == nullptr) {
 		return;
 	}
-
-#ifdef _WIN32
-	if (shim::opengl == false) {
-		Image_Info *info = image_info(prg);
-		std::map< int, Image * >::iterator it;
-		for (it = info->images.begin(); it != info->images.end(); it++) {
-			Image *img = (*it).second;
-			if (img->created) {
-				img->image = new gfx::Image(img->size);
-			}
-		}
-	}
-#endif
 
 	if (is_3d) {
 		set_3d();
@@ -3979,16 +3921,6 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 	
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
-/*
-	if (shim::opengl) {
-		glDisable_ptr(GL_SCISSOR_TEST);
-	}
-#ifdef _WIN32
-	else {
-		shim::d3d_device->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
-	}
-#endif
-*/
 
 	gfx::Vertex_Cache::instance()->start();
 	gfx::Vertex_Cache::instance()->cache_3d_immediate(vert_vec, num_triangles);
@@ -4057,39 +3989,17 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 	
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
-/*
-	if (shim::opengl) {
-		glDisable_ptr(GL_SCISSOR_TEST);
-	}
-#ifdef _WIN32
-	else {
-		shim::d3d_device->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
-	}
-#endif
-*/
 
 	Image_Info *iinfo = image_info(prg);
 	INFO_EXISTS(iinfo->images, tex)
 	gfx::Image *image = iinfo->images[tex]->image;
-	if (shim::opengl) {
-		GLuint texture = image->get_opengl_texture();
-		glBindTexture_ptr(GL_TEXTURE_2D, texture);
-		PRINT_GL_ERROR("glActiveTexture\n");
-		glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		PRINT_GL_ERROR("glTexParameteri\n");
-		glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		PRINT_GL_ERROR("glTexParameteri\n");
-	}
-#ifdef _WIN32
-	else {
-		if (shim::d3d_device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP) != D3D_OK) {
-			util::infomsg("SetSamplerState failed.\n");
-		}
-		if (shim::d3d_device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP) != D3D_OK) {
-			util::infomsg("SetSamplerState failed.\n");
-		}
-	}
-#endif
+	GLuint texture = image->get_opengl_texture();
+	glBindTexture_ptr(GL_TEXTURE_2D, texture);
+	PRINT_GL_ERROR("glActiveTexture\n");
+	glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	PRINT_GL_ERROR("glTexParameteri\n");
+	glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	PRINT_GL_ERROR("glTexParameteri\n");
 	
 	gfx::Vertex_Cache::instance()->start(image);
 	gfx::Vertex_Cache::instance()->cache_3d_immediate(vert_vec, num_triangles);
@@ -4098,22 +4008,10 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 	gfx::enable_depth_test(false);
 	gfx::enable_depth_write(false);
 
-	if (shim::opengl) {
-		glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		PRINT_GL_ERROR("glTexParameteri\n");
-		glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		PRINT_GL_ERROR("glTexParameteri\n");
-	}
-#ifdef _WIN32
-	else {
-		if (shim::d3d_device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP) != D3D_OK) {
-			util::infomsg("SetSamplerState failed.\n");
-		}
-		if (shim::d3d_device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP) != D3D_OK) {
-			util::infomsg("SetSamplerState failed.\n");
-		}
-	}
-#endif
+	glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	PRINT_GL_ERROR("glTexParameteri\n");
+	glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	PRINT_GL_ERROR("glTexParameteri\n");
 
 	return true;
 }
