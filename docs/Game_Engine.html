@@ -52,10 +52,6 @@ draw a letterbox when the window size and aspect ratio you requested don't
 match.
 </p>
 
-<p>lost_device and found_device are other callbacks that get called for example when
-the window resizes. On D3D this means any render targets are invalidated and must be redrawn
-in found_device. See the 'target' example.</p>
-
 <p>
 At startup, global code is run. Then the above mentioned callbacks get called
 at intervals or shutdown.
@@ -74,7 +70,6 @@ few of them:
 </p>
 
 <ul>
-<li>-opengl ; use D3D</li>
 <li>+fullscreen</li>
 <li>+width x</li>
 <li>+height x</li>
@@ -790,9 +785,8 @@ The following sections describe the API:
 <pre>
 	Load a shader
 	e.g. shader_load n "my_vert" "my_frag" ^ lffs
-	When running on OpenGL this will load from
-	data/gfx/shaders/glsl/my_vert.txt. D3D will load
-	data/gfx/shaders/hlsl/my_vert.shader
+	This will load from
+	data/gfx/shaders/glsl/my_vert.txt
 </pre>
 
 <h3>shader_use</h3>
@@ -1798,13 +1792,6 @@ GUI constants:
 	<li>BAR_BOTTOM</li>
 	<li>BAR_LEFT</li>
 	<li>BAR_RIGHT</li>
-</ul>
-
-<p>Other constants:</p>
-
-<ul>
-	<li>D3D9 ; true if the backend is D3D9</li>
-	<li>OPENGL2 ; true if the backend is OpenGL 2</li>
 </ul>
 
 <a id="Events"></a>
