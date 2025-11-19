@@ -194,6 +194,18 @@ Sections:
 	e.g. = `p 10 ; some_num is now 10
 </pre>
 
+<h3>toptr</h3>
+<pre>
+	You can do some basic "reflection" using toptr to get a pointer
+	the to variable with the name in a string.
+	e.g. number foo
+	e.g. = number 10
+	e.g. string bar
+	e.g. = bar "foo"
+	e.g. = `(toptr bar) 1000 ; foo is now 1000
+	You can use this to script BooBoo with function names/etc in a text file.
+</pre>
+
 <a id="Flow"></a>
 <h2>Flow Control</h2>
 
