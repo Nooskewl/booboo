@@ -9,4 +9,6 @@ data/ directory.
 
 play_mml is an MML music/SFX player.
 
+io_scene_goobliata_x - Blender 2.73 model import/exporter
+
 These tools need SDL3.dll, located in the root of the BooBoo installation.
