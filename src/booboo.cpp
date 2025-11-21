@@ -2738,6 +2738,26 @@ static bool corefunc_rand(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool corefunc_explode(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	Variable vec = as_variable_resolve(prg, v[v.size()-1]);
+
+	CHECK_VECTOR(vec)
+
+	for (size_t i = 0; i < v.size()-1; i++) {
+		Variable &v1 = as_variable(prg, v[i]);
+		std::string name = v1.name;
+		std::string obfuscated = v1.obfuscated;
+		v1 = vec.v[i];
+		v1.name = name;
+		v1.obfuscated = obfuscated;
+	}
+
+	return true;
+}
+
 Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 {
 	Variable ret;
@@ -3901,6 +3921,7 @@ void start()
 	add_instruction("if", corefunc_if);
 	
 	add_instruction("rand", corefunc_rand);
+	add_instruction("explode", corefunc_explode);
 	
 	return_code = 0;
 }
