@@ -1134,6 +1134,7 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "FALSE", 0, pass, var_i);
 	insert_constant(prg, "PI", M_PI, pass, var_i);
 	insert_constant(prg, "E", M_E, pass, var_i);
+	insert_pointer(prg, "NULL", nullptr, pass, var_i);
 	insert_constant(prg, "BLACK", 0, pass, var_i);
 	insert_constant(prg, "BLUE", 1, pass, var_i);
 	insert_constant(prg, "GREEN", 2, pass, var_i);
@@ -1142,7 +1143,6 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "PURPLE", 5, pass, var_i);
 	insert_constant(prg, "YELLOW", 6, pass, var_i);
 	insert_constant(prg, "WHITE", 7, pass, var_i);
-	insert_pointer(prg, "NULL", nullptr, pass, var_i);
 #ifndef CLI
 	insert_constant(prg, "KEY_UNKNOWN", TGUIK_UNKNOWN, pass, var_i);
 	insert_constant(prg, "KEY_RETURN", TGUIK_RETURN, pass, var_i);
