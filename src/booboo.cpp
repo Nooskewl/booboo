@@ -1097,6 +1097,25 @@ static void insert_constant(Program *prg, std::string name, double value, Pass p
 	}
 }
 
+static void insert_pointer(Program *prg, std::string name, Variable *value, Pass pass, int &var_i)
+{
+	int var_index = var_i;
+	var_i++;
+	if (pass == PASS2) {
+		prg->variables_map[name] = var_index;
+	}
+	Variable v;
+	v.name = name;
+	v.type = Variable::POINTER;
+	v.p = value;
+	char buf[1000];
+	snprintf(buf, 1000, "%p", value);
+	v.obfuscated = buf;
+	if (pass == PASS1) {
+		prg->variables.push_back(v);
+	}
+}
+
 static void compile(Program *prg, Pass pass)
 {
 	int p_bak = prg->s->p;
@@ -1123,6 +1142,7 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "PURPLE", 5, pass, var_i);
 	insert_constant(prg, "YELLOW", 6, pass, var_i);
 	insert_constant(prg, "WHITE", 7, pass, var_i);
+	insert_pointer(prg, "NULL", nullptr, pass, var_i);
 #ifndef CLI
 	insert_constant(prg, "KEY_UNKNOWN", TGUIK_UNKNOWN, pass, var_i);
 	insert_constant(prg, "KEY_RETURN", TGUIK_RETURN, pass, var_i);
@@ -3058,6 +3078,24 @@ Variable exprfunc_lessequal(Program *prg, const std::vector<Token> &v)
 
 Variable exprfunc_equal(Program *prg, const std::vector<Token> &v)
 {
+	if (v[0].type == Token::SYMBOL) {
+		Variable var1 = as_variable_resolve(prg, v[0]);
+		if (var1.type == Variable::POINTER) {
+			COUNT_ARGS(2)
+			Variable var2 = as_variable_resolve(prg, v[1]);
+			if (var2.type == Variable::POINTER) {
+				Variable var;
+				var.type = Variable::NUMBER;
+				var.name = "-booboo-";
+				var.n = var1.p == var2.p;
+				return var;
+			}
+			else {
+				throw Error(std::string(__FUNCTION__) + ": " + "Invalid comparison to pointer at " + get_error_info(prg));
+			}
+		}
+	}
+
 	bool b = true;
 
 	bool string = v[0].type == Token::STRING ? true : false;
@@ -3093,6 +3131,24 @@ Variable exprfunc_equal(Program *prg, const std::vector<Token> &v)
 
 Variable exprfunc_notequal(Program *prg, const std::vector<Token> &v)
 {
+	if (v[0].type == Token::SYMBOL) {
+		Variable var1 = as_variable_resolve(prg, v[0]);
+		if (var1.type == Variable::POINTER) {
+			COUNT_ARGS(2)
+			Variable var2 = as_variable_resolve(prg, v[1]);
+			if (var2.type == Variable::POINTER) {
+				Variable var;
+				var.type = Variable::NUMBER;
+				var.name = "-booboo-";
+				var.n = var1.p != var2.p;
+				return var;
+			}
+			else {
+				throw Error(std::string(__FUNCTION__) + ": " + "Invalid comparison to pointer at " + get_error_info(prg));
+			}
+		}
+	}
+
 	bool b = true;
 
 	bool string = v[0].type == Token::STRING ? true : false;
@@ -3728,9 +3784,18 @@ Variable exprfunc_toptr(Program *prg, const std::vector<Token> &v)
 
 	std::string s = as_string(prg, v[0]);
 
+	Variable *p;
+
+	if (prg->variables_map.find(s) == prg->variables_map.end()) {
+		p = nullptr;
+	}
+	else {
+		p = &prg->variables[prg->variables_map[s]];
+	}
+
 	Variable var;
 	var.type = Variable::POINTER;
-	var.p = &prg->variables[prg->variables_map[s]];
+	var.p = p;
 
 	return var;
 }
