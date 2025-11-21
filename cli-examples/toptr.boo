@@ -5,9 +5,11 @@ file_read f s
 file_close f
 pointer p
 = p (toptr s)
-if (!= p NULL) go
+if (!= p NULL) go nope
 	call `p
 :go
+	print "NOPE!\n"
+:nope
 function foo
 {
 	print "foo!\n"
