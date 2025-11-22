@@ -3692,33 +3692,6 @@ static bool modelfunc_translate_3d(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static void lost_device_callback()
-{
-	if (prg == nullptr) {
-		return;
-	}
-
-	std::vector<Token> v;
-	call_void_function_obfuscated(prg, "lost_device", v, 0);
-}
-
-static void found_device_callback()
-{
-	if (prg == nullptr) {
-		return;
-	}
-
-	if (is_3d) {
-		set_3d();
-	}
-	else {
-		set_2d();
-	}
-	
-	std::vector<Token> v;
-	call_void_function_obfuscated(prg, "found_device", v, 0);
-}
-
 static bool modelfunc_set_2d(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -5176,14 +5149,10 @@ static void black_bars_callback(gfx::Black_Bar_Type type, int x, int y, int w, i
 
 void register_game_callbacks()
 {
-	gfx::register_lost_device_callbacks(lost_device_callback, found_device_callback);
-	gfx::register_black_bars_callback(black_bars_callback);
 }
 
 void unregister_game_callbacks()
 {
-	gfx::register_lost_device_callbacks(nullptr, nullptr);
-	gfx::register_black_bars_callback(nullptr);
 }
 
 void start_lib_game()
@@ -5371,8 +5340,6 @@ void start_lib_game()
 	add_special_function("end");
 	add_special_function("run");
 	add_special_function("draw");
-	add_special_function("lost_device");
-	add_special_function("found_device");
 	add_special_function("event");
 	add_special_function("gui_event");
 	add_special_function("gui_draw");
