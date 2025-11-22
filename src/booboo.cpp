@@ -604,7 +604,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 	}
 	p++; // skip (
 	std::string name;
-	while (p < (int)expr.length() && !isspace(expr[p]) && expr[p] != '(' && expr[p] != '[') {
+	while (p < (int)expr.length() && !isspace(expr[p]) && expr[p] != '(' && expr[p] != '[' && expr[p] != ')') {
 		char buf[2];
 		buf[0] = expr[p];
 		buf[1] = 0;
@@ -2258,90 +2258,6 @@ bool corefunc_set(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_add(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(2)
-
-	Variable &v1 = as_variable(prg, v[0]);
-
-	for (size_t i = 1; i < v.size(); i++) {
-		if (IS_NUMBER(v1)) {
-			v1.n += as_number(prg, v[i]);
-		}
-		else if (IS_STRING(v1)) {
-			v1.s += as_string(prg, v[i]);
-		}
-		else if (IS_VECTOR(v1)) {
-			Variable &v2 = as_variable(prg, v[i]);
-			if (IS_VECTOR(v2) == false) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-			}
-			else {
-				v1.v.insert(v1.v.end(), v2.v.begin(), v2.v.end());
-			}
-		}
-		else if (IS_MAP(v1)) {
-			Variable &v2 = as_variable(prg, v[i]);
-			if (IS_MAP(v2) == false) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-			}
-			else {
-				v1.m.insert(v2.m.begin(), v2.m.end());
-			}
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-		}
-	}
-
-	return true;
-}
-
-bool corefunc_subtract(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(2)
-
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
-
-	for (size_t i = 1; i < v.size(); i++) {
-		v1.n -= as_number(prg, v[i]);
-	}
-
-	return true;
-}
-
-bool corefunc_multiply(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(2)
-
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)	
-
-	for (size_t i = 1; i < v.size(); i++) {
-		v1.n *= as_number(prg, v[i]);
-	}
-
-	return true;
-}
-
-bool corefunc_divide(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(2)
-
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)	
-
-	for (size_t i = 1; i < v.size(); i++) {
-		v1.n /= as_number(prg, v[i]);
-	}
-
-	return true;
-}
-
 bool corefunc_label(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -2550,74 +2466,30 @@ static std::string typeof_var(Variable &v1)
 	return res;
 }
 
-bool corefunc_typeof(Program *prg, const std::vector<Token> &v)
+Variable exprfunc_typeof(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
-	std::string res;
+	Variable res;
+	res.type = Variable::STRING;
 
-	if (v[1].type != Token::SYMBOL) {
-		if (v[1].type == Token::NUMBER) {
-			res = "number";
+	if (v[0].type != Token::SYMBOL) {
+		if (v[0].type == Token::NUMBER) {
+			res.s = "number";
 		}
-		else if (v[1].type == Token::STRING) {
-			res = "string";
+		else if (v[0].type == Token::STRING) {
+			res.s = "string";
 		}
 		else {
-			res = "unknown";
+			res.s = "unknown";
 		}
 	}
 	else {
-		Variable &v1 = prg->variables[v[1].i];
-
-		if (IS_VECTOR(v1)) {
-			if (v.size() > 2) {
-				std::vector<Variable> *p;
-				p = &v1.v;
-				int index = 0;
-				for (size_t i = 2; i < v.size(); i++) {
-					index = as_number(prg, v[i]);
-					if (i < v.size()-1) {
-						p = &(*p)[index].v;
-					}
-				}
-				Variable &v2 = (*p)[index];
-				res = typeof_var(v2);
-			}
-			else {
-				res = "vector";
-			}
-		}
-		else if (IS_MAP(v1)) {
-			if (v.size() > 2) {
-				std::map<std::string, Variable> *p;
-				p = &v1.m;
-				std::string key = "";
-				for (size_t i = 2; i < v.size(); i++) {
-					key = as_string(prg, v[i]);
-					if (i < v.size()-1) {
-						p = &(*p)[key].m;
-					}
-				}
-				Variable &v2 = (*p)[key];
-				res = typeof_var(v2);
-			}
-			else {
-				res = "map";
-			}
-		}
-		else {
-			res = typeof_var(v1);
-		}
+		Variable &v1 = prg->variables[v[0].i];
+		res.s = typeof_var(v1);
 	}
 
-	Variable &v2 = as_variable(prg, v[0]);
-
-	CHECK_STRING(v2)
-
-	v2.s = res;
-
-	return true;
+	return res;
 }
 
 bool corefunc_for(Program *prg, const std::vector<Token> &v)
@@ -2722,20 +2594,38 @@ bool corefunc_if(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool corefunc_rand(Program *prg, const std::vector<Token> &v)
+Variable exprfunc_time(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(0)
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = (double)time(NULL);
+	return var;
+}
 
-	Variable &v1 = as_variable(prg, v[0]);
+bool corefunc_srand(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
 
-	int min_incl = as_number(prg, v[1]);
-	int max_incl = as_number(prg, v[2]);
+	uint32_t seed = (uint32_t)as_number(prg, v[0]);
 
-	CHECK_NUMBER(v1)
-
-	v1.n = util::rand(min_incl, max_incl);
+	util::srand(seed);
 
 	return true;
+}
+
+static Variable exprfunc_rand(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int min_incl = as_number(prg, v[0]);
+	int max_incl = as_number(prg, v[1]);
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+	v1.n = util::rand(min_incl, max_incl);
+
+	return v1;
 }
 
 static bool corefunc_explode(Program *prg, const std::vector<Token> &v)
@@ -3899,10 +3789,6 @@ void start()
 	add_instruction("pointer", corefunc_pointer);
 	
 	add_instruction("=", corefunc_set);
-	add_instruction("+", corefunc_add);
-	add_instruction("-", corefunc_subtract);
-	add_instruction("*", corefunc_multiply);
-	add_instruction("/", corefunc_divide);
 	
 	add_instruction(":", corefunc_label);
 	add_instruction("goto", corefunc_goto);
@@ -3915,12 +3801,14 @@ void start()
 	add_instruction("jge", corefunc_jge);
 	add_instruction("call", corefunc_call);
 	add_instruction("call_result", corefunc_call_result);
-	add_instruction("typeof", corefunc_typeof);
+	add_expression_handler("typeof", exprfunc_typeof);
 
 	add_instruction("for", corefunc_for);
 	add_instruction("if", corefunc_if);
 	
-	add_instruction("rand", corefunc_rand);
+	add_expression_handler("time", exprfunc_time);
+	add_instruction("srand", corefunc_srand);
+	add_expression_handler("rand", exprfunc_rand);
 	add_instruction("explode", corefunc_explode);
 	
 	return_code = 0;
