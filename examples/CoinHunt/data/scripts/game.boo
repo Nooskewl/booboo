@@ -410,13 +410,13 @@ function bullet_collide bx by
 	vector_set coins i coin
 	mml_play hit_sfx 1 0
 	mml_play shot_coin_sfx 1 0
-	call explode cx cy 64 251 242 54
+	call do_explode cx cy 64 251 242 54
 	? dead 1
 	jne die
 	return 1
 :die
 	= dead 1
-	call explode pos_x pos_y 64 255 255 255
+	call do_explode pos_x pos_y 64 255 255 255
 	return 1
 :skip_it
 	+ i 1
@@ -455,7 +455,7 @@ function bullet_collide bx by
 	vector_set e 2 0
 	vector_set enemies i e
 	mml_play hit_sfx 1 0
-	call explode ex ey 48 223 113 38
+	call do_explode ex ey 48 223 113 38
 	return 1
 :not_a_hit2
 	+ i 1
@@ -465,7 +465,7 @@ function bullet_collide bx by
 	return 0
 }
 
-function explode x y max_r r g b
+function do_explode x y max_r r g b
 {
 	vector e
 	vector_add e x
@@ -1195,8 +1195,8 @@ function run
 	? dx 14
 	jge player_didnt_hit_enemy
 	= dead 1
-	call explode ex ey 48 223 113 38
-	call explode pos_x pos_y 64 255 255 255
+	call do_explode ex ey 48 223 113 38
+	call do_explode pos_x pos_y 64 255 255 255
 	mml_play hit_sfx 1 0
 	vector_set e 2 0
 	vector_set enemies i e
