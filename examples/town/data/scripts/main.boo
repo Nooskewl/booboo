@@ -1,5 +1,5 @@
 var music
-=music (mml_load "music/town.mml")
+= music (mml_load "music/town.mml")
 mml_play music 0.5 1
 
 var pickup
