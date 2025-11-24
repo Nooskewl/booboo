@@ -1220,7 +1220,7 @@ static Variable exprfunc_image_load(Program *prg, const std::vector<Token> &v)
 	Variable v1;
 	v1.type = Variable::NUMBER;
 
-	std::string name = as_string(prg, v[1]);
+	std::string name = as_string(prg, v[0]);
 
 	Image_Info *info = image_info(prg);
 
@@ -5090,10 +5090,10 @@ void start_lib_game()
 	add_instruction("sample_destroy", samplefunc_destroy);
 	add_instruction("sample_play", samplefunc_play);
 	add_instruction("sample_stop", samplefunc_stop);
-	add_expression_handler("joystick_count", exprfunc_joy_count);
+	add_expression_handler("joy_count", exprfunc_joy_count);
 	add_instruction("rumble", joyfunc_rumble);
-	add_expression_handler("joystick_get_button", exprfunc_joy_get_button);
-	add_expression_handler("joystick_get_axis", exprfunc_joy_get_axis);
+	add_expression_handler("joy_get_button", exprfunc_joy_get_button);
+	add_expression_handler("joy_get_axis", exprfunc_joy_get_axis);
 	add_expression_handler("cfg_load", exprfunc_cfg_load);
 	add_instruction("cfg_destroy", cfgfunc_destroy);
 	add_instruction("cfg_save", cfgfunc_save);

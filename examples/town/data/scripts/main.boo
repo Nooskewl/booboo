@@ -1,27 +1,27 @@
-number music
-mml_load music "music/town.mml"
+var music
+=music (mml_load "music/town.mml")
 mml_play music 0.5 1
 
-number pickup
-mml_load pickup "sfx/pickup.mml"
+var pickup
+= pickup (mml_load "sfx/pickup.mml")
 
-number W H
+var W H
 = W 240
 = H 135
 resize W H
 
-number sprite
-sprite_load sprite "pleasant"
+var sprite
+= sprite (sprite_load "pleasant")
 
-number apple_img carrot_img
-image_load apple_img "misc/apple.png"
-image_load carrot_img "misc/carrot.png"
+var apple_img carrot_img
+= apple_img (image_load "misc/apple.png")
+= carrot_img (image_load "misc/carrot.png")
 
-number tilemap
-tilemap_load tilemap "map.wm3"
+var tilemap
+= tilemap (tilemap_load "map.wm3")
 		
-vector anim
-vector frame
+var anim
+var frame
 vector_add frame 8
 vector_add frame 7
 vector_add anim frame
@@ -31,16 +31,16 @@ vector_add frame 7
 vector_add anim frame
 tilemap_set_animated_tiles tilemap 500 4 3 anim
 
-vector collectibles
-vector groups
-tilemap_get_groups tilemap groups
-number num_groups
-vector_size groups num_groups
-number i
+var collectibles
+var groups
+= groups (tilemap_get_groups tilemap)
+var num_groups
+= num_groups (vector_size groups)
+var i
 for i 0 (< i num_groups) 1 next_group
-	vector group
+	var group
 	= group [groups i]
-	vector c
+	var c
 	if (& [group 0] 1) apple carrot
 		vector_add c apple_img
 	:apple
@@ -51,7 +51,7 @@ for i 0 (< i num_groups) 1 next_group
 	vector_add collectibles c
 :next_group
 
-number TILE_SIZE px py dir_x dir_y moving move_count MOVE_TIME
+var TILE_SIZE px py dir_x dir_y moving move_count MOVE_TIME
 = TILE_SIZE 16
 = px 19
 = py 11
@@ -75,7 +75,7 @@ function suffix_from_dirs dx dy
 
 function draw
 {
-	number ox oy sx sy
+	var ox oy sx sy
 
 	= ox (- (+ (/ TILE_SIZE 2) (* px TILE_SIZE)) (/ W 2))
 	= oy (- (+ (/ TILE_SIZE 2) (* py TILE_SIZE)) (/ H 2))
@@ -84,27 +84,26 @@ function draw
 	= sy (* py TILE_SIZE)
 
 	if (== moving 1) draw_moving
-		number dx dy
+		var dx dy
 		= dx dir_x
 		= dy dir_y
-		number inc
+		var inc
 		= inc TILE_SIZE
-		number p
-		= p move_count
-		/ p MOVE_TIME
-		* inc p
-		* dx inc
-		* dy inc
-		+ ox dx
-		+ oy dy
-		+ sx dx
-		+ sy dy
+		var p
+		= p (/ move_count MOVE_TIME)
+		= inc (* inc p)
+		= dx (* dx inc)
+		= dy (* dy inc)
+		= ox (+ ox dx)
+		= oy (+ oy dy)
+		= sx (+ sx dx)
+		= sy (+ sy dy)
 	:draw_moving
 
-	number map_w map_h
-	tilemap_size tilemap map_w map_h
-	* map_w TILE_SIZE
-	* map_h TILE_SIZE
+	var map_w map_h
+	explode (tilemap_size tilemap) map_w map_h
+	= map_w (* map_w TILE_SIZE)
+	= map_h (* map_h TILE_SIZE)
 
 	if (< ox 0) too_left (> ox (- map_w W)) too_right
 		= ox 0
@@ -118,18 +117,18 @@ function draw
 		= oy (- map_h H)
 	:too_down
 
-	number layers
-	tilemap_num_layers tilemap layers
+	var layers
+	= layers (tilemap_num_layers tilemap)
 
 	tilemap_draw tilemap 0 1 (* ox -1) (* oy -1)
 
-	number i
-	number sz
-	vector_size collectibles sz
+	var i
+	var sz
+	= sz (vector_size collectibles)
 	for i 0 (< i sz) 1 next_collectible
-		vector c
-		vector_get collectibles c i
-		number dx dy
+		var c
+		= c [collectibles i]
+		var dx dy
 		= dx (- (* [c 1] TILE_SIZE) ox)
 		= dy (- (* [c 2] TILE_SIZE) oy)
 		image_draw [c 0] 255 255 255 255 dx dy 0 0
@@ -144,11 +143,11 @@ function run
 {
 	include "poll_joystick.inc"
 
-	number map_w map_h
-	tilemap_size tilemap map_w map_h
+	var map_w map_h
+	explode (tilemap_size tilemap) map_w map_h
 
 	if (== moving 1) do_moving not_moving
-		+ move_count 1
+		= move_count (+ move_count 1)
 		if (>= move_count MOVE_TIME) done_moving
 			if (== dir_x -1) check_l (== dir_x 1) check_r (== dir_y -1) check_u (== dir_y 1) check_d
 				if (!= joy_l 1) done_l
@@ -167,28 +166,28 @@ function run
 					= moving 0
 				:done_d
 			:check_d
-			+ px dir_x
-			+ py dir_y
+			= px (+ px dir_x)
+			= py (+ py dir_y)
 			= move_count 0
 			if (== moving 1) check_solids2
-				number xx
-				number yy
+				var xx
+				var yy
 				= xx px
 				= yy py
-				+ xx dir_x
-				+ yy dir_y
-				number s
-				tilemap_is_solid tilemap s xx yy
+				= xx (+ xx dir_x)
+				= yy (+ yy dir_y)
+				var s
+				= s (tilemap_is_solid tilemap xx yy)
 				if (== s 1) stop
 					= moving 0
 				:stop
 			:check_solids2
 			if (== moving 0) stand
-				string suffix
+				var suffix
 				call_result suffix suffix_from_dirs dir_x dir_y
-				string a
+				var a
 				= a "stand"
-				+ a suffix
+				= a (+ a suffix)
 				sprite_set_animation sprite a
 			:stand
 		:done_moving
@@ -215,31 +214,31 @@ function run
 			= dir_y 1
 		:go_down
 		if (== moving 1) check_solids
-			number xx yy
+			var xx yy
 			= xx px
 			= yy py
-			+ xx dir_x
-			+ yy dir_y
+			= xx (+ xx dir_x)
+			= yy (+ yy dir_y)
 			if (== 0 (&& (>= xx 0) (>= yy 0) (< xx map_w) (< yy map_h))) cant_move continue_check
 				= moving 0
 			:cant_move
-				number solid
-				tilemap_is_solid tilemap solid xx yy
+				var solid
+				= solid (tilemap_is_solid tilemap xx yy)
 				if (== 1 solid) cant_move2
 					= moving 0
 				:cant_move2
 			:continue_check
 		:check_solids
-		string suffix
+		var suffix
 		call_result suffix suffix_from_dirs dir_x dir_y
-		string a
+		var a
 		if (== moving 1) walk stand2
 			= a "walk"
-			+ a suffix
+			= a (+ a suffix)
 			sprite_set_animation sprite a
 		:walk
 			= a "stand"
-			+ a suffix
+			= a (+ a suffix)
 			sprite_set_animation sprite a
 		:stand2
 	:not_moving
@@ -247,16 +246,16 @@ function run
 	? joy_a 1
 	jne no_pickup
 
-	number dx dy
+	var dx dy
 	= dx (+ px dir_x)
 	= dy (+ py dir_y)
 
-	number i sz
-	vector_size collectibles sz
+	var i sz
+	= sz (vector_size collectibles)
 	for i 0 (< i sz) 1 next_pickup_check
-		vector c
-		vector_get collectibles c i
-		number cx cy
+		var c
+		= c [collectibles i]
+		var cx cy
 		= cx [c 1]
 		= cy [c 2]
 		if (&& (== cx dx) (== cy dy)) pick_it_up

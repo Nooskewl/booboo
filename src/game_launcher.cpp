@@ -51,16 +51,14 @@ static bool mousefunc_set_relative(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool mousefunc_get_delta(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_mouse_get_delta(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(0)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	Variable &v2 = as_variable(prg, v[1]);
-	
-	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
+	Variable v1;
+	Variable v2;
+	v1.type = Variable::NUMBER;
+	v2.type = Variable::NUMBER;
 
 	if (delta_got == false) {
 		mouse_dx = 0;
@@ -74,61 +72,72 @@ static bool mousefunc_get_delta(Program *prg, const std::vector<Token> &v)
 	mouse_dx = 0;
 	mouse_dy = 0;
 
-	return true;
+	Variable vec;
+	vec.type = Variable::VECTOR;
+	vec.v.push_back(v1);
+	vec.v.push_back(v2);
+
+	return vec;
 }
 
-static bool mousefunc_get_position(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_mouse_get_position(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(0)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	Variable &v2 = as_variable(prg, v[1]);
+	Variable v1;
+	Variable v2;
+	v1.type = Variable::NUMBER;
+	v2.type = Variable::NUMBER;
 	
-	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
-
 	v1.n = mouse_pos.x;
 	v2.n = mouse_pos.y;
 
-	return true;
+	Variable vec;
+	vec.type = Variable::NUMBER;
+	vec.v.push_back(v1);
+	vec.v.push_back(v2);
+
+	return vec;
 }
 
-static bool mousefunc_get_buttons(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_mouse_get_buttons(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(4)
+	COUNT_ARGS(0)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	Variable &v2 = as_variable(prg, v[1]);
-	Variable &v3 = as_variable(prg, v[2]);
-	Variable &v4 = as_variable(prg, v[3]);
+	Variable v1;
+	Variable v2;
+	Variable v3;
+	Variable v4;
+	v1.type = Variable::NUMBER;
+	v2.type = Variable::NUMBER;
+	v3.type = Variable::NUMBER;
+	v4.type = Variable::NUMBER;
 	
-	if (v1.type != Variable::NUMBER || v2.type != Variable::NUMBER || v3.type != Variable::NUMBER || v4.type != Variable::NUMBER) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
-
 	v1.n = mouse_b1;
 	v2.n = mouse_b2;
 	v3.n = mouse_b3;
 	v4.n = mouse_wheel_y;
 
-	return true;
+	Variable vec;
+	vec.type = Variable::VECTOR;
+	vec.v.push_back(v1);
+	vec.v.push_back(v2);
+	vec.v.push_back(v3);
+	vec.v.push_back(v4);
+
+	return vec;
 }
 
 std::list<int> keys_pressed;
 
-static bool keyfunc_get(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_key_get(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	
-	if (v1.type != Variable::NUMBER) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-	}
-
+	Variable v1;
+	v1.type = Variable::NUMBER;
 	bool pressed = false;
-	int checking = as_number(prg, v[1]);
+	int checking = as_number(prg, v[0]);
 
 	for (std::list<int>::iterator it = keys_pressed.begin(); it != keys_pressed.end(); it++) {
 		int &k = *it;
@@ -140,7 +149,7 @@ static bool keyfunc_get(Program *prg, const std::vector<Token> &v)
 
 	v1.n = pressed;
 
-	return true;
+	return v1;
 }
 
 bool start()
@@ -808,10 +817,10 @@ int main(int argc, char **argv)
 	start_lib_game();
 
 	add_instruction("mouse_set_relative", mousefunc_set_relative);
-	add_instruction("mouse_get_delta", mousefunc_get_delta);
-	add_instruction("mouse_get_position", mousefunc_get_position);
-	add_instruction("mouse_get_buttons", mousefunc_get_buttons);
-	add_instruction("key_get", keyfunc_get);
+	add_expression_handler("mouse_get_delta", exprfunc_mouse_get_delta);
+	add_expression_handler("mouse_get_position", exprfunc_mouse_get_position);
+	add_expression_handler("mouse_get_buttons", exprfunc_mouse_get_buttons);
+	add_expression_handler("key_get", exprfunc_key_get);
 
 	try {
 		std::string path = save_dir();
