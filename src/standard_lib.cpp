@@ -39,22 +39,22 @@ File_Info *file_info(Program *prg)
 	return info;
 }
 
-bool corefunc_getenv(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_getenv(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string get = as_string(prg, v[1]);
-
-	CHECK_STRING(v1)
+	std::string get = as_string(prg, v[0]);
 
 	char *ptr = getenv(get.c_str());
-	v1.s = ptr == nullptr ? "" : ptr;
 
-	return true;
+	Variable var;
+	var.type = Variable::STRING;
+	var.s = ptr == nullptr ? "" : ptr;
+
+	return var;
 }
 
-bool corefunc_print(Program *prg, const std::vector<Token> &v)
+static bool corefunc_print(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 
@@ -222,13 +222,12 @@ bool corefunc_print(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_input(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_input(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	COUNT_ARGS(0)
 
-	Variable &var = as_variable(prg, v[0]);
-
-	CHECK_STRING(var)
+	Variable var;
+	var.type = Variable::STRING;
 
 	if (std::cin.eof()) {
 		var.s = "";
@@ -237,10 +236,10 @@ bool corefunc_input(Program *prg, const std::vector<Token> &v)
 		std::cin >> var.s;
 	}
 
-	return true;
+	return var;
 }
 
-bool corefunc_mkdir(Program *prg, const std::vector<Token> &v)
+static bool corefunc_mkdir(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -251,34 +250,33 @@ bool corefunc_mkdir(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_get_system_language(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_get_system_language(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	COUNT_ARGS(0)
 
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_STRING(v1)
-
+	Variable v1;
+	v1.type = Variable::STRING;
 	v1.s = util::get_system_language();
 
-	return true;
+	return v1;
 }
 
-bool corefunc_get_full_path(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_get_full_path(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	std::string str = as_string(prg, v[0]);
 
-	CHECK_STRING(v1)
+	Variable v1;
+	v1.type = Variable::STRING;
 
 #ifdef _WIN32
 	char buf[MAX_PATH];
-	GetFullPathName(v1.s.c_str(), MAX_PATH, buf, NULL);
+	GetFullPathName(str.c_str(), MAX_PATH, buf, NULL);
 	v1.s = buf;
 #else
 	char buf[PATH_MAX];
-	v1.s = realpath(v1.s.c_str(), buf);
+	v1.s = realpath(str.c_str(), buf);
 	if (v1.s != "/") {
 		struct stat s;
 		if (stat(v1.s.c_str(), &s) == 0) {
@@ -289,18 +287,15 @@ bool corefunc_get_full_path(Program *prg, const std::vector<Token> &v)
 	}
 #endif
 
-	return true;
+	return v1;
 }
 
-bool corefunc_list_drives(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_list_drives(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	COUNT_ARGS(0)
 
-	Variable &vec = as_variable(prg, v[0]);
-
-	CHECK_VECTOR(vec)	
-
-	vec.v.clear();
+	Variable vec;
+	vec.type = Variable::VECTOR;
 
 #ifdef _WIN32
 	DWORD d = GetLogicalDrives();
@@ -318,18 +313,17 @@ bool corefunc_list_drives(Program *prg, const std::vector<Token> &v)
 	}
 #endif
 
-	return true;
+	return vec;
 }
 
-bool corefunc_list_directory(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_list_directory(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
-	Variable &vec = as_variable(prg, v[0]);
+	Variable vec;
+	vec.type = Variable::VECTOR;
 
-	CHECK_VECTOR(vec)
-
-	std::string glob = as_string(prg, v[1]);
+	std::string glob = as_string(prg, v[0]);
 
 	std::string path_part;
 	int p = glob.length() - 1;
@@ -345,8 +339,6 @@ bool corefunc_list_directory(Program *prg, const std::vector<Token> &v)
 	util::List_Directory l(glob);
 
 	std::string fn;
-
-	vec.v.clear();
 
 	while ((fn = l.next()) != "") {
 		if (fn == "." || fn == "..") {
@@ -371,16 +363,17 @@ bool corefunc_list_directory(Program *prg, const std::vector<Token> &v)
 		vec.v.push_back(v);
 	}
 
-	return true;
+	return vec;
 }
 
-bool stringfunc_format(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_string_format(Program *prg, const std::vector<Token> &v)
 {
-	MIN_ARGS(2)
+	MIN_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string fmt = as_string(prg, v[1]);
-	int _tok = 2;
+	Variable v1;
+
+	std::string fmt = as_string(prg, v[0]);
+	int _tok = 1;
 	
 	int prev = 0;
 	int arg_count = 0;
@@ -532,140 +525,142 @@ bool stringfunc_format(Program *prg, const std::vector<Token> &v)
 	v1.type = Variable::STRING;
 	v1.s = result;
 
-	return true;
+	return v1;
 }
 
-bool stringfunc_char_at(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_string_char_at(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string s = as_string(prg, v[1]);
-	int index = as_number(prg, v[2]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
+	
+	std::string s = as_string(prg, v[0]);
+	int index = as_number(prg, v[1]);
 
 	uint32_t value = util::utf8_char(s, index);
 
-	CHECK_NUMBER(v1)
-	
 	v1.n = value;
 
-	return true;
+	return v1;
 }
 
-bool stringfunc_length(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_string_length(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string s = as_string(prg, v[1]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
-	CHECK_NUMBER(v1)
-		
+	std::string s = as_string(prg, v[0]);
+
 	v1.n = util::utf8_len(s);
 
-	return true;
+	return v1;
 }
 
-bool stringfunc_from_number(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_string_from_number(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	uint32_t n = as_number(prg, v[1]);
+	Variable v1;
+       	v1.type = Variable::STRING;
 
-	CHECK_STRING(v1)
-	
+	uint32_t n = as_number(prg, v[0]);
+
 	v1.s = util::utf8_char_to_string(n);
 
-	return true;
+	return v1; 
 }
 
-bool stringfunc_substr(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_string_substr(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::STRING;
+
+	std::string str = as_string(prg, v[0]);
+
 	int start = as_number(prg, v[1]);
 	int count = -1;
-
-	CHECK_STRING(v1)	
 
 	if (v.size() >= 3) {
 		count = as_number(prg, v[2]);
 	}
 
-	v1.s = util::utf8_substr(v1.s, start, count);
+	v1.s = util::utf8_substr(str, start, count);
 
-	return true;
+	return v1;
 }
 
-bool stringfunc_uppercase(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_string_uppercase(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::STRING;
 
-	CHECK_STRING(v1)
-	
-	v1.s = util::uppercase(v1.s);
+	std::string str = as_string(prg, v[0]);
 
-	return true;
+	v1.s = util::uppercase(str);
+
+	return v1;
 }
 
-bool stringfunc_lowercase(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_string_lowercase(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::STRING;
 
-	CHECK_STRING(v1)
-		
-	v1.s = util::lowercase(v1.s);
+	std::string str = as_string(prg, v[0]);
 
-	return true;
+	v1.s = util::lowercase(str);
+
+	return v1;
 }
 
-bool stringfunc_trim(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_string_trim(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::STRING;
 
-	CHECK_STRING(v1)
-	
-	v1.s = util::trim(v1.s);
+	std::string str = as_string(prg, v[0]);
 
-	return true;
+	v1.s = util::trim(str);
+
+	return v1;
 }
 
-bool stringfunc_replace(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_string_replace(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::STRING;
 
-	CHECK_STRING(v1)	
-
+	std::string str = as_string(prg, v[0]);
 	std::string regex = as_string(prg, v[1]);
 	std::string fmt = as_string(prg, v[2]);
 
-	v1.s = std::regex_replace(v1.s.c_str(), std::regex(regex), fmt.c_str());
+	v1.s = std::regex_replace(str, std::regex(regex), fmt.c_str());
 
-	return true;
+	return v1;
 }
 
-bool stringfunc_match(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_string_match(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::VECTOR;
 
-	CHECK_VECTOR(v1)	
-
-	std::string str = as_string(prg, v[1]);
-	std::string regex = as_string(prg, v[2]);
-
-	v1.v.clear();
+	std::string str = as_string(prg, v[0]);
+	std::string regex = as_string(prg, v[1]);
 
 	std::smatch match;
 
@@ -680,317 +675,299 @@ bool stringfunc_match(Program *prg, const std::vector<Token> &v)
 		}
 	}
 
-	return true;
+	return v1;
 }
 
-bool stringfunc_matches(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_string_matches(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string str = as_string(prg, v[1]);
-	std::string regex = as_string(prg, v[2]);
+	Variable v1;
+       	v1.type = Variable::NUMBER;
+	std::string str = as_string(prg, v[0]);
+	std::string regex = as_string(prg, v[1]);
 
-	CHECK_NUMBER(v1)
-		
 	v1.n = std::regex_search(str, std::regex(regex));
 
-	return true;
+	return v1;
 }
 
-bool mathfunc_sin(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_math_sin(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
-	CHECK_NUMBER(v1)
-	
-	v1.n = sin(v1.n);
+	v1.n = sin(as_number(prg, v[0]));
 
-	return true;
+	return v1;
 }
 
-bool mathfunc_cos(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_math_cos(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
-	CHECK_NUMBER(v1)
+	v1.n = cos(as_number(prg, v[0]));
 
-	v1.n = cos(v1.n);
-
-	return true;
+	return v1;
 }
 
-bool mathfunc_tan(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_math_tan(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
-	CHECK_NUMBER(v1)
-		
-	v1.n = tan(v1.n);
+	v1.n = tan(as_number(prg, v[0]));
 
-	return true;
+	return v1;
 }
 
-bool mathfunc_asin(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_math_asin(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
-	CHECK_NUMBER(v1)
-		
-	v1.n = asin(v1.n);
+	v1.n = asin(as_number(prg, v[0]));
 
-	return true;
+	return v1;
 }
 
-bool mathfunc_acos(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_math_acos(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
-	CHECK_NUMBER(v1)
+	v1.n = acos(as_number(prg, v[0]));
 
-		
-	v1.n = acos(v1.n);
-
-	return true;
+	return v1;
 }
 
-bool mathfunc_atan(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_math_atan(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	v1.n = atan(as_number(prg, v[0]));
+
+	return v1;
+}
+
+static Variable exprfunc_math_atan2(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
-	CHECK_NUMBER(v1)
-		
-	v1.n = atan(v1.n);
+	v1.n = atan2(as_number(prg, v[0]), as_number(prg, v[1]));
 
-	return true;
+	return v1;
 }
 
-bool mathfunc_atan2(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_math_abs(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+		
+	v1.n = fabs(as_number(prg, v[0]));
+
+	return v1;
+}
+
+static Variable exprfunc_math_pow(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
-	CHECK_NUMBER(v1)
-		
-	v1.n = atan2(v1.n, as_number(prg, v[1]));
+	v1.n = pow(as_number(prg, v[0]), as_number(prg, v[1]));
 
-	return true;
+	return v1;
 }
 
-bool mathfunc_abs(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_math_sqrt(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
-	CHECK_NUMBER(v1)
-		
-	v1.n = fabs(v1.n);
+	v1.n = sqrt(as_number(prg, v[0]));
 
-	return true;
+	return v1;
 }
 
-bool mathfunc_pow(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_math_floor(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	v1.n = floor(as_number(prg, v[0]));
+
+	return v1;
+}
+
+static Variable exprfunc_math_ceil(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	v1.n = ceil(as_number(prg, v[0]));
+
+	return v1;
+}
+
+static Variable exprfunc_math_neg(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	v1.n = -as_number(prg, v[0]);
+
+	return v1;
+}
+
+static Variable exprfunc_math_intmod(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+       	v1.type = Variable::NUMBER;
 
-	CHECK_NUMBER(v1)
-		
-	v1.n = pow(v1.n, as_number(prg, v[1]));
+	int n1 = (int)as_number(prg, v[0]);
+	int n2 = (int)as_number(prg, v[1]);
 
-	return true;
+	v1.n = n1 % n2;
+
+	return v1;
 }
 
-bool mathfunc_sqrt(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
-		
-	v1.n = sqrt(v1.n);
-
-	return true;
-}
-
-bool mathfunc_floor(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
-
-	v1.n = floor(v1.n);
-
-	return true;
-}
-
-bool mathfunc_ceil(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
-
-	v1.n = ceil(v1.n);
-
-	return true;
-}
-
-bool mathfunc_neg(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
-		
-	v1.n = -v1.n;
-
-	return true;
-}
-
-bool mathfunc_intmod(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_math_fmod(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	int d = as_number(prg, v[1]);
+	Variable v1;
+       	v1.type = Variable::NUMBER;
 
-	CHECK_NUMBER(v1)
-		
-	v1.n = int(v1.n) % int(d);
+	double n1 = as_number(prg, v[0]);
+	double n2 = as_number(prg, v[1]);
 
-	return true;
+	v1.n = fmod(n1, n2);
+
+	return v1;
 }
 
-bool mathfunc_fmod(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_math_sign(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+		
+	v1.n = sign(as_number(prg, v[0]));
+
+	return v1;
+}
+
+static Variable exprfunc_math_exp(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+		
+	v1.n = exp(as_number(prg, v[0]));
+
+	return v1;
+}
+
+static Variable exprfunc_math_hypot(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	double d = as_number(prg, v[1]);
-
-	CHECK_NUMBER(v1)
+	Variable v1;
+	v1.type = Variable::NUMBER;
 		
-	v1.n = fmod(v1.n, d);
+	v1.n = hypot(as_number(prg, v[0]), as_number(prg, v[1]));
 
-	return true;
+	return v1;
 }
 
-bool mathfunc_sign(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_math_log(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
+	Variable v1;
+	v1.type = Variable::NUMBER;
 		
-	v1.n = sign(v1.n);
+	v1.n = log(as_number(prg, v[0]));
 
-	return true;
+	return v1;
 }
 
-bool mathfunc_exp(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_math_log10(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
+	Variable v1;
+	v1.type = Variable::NUMBER;
 		
-	v1.n = exp(v1.n);
+	v1.n = log10(as_number(prg, v[0]));
 
-	return true;
+	return v1;
 }
 
-bool mathfunc_hypot(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_math_min(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	MIN_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
-	CHECK_NUMBER(v1)
-		
-	v1.n = hypot(v1.n, as_number(prg, v[1]));
+	v1.n = as_number(prg, v[0]);
 
-	return true;
-}
-
-bool mathfunc_log(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
-		
-	v1.n = log(v1.n);
-
-	return true;
-}
-
-bool mathfunc_log10(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
-		
-	v1.n = log10(v1.n);
-
-	return true;
-}
-
-bool mathfunc_min(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(3)
-
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
-
-	v1.n = as_number(prg, v[1]);
-
-	for (size_t i = 2; i < v.size(); i++) {
+	for (size_t i = 1; i < v.size(); i++) {
 		v1.n = MIN(v1.n, as_number(prg, v[i]));
 	}
 
-	return true;
+	return v1;
 }
 
-bool mathfunc_max(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_math_max(Program *prg, const std::vector<Token> &v)
 {
-	MIN_ARGS(3)
+	MIN_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
-	CHECK_NUMBER(v1)
+	v1.n = as_number(prg, v[0]);
 
-	v1.n = as_number(prg, v[1]);
-
-	for (size_t i = 2; i < v.size(); i++) {
+	for (size_t i = 1; i < v.size(); i++) {
 		v1.n = MAX(v1.n, as_number(prg, v[i]));
 	}
 
-	return true;
+	return v1;
 }
 
 static bool vectorfunc_init(Program *prg, const std::vector<Token> &v)
@@ -1042,81 +1019,19 @@ static bool vectorfunc_add(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool vectorfunc_size(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_vector_size(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	Variable id = as_variable_resolve(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
 
 	CHECK_VECTOR(id)
-	CHECK_NUMBER(v1)
-		
-	v1.n = id.v.size();
-
-	return true;
-}
-
-static bool vectorfunc_set(Program *prg, const std::vector<Token> &v)
-{
-	Variable &id = as_variable(prg, v[0]);
-	int val_index = v.size() - 1;
-	std::vector<int> indices;
-
-	MIN_ARGS(3)
-
-	CHECK_VECTOR(id)
-
-	for (int i = 1; i < val_index; i++) {
-		indices.push_back(as_number(prg, v[i]));
-	}
-
+	
 	Variable var;
+	var.type = Variable::VECTOR;
+	var.n = id.v.size();
 
-	if (v[val_index].type == Token::NUMBER) {
-		var.type = Variable::NUMBER;
-		var.name = "-booboo-";
-		var.n = v[val_index].n;
-	}
-	else if (v[val_index].type == Token::SYMBOL) {
-		var = as_variable(prg, v[val_index]);
-	}
-	else {
-		var.type = Variable::STRING;
-		var.name = "-booboo-";
-		var.s = v[2].s;
-	}
-
-	std::vector<Variable> *p = nullptr;
-
-	for (size_t i = 0; i < indices.size()-1; i++) {
-		int index = indices[i];
-		if (p == nullptr) {
-			if (index < 0 || index >= (int)id.v.size()) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
-			}
-			p = &id.v[index].v;
-		}
-		else {
-			if (index < 0 || index >= (int)(*p).size()) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
-			}
-			p = &(*p)[index].v;
-		}
-	}
-			
-	if (p == nullptr) {
-		p = &id.v;
-	}
-
-	if (v[0].dereference) {
-		*((*p)[indices[indices.size()-1]]).p = var;
-	}
-	else {
-		(*p)[indices[indices.size()-1]] = var;
-	}
-
-	return true;
+	return var;
 }
 
 static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
@@ -1149,55 +1064,6 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 	}
 
 	id.v.insert(id.v.begin()+index, var);
-
-	return true;
-}
-
-static bool vectorfunc_get(Program *prg, const std::vector<Token> &v)
-{
-	Variable &id = as_variable(prg, v[0]);
-	std::vector<int> indices;
-
-	MIN_ARGS(3)
-
-	CHECK_VECTOR(id)
-
-	for (size_t i = 2; i < v.size(); i++) {
-		int index = as_number(prg, v[i]);
-		indices.push_back(index);
-	}
-
-	std::vector<Variable> *p = nullptr;
-
-	for (size_t i = 0; i < indices.size(); i++) {
-		int index = indices[i];
-		if (i == indices.size()-1) {
-			if (p == nullptr) {
-				p = &id.v;
-			}
-			if (index < 0 || index >= (int)(*p).size()) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
-			}
-			Variable &v1 = as_variable(prg, v[1]);
-			std::string bak = v1.name;
-			v1 = (*p)[index];
-			v1.name = bak;
-		}
-		else {
-			if (p == nullptr) {
-				if (index < 0 || index >= (int)id.v.size()) {
-					throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
-				}
-				p = &id.v[index].v;
-			}
-			else {
-				if (index < 0 || index >= (int)(*p).size()) {
-					throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
-				}
-				p = &(*p)[index].v;
-			}
-		}
-	}
 
 	return true;
 }
@@ -1248,83 +1114,6 @@ static bool vectorfunc_reserve(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool mapfunc_set(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(3)
-
-	Variable &id = as_variable(prg, v[0]);
-
-	CHECK_MAP(id)
-
-	Variable var;
-	int val_index = v.size()-1;
-
-	if (v[val_index].type == Token::NUMBER) {
-		var.type = Variable::NUMBER;
-		var.name = "-booboo-";
-		var.n = v[val_index].n;
-	}
-	else if (v[val_index].type == Token::SYMBOL) {
-		var = as_variable(prg, v[val_index]);
-		if (IS_FISH(var)) {
-			var = go_fish(prg, var.f);
-		}
-		else if (IS_EXPRESSION(var)) {
-			var = evaluate_expression(prg, var.e);
-		}
-	}
-	else {
-		var.type = Variable::STRING;
-		var.name = "-booboo-";
-		var.s = v[val_index].s;
-	}
-
-	std::map<std::string, Variable> *p = &id.m;
-	std::string key;
-
-	for (size_t i = 1; i < (size_t)val_index; i++) {
-		key = as_string(prg, v[i]);
-		if ((int)i < val_index-1) {
-			p = &(*p)[key].m;
-		}
-	}
-
-	if (v[0].dereference) {
-		*((*p)[key]).p = var;
-	}
-	else {
-		(*p)[key] = var;
-	}
-
-	return true;
-}
-
-static bool mapfunc_get(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(3)
-
-	Variable &id = as_variable(prg, v[0]);
-
-	CHECK_MAP(id)
-
-	std::map<std::string, Variable> *p = &id.m;
-	std::string key;
-
-	for (size_t i = 2; i < v.size(); i++) {
-		key = as_string(prg, v[i]);
-		if (i < v.size()-1) {
-			p = &(*p)[key].m;
-		}
-	}
-
-	Variable &v1 = as_variable(prg, v[1]);
-	std::string bak = v1.name;
-	v1 = (*p)[key];
-	v1.name = bak;
-
-	return true;
-}
-
 static bool mapfunc_clear(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -1358,19 +1147,18 @@ static bool mapfunc_erase(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool mapfunc_keys(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_map_keys(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	Variable m = as_variable_resolve(prg, v[0]);
-	Variable &vec_var = as_variable(prg, v[1]);
 
 	CHECK_MAP(m)
-	CHECK_VECTOR(vec_var)
-
-	vec_var.v.clear();
 
 	std::map<std::string, Variable>::iterator it;
+
+	Variable v1;
+	v1.type = Variable::VECTOR;
 
 	for (it = m.m.begin(); it != m.m.end(); it++) {
 		std::pair<std::string, Variable> p = *it;
@@ -1378,24 +1166,23 @@ static bool mapfunc_keys(Program *prg, const std::vector<Token> &v)
 		var.type = Variable::STRING;
 		var.name = "-booboo-";
 		var.s = p.first;
-		vec_var.v.push_back(var);
+		v1.v.push_back(var);
 	}
 
-	return true;
+	return v1;
 }
 
-static bool filefunc_open(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_file_open(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string filename = as_string(prg, v[1]);
-	std::string mode = as_string(prg, v[2]);
+	std::string filename = as_string(prg, v[0]);
+	std::string mode = as_string(prg, v[1]);
 	
 	File_Info *info = file_info(prg);
 
-	CHECK_NUMBER(v1)
-		
+	Variable v1;
+	v1.type = Variable::NUMBER;
 	v1.n = info->file_id;
 
 	std::fstream *f = new std::fstream;
@@ -1415,12 +1202,12 @@ static bool filefunc_open(Program *prg, const std::vector<Token> &v)
 
 	if (f->fail()) {
 		v1.n = -1;
-		return true;
+		return v1;
 	}
 
 	info->files[info->file_id++] = f;
 
-	return true;
+	return v1;
 }
 
 static bool filefunc_close(Program *prg, const std::vector<Token> &v)
@@ -1436,30 +1223,30 @@ static bool filefunc_close(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool filefunc_read(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_file_read(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
 	int id = as_number(prg, v[0]);
-	Variable &var = as_variable(prg, v[1]);
 
-	CHECK_STRING(var)
+	Variable var;
+	var.type = Variable::STRING;
 
 	File_Info *info = file_info(prg);
 
 	(*info->files[id]) >> var.s;
 
-	return true;
+	return var;
 }
 
-static bool filefunc_read_line(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_file_read_line(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	Variable &var = as_variable(prg, v[1]);
 
-	CHECK_STRING(var)
+	Variable var;
+	var.type = Variable::STRING;
 
 	File_Info *info = file_info(prg);
 
@@ -1470,7 +1257,7 @@ static bool filefunc_read_line(Program *prg, const std::vector<Token> &v)
 		std::getline(*info->files[id], var.s);
 	}
 
-	return true;
+	return var;
 }
 
 static bool filefunc_write(Program *prg, const std::vector<Token> &v)
@@ -1649,82 +1436,7 @@ bool filefunc_print(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool bitfunc_or(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(2)
-
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
-
-	for (size_t i = 1; i < v.size(); i++) {
-		v1.n = (int)v1.n | (int)as_number(prg, v[i]);
-	}
-
-	return true;
-}
-
-bool bitfunc_xor(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(2)
-
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
-
-	for (size_t i = 1; i < v.size(); i++) {
-		v1.n = (int)v1.n ^ (int)as_number(prg, v[i]);
-	}
-
-	return true;
-}
-
-bool bitfunc_and(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(2)
-
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
-
-	for (size_t i = 1; i < v.size(); i++) {
-		v1.n = (int)v1.n & (int)as_number(prg, v[i]);
-	}
-
-	return true;
-}
-
-bool bitfunc_leftshift(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(2)
-
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
-
-	for (size_t i = 1; i < v.size(); i++) {
-		v1.n = (int)v1.n << (int)as_number(prg, v[i]);
-	}
-
-	return true;
-}
-
-bool bitfunc_rightshift(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(2)
-
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
-
-	for (size_t i = 1; i < v.size(); i++) {
-		v1.n = (int)v1.n >> (int)as_number(prg, v[i]);
-	}
-
-	return true;
-}
-
-bool twinklefunc_colour(Program *prg, const std::vector<Token> &v)
+static bool twinklefunc_colour(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
@@ -1738,7 +1450,7 @@ bool twinklefunc_colour(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool twinklefunc_reset(Program *prg, const std::vector<Token> &v)
+static bool twinklefunc_reset(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
@@ -1747,20 +1459,19 @@ bool twinklefunc_reset(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool twinklefunc_getch(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_twinkle_getch(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	COUNT_ARGS(0)
 	
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
-	CHECK_NUMBER(v1)
-	
 	v1.n = twinkle::getch();
 
-	return true;
+	return v1;
 }
 
-bool twinklefunc_clear(Program *prg, const std::vector<Token> &v)
+static bool twinklefunc_clear(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
@@ -1771,82 +1482,72 @@ bool twinklefunc_clear(Program *prg, const std::vector<Token> &v)
 
 void start_lib_standard()
 {
-	add_instruction("getenv", corefunc_getenv);
-	add_instruction("list_directory", corefunc_list_directory);
+	add_expression_handler("getenv", exprfunc_getenv);
+	add_expression_handler("list_directory", exprfunc_list_directory);
 	add_instruction("print", corefunc_print);
-	add_instruction("input", corefunc_input);
+	add_expression_handler("input", exprfunc_input);
 	add_instruction("mkdir", corefunc_mkdir);
-	add_instruction("get_system_language", corefunc_get_system_language);
-	add_instruction("get_full_path", corefunc_get_full_path);
-	add_instruction("list_drives", corefunc_list_drives);
+	add_expression_handler("get_system_language", exprfunc_get_system_language);
+	add_expression_handler("get_full_path", exprfunc_get_full_path);
+	add_expression_handler("list_drives", exprfunc_list_drives);
 
-	add_instruction("string_format", stringfunc_format);
-	add_instruction("string_char_at", stringfunc_char_at);
-	add_instruction("string_length", stringfunc_length);
-	add_instruction("string_from_number", stringfunc_from_number);
-	add_instruction("string_substr", stringfunc_substr);
-	add_instruction("string_uppercase", stringfunc_uppercase);
-	add_instruction("string_lowercase", stringfunc_lowercase);
-	add_instruction("string_trim", stringfunc_trim);
-	add_instruction("string_replace", stringfunc_replace);
-	add_instruction("string_match", stringfunc_match);
-	add_instruction("string_matches", stringfunc_matches);
+	add_expression_handler("string_format", exprfunc_string_format);
+	add_expression_handler("string_char_at", exprfunc_string_char_at);
+	add_expression_handler("string_length", exprfunc_string_length);
+	add_expression_handler("string_from_number", exprfunc_string_from_number);
+	add_expression_handler("string_substr", exprfunc_string_substr);
+	add_expression_handler("string_uppercase", exprfunc_string_uppercase);
+	add_expression_handler("string_lowercase", exprfunc_string_lowercase);
+	add_expression_handler("string_trim", exprfunc_string_trim);
+	add_expression_handler("string_replace", exprfunc_string_replace);
+	add_expression_handler("string_match", exprfunc_string_match);
+	add_expression_handler("string_matches", exprfunc_string_matches);
 
-	add_instruction("sin", mathfunc_sin);
-	add_instruction("cos", mathfunc_cos);
-	add_instruction("tan", mathfunc_tan);
-	add_instruction("asin", mathfunc_asin);
-	add_instruction("acos", mathfunc_acos);
-	add_instruction("atan", mathfunc_atan);
-	add_instruction("atan2", mathfunc_atan2);
-	add_instruction("abs", mathfunc_abs);
-	add_instruction("pow", mathfunc_pow);
-	add_instruction("sqrt", mathfunc_sqrt);
-	add_instruction("floor", mathfunc_floor);
-	add_instruction("ceil", mathfunc_ceil);
-	add_instruction("neg", mathfunc_neg);
-	add_instruction("%", mathfunc_intmod);
-	add_instruction("fmod", mathfunc_fmod);
-	add_instruction("sign", mathfunc_sign);
-	add_instruction("exp", mathfunc_exp);
-	add_instruction("hypot", mathfunc_hypot);
-	add_instruction("log", mathfunc_log);
-	add_instruction("log10", mathfunc_log10);
-	add_instruction("min", mathfunc_min);
-	add_instruction("max", mathfunc_max);
+	add_expression_handler("sin", exprfunc_math_sin);
+	add_expression_handler("cos", exprfunc_math_cos);
+	add_expression_handler("tan", exprfunc_math_tan);
+	add_expression_handler("asin", exprfunc_math_asin);
+	add_expression_handler("acos", exprfunc_math_acos);
+	add_expression_handler("atan", exprfunc_math_atan);
+	add_expression_handler("atan2", exprfunc_math_atan2);
+	add_expression_handler("abs", exprfunc_math_abs);
+	add_expression_handler("pow", exprfunc_math_pow);
+	add_expression_handler("sqrt", exprfunc_math_sqrt);
+	add_expression_handler("floor", exprfunc_math_floor);
+	add_expression_handler("ceil", exprfunc_math_ceil);
+	add_expression_handler("neg", exprfunc_math_neg);
+	add_expression_handler("%", exprfunc_math_intmod);
+	add_expression_handler("fmod", exprfunc_math_fmod);
+	add_expression_handler("sign", exprfunc_math_sign);
+	add_expression_handler("exp", exprfunc_math_exp);
+	add_expression_handler("hypot", exprfunc_math_hypot);
+	add_expression_handler("log", exprfunc_math_log);
+	add_expression_handler("log10", exprfunc_math_log10);
+	add_expression_handler("min", exprfunc_math_min);
+	add_expression_handler("max", exprfunc_math_max);
 
 	add_instruction("vector_init", vectorfunc_init);
 	add_instruction("vector_add", vectorfunc_add);
-	add_instruction("vector_size", vectorfunc_size);
-	add_instruction("vector_set", vectorfunc_set);
+	add_expression_handler("vector_size", exprfunc_vector_size);
 	add_instruction("vector_insert", vectorfunc_insert);
-	add_instruction("vector_get", vectorfunc_get);
 	add_instruction("vector_erase", vectorfunc_erase);
 	add_instruction("vector_clear", vectorfunc_clear);
 	add_instruction("vector_reserve", vectorfunc_reserve);
 
-	add_instruction("map_set", mapfunc_set);
-	add_instruction("map_get", mapfunc_get);
 	add_instruction("map_clear", mapfunc_clear);
 	add_instruction("map_erase", mapfunc_erase);
-	add_instruction("map_keys", mapfunc_keys);
+	add_expression_handler("map_keys", exprfunc_map_keys);
 
-	add_instruction("file_open", filefunc_open);
+	add_expression_handler("file_open", exprfunc_file_open);
 	add_instruction("file_close", filefunc_close);
-	add_instruction("file_read", filefunc_read);
-	add_instruction("file_read_line", filefunc_read_line);
+	add_expression_handler("file_read", exprfunc_file_read);
+	add_expression_handler("file_read_line", exprfunc_file_read_line);
 	add_instruction("file_write", filefunc_write);
 	add_instruction("file_print", filefunc_print);
 	
-	add_instruction("|", bitfunc_or);
-	add_instruction("^", bitfunc_xor);
-	add_instruction("&", bitfunc_and);
-	add_instruction("<<", bitfunc_leftshift);
-	add_instruction(">>", bitfunc_rightshift);
-	
 	add_instruction("text_colour", twinklefunc_colour);
 	add_instruction("text_reset", twinklefunc_reset);
-	add_instruction("getch", twinklefunc_getch);
+	add_expression_handler("getch", exprfunc_twinkle_getch);
 	add_instruction("text_clear", twinklefunc_clear);
 }
 

@@ -385,28 +385,23 @@ static bool miscfunc_delay(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool miscfunc_get_ticks(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_misc_get_ticks(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	COUNT_ARGS(0)
 
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)	
-
+	Variable v1;
+	v1.type = Variable::NUMBER;
 	v1.n = SDL_GetTicks();
 
-	return true;
+	return v1;
 }
 
-static bool miscfunc_args(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_misc_get_args(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	COUNT_ARGS(0)
 
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_VECTOR(v1)	
-
-	v1.v.clear();
+	Variable v1;
+	v1.type = Variable::VECTOR;
 
 	for (int i = 0; i < shim::argc; i++) {
 		Variable var;
@@ -416,20 +411,18 @@ static bool miscfunc_args(Program *prg, const std::vector<Token> &v)
 		v1.v.push_back(var);
 	}
 
-	return true;
+	return v1;
 }
 
-static bool miscfunc_get_logic_rate(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_misc_get_logic_rate(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	COUNT_ARGS(0)
 
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
-
+	Variable v1;
+	v1.type = Variable::NUMBER;
 	v1.n = shim::logic_rate;
 
-	return true;
+	return v1;
 }
 
 static bool miscfunc_set_logic_rate(Program *prg, const std::vector<Token> &v)
@@ -447,15 +440,12 @@ static bool miscfunc_set_logic_rate(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool miscfunc_file_list(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_misc_file_list(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	COUNT_ARGS(0)
 
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_VECTOR(v1)	
-
-	v1.v.clear();
+	Variable v1;
+	v1.type = Variable::VECTOR;
 
 	std::vector<std::string> l = shim::cpa->get_all_filenames();
 
@@ -467,7 +457,7 @@ static bool miscfunc_file_list(Program *prg, const std::vector<Token> &v)
 		v1.v.push_back(var);
 	}
 
-	return true;
+	return v1;
 }
 
 static bool gfxfunc_set_scissor(Program *prg, const std::vector<Token> &v)
@@ -523,65 +513,63 @@ static bool gfxfunc_resize(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_get_screen_size(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_gfx_get_screen_size(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(0)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	Variable &v2 = as_variable(prg, v[1]);
+	Variable vec;
+	vec.type = Variable::VECTOR;
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = shim::real_screen_size.w;
+	vec.v.push_back(var);
+	var.n = shim::real_screen_size.h;
+	vec.v.push_back(var);
 
-	CHECK_NUMBER(v1)
-	CHECK_NUMBER(v2)	
-
-	v1.n = shim::real_screen_size.w;
-	v2.n = shim::real_screen_size.h;
-
-	return true;
+	return vec;
 }
 
-static bool gfxfunc_get_buffer_size(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_gfx_get_buffer_size(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(0)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	Variable &v2 = as_variable(prg, v[1]);
+	Variable vec;
+	vec.type = Variable::VECTOR;
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = shim::screen_size.w;
+	vec.v.push_back(var);
+	var.n = shim::screen_size.h;
+	vec.v.push_back(var);
 
-	CHECK_NUMBER(v1)
-	CHECK_NUMBER(v2)	
-
-	v1.n = shim::screen_size.w;
-	v2.n = shim::screen_size.h;
-
-	return true;
+	return vec;
 }
 
-static bool gfxfunc_get_screen_offset(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_gfx_get_screen_offset(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(0)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	Variable &v2 = as_variable(prg, v[1]);
+	Variable vec;
+	vec.type = Variable::VECTOR;
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = shim::screen_offset.x;
+	vec.v.push_back(var);
+	var.n = shim::screen_offset.y;
+	vec.v.push_back(var);
 
-	CHECK_NUMBER(v1)
-	CHECK_NUMBER(v2)	
-
-	v1.n = shim::screen_offset.x;
-	v2.n = shim::screen_offset.y;
-
-	return true;
+	return vec;
 }
 
-static bool gfxfunc_get_scale(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_gfx_get_scale(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	COUNT_ARGS(0)
 
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)	
-
+	Variable v1;
+	v1.type = Variable::NUMBER;
 	v1.n = shim::scale;
 
-	return true;
+	return v1;
 }
 
 static bool gfxfunc_set_target(Program *prg, const std::vector<Token> &v)
@@ -633,17 +621,15 @@ static bool gfxfunc_add_notification(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_is_fullscreen(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_gfx_is_fullscreen(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	COUNT_ARGS(0)
 
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
-
+	Variable v1;
+	v1.type = Variable::NUMBER;
 	v1.n = gfx::is_fullscreen();
 
-	return true;
+	return v1;
 }
 
 static void gen_f11()
@@ -665,17 +651,15 @@ static bool gfxfunc_toggle_fullscreen(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool gfxfunc_get_refresh_rate(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_gfx_get_refresh_rate(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	COUNT_ARGS(0)
 
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
-
+	Variable v1;
+	v1.type = Variable::NUMBER;
 	v1.n = shim::refresh_rate;
 
-	return true;
+	return v1;
 }
 
 static bool gfxfunc_unset_scissor(Program *prg, const std::vector<Token> &v)
@@ -1003,17 +987,17 @@ static bool primfunc_filled_circle(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool mmlfunc_create(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_mml_create(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string str = as_string(prg, v[1]);
+	Variable v1;
+       	v1.type = Variable::NUMBER;
+
+	std::string str = as_string(prg, v[0]);
 	
 	MML_Info *info = mml_info(prg);
 
-	CHECK_NUMBER(v1)
-	
 	v1.n = info->mml_id;
 
 	Uint8 *bytes = (Uint8 *)str.c_str();
@@ -1022,7 +1006,7 @@ static bool mmlfunc_create(Program *prg, const std::vector<Token> &v)
 
 	info->mmls[info->mml_id++] = mml;
 
-	return true;
+	return v1;
 }
 
 static bool mmlfunc_destroy(Program *prg, const std::vector<Token> &v)
@@ -1038,29 +1022,29 @@ static bool mmlfunc_destroy(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool mmlfunc_load(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_mml_load(Program *prg, const std::vector<Token> &v)
 {
-	MIN_ARGS(2)
+	MIN_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	Variable v1;
+       	v1.type = Variable::NUMBER;
+
+	std::string name = as_string(prg, v[0]);
 
 	MML_Info *info = mml_info(prg);
 
-	CHECK_NUMBER(v1)
-	
 	v1.n = info->mml_id;
 
 	bool load_from_filesystem = false;
-	if (v.size() > 2) {
-		load_from_filesystem = as_number(prg, v[2]);
+	if (v.size() > 1) {
+		load_from_filesystem = as_number(prg, v[1]);
 	}
 
 	audio::MML *mml = new audio::MML(name, load_from_filesystem);
 
 	info->mmls[info->mml_id++] = mml;
 
-	return true;
+	return v1;
 }
 
 static bool mmlfunc_play(Program *prg, const std::vector<Token> &v)
@@ -1114,29 +1098,29 @@ static bool mmlfunc_stop(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool samplefunc_load(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_sample_load(Program *prg, const std::vector<Token> &v)
 {
-	MIN_ARGS(2)
+	MIN_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	std::string name = as_string(prg, v[0]);
 
 	Sample_Info *info = sample_info(prg);
 
-	CHECK_NUMBER(v1)
-		
 	v1.n = info->sample_id;
 
 	bool load_from_filesystem = false;
-	if (v.size() > 2) {
-		load_from_filesystem = as_number(prg, v[2]);
+	if (v.size() > 1) {
+		load_from_filesystem = as_number(prg, v[1]);
 	}
 
 	audio::Sample *sample = new audio::Sample(name, load_from_filesystem);
 
 	info->samples[info->sample_id++] = sample;
 
-	return true;
+	return v1;
 }
 
 static bool samplefunc_destroy(Program *prg, const std::vector<Token> &v)
@@ -1203,19 +1187,18 @@ static bool samplefunc_stop(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool imagefunc_create(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_image_create(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
-	int w = as_number(prg, v[1]);
-	int h = as_number(prg, v[2]);
+	int w = as_number(prg, v[0]);
+	int h = as_number(prg, v[1]);
 
 	Image_Info *info = image_info(prg);
 
-	CHECK_NUMBER(v1)
-	
 	v1.n = info->image_id;
 
 	gfx::Image *img = new gfx::Image(util::Size<int>(w, h));
@@ -1227,25 +1210,25 @@ static bool imagefunc_create(Program *prg, const std::vector<Token> &v)
 
 	info->images[info->image_id++] = i;
 
-	return true;
+	return v1;
 }
 
-static bool imagefunc_load(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_image_load(Program *prg, const std::vector<Token> &v)
 {
-	MIN_ARGS(2)
+	MIN_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
 	std::string name = as_string(prg, v[1]);
 
 	Image_Info *info = image_info(prg);
 
-	CHECK_NUMBER(v1)
-	
 	v1.n = info->image_id;
 
 	bool load_from_filesystem = false;
-	if (v.size() > 2) {
-		load_from_filesystem = as_number(prg, v[2]);
+	if (v.size() > 1) {
+		load_from_filesystem = as_number(prg, v[1]);
 	}
 
 	gfx::Image *img = new gfx::Image(name, false, load_from_filesystem);
@@ -1256,7 +1239,7 @@ static bool imagefunc_load(Program *prg, const std::vector<Token> &v)
 
 	info->images[info->image_id++] = i;
 
-	return true;
+	return v1;
 }
 
 static bool imagefunc_save(Program *prg, const std::vector<Token> &v)
@@ -1538,14 +1521,16 @@ static bool imagefunc_end(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool imagefunc_size(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_image_size(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
 
-	Variable &v1 = as_variable(prg, v[1]);
-	Variable &v2 = as_variable(prg, v[2]);
+	Variable vec;
+	vec.type = Variable::VECTOR;
+	Variable var;
+	var.type = Variable::NUMBER;
 	
 	Image_Info *info = image_info(prg);
 
@@ -1553,13 +1538,12 @@ static bool imagefunc_size(Program *prg, const std::vector<Token> &v)
 
 	gfx::Image *img = info->images[id]->image;
 
-	CHECK_NUMBER(v1)
-	CHECK_NUMBER(v2)
-	
-	v1.n = img->size.w;
-	v2.n = img->size.h;
+	var.n = img->size.w;
+	vec.v.push_back(var);
+	var.n = img->size.h;
+	vec.v.push_back(var);
 
-	return true;
+	return vec;
 }
 
 static bool imagefunc_draw_9patch(Program *prg, const std::vector<Token> &v)
@@ -1594,12 +1578,14 @@ static bool imagefunc_draw_9patch(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool imagefunc_read_texture(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_image_read_texture(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
+
+	Variable v1;
+	v1.type = Variable::VECTOR;
 
 	Image_Info *info = image_info(prg);
 
@@ -1608,9 +1594,6 @@ static bool imagefunc_read_texture(Program *prg, const std::vector<Token> &v)
 	gfx::Image *img = info->images[id]->image;
 
 	unsigned char *pixels = gfx::Image::read_texture(img);
-
-	v1.type = Variable::VECTOR;
-	v1.v.clear();
 
 	for (int y = 0; y < img->size.h; y++) {
 		Variable var;
@@ -1635,20 +1618,20 @@ static bool imagefunc_read_texture(Program *prg, const std::vector<Token> &v)
 
 	delete[] pixels;
 
-	return true;
+	return v1;
 }
 
-static bool imagefunc_to_texture(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_image_to_texture(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	Variable &v2 = as_variable(prg, v[1]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	Variable &v2 = as_variable(prg, v[0]);
 
 	Image_Info *info = image_info(prg);
 
-	CHECK_NUMBER(v1)
-	
 	v1.n = info->image_id;
 
 	int w = v2.v.size();
@@ -1677,7 +1660,7 @@ static bool imagefunc_to_texture(Program *prg, const std::vector<Token> &v)
 
 	info->images[info->image_id++] = i;
 
-	return true;
+	return v1;
 }
 
 static bool imagefunc_update(Program *prg, const std::vector<Token> &v)
@@ -1714,25 +1697,24 @@ static bool imagefunc_update(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool fontfunc_load(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_font_load(Program *prg, const std::vector<Token> &v)
 {
-	MIN_ARGS(4)
+	MIN_ARGS(3)
 
-	std::string name = as_string(prg, v[1]);
-	int size = as_number(prg, v[2]);
-	bool smooth = as_number(prg, v[3]);
+	std::string name = as_string(prg, v[0]);
+	int size = as_number(prg, v[1]);
+	bool smooth = as_number(prg, v[2]);
 
-	Variable &v1 = as_variable(prg, v[0]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
 	Font_Info *info = font_info(prg);
 
-	CHECK_NUMBER(v1)
-	
 	v1.n = info->font_id;
 
 	bool load_from_filesystem = false;
-	if (v.size() > 4) {
-		load_from_filesystem = as_number(prg, v[4]);
+	if (v.size() > 3) {
+		load_from_filesystem = as_number(prg, v[3]);
 	}
 
 	gfx::TTF *font = new gfx::TTF(name, size, 1024, load_from_filesystem);
@@ -1740,7 +1722,7 @@ static bool fontfunc_load(Program *prg, const std::vector<Token> &v)
 
 	info->fonts[info->font_id++] = font;
 
-	return true;
+	return v1;
 }
 
 static bool fontfunc_destroy(Program *prg, const std::vector<Token> &v)
@@ -1794,13 +1776,12 @@ static bool fontfunc_draw(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool fontfunc_width(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_font_width(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(2)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	std::string text = as_string(prg, v[2]);
+	std::string text = as_string(prg, v[1]);
 	
 	Font_Info *info = font_info(prg);
 
@@ -1810,19 +1791,18 @@ static bool fontfunc_width(Program *prg, const std::vector<Token> &v)
 
 	int w = font->get_text_width(text);
 
-	CHECK_NUMBER(v1)
-	
+	Variable v1;
+	v1.type = Variable::NUMBER;
 	v1.n = w;
 
-	return true;
+	return v1;
 }
 
-static bool fontfunc_height(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_font_height(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
 	
 	Font_Info *info = font_info(prg);
 
@@ -1832,11 +1812,11 @@ static bool fontfunc_height(Program *prg, const std::vector<Token> &v)
 
 	int h = font->get_height();
 
-	CHECK_NUMBER(v1)
-
+	Variable v1;
+	v1.type = Variable::NUMBER;
 	v1.n = h;
 
-	return true;
+	return v1;
 }
 
 static bool fontfunc_add_extra_glyph(Program *prg, const std::vector<Token> &v)
@@ -1869,29 +1849,29 @@ static bool tilemapfunc_set_tile_size(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool tilemapfunc_load(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_tilemap_load(Program *prg, const std::vector<Token> &v)
 {
-	MIN_ARGS(2)
+	MIN_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	std::string name = as_string(prg, v[0]);
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
-	CHECK_NUMBER(v1)
-	
 	v1.n = info->tilemap_id;
 
 	bool load_from_filesystem = false;
-	if (v.size() > 2) {
-		load_from_filesystem = as_number(prg, v[2]);
+	if (v.size() > 1) {
+		load_from_filesystem = as_number(prg, v[1]);
 	}
 
 	gfx::Tilemap *tilemap = new gfx::Tilemap(name, load_from_filesystem);
 
 	info->tilemaps[info->tilemap_id++] = tilemap;
 
-	return true;
+	return v1;
 }
 
 static bool tilemapfunc_destroy(Program *prg, const std::vector<Token> &v)
@@ -1928,15 +1908,15 @@ static bool tilemapfunc_draw(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool tilemapfunc_num_layers(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_tilemap_num_layers(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	
-	CHECK_NUMBER(v1)
 
+	Variable v1;
+	v1.type = Variable::NUMBER;
+	
 	Tilemap_Info *info = tilemap_info(prg);
 
 	INFO_EXISTS(info->tilemaps, id)
@@ -1945,19 +1925,14 @@ static bool tilemapfunc_num_layers(Program *prg, const std::vector<Token> &v)
 
 	v1.n = tilemap->get_num_layers();
 
-	return true;
+	return v1;
 }
 
-static bool tilemapfunc_size(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_tilemap_size(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	Variable &v2 = as_variable(prg, v[2]);
-	
-	CHECK_NUMBER(v1)
-	CHECK_NUMBER(v2)
 
 	Tilemap_Info *info = tilemap_info(prg);
 
@@ -1967,42 +1942,47 @@ static bool tilemapfunc_size(Program *prg, const std::vector<Token> &v)
 
 	util::Size<int> sz = tilemap->get_size();
 
-	v1.n = sz.w;
-	v2.n = sz.h;
+	Variable vec;
+	vec.type = Variable::VECTOR;
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = sz.w;
+	vec.v.push_back(var);
+	var.n = sz.h;
+	vec.v.push_back(var);
 
-	return true;
+	return vec;
 }
 
-static bool tilemapfunc_is_solid(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_tilemap_is_solid(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(4)
+	COUNT_ARGS(3)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	int x = as_number(prg, v[2]);
-	int y = as_number(prg, v[3]);
+	int x = as_number(prg, v[1]);
+	int y = as_number(prg, v[2]);
 	
-	CHECK_NUMBER(v1)
-
 	Tilemap_Info *info = tilemap_info(prg);
 
 	INFO_EXISTS(info->tilemaps, id)
 
 	gfx::Tilemap *tilemap = info->tilemaps[id];
 
+	Variable v1;
+	v1.type = Variable::NUMBER;
 	v1.n = tilemap->is_solid(-1, util::Point<int>(x, y));
 
-	return true;
+	return v1;
 }
 
-static bool tilemapfunc_get_groups(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_tilemap_get_groups(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	Variable &vec = as_variable(prg, v[1]);
 
-	CHECK_VECTOR(vec)
+	Variable vec;
+	vec.type = Variable::VECTOR;
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
@@ -2045,7 +2025,7 @@ static bool tilemapfunc_get_groups(Program *prg, const std::vector<Token> &v)
 		vec.v.push_back(v);
 	}
 
-	return true;
+	return vec;
 }
 
 static bool tilemapfunc_set_animated_tiles(Program *prg, const std::vector<Token> &v)
@@ -2085,19 +2065,17 @@ static bool tilemapfunc_set_animated_tiles(Program *prg, const std::vector<Token
 	return true;
 }
 
-static bool tilemapfunc_find_path(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_tilemap_find_path(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(7)
+	COUNT_ARGS(6)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	Variable entity_solids = as_variable_resolve(prg, v[2]);
-	int start_x = (int)as_number(prg, v[3]);
-	int start_y = (int)as_number(prg, v[4]);
-	int end_x = (int)as_number(prg, v[5]);
-	int end_y = (int)as_number(prg, v[6]);
+	Variable entity_solids = as_variable_resolve(prg, v[1]);
+	int start_x = (int)as_number(prg, v[2]);
+	int start_y = (int)as_number(prg, v[3]);
+	int end_x = (int)as_number(prg, v[4]);
+	int end_y = (int)as_number(prg, v[5]);
 
-	CHECK_VECTOR(v1)
 	CHECK_VECTOR(entity_solids)	
 
 	Tilemap_Info *info = tilemap_info(prg);
@@ -2122,7 +2100,8 @@ static bool tilemapfunc_find_path(Program *prg, const std::vector<Token> &v)
 	
 	std::list<util::A_Star::Node> path = a_star->find_path(util::Point<int>(start_x, start_y), util::Point<int>(end_x, end_y));
 
-	v1.v.clear();
+	Variable v1;
+	v1.type = Variable::VECTOR;
 
 	for (std::list<util::A_Star::Node>::iterator it = path.begin(); it != path.end(); it++) {
 		util::A_Star::Node &n = *it;
@@ -2144,7 +2123,7 @@ static bool tilemapfunc_find_path(Program *prg, const std::vector<Token> &v)
 
 	delete a_star;
 
-	return true;
+	return v1;
 }
 
 static bool tilemapfunc_set_solid(Program *prg, const std::vector<Token> &v)
@@ -2190,22 +2169,22 @@ static bool tilemapfunc_set_tile(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool tilemapfunc_get_tile(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_tilemap_get_tile(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(7)
+	COUNT_ARGS(4)
 
 	int id = as_number(prg, v[0]);
-	Variable &vx = as_variable(prg, v[1]);
-	Variable &vy = as_variable(prg, v[2]);
-	Variable &vs = as_variable(prg, v[3]);
-	int layer = as_number(prg, v[4]);
-	int x = as_number(prg, v[5]);
-	int y = as_number(prg, v[6]);
+	int layer = as_number(prg, v[1]);
+	int x = as_number(prg, v[2]);
+	int y = as_number(prg, v[3]);
 
-	CHECK_NUMBER(vx)
-	CHECK_NUMBER(vy)
-	CHECK_NUMBER(vs)
-	
+	Variable vx;
+	vx.type = Variable::NUMBER;
+	Variable vy;
+	vy.type = Variable::NUMBER;
+	Variable vs;
+	vs.type = Variable::NUMBER;
+
 	Tilemap_Info *info = tilemap_info(prg);
 
 	INFO_EXISTS(info->tilemaps, id)
@@ -2221,32 +2200,38 @@ static bool tilemapfunc_get_tile(Program *prg, const std::vector<Token> &v)
 	vy.n = tile_xy.y;
 	vs.n = solid;
 
-	return true;
+	Variable vec;
+	vec.type = Variable::VECTOR;
+	vec.v.push_back(vx);
+	vec.v.push_back(vy);
+	vec.v.push_back(vs);
+
+	return vec;
 }
 
-static bool spritefunc_load(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_sprite_load(Program *prg, const std::vector<Token> &v)
 {
-	MIN_ARGS(2)
+	MIN_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	std::string name = as_string(prg, v[0]);
 	
 	Sprite_Info *info = sprite_info(prg);
 
-	CHECK_NUMBER(v1)
-	
 	v1.n = info->sprite_id;
 
 	bool load_from_filesystem = false;
-	if (v.size() > 2) {
-		load_from_filesystem = as_number(prg, v[2]);
+	if (v.size() > 1) {
+		load_from_filesystem = as_number(prg, v[1]);
 	}
 
 	gfx::Sprite *sprite = new gfx::Sprite(name, name, load_from_filesystem);
 
 	info->sprites[info->sprite_id++] = sprite;
 
-	return true;
+	return v1;
 }
 
 static bool spritefunc_destroy(Program *prg, const std::vector<Token> &v)
@@ -2327,14 +2312,13 @@ static bool spritefunc_set_animation(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_get_animation(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_sprite_get_animation(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	
-	CHECK_STRING(v1)
+	Variable v1;
+	v1.type = Variable::STRING;
 
 	Sprite_Info *info = sprite_info(prg);
 	
@@ -2344,37 +2328,35 @@ static bool spritefunc_get_animation(Program *prg, const std::vector<Token> &v)
 
 	v1.s = sprite->get_animation();
 
-	return true;
+	return v1;
 }
 
-static bool spritefunc_get_previous_animation(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_sprite_get_previous_animation(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	
-	CHECK_STRING(v1)
+	Variable v1;
+	v1.type = Variable::STRING;
 
 	Sprite_Info *info = sprite_info(prg);
-
-	INFO_EXISTS(info->sprites, id)
 	
+	INFO_EXISTS(info->sprites, id)
+
 	gfx::Sprite *sprite = info->sprites[id];
 
 	v1.s = sprite->get_previous_animation();
 
-	return true;
+	return v1;
 }
 
-static bool spritefunc_current_frame(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_sprite_current_frame(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	
-	CHECK_NUMBER(v1)
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
 	Sprite_Info *info = sprite_info(prg);
 
@@ -2384,17 +2366,16 @@ static bool spritefunc_current_frame(Program *prg, const std::vector<Token> &v)
 
 	v1.n = sprite->get_current_frame();
 
-	return true;
+	return v1;
 }
 
-static bool spritefunc_num_frames(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_sprite_num_frames(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	
-	CHECK_NUMBER(v1)
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
 	Sprite_Info *info = sprite_info(prg);
 
@@ -2404,39 +2385,33 @@ static bool spritefunc_num_frames(Program *prg, const std::vector<Token> &v)
 
 	v1.n = sprite->get_num_frames();
 
-	return true;
+	return v1;
 }
 
-static bool spritefunc_length(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_sprite_length(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	
-	CHECK_NUMBER(v1)
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
 	Sprite_Info *info = sprite_info(prg);
-	
+
 	INFO_EXISTS(info->sprites, id)
 
 	gfx::Sprite *sprite = info->sprites[id];
 
 	v1.n = sprite->get_length();
 
-	return true;
+	return v1;
 }
 
-static bool spritefunc_current_frame_size(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_sprite_current_frame_size(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	Variable &v2 = as_variable(prg, v[2]);
-	
-	CHECK_NUMBER(v1)
-	CHECK_NUMBER(v2)
 
 	Sprite_Info *info = sprite_info(prg);
 
@@ -2446,10 +2421,16 @@ static bool spritefunc_current_frame_size(Program *prg, const std::vector<Token>
 
 	gfx::Image *img = sprite->get_current_image();
 
-	v1.n = img->size.w;
-	v2.n = img->size.h;
+	Variable vec;
+	vec.type = Variable::VECTOR;
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = img->size.w;
+	vec.v.push_back(var);
+	var.n = img->size.h;
+	vec.v.push_back(var);
 
-	return true;
+	return vec;
 }
 
 static bool spritefunc_draw(Program *prg, const std::vector<Token> &v)
@@ -2559,20 +2540,11 @@ static bool spritefunc_reset(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool spritefunc_bounds(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_sprite_bounds(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(5)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	Variable &v2 = as_variable(prg, v[2]);
-	Variable &v3 = as_variable(prg, v[3]);
-	Variable &v4 = as_variable(prg, v[4]);
-	
-	CHECK_NUMBER(v1)
-	CHECK_NUMBER(v2)
-	CHECK_NUMBER(v3)
-	CHECK_NUMBER(v4)
 
 	Sprite_Info *info = sprite_info(prg);
 
@@ -2585,23 +2557,30 @@ static bool spritefunc_bounds(Program *prg, const std::vector<Token> &v)
 
 	sprite->get_bounds(topleft, bottomright);
 
-	v1.n = topleft.x;
-	v2.n = topleft.y;
-	v3.n = bottomright.x;
-	v4.n = bottomright.y;
+	Variable vec;
+	vec.type = Variable::VECTOR;
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = topleft.x;
+	vec.v.push_back(var);
+	var.n = topleft.y;
+	vec.v.push_back(var);
+	var.n = bottomright.x;
+	vec.v.push_back(var);
+	var.n = bottomright.y;
+	vec.v.push_back(var);
 
-	return true;
+	return vec;
 }
 
-static bool spritefunc_elapsed(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_sprite_elapsed(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
+	Variable v1;
+	v1.type = Variable::NUMBER;
 	
-	CHECK_NUMBER(v1)
-
 	Sprite_Info *info = sprite_info(prg);
 
 	INFO_EXISTS(info->sprites, id)
@@ -2610,17 +2589,14 @@ static bool spritefunc_elapsed(Program *prg, const std::vector<Token> &v)
 
 	v1.n = sprite->get_elapsed();
 
-	return true;
+	return v1;
 }
 
-static bool spritefunc_frame_times(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_sprite_frame_times(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	Variable &vec = as_variable(prg, v[1]);
-
-	CHECK_VECTOR(vec)	
 
 	Sprite_Info *info = sprite_info(prg);
 
@@ -2630,6 +2606,9 @@ static bool spritefunc_frame_times(Program *prg, const std::vector<Token> &v)
 
 	std::vector<Uint32> times = sprite->get_frame_times();
 
+	Variable vec;
+	vec.type = Variable::VECTOR;
+
 	for (size_t i = 0; i < times.size(); i++) {
 		Variable v;
 		v.type = Variable::NUMBER;
@@ -2638,17 +2617,16 @@ static bool spritefunc_frame_times(Program *prg, const std::vector<Token> &v)
 		vec.v.push_back(v);
 	}
 
-	return true;
+	return vec;
 }
 
-static bool spritefunc_is_started(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_sprite_is_started(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	
-	CHECK_NUMBER(v1)
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
 	Sprite_Info *info = sprite_info(prg);
 
@@ -2658,182 +2636,18 @@ static bool spritefunc_is_started(Program *prg, const std::vector<Token> &v)
 
 	v1.n = sprite->is_started();
 
-	return true;
+	return v1;
 }
 
-static void set_string_or_number(Program *prg, int index, double value)
+static Variable exprfunc_joy_count(Program *prg, const std::vector<Token> &v)
 {
-	Variable &v1 = booboo::get_variable(prg, index);
+	COUNT_ARGS(0)
 
-	CHECK_NUMBER(v1)
-       
-	v1.n = value;
-}
-
-static bool joyfunc_poll(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(21)
-
-	double num = as_number(prg, v[0]);
-	int x1 = v[1].i;
-	int y1 = v[2].i;
-	int x2 = v[3].i;
-	int y2 = v[4].i;
-	int x3 = v[5].i;
-	int y3 = v[6].i;
-	int l = v[7].i;
-	int r = v[8].i;
-	int u = v[9].i;
-	int d = v[10].i;
-	int a = v[11].i;
-	int b = v[12].i;
-	int x = v[13].i;
-	int y = v[14].i;
-	int lb = v[15].i;
-	int rb = v[16].i;
-	int ls = v[17].i;
-	int rs = v[18].i;
-	int back = v[19].i;
-	int start = v[20].i;
-
-	SDL_JoystickID id = input::get_controller_id(num);
-	SDL_Gamepad *gc = input::get_sdl_gamepad(id);
-	bool connected = gc != nullptr;
-
-	if (connected == false) {
-		set_string_or_number(prg, x1, 0);
-		set_string_or_number(prg, y1, 0);
-		set_string_or_number(prg, x2, 0);
-		set_string_or_number(prg, y2, 0);
-		set_string_or_number(prg, a, 0);
-		set_string_or_number(prg, l, 0);
-		set_string_or_number(prg, r, 0);
-		set_string_or_number(prg, u, 0);
-		set_string_or_number(prg, d, 0);
-		set_string_or_number(prg, b, 0);
-		set_string_or_number(prg, x, 0);
-		set_string_or_number(prg, y, 0);
-		set_string_or_number(prg, lb, 0);
-		set_string_or_number(prg, rb, 0);
-		set_string_or_number(prg, back, 0);
-		set_string_or_number(prg, start, 0);
-		set_string_or_number(prg, ls, 0);
-		set_string_or_number(prg, rs, 0);
-		set_string_or_number(prg, x3, 0);
-		set_string_or_number(prg, y3, 0);
-	}
-	else {
-
-		Sint16 si_x1 = SDL_GetGamepadAxis(gc, SDL_GAMEPAD_AXIS_LEFTX);
-		Sint16 si_y1 = SDL_GetGamepadAxis(gc, SDL_GAMEPAD_AXIS_LEFTY);
-		Sint16 si_x2 = SDL_GetGamepadAxis(gc, SDL_GAMEPAD_AXIS_RIGHTX);
-		Sint16 si_y2 = SDL_GetGamepadAxis(gc, SDL_GAMEPAD_AXIS_RIGHTY);
-		Sint16 si_x3 = SDL_GetGamepadAxis(gc, SDL_GAMEPAD_AXIS_LEFT_TRIGGER);
-		Sint16 si_y3 = SDL_GetGamepadAxis(gc, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER);
-
-		double x1f;
-		double y1f;
-		double x2f;
-		double y2f;
-		double x3f;
-		double y3f;
-
-		if (si_x1 < 0) {
-			x1f = si_x1 / 32768.0;
-		}
-		else {
-			x1f = si_x1 / 32767.0;
-		}
-
-		if (si_y1 < 0) {
-			y1f = si_y1 / 32768.0;
-		}
-		else {
-			y1f = si_y1 / 32767.0;
-		}
-
-		if (si_x2 < 0) {
-			x2f = si_x2 / 32768.0;
-		}
-		else {
-			x2f = si_x2 / 32767.0;
-		}
-
-		if (si_y2 < 0) {
-			y2f = si_y2 / 32768.0;
-		}
-		else {
-			y2f = si_y2 / 32767.0;
-		}
-
-		if (si_x3 < 0) {
-			x3f = si_x3 / 32768.0;
-		}
-		else {
-			x3f = si_x3 / 32767.0;
-		}
-
-		if (si_y3 < 0) {
-			y3f = si_y3 / 32768.0;
-		}
-		else {
-			y3f = si_y3 / 32767.0;
-		}
-
-		set_string_or_number(prg, x1, x1f);
-		set_string_or_number(prg, y1, y1f);
-
-		set_string_or_number(prg, x2, x2f);
-		set_string_or_number(prg, y2, y2f);
-
-		set_string_or_number(prg, x3, x3f);
-		set_string_or_number(prg, y3, y3f);
-
-		double ab = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_A);
-		double bb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_B);
-		double xb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_X);
-		double yb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_Y);
-		double lbb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_LB);
-		double rbb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_RB);
-		double backb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_BACK);
-		double startb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_START);
-		double lsb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_LS);
-		double rsb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_RS);
-		double _lb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_L);
-		double _rb = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_R);
-		double ub = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_U);
-		double db = SDL_GetGamepadButton(gc, (SDL_GamepadButton)TGUI_B_D);
-
-		set_string_or_number(prg, l, _lb);
-		set_string_or_number(prg, r, _rb);
-		set_string_or_number(prg, u, ub);
-		set_string_or_number(prg, d, db);
-		set_string_or_number(prg, a, ab);
-		set_string_or_number(prg, b, bb);
-		set_string_or_number(prg, x, xb);
-		set_string_or_number(prg, y, yb);
-		set_string_or_number(prg, lb, lbb);
-		set_string_or_number(prg, rb, rbb);
-		set_string_or_number(prg, ls, lsb);
-		set_string_or_number(prg, rs, rsb);
-		set_string_or_number(prg, back, backb);
-		set_string_or_number(prg, start, startb);
-	}
-
-	return true;
-}
-
-static bool joyfunc_count(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-
-	Variable &v1 = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(v1)
-	
+	Variable v1;
+	v1.type = Variable::NUMBER;
 	v1.n = input::get_num_joysticks();
 
-	return true;
+	return v1;
 }
 
 static bool joyfunc_rumble(Program *prg, const std::vector<Token> &v)
@@ -2852,32 +2666,32 @@ static bool joyfunc_rumble(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool joyfunc_get_button(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_joy_get_button(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(2)
 
 	int index = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	int n = as_number(prg, v[2]);
+	int n = as_number(prg, v[1]);
 
-	CHECK_NUMBER(v1)
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
 	SDL_JoystickID id = input::get_controller_id(index);
 	SDL_Gamepad *gc = input::get_sdl_gamepad(id);
 	v1.n = SDL_GetGamepadButton(gc, (SDL_GamepadButton)n);
 
-	return true;
+	return v1;
 }
 
-static bool joyfunc_get_axis(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_joy_get_axis(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(2)
 
 	int index = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	int n = as_number(prg, v[2]);
+	int n = as_number(prg, v[1]);
 
-	CHECK_NUMBER(v1)
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
 	SDL_JoystickID id = input::get_controller_id(index);
 	SDL_Gamepad *gc = input::get_sdl_gamepad(id);
@@ -2890,26 +2704,26 @@ static bool joyfunc_get_axis(Program *prg, const std::vector<Token> &v)
 		v1.n /= 32767;
 	}
 
-	return true;
+	return v1;
 }
 
-static bool cfgfunc_load(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_cfg_load(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string cfg_name = as_string(prg, v[1]);
+	std::string cfg_name = as_string(prg, v[0]);
 
-	CHECK_NUMBER(v1)
-	
 	CFG_Info *info = cfg_info(prg);
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
 	std::map<std::string, Config_Value> val = load_cfg(prg, cfg_name);
 	int id = info->cfg_id++;
 	v1.n = id;
 	info->cfgs[id] = val;
 
-	return true;
+	return v1;
 }
 
 static bool cfgfunc_destroy(Program *prg, const std::vector<Token> &v)
@@ -2941,50 +2755,52 @@ static bool cfgfunc_save(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool cfgfunc_get_number(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_cfg_get_number(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(2)
 
 	int id = as_number(prg, v[0]);
-	Variable &v2 = as_variable(prg, v[1]);
-	std::string name = as_string(prg, v[2]);
-
-	CHECK_NUMBER(v2)
+	std::string name = as_string(prg, v[1]);
 
 	CFG_Info *info = cfg_info(prg);
 	
 	INFO_EXISTS(info->cfgs, id)
 
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
 	if (info->cfgs[id].find(name) == info->cfgs[id].end()) {
-		return true;
+		v1.n = 0;
+	}
+	else {
+		v1.n = info->cfgs[id][name].n;
 	}
 
-	v2.n = info->cfgs[id][name].n;
-
-	return true;
+	return v1;
 }
 
-static bool cfgfunc_get_string(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_cfg_get_string(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(2)
 
 	int id = as_number(prg, v[0]);
-	Variable &v2 = as_variable(prg, v[1]);
-	std::string name = as_string(prg, v[2]);
-
-	CHECK_STRING(v2)
+	std::string name = as_string(prg, v[1]);
 
 	CFG_Info *info = cfg_info(prg);
 	
 	INFO_EXISTS(info->cfgs, id)
 
+	Variable v1;
+	v1.type = Variable::STRING;
+
 	if (info->cfgs[id].find(name) == info->cfgs[id].end()) {
-		return true;
+		v1.s = "";
+	}
+	else {
+		v1.s = info->cfgs[id][name].s;
 	}
 
-	v2.s = info->cfgs[id][name].s;
-
-	return true;
+	return v1;
 }
 
 static bool cfgfunc_set_number(Program *prg, const std::vector<Token> &v)
@@ -3029,13 +2845,12 @@ static bool cfgfunc_set_string(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool cfgfunc_exists(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_cfg_exists(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(2)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	std::string name = as_string(prg, v[2]);
+	std::string name = as_string(prg, v[1]);
 
 	CFG_Info *info = cfg_info(prg);
 
@@ -3043,11 +2858,11 @@ static bool cfgfunc_exists(Program *prg, const std::vector<Token> &v)
 
 	bool found = info->cfgs[id].find(name) != info->cfgs[id].end();
 
-	CHECK_NUMBER(v1)
-	
+	Variable v1;
+	v1.type = Variable::NUMBER;
 	v1.n = found;
 
-	return true;
+	return v1;
 }
 
 static bool cfgfunc_erase(Program *prg, const std::vector<Token> &v)
@@ -3070,26 +2885,25 @@ static bool cfgfunc_erase(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool shaderfunc_load(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_shader_load(Program *prg, const std::vector<Token> &v)
 {
-	MIN_ARGS(3)
+	MIN_ARGS(2)
 
-	Variable &v1 = as_variable(prg, v[0]);
-
-	std::string vname = as_string(prg, v[1]);
-	std::string fname = as_string(prg, v[2]);
+	std::string vname = as_string(prg, v[0]);
+	std::string fname = as_string(prg, v[1]);
 	
 	Shader_Info *info = shader_info(prg);
 
-	CHECK_NUMBER(v1)
-	
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
 	v1.n = info->shader_id;
 
 	gfx::Shader *shader = nullptr;
 
 	bool load_from_filesystem = false;
-	if (v.size() > 3) {
-		load_from_filesystem = as_number(prg, v[3]);
+	if (v.size() > 2) {
+		load_from_filesystem = as_number(prg, v[2]);
 	}
 
 	std::string vs, fs;
@@ -3120,7 +2934,7 @@ static bool shaderfunc_load(Program *prg, const std::vector<Token> &v)
 
 	info->shaders[info->shader_id++] = shader;
 
-	return true;
+	return v1;
 }
 
 static bool shaderfunc_destroy(Program *prg, const std::vector<Token> &v)
@@ -3336,30 +3150,29 @@ static bool shaderfunc_set_colour(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool jsonfunc_load(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_json_load(Program *prg, const std::vector<Token> &v)
 {
-	MIN_ARGS(2)
+	MIN_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
-
-	std::string name = as_string(prg, v[1]);
+	std::string name = as_string(prg, v[0]);
 
 	JSON_Info *info = json_info(prg);
 
-	CHECK_NUMBER(v1)
-	
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
 	v1.n = info->json_id;
 
 	bool load_from_filesystem = false;
-	if (v.size() > 2) {
-		load_from_filesystem = as_number(prg, v[2]);
+	if (v.size() > 1) {
+		load_from_filesystem = as_number(prg, v[1]);
 	}
 
 	util::JSON *json = new util::JSON(name, load_from_filesystem);
 
 	info->jsons[info->json_id++] = json;
 
-	return true;
+	return v1;
 }
 
 static bool jsonfunc_destroy(Program *prg, const std::vector<Token> &v)
@@ -3375,44 +3188,44 @@ static bool jsonfunc_destroy(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool jsonfunc_get_string(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_json_get_string(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(2)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	std::string name = as_string(prg, v[2]);
+	std::string name = as_string(prg, v[1]);
 	
 	JSON_Info *info = json_info(prg);
 	INFO_EXISTS(info->jsons, id)
 	util::JSON *json = info->jsons[id];
 
-	CHECK_STRING(v1)
-	
+	Variable v1;
+	v1.type = Variable::STRING;
+
 	util::JSON::Node *n = json->get_root()->find(name);
 	v1.s = n->as_string();
 
-	return true;
+	return v1;
 }
 
-static bool jsonfunc_get_number(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_json_get_number(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(2)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	std::string name = as_string(prg, v[2]);
+	std::string name = as_string(prg, v[1]);
 	
 	JSON_Info *info = json_info(prg);
 	INFO_EXISTS(info->jsons, id)
 	util::JSON *json = info->jsons[id];
 
-	CHECK_NUMBER(v1)
-	
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
 	util::JSON::Node *n = json->get_root()->find(name);
 	v1.n = n->as_double();
 
-	return true;
+	return v1;
 }
 
 bool is_3d = false;
@@ -3440,22 +3253,22 @@ void set_2d()
 	is_3d = false;
 }
 
-static bool modelfunc_load(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_model_load(Program *prg, const std::vector<Token> &v)
 {
-	MIN_ARGS(2)
+	MIN_ARGS(1)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	std::string name = as_string(prg, v[0]);
 
 	Model_Info *info = model_info(prg);
 
-	CHECK_NUMBER(v1)
-	
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
 	v1.n = info->model_id;
 
 	bool load_from_filesystem = false;
-	if (v.size() > 2) {
-		load_from_filesystem = as_number(prg, v[2]);
+	if (v.size() > 1) {
+		load_from_filesystem = as_number(prg, v[1]);
 	}
 
 	gfx::Model *model = new gfx::Model(name, load_from_filesystem);
@@ -3467,7 +3280,7 @@ static bool modelfunc_load(Program *prg, const std::vector<Token> &v)
 
 	info->models[info->model_id++] = m;
 
-	return true;
+	return v1;
 }
 
 static bool modelfunc_destroy(Program *prg, const std::vector<Token> &v)
@@ -3601,19 +3414,18 @@ static bool modelfunc_translate(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool modelfunc_get_position(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_model_get_position(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(4)
+	COUNT_ARGS(1)
 
 	int model_id = as_number(prg, v[0]);
 
-	Variable &x = as_variable(prg, v[1]);
-	Variable &y = as_variable(prg, v[2]);
-	Variable &z = as_variable(prg, v[3]);
-
-	CHECK_NUMBER(x)
-	CHECK_NUMBER(y)
-	CHECK_NUMBER(z)
+	Variable x;
+	x.type = Variable::NUMBER;
+	Variable y;
+	y.type = Variable::NUMBER;
+	Variable z;
+	z.type = Variable::NUMBER;
 
 	Model_Info *info = model_info(prg);
 	INFO_EXISTS(info->models, model_id)
@@ -3624,7 +3436,13 @@ static bool modelfunc_get_position(Program *prg, const std::vector<Token> &v)
 	y.n = pos.y;
 	z.n = pos.z;
 
-	return true;
+	Variable vec;
+	vec.type = Variable::VECTOR;
+	vec.v.push_back(x);
+	vec.v.push_back(y);
+	vec.v.push_back(z);
+
+	return vec;
 }
 
 static bool modelfunc_identity_3d(Program *prg, const std::vector<Token> &v)
@@ -3787,20 +3605,19 @@ static bool modelfunc_reset(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool modelfunc_size(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_model_size(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(4)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
 
-	Variable &out_x = as_variable(prg, v[1]);
-	Variable &out_y = as_variable(prg, v[2]);
-	Variable &out_z = as_variable(prg, v[3]);
+	Variable out_x;
+	out_x.type = Variable::NUMBER;
+	Variable out_y;
+	out_y.type = Variable::NUMBER;
+	Variable out_z;
+	out_z.type = Variable::NUMBER;
 
-	CHECK_NUMBER(out_x)
-	CHECK_NUMBER(out_y)
-	CHECK_NUMBER(out_z)
-	
 	Model_Info *info = model_info(prg);
 	INFO_EXISTS(info->models, id)
 	Model *model = info->models[id];
@@ -3827,7 +3644,13 @@ static bool modelfunc_size(Program *prg, const std::vector<Token> &v)
 	out_y.n = szy;
 	out_z.n = szz;
 
-	return true;
+	Variable vec;
+	vec.type = Variable::VECTOR;
+	vec.v.push_back(out_x);
+	vec.v.push_back(out_y);
+	vec.v.push_back(out_z);
+
+	return vec;
 }
 
 static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
@@ -3989,15 +3812,14 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 	return true;
 }
 
-static bool modelfunc_clone(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_model_clone(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
-	Variable &result = as_variable(prg, v[1]);
+	Variable result;
+	result.type = Variable::NUMBER;
 
-	CHECK_NUMBER(result)
-	
 	Model_Info *info = model_info(prg);
 	INFO_EXISTS(info->models, id)
 	Model *model = new Model;
@@ -4008,23 +3830,23 @@ static bool modelfunc_clone(Program *prg, const std::vector<Token> &v)
 	result.n = info->model_id;
 	info->models[info->model_id++] = model;
 
-	return true;
+	return result;
 }
 
-static bool modelfunc_billboard_create(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_billboard_create(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(7)
+	COUNT_ARGS(6)
 
-	Variable &result = as_variable(prg, v[0]);
-	int image_id = as_number(prg, v[1]);
-	double x = as_number(prg, v[2]);
-	double y = as_number(prg, v[3]);
-	double z = as_number(prg, v[4]);
-	double w = as_number(prg, v[5]);
-	double h = as_number(prg, v[6]);
+	Variable result;
+	result.type = Variable::NUMBER;
 
-	CHECK_NUMBER(result)
-	
+	int image_id = as_number(prg, v[0]);
+	double x = as_number(prg, v[1]);
+	double y = as_number(prg, v[2]);
+	double z = as_number(prg, v[3]);
+	double w = as_number(prg, v[4]);
+	double h = as_number(prg, v[5]);
+
 	Image_Info *info = image_info(prg);
 	INFO_EXISTS(info->images, image_id)
 	gfx::Image *image = info->images[image_id]->image;
@@ -4046,7 +3868,7 @@ static bool modelfunc_billboard_create(Program *prg, const std::vector<Token> &v
 	billboard->unit = 0;
 	result.n = info2->billboard_id;
 	info2->billboards[info2->billboard_id++] = billboard;
-	return true;
+	return result;
 }
 
 static bool modelfunc_billboard_destroy(Program *prg, const std::vector<Token> &v)
@@ -4062,21 +3884,21 @@ static bool modelfunc_billboard_destroy(Program *prg, const std::vector<Token> &
 	return true;
 }
 
-static bool modelfunc_billboard_from_sprite(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_billboard_from_sprite(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(8)
+	COUNT_ARGS(7)
 
-	Variable &result = as_variable(prg, v[0]);
-	int sprite_id = as_number(prg, v[1]);
-	double x = as_number(prg, v[2]);
-	double y = as_number(prg, v[3]);
-	double z = as_number(prg, v[4]);
-	double w = as_number(prg, v[5]);
-	double h = as_number(prg, v[6]);
-	double unit = as_number(prg, v[7]);
+	Variable result;
+	result.type = Variable::NUMBER;
 
-	CHECK_NUMBER(result)
-	
+	int sprite_id = as_number(prg, v[0]);
+	double x = as_number(prg, v[1]);
+	double y = as_number(prg, v[2]);
+	double z = as_number(prg, v[3]);
+	double w = as_number(prg, v[4]);
+	double h = as_number(prg, v[5]);
+	double unit = as_number(prg, v[6]);
+
 	Sprite_Info *info = sprite_info(prg);
 	INFO_EXISTS(info->sprites, sprite_id)
 	gfx::Sprite *sprite = info->sprites[sprite_id];
@@ -4098,7 +3920,7 @@ static bool modelfunc_billboard_from_sprite(Program *prg, const std::vector<Toke
 	billboard->unit = unit;
 	result.n = info2->billboard_id;
 	info2->billboards[info2->billboard_id++] = billboard;
-	return true;
+	return result;
 }
 
 static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
@@ -4245,78 +4067,77 @@ static bool modelfunc_billboard_scale(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool cdfunc_model_point(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_cd_model_point(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(5)
+	COUNT_ARGS(4)
 
-	Variable &result = as_variable(prg, v[0]);
-	int model_id = as_number(prg, v[1]);
-	double x = as_number(prg, v[2]);
-	double y = as_number(prg, v[3]);
-	double z = as_number(prg, v[4]);
+	Variable result;
+	result.type = Variable::NUMBER;
 
-	CHECK_NUMBER(result)
-	
+	int model_id = as_number(prg, v[0]);
+	double x = as_number(prg, v[1]);
+	double y = as_number(prg, v[2]);
+	double z = as_number(prg, v[3]);
+
 	Model_Info *info = model_info(prg);
 	INFO_EXISTS(info->models, model_id)
 	Model *model = info->models[model_id];
 			
 	result.n = cd::model_point(model->model, model->mat, glm::vec3(x, y, z));
 
-	return true;
+	return result;
 }
 
-static bool cdfunc_model_line_segment(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_cd_model_line_segment(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(11)
+	COUNT_ARGS(7)
 
-	Variable &result = as_variable(prg, v[0]);
-	int model_id = as_number(prg, v[1]);
-	double x = as_number(prg, v[2]);
-	double y = as_number(prg, v[3]);
-	double z = as_number(prg, v[4]);
-	double x2 = as_number(prg, v[5]);
-	double y2 = as_number(prg, v[6]);
-	double z2 = as_number(prg, v[7]);
-	Variable &out_x = as_variable(prg, v[8]);
-	Variable &out_y = as_variable(prg, v[9]);
-	Variable &out_z = as_variable(prg, v[10]);
+	Variable result;
+	result.type = Variable::VECTOR;
+	Variable var;
+	var.type = Variable::NUMBER;
 
-	CHECK_NUMBER(result)
-	CHECK_NUMBER(out_x)
-	CHECK_NUMBER(out_y)
-	CHECK_NUMBER(out_z)
-	
+	int model_id = as_number(prg, v[0]);
+	double x = as_number(prg, v[1]);
+	double y = as_number(prg, v[2]);
+	double z = as_number(prg, v[3]);
+	double x2 = as_number(prg, v[4]);
+	double y2 = as_number(prg, v[5]);
+	double z2 = as_number(prg, v[6]);
+
 	Model_Info *info = model_info(prg);
 	INFO_EXISTS(info->models, model_id)
 	Model *model = info->models[model_id];
 			
 	glm::vec3 out;
 
-	result.n = cd::model_line_segment(model->model, model->mat, glm::vec3(x, y, z), glm::vec3(x2, y2, z2), out);
+	var.n = cd::model_line_segment(model->model, model->mat, glm::vec3(x, y, z), glm::vec3(x2, y2, z2), out);
+	result.v.push_back(var);
+	var.n = out.x;
+	result.v.push_back(var);
+	var.n = out.y;
+	result.v.push_back(var);
+	var.n = out.z;
+	result.v.push_back(var);
 
-	out_x.n = out.x;
-	out_y.n = out.y;
-	out_z.n = out.z;
-
-	return true;
+	return result;
 }
 
-static bool cdfunc_sphere_sphere(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_cd_sphere_sphere(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(9)
+	COUNT_ARGS(8)
 
-	Variable &result = as_variable(prg, v[0]);
-	double x = as_number(prg, v[1]);
-	double y = as_number(prg, v[2]);
-	double z = as_number(prg, v[3]);
-	double r = as_number(prg, v[4]);
-	double x2 = as_number(prg, v[5]);
-	double y2 = as_number(prg, v[6]);
-	double z2 = as_number(prg, v[7]);
-	double r2 = as_number(prg, v[8]);
+	Variable result;
+	result.type = Variable::NUMBER;
 
-	CHECK_NUMBER(result)
+	double x = as_number(prg, v[0]);
+	double y = as_number(prg, v[1]);
+	double z = as_number(prg, v[2]);
+	double r = as_number(prg, v[3]);
+	double x2 = as_number(prg, v[4]);
+	double y2 = as_number(prg, v[5]);
+	double z2 = as_number(prg, v[6]);
+	double r2 = as_number(prg, v[7]);
 
 	x -= x2;
 	y -= y2;
@@ -4324,7 +4145,7 @@ static bool cdfunc_sphere_sphere(Program *prg, const std::vector<Token> &v)
 	double len = sqrt(x*x + y*y + z*z);
 	result.n = len < (r+r2);
 
-	return true;
+	return result;
 }
 
 class BooBoo_Widget : public TGUI_Widget {
@@ -4530,16 +4351,16 @@ void BooBoo_Widget::handle_event(TGUI_Event *event)
 	}
 }
 
-static bool widgetfunc_create(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_widget_create(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(4)
+	COUNT_ARGS(3)
 
-	Variable &v1 = as_variable(prg, v[0]);
-	double w = as_number(prg, v[1]);
-	double h = as_number(prg, v[2]);
-	Variable &data = as_variable(prg, v[3]);
-	
-	CHECK_NUMBER(v1)
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	double w = as_number(prg, v[0]);
+	double h = as_number(prg, v[1]);
+	Variable &data = as_variable(prg, v[2]);
 	
 	Widget_Info *info = widget_info(prg);
 
@@ -4565,7 +4386,7 @@ static bool widgetfunc_create(Program *prg, const std::vector<Token> &v)
 
 	info->widgets[info->widget_id++] = widget;
 
-	return true;
+	return v1;
 }
 
 static bool widgetfunc_set_parent(Program *prg, const std::vector<Token> &v)
@@ -5159,25 +4980,25 @@ void start_lib_game()
 {
 	add_instruction("inspect", miscfunc_inspect);
 	add_instruction("delay", miscfunc_delay);
-	add_instruction("get_ticks", miscfunc_get_ticks);
-	add_instruction("args", miscfunc_args);
-	add_instruction("get_logic_rate", miscfunc_get_logic_rate);
+	add_expression_handler("get_ticks", exprfunc_misc_get_ticks);
+	add_expression_handler("get_args", exprfunc_misc_get_args);
+	add_expression_handler("get_logic_rate", exprfunc_misc_get_logic_rate);
 	add_instruction("set_logic_rate", miscfunc_set_logic_rate);
-	add_instruction("file_list", miscfunc_file_list);
+	add_expression_handler("file_list", exprfunc_misc_file_list);
 	add_instruction("clear", gfxfunc_clear);
 	add_instruction("flip", gfxfunc_flip);
 	add_instruction("resize", gfxfunc_resize);
-	add_instruction("get_screen_size", gfxfunc_get_screen_size);
-	add_instruction("get_buffer_size", gfxfunc_get_buffer_size);
-	add_instruction("get_screen_offset", gfxfunc_get_screen_offset);
-	add_instruction("get_scale", gfxfunc_get_scale);
+	add_expression_handler("get_screen_size", exprfunc_gfx_get_screen_size);
+	add_expression_handler("get_buffer_size", exprfunc_gfx_get_buffer_size);
+	add_expression_handler("get_screen_offset", exprfunc_gfx_get_screen_offset);
+	add_expression_handler("get_scale", exprfunc_gfx_get_scale);
 	add_instruction("set_target", gfxfunc_set_target);
 	add_instruction("set_target_backbuffer", gfxfunc_set_target_backbuffer);
 	add_instruction("screen_shake", gfxfunc_screen_shake);
 	add_instruction("add_notification", gfxfunc_add_notification);
-	add_instruction("is_fullscreen", gfxfunc_is_fullscreen);
+	add_expression_handler("is_fullscreen", exprfunc_gfx_is_fullscreen);
 	add_instruction("toggle_fullscreen", gfxfunc_toggle_fullscreen);
-	add_instruction("get_refresh_rate", gfxfunc_get_refresh_rate);
+	add_expression_handler("get_refresh_rate", exprfunc_gfx_get_refresh_rate);
 	add_instruction("set_scissor", gfxfunc_set_scissor);
 	add_instruction("unset_scissor", gfxfunc_unset_scissor);
 	add_instruction("start_primitives", primfunc_start_primitives);
@@ -5191,8 +5012,8 @@ void start_lib_game()
 	add_instruction("filled_ellipse", primfunc_filled_ellipse);
 	add_instruction("circle", primfunc_circle);
 	add_instruction("filled_circle", primfunc_filled_circle);
-	add_instruction("image_create", imagefunc_create);
-	add_instruction("image_load", imagefunc_load);
+	add_expression_handler("image_create", exprfunc_image_create);
+	add_expression_handler("image_load", exprfunc_image_load);
 	add_instruction("image_save", imagefunc_save);
 	add_instruction("screenshot", imagefunc_screenshot);
 	add_instruction("image_destroy", imagefunc_destroy);
@@ -5201,72 +5022,71 @@ void start_lib_game()
 	add_instruction("image_draw_rotated_scaled", imagefunc_draw_rotated_scaled);
 	add_instruction("image_start", imagefunc_start);
 	add_instruction("image_end", imagefunc_end);
-	add_instruction("image_size", imagefunc_size);
+	add_expression_handler("image_size", exprfunc_image_size);
 	add_instruction("image_draw_9patch", imagefunc_draw_9patch);
-	add_instruction("image_read_texture", imagefunc_read_texture);
-	add_instruction("image_to_texture", imagefunc_to_texture);
+	add_expression_handler("image_read_texture", exprfunc_image_read_texture);
+	add_expression_handler("image_to_texture", exprfunc_image_to_texture);
 	add_instruction("image_update", imagefunc_update);
-	add_instruction("font_load", fontfunc_load);
+	add_expression_handler("font_load", exprfunc_font_load);
 	add_instruction("font_destroy", fontfunc_destroy);
 	add_instruction("font_draw", fontfunc_draw);
-	add_instruction("font_width", fontfunc_width);
-	add_instruction("font_height", fontfunc_height);
+	add_expression_handler("font_width", exprfunc_font_width);
+	add_expression_handler("font_height", exprfunc_font_height);
 	add_instruction("font_add_extra_glyph", fontfunc_add_extra_glyph);
 	add_instruction("set_tile_size", tilemapfunc_set_tile_size);
-	add_instruction("tilemap_load", tilemapfunc_load);
+	add_expression_handler("tilemap_load", exprfunc_tilemap_load);
 	add_instruction("tilemap_destroy", tilemapfunc_destroy);
 	add_instruction("tilemap_draw", tilemapfunc_draw);
-	add_instruction("tilemap_num_layers", tilemapfunc_num_layers);
-	add_instruction("tilemap_size", tilemapfunc_size);
-	add_instruction("tilemap_is_solid", tilemapfunc_is_solid);
-	add_instruction("tilemap_get_groups", tilemapfunc_get_groups);
+	add_expression_handler("tilemap_num_layers", exprfunc_tilemap_num_layers);
+	add_expression_handler("tilemap_size", exprfunc_tilemap_size);
+	add_expression_handler("tilemap_is_solid", exprfunc_tilemap_is_solid);
+	add_expression_handler("tilemap_get_groups", exprfunc_tilemap_get_groups);
 	add_instruction("tilemap_set_animated_tiles", tilemapfunc_set_animated_tiles);
-	add_instruction("tilemap_find_path", tilemapfunc_find_path);
+	add_expression_handler("tilemap_find_path", exprfunc_tilemap_find_path);
 	add_instruction("tilemap_set_solid", tilemapfunc_set_solid);
 	add_instruction("tilemap_set_tile", tilemapfunc_set_tile);
-	add_instruction("tilemap_get_tile", tilemapfunc_get_tile);
-	add_instruction("sprite_load", spritefunc_load);
+	add_expression_handler("tilemap_get_tile", exprfunc_tilemap_get_tile);
+	add_expression_handler("sprite_load", exprfunc_sprite_load);
 	add_instruction("sprite_destroy", spritefunc_destroy);
 	add_instruction("sprite_set_animation_lazy", spritefunc_set_animation_lazy);
 	add_instruction("sprite_set_animation", spritefunc_set_animation);
-	add_instruction("sprite_get_animation", spritefunc_get_animation);
-	add_instruction("sprite_get_previous_animation", spritefunc_get_previous_animation);
-	add_instruction("sprite_length", spritefunc_length);
-	add_instruction("sprite_current_frame", spritefunc_current_frame);
-	add_instruction("sprite_num_frames", spritefunc_num_frames);
-	add_instruction("sprite_current_frame_size", spritefunc_current_frame_size);
+	add_expression_handler("sprite_get_animation", exprfunc_sprite_get_animation);
+	add_expression_handler("sprite_get_previous_animation", exprfunc_sprite_get_previous_animation);
+	add_expression_handler("sprite_length", exprfunc_sprite_length);
+	add_expression_handler("sprite_current_frame", exprfunc_sprite_current_frame);
+	add_expression_handler("sprite_num_frames", exprfunc_sprite_num_frames);
+	add_expression_handler("sprite_current_frame_size", exprfunc_sprite_current_frame_size);
 	add_instruction("sprite_draw", spritefunc_draw);
 	add_instruction("sprite_start", spritefunc_start);
 	add_instruction("sprite_stop", spritefunc_stop);
 	add_instruction("sprite_reset", spritefunc_reset);
-	add_instruction("sprite_bounds", spritefunc_bounds);
-	add_instruction("sprite_elapsed", spritefunc_elapsed);
-	add_instruction("sprite_frame_times", spritefunc_frame_times);
-	add_instruction("sprite_is_started", spritefunc_is_started);
-	add_instruction("mml_create", mmlfunc_create);
-	add_instruction("mml_load", mmlfunc_load);
+	add_expression_handler("sprite_bounds", exprfunc_sprite_bounds);
+	add_expression_handler("sprite_elapsed", exprfunc_sprite_elapsed);
+	add_expression_handler("sprite_frame_times", exprfunc_sprite_frame_times);
+	add_expression_handler("sprite_is_started", exprfunc_sprite_is_started);
+	add_expression_handler("mml_create", exprfunc_mml_create);
+	add_expression_handler("mml_load", exprfunc_mml_load);
 	add_instruction("mml_destroy", mmlfunc_destroy);
 	add_instruction("mml_play", mmlfunc_play);
 	add_instruction("mml_stop", mmlfunc_stop);
-	add_instruction("sample_load", samplefunc_load);
+	add_expression_handler("sample_load", exprfunc_sample_load);
 	add_instruction("sample_destroy", samplefunc_destroy);
 	add_instruction("sample_play", samplefunc_play);
 	add_instruction("sample_stop", samplefunc_stop);
-	add_instruction("joystick_poll", joyfunc_poll);
-	add_instruction("joystick_count", joyfunc_count);
+	add_expression_handler("joystick_count", exprfunc_joy_count);
 	add_instruction("rumble", joyfunc_rumble);
-	add_instruction("joystick_get_button", joyfunc_get_button);
-	add_instruction("joystick_get_axis", joyfunc_get_axis);
-	add_instruction("cfg_load", cfgfunc_load);
+	add_expression_handler("joystick_get_button", exprfunc_joy_get_button);
+	add_expression_handler("joystick_get_axis", exprfunc_joy_get_axis);
+	add_expression_handler("cfg_load", exprfunc_cfg_load);
 	add_instruction("cfg_destroy", cfgfunc_destroy);
 	add_instruction("cfg_save", cfgfunc_save);
-	add_instruction("cfg_get_number", cfgfunc_get_number);
-	add_instruction("cfg_get_string", cfgfunc_get_string);
+	add_expression_handler("cfg_get_number", exprfunc_cfg_get_number);
+	add_expression_handler("cfg_get_string", exprfunc_cfg_get_string);
 	add_instruction("cfg_set_number", cfgfunc_set_number);
 	add_instruction("cfg_set_string", cfgfunc_set_string);
-	add_instruction("cfg_exists", cfgfunc_exists);
+	add_expression_handler("cfg_exists", exprfunc_cfg_exists);
 	add_instruction("cfg_erase", cfgfunc_erase);
-	add_instruction("shader_load", shaderfunc_load);
+	add_expression_handler("shader_load", exprfunc_shader_load);
 	add_instruction("shader_destroy", shaderfunc_destroy);
 	add_instruction("shader_use", shaderfunc_use);
 	add_instruction("shader_use_default", shaderfunc_use_default);
@@ -5278,11 +5098,11 @@ void start_lib_game()
 	add_instruction("shader_set_float_vector", shaderfunc_set_float_vector);
 	add_instruction("shader_set_matrix", shaderfunc_set_matrix);
 	add_instruction("shader_set_matrix_array", shaderfunc_set_matrix_array);
-	add_instruction("json_load", jsonfunc_load);
+	add_expression_handler("json_load", exprfunc_json_load);
 	add_instruction("json_destroy", jsonfunc_destroy);
-	add_instruction("json_get_string", jsonfunc_get_string);
-	add_instruction("json_get_number", jsonfunc_get_number);
-	add_instruction("model_load", modelfunc_load);
+	add_expression_handler("json_get_string", exprfunc_json_get_string);
+	add_expression_handler("json_get_number", exprfunc_json_get_number);
+	add_expression_handler("model_load", exprfunc_model_load);
 	add_instruction("model_destroy", modelfunc_destroy);
 	add_instruction("model_draw", modelfunc_draw);
 	add_instruction("set_2d", modelfunc_set_2d);
@@ -5291,7 +5111,7 @@ void start_lib_game()
 	add_instruction("model_scale", modelfunc_scale);
 	add_instruction("model_rotate", modelfunc_rotate);
 	add_instruction("model_translate", modelfunc_translate);
-	add_instruction("model_get_position", modelfunc_get_position);
+	add_expression_handler("model_get_position", exprfunc_model_get_position);
 	add_instruction("identity_3d", modelfunc_identity_3d);
 	add_instruction("scale_3d", modelfunc_scale_3d);
 	add_instruction("rotate_3d", modelfunc_rotate_3d);
@@ -5299,20 +5119,20 @@ void start_lib_game()
 	add_instruction("model_set_animation", modelfunc_set_animation);
 	add_instruction("model_stop", modelfunc_stop);
 	add_instruction("model_reset", modelfunc_reset);
-	add_instruction("model_size", modelfunc_size);
+	add_expression_handler("model_size", exprfunc_model_size);
 	add_instruction("draw_3d", modelfunc_draw_3d);
 	add_instruction("draw_3d_textured", modelfunc_draw_3d_textured);
-	add_instruction("model_clone", modelfunc_clone);
-	add_instruction("billboard_create", modelfunc_billboard_create);
-	add_instruction("billboard_from_sprite", modelfunc_billboard_from_sprite);
+	add_expression_handler("model_clone", exprfunc_model_clone);
+	add_expression_handler("billboard_create", exprfunc_billboard_create);
+	add_expression_handler("billboard_from_sprite", exprfunc_billboard_from_sprite);
 	add_instruction("billboard_destroy", modelfunc_billboard_destroy);
 	add_instruction("billboard_draw", modelfunc_billboard_draw);
 	add_instruction("billboard_translate", modelfunc_billboard_translate);
 	add_instruction("billboard_scale", modelfunc_billboard_scale);
-	add_instruction("cd_model_point", cdfunc_model_point);
-	add_instruction("cd_model_line_segment", cdfunc_model_line_segment);
-	add_instruction("cd_sphere_sphere", cdfunc_sphere_sphere);
-	add_instruction("widget_create", widgetfunc_create);
+	add_expression_handler("cd_model_point", exprfunc_cd_model_point);
+	add_expression_handler("cd_model_line_segment", exprfunc_cd_model_line_segment);
+	add_expression_handler("cd_sphere_sphere", exprfunc_cd_sphere_sphere);
+	add_expression_handler("widget_create", exprfunc_widget_create);
 	add_instruction("widget_set_parent", widgetfunc_set_parent);
 	add_instruction("widget_set_float_left", widgetfunc_set_float_left);
 	add_instruction("widget_set_float_right", widgetfunc_set_float_right);
