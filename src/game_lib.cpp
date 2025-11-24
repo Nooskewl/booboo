@@ -2748,8 +2748,7 @@ static bool cfgfunc_save(Program *prg, const std::vector<Token> &v)
 
 	bool success = save_cfg(prg, id, cfg_name);
 
-	CHECK_NUMBER(v1)	
-	
+	v.type = Variable::NUMBER;
 	v1.n = success;
 
 	return true;

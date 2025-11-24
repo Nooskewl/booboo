@@ -1038,7 +1038,7 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 	Variable &id = as_variable(prg, v[0]);
 	double index = as_number(prg, v[1]);
 
-	CHECK_VECTOR(id)
+	id.type = Variable::VECTOR;
 
 	if (index < 0 || index > id.v.size()) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
@@ -1090,7 +1090,7 @@ static bool vectorfunc_clear(Program *prg, const std::vector<Token> &v)
 
 	Variable &id = as_variable(prg, v[0]);
 
-	CHECK_VECTOR(id)
+	id.type = Variable::VECTOR;
 
 	id.v.clear();
 
@@ -1104,7 +1104,7 @@ static bool vectorfunc_reserve(Program *prg, const std::vector<Token> &v)
 	Variable &id = as_variable(prg, v[0]);
 	int n = as_number(prg, v[1]);
 
-	CHECK_VECTOR(id)
+	id.type = Variable::VECTOR;
 
 	id.v.reserve(n);
 
@@ -1117,7 +1117,7 @@ static bool mapfunc_clear(Program *prg, const std::vector<Token> &v)
 
 	Variable &id = as_variable(prg, v[0]);
 
-	CHECK_MAP(id)
+	id.type = Variable::MAP;
 
 	id.m.clear();
 
