@@ -1,8 +1,12 @@
 var f
 = f (file_open "word.txt" "r")
 var s
-= s (file_read f)
-file_close f
+if (== -1 f) default read
+	= s ""
+:default
+	= s (file_read f)
+	file_close f
+:read
 var p
 = p (toptr s)
 if (!= p NULL) go nope
