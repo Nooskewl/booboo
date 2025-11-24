@@ -1,6 +1,5 @@
 number i
 for i 2 (< i 5) 1 end_label
-print "%\n" i
-print "FOO\n"
+	print "%\n" i
 :end_label
 print "Done!\n"

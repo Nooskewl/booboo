@@ -11,9 +11,9 @@ print "N"
 text_reset
 print "): "
 number response
-getch response
+= response (getch)
 string s
-string_from_number s response
+= s (string_from_number response)
 print "\n\n"
 if (== s "y") slay dead
 	text_colour GREEN 1 GREEN 0

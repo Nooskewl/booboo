@@ -240,8 +240,8 @@ function draw
 
 function run
 {
-	+ rx 0.01
-	+ ry 0.02
+	= rx (+ rx 0.01)
+	= ry (+ ry 0.02)
 	identity_3d
 	translate_3d 0 0 -5
 	rotate_3d rx 1 0 0

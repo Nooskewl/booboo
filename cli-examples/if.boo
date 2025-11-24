@@ -4,14 +4,14 @@ number a b c
 = c 9
 string s
 print "Enter a number (7,8,9 are special, so is everything else!)\n"
-input s
+= s (input)
 if (== a s) the_if (== b s) elseif (== c s) elseif2 else
-print "the_if\n"
+	print "the_if\n"
 :the_if
-print "elseif\n"
+	print "elseif\n"
 :elseif
-print "elseif2\n"
+	print "elseif2\n"
 :elseif2
-print "else\n"
+	print "else\n"
 :else
 print "Done!\n"

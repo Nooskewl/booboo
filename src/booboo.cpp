@@ -2205,9 +2205,11 @@ bool corefunc_set(Program *prg, const std::vector<Token> &v)
 	}
 
 	if (v[1].type == Token::NUMBER) {
+		v1->type = Variable::NUMBER;
 		v1->n = as_number(prg, v[1]);
 	}
 	else if (v[1].type == Token::STRING) {
+		v1->type = Variable::STRING;
 		v1->s = as_string(prg, v[1]);
 	}
 	else {

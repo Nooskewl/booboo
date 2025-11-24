@@ -525,17 +525,17 @@ function draw_time_playing
 	call_result ss zero_padded_string_from_number seconds
 	call_result hs zero_padded_string_from_number hundredths
 
-	string time
-	string_format time "%:%.%" ms ss hs
+	string _time
+	string_format _time "%:%.%" ms ss hs
 
 	number tx
 	= tx 639
 	- tx 16
 	number w
-	font_width small_font w time
+	font_width small_font w _time
 	- tx w
 
-	font_draw small_font 223 113 38 255 time tx 0
+	font_draw small_font 223 113 38 255 _time tx 0
 
 	number seconds
 	= seconds got_coins_ticks
@@ -565,19 +565,19 @@ function draw_time_playing
 	call_result ss zero_padded_string_from_number seconds
 	call_result hs zero_padded_string_from_number hundredths
 
-	string time
-	string_format time "%:%.%" ms ss hs
+	string _time
+	string_format _time "%:%.%" ms ss hs
 
 	number tx
 	= tx 639
 	- tx 16
 	number w2
-	font_width small_font w2 time
+	font_width small_font w2 _time
 	- tx w
 	- tx w2
 	- tx 16
 
-	font_draw small_font 251 242 54 255 time tx 0
+	font_draw small_font 251 242 54 255 _time tx 0
 }
 
 function draw_time_won
@@ -886,13 +886,13 @@ function draw
 	call_result ss zero_padded_string_from_number seconds
 	call_result hs zero_padded_string_from_number hundredths
 
-	string time
-	string_format time "%:%.%" ms ss hs
+	string _time
+	string_format _time "%:%.%" ms ss hs
 
 	number tx
 	= tx 320
 	number w
-	font_width big_font w time
+	font_width big_font w _time
 	/ w 2
 	- tx w
 	number ty
@@ -902,7 +902,7 @@ function draw
 	/ h 2
 	- ty h
 
-	font_draw big_font 255 255 255 255 time tx ty
+	font_draw big_font 255 255 255 255 _time tx ty
 
 :done_draw
 }

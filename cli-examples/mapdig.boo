@@ -1,25 +1,20 @@
-map m
+map m m2 m3 m4
 
-map m2
-map m3
+= [m2 "foo"] "bar"
+= [m2 "baz"] "bazoo"
 
-map m4
+= [m3 "number"] 10
+= [m3 "string"] "foobarbaz"
 
-map_set m2 "foo" "bar"
-map_set m2 "baz" "bazoo"
+= [m4 "turkey"] "sandwich"
+= [m4 "boneless"] "ribs"
 
-map_set m3 "number" 10
-map_set m3 "string" "foobarbaz"
+= [m2 "recipes"] m4
 
-map_set m4 "turkey" "sandwich"
-map_set m4 "boneless" "ribs"
-
-map_set m2 "recipes" m4
-
-map_set m "0" m2
-map_set m "1" m3
+= [m "0"] m2
+= [m "1"] m3
 
 string recipe
-map_get m recipe "0" "recipes" "boneless"
+= recipe [m "0" "recipes" "boneless"]
 
 print "We're having %!\n" recipe

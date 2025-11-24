@@ -25,11 +25,10 @@ function draw
 	number th
 	font_width font tw text
 	font_height font th
-	/ tw 2
+	= tw (/ tw 2)
 	number dx
 	number dy
-	= dx 320
-	- dx tw
+	= dx (- 320 tw)
 	= dy 50
 	font_draw font 255 255 255 255 text dx dy
 
