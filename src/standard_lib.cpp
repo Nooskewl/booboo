@@ -1007,8 +1007,7 @@ static bool vectorfunc_add(Program *prg, const std::vector<Token> &v)
 	MIN_ARGS(2)
 
 	Variable &id = as_variable(prg, v[0]);
-
-	CHECK_VECTOR(id)
+	id.type = Variable::VECTOR;
 
 	for (size_t i  = 1; i < v.size(); i++) {
 		Variable var = as_variable_resolve(prg, v[i]);

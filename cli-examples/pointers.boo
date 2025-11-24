@@ -1,12 +1,12 @@
-number n
+var n
 = n 10
-pointer p
+var p
 = p (@ n)
 = `p 20
 print "%\n" n
 print "%\n" `p
 
-map m
+var m
 = [m "foo"] p
 = `[m "foo"] 30
 print "%\n" n

@@ -1,8 +1,8 @@
-number a b c
+var a b c
 = a 7
 = b 8
 = c 9
-string s
+var s
 print "Enter a number (7,8,9 are special, so is everything else!)\n"
 = s (input)
 if (== a s) the_if (== b s) elseif (== c s) elseif2 else

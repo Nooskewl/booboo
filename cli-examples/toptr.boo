@@ -1,9 +1,9 @@
-number f
+var f
 = f (file_open "word.txt" "r")
-string s
+var s
 = s (file_read f)
 file_close f
-pointer p
+var p
 = p (toptr s)
 if (!= p NULL) go nope
 	call `p

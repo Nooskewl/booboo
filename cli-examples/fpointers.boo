@@ -3,7 +3,7 @@ function foo
 	print "FOO\n"
 }
 
-pointer p
+var p
 = p (@ foo)
 call `p
 

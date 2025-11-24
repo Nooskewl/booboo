@@ -10,9 +10,9 @@ text_colour RED 0 BLACK 0
 print "N"
 text_reset
 print "): "
-number response
+var response
 = response (getch)
-string s
+var s
 = s (string_from_number response)
 print "\n\n"
 if (== s "y") slay dead

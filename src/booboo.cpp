@@ -1537,7 +1537,7 @@ func_top:
 					}
 					var_i++;
 				}
-				else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map" || tok == "pointer") {
+				else if (tok == "var") {
 					Statement s;
 					s.method = library_map[tok];
 					s.name = tok;
@@ -1563,21 +1563,7 @@ func_top:
 						}
 						Variable v;
 						v.name = tok2;
-						if (tok == "number") {
-							v.type = Variable::NUMBER;
-						}
-						else if (tok == "string") {
-							v.type = Variable::STRING;
-						}
-						else if (tok == "vector") {
-							v.type = Variable::VECTOR;
-						}
-						else if (tok == "map") {
-							v.type = Variable::MAP;
-						}
-						else { // pointer
-							v.type = Variable::POINTER;
-						}
+						v.type = Variable::UNTYPED;
 						v.obfuscated = obfuscated_name(prg);
 						std::map<std::string, int>::iterator it;
 						it = prg->variables_map.find(tok2);
@@ -1781,7 +1767,7 @@ func_top:
 			prg->variables_map[tok2] = var_i;
 			var_i++;
 		}
-		else if (tok == "number" || tok == "string" || tok == "vector" || tok == "map" || tok == "pointer") {
+		else if (tok == "var") {
 			Statement s;
 			s.method = library_map[tok];
 			s.name = tok;
@@ -1805,21 +1791,7 @@ func_top:
 				}
 				Variable v;
 				v.name = tok2;
-				if (tok == "number") {
-					v.type = Variable::NUMBER;
-				}
-				else if (tok == "string") {
-					v.type = Variable::STRING;
-				}
-				else if (tok == "vector") {
-					v.type = Variable::VECTOR;
-				}
-				else if (tok == "map") {
-					v.type = Variable::MAP;
-				}
-				else { // pointer
-					v.type = Variable::POINTER;
-				}
+				v.type = Variable::UNTYPED;
 				v.obfuscated = obfuscated_name(prg);
 				if (pass == PASS1) {
 					prg->variables.push_back(v);
@@ -2145,40 +2117,7 @@ bool breaker_return(Program *prg, const std::vector<Token> &v)
 	return false;
 }
 
-bool corefunc_number(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(1)
-	return true;
-}
-
-bool corefunc_string(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(1)
-	return true;
-}
-
-bool corefunc_vector(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(1)
-	
-	for (size_t i = 0; i < v.size(); i++) {
-		prg->variables[v[i].i].v.clear();
-	}
-
-	return true;
-}
-
-bool corefunc_map(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(1)
-	
-	for (size_t i = 0; i < v.size(); i++) {
-		prg->variables[v[i].i].m.clear();
-	}
-	return true;
-}
-
-bool corefunc_pointer(Program *prg, const std::vector<Token> &v)
+bool corefunc_var(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 	return true;
@@ -2464,8 +2403,7 @@ bool corefunc_for(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(5)
 
 	Variable &count = as_variable(prg, v[0]);
-
-	CHECK_NUMBER(count)
+	count.type = Variable::NUMBER;
 
 	count.n = as_number(prg, v[1]);
 	Variable &expr = as_variable(prg, v[2]);
@@ -3749,11 +3687,7 @@ void start()
 	add_instruction("exit", breaker_exit);
 	add_instruction("return", breaker_return);
 
-	add_instruction("number", corefunc_number);
-	add_instruction("string", corefunc_string);
-	add_instruction("vector", corefunc_vector);
-	add_instruction("map", corefunc_map);
-	add_instruction("pointer", corefunc_pointer);
+	add_instruction("var", corefunc_var);
 	
 	add_instruction("=", corefunc_set);
 	

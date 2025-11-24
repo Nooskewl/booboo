@@ -1,4 +1,4 @@
-number x
+var x
 = x 2
 = x (+ x 1 2 3)
 print "%\n" x

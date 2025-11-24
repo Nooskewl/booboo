@@ -1,4 +1,4 @@
-map m m2 m3 m4
+var m m2 m3 m4
 
 = [m2 "foo"] "bar"
 = [m2 "baz"] "bazoo"
@@ -14,7 +14,7 @@ map m m2 m3 m4
 = [m "0"] m2
 = [m "1"] m3
 
-string recipe
+var recipe
 = recipe [m "0" "recipes" "boneless"]
 
 print "We're having %!\n" recipe

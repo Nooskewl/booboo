@@ -49,7 +49,8 @@ struct Variable
 		FUNCTION,
 		EXPRESSION,
 		FISH,
-		POINTER
+		POINTER,
+		UNTYPED
 	} type;
 
 	struct Expression
