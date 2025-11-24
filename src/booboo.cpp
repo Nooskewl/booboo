@@ -2120,6 +2120,9 @@ bool breaker_return(Program *prg, const std::vector<Token> &v)
 bool corefunc_var(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
+	for (size_t i = 0; i < v.size(); i++) {
+		prg->variables[v[i].i].v.clear();
+	}
 	return true;
 }
 
