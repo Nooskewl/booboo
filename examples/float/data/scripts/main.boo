@@ -1,5 +1,4 @@
-vector pts
-vector v
+var pts v
 vector_add v 100
 vector_add v 50
 vector_add v 1
@@ -20,24 +19,24 @@ vector_add pts v
 
 function run
 {
-	number sz
-	vector_size pts sz
+	var sz
+	= sz (vector_size pts)
 
-	number i
+	var i
 	for i 0 (< i sz) 1 update
-		vector v
+		var v
 		= v [pts i]
-		+ [v 0] [v 2]
-		+ [v 1] [v 3]
+		= [v 0] (+ [v 0] [v 2])
+		= [v 1] (+ [v 1] [v 3])
 		if (< [v 0] 50) too_left (> [v 0] (- 640 50)) too_right
-			neg [v 2]
+			= [v 2] (neg [v 2])
 :too_left
-			neg [v 2]
+			= [v 2] (neg [v 2])
 :too_right
 		if (< [v 1] 50) too_up (> [v 1] (- 360 50)) too_down
-			neg [v 3]
+			= [v 3] (neg [v 3])
 :too_up
-			neg [v 3]
+			= [v 3] (neg [v 3])
 :too_down
 		= [pts i] v
 :update

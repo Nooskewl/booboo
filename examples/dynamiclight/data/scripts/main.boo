@@ -1,16 +1,16 @@
-number model
-model_load model "zeus.x"
+var model
+= model (model_load "zeus.x")
 model_set_animation model "ArmatureAction"
 
-number shader
-shader_load shader "lit_3d_vertex" "lit_3d_fragment"
+var shader
+= shader (shader_load "lit_3d_vertex" "lit_3d_fragment")
 
 set_3d
 
-vector start_light_pos light_pos
+var start_light_pos light_pos
 vector_init start_light_pos 0 0 0 1
 vector_init light_pos 0 0 0
-vector m
+var m
 = m (identity 4)
 
 function draw

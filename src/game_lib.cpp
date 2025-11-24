@@ -4968,12 +4968,30 @@ static void black_bars_callback(gfx::Black_Bar_Type type, int x, int y, int w, i
 	call_void_function_obfuscated(prg, "draw_black_bar", v, 0);
 }
 
-void register_game_callbacks()
+static void lost_device_callback()
 {
 }
 
+static void found_device_callback()
+{
+	if (is_3d) {
+		set_3d();
+	}
+	else {
+		set_2d();
+	}
+}
+
+void register_game_callbacks()
+{
+	gfx::register_lost_device_callbacks(lost_device_callback, found_device_callback);
+	gfx::register_black_bars_callback(black_bars_callback);
+}
+ 
 void unregister_game_callbacks()
 {
+	gfx::register_lost_device_callbacks(nullptr, nullptr);
+	gfx::register_black_bars_callback(nullptr);
 }
 
 void start_lib_game()

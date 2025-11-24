@@ -975,9 +975,7 @@ static bool vectorfunc_init(Program *prg, const std::vector<Token> &v)
 	MIN_ARGS(1)
 
 	Variable &vec = as_variable(prg, v[0]);
-
-	CHECK_VECTOR(vec)
-
+	vec.type = Variable::VECTOR;
 	vec.v.clear();
 
 	for (size_t i = 1; i < v.size(); i++) {

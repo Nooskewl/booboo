@@ -1,21 +1,21 @@
-number json
-json_load json "colours.json"
+var json
+= json (json_load "colours.json")
 
 function draw
 {
-	number r1 g1 b1 r2 g2 b2 r3 g3 b3 r4 g4 b4
-	json_get_number json r1 "topleft>r"
-	json_get_number json g1 "topleft>g"
-	json_get_number json b1 "topleft>b"
-	json_get_number json r2 "topright>r"
-	json_get_number json g2 "topright>g"
-	json_get_number json b2 "topright>b"
-	json_get_number json r3 "bottomright>r"
-	json_get_number json g3 "bottomright>g"
-	json_get_number json b3 "bottomright>b"
-	json_get_number json r4 "bottomleft>[0]"
-	json_get_number json g4 "bottomleft>[1]"
-	json_get_number json b4 "bottomleft>[2]"
+	var r1 g1 b1 r2 g2 b2 r3 g3 b3 r4 g4 b4
+	= r1 (json_get_number json "topleft>r")
+	= g1 (json_get_number json "topleft>g")
+	= b1 (json_get_number json "topleft>b")
+	= r2 (json_get_number json "topright>r")
+	= g2 (json_get_number json "topright>g")
+	= b2 (json_get_number json "topright>b")
+	= r3 (json_get_number json "bottomright>r")
+	= g3 (json_get_number json "bottomright>g")
+	= b3 (json_get_number json "bottomright>b")
+	= r4 (json_get_number json "bottomleft>[0]")
+	= g4 (json_get_number json "bottomleft>[1]")
+	= b4 (json_get_number json "bottomleft>[2]")
 
 	filled_rectangle r1 g1 b1 255 r2 g2 b2 255 r3 g3 b3 255 r4 g4 b4 255 0 0 640 360
 }

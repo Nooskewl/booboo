@@ -1,4 +1,4 @@
-vector verts faces colours
+var verts faces colours
 vector_add verts -0.5
 vector_add verts 0.5
 vector_add verts 0.5
@@ -223,9 +223,9 @@ vector_add colours 216
 vector_add colours 255
 vector_add colours 255
 
-vector normals
+var normals
 
-number rx ry
+var rx ry
 = rx 0
 = ry 0
 
