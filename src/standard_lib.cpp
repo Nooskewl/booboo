@@ -1028,7 +1028,7 @@ static Variable exprfunc_vector_size(Program *prg, const std::vector<Token> &v)
 	CHECK_VECTOR(id)
 	
 	Variable var;
-	var.type = Variable::VECTOR;
+	var.type = Variable::NUMBER;
 	var.n = id.v.size();
 
 	return var;
@@ -1225,7 +1225,7 @@ static bool filefunc_close(Program *prg, const std::vector<Token> &v)
 
 static Variable exprfunc_file_read(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(2)
+	COUNT_ARGS(1)
 
 	int id = as_number(prg, v[0]);
 

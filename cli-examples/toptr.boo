@@ -1,7 +1,7 @@
 number f
-file_open f "word.txt" "r"
+= f (file_open "word.txt" "r")
 string s
-file_read f s
+= s (file_read f)
 file_close f
 pointer p
 = p (toptr s)

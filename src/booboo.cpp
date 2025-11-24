@@ -2215,46 +2215,11 @@ bool corefunc_set(Program *prg, const std::vector<Token> &v)
 	else {
 		Variable v2 = as_variable_resolve(prg, v[1]);
 
-		if (IS_NUMBER(v2)) {
-			if (v1->type == Variable::NUMBER) {
-				v1->n = v2.n;
-			}
-			else { // string
-				char buf[1000];
-				snprintf(buf, 1000, "%f", v2.n);
-				v1->s = buf;
-			}
-		}
-		else if (IS_STRING(v2)) {
-			if (v1->type == Variable::NUMBER) {
-				v1->n = atof(v2.s.c_str());
-			}
-			else { // string
-				v1->s = v2.s;
-			}
-		}
-		else if (IS_VECTOR(v2)) {
-			if (IS_VECTOR(v2)) {
-				v1->v = v2.v;
-			}
-			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-			}
-		}
-		else if (IS_MAP(v2)) {
-			if (IS_MAP(v2)) {
-				v1->m = v2.m;
-			}
-			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-			}
-		}
-		else if (IS_POINTER(v2)) {
-			v1->p = v2.p;
-		}
-		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Operation undefined for operands at " + get_error_info(prg));
-		}
+		std::string name = v1->name;
+		std::string obfuscated = v1->obfuscated;
+		*v1 = v2;
+		v1->name = name;
+		v1->obfuscated = obfuscated;
 	}
 
 	return true;

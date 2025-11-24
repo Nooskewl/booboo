@@ -1,3 +1,5 @@
+srand(time)
+
 function circle
 {
 	print "Circle\n"
@@ -23,20 +25,13 @@ vector shapes
 map m
 
 number i
-= i 0
+for i 0 (< i 10) 1 next_loop
+	= [m "draw"] [v (rand 0 2)]
+	vector_add shapes m
 :next_loop
-map_set m "draw" [v (rand 0 2)]
-vector_add shapes m
-+ i 1
-? i 10
-jl next_loop
 
-number i
-= i 0
+for i 0 (< i 10) 1 next_loop2
+	map m
+	= m [shapes i]
+	call [m "draw"]
 :next_loop2
-map m
-vector_get shapes m i
-call [m "draw"]
-+ i 1
-? i 10
-jl next_loop2
