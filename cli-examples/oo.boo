@@ -1,5 +1,3 @@
-srand(time)
-
 function circle
 {
 	print "Circle\n"

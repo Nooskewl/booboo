@@ -3646,6 +3646,8 @@ static void init_token_map()
 
 void start()
 {
+	util::srand((Uint32)time(NULL));
+
 	twinkle::start();
 
 	init_token_map();
