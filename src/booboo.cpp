@@ -2920,15 +2920,29 @@ Variable exprfunc_lessequal(Program *prg, const std::vector<Token> &v)
 Variable exprfunc_equal(Program *prg, const std::vector<Token> &v)
 {
 	if (v[0].type == Token::SYMBOL) {
-		Variable var1 = as_variable_resolve(prg, v[0]);
-		if (var1.type == Variable::POINTER) {
+		Variable *v1;
+		Variable tmp;
+
+		if (v[0].dereference) {
+			if (prg->variables[v[0].i].type == Variable::EXPRESSION) {
+				tmp = as_variable_resolve(prg, v[0]);
+				v1 = tmp.p;
+			}
+			else {
+				v1 = as_variable(prg, v[0]).p;
+			}
+		}
+		else {
+			v1 = &as_variable(prg, v[0]);
+		}
+		if (v1->type == Variable::POINTER) {
 			COUNT_ARGS(2)
 			Variable var2 = as_variable_resolve(prg, v[1]);
 			if (var2.type == Variable::POINTER) {
 				Variable var;
 				var.type = Variable::NUMBER;
 				var.name = "-booboo-";
-				var.n = var1.p == var2.p;
+				var.n = v1->p == var2.p;
 				return var;
 			}
 			else {
