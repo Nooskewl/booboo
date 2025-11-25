@@ -928,7 +928,7 @@ function run
 	jne do_fire
 	goto do_thrust
 :do_fire
-	? next_fire_ticks 5
+	? next_fire_ticks 7
 	jl do_thrust
 	= next_fire_ticks 0
 	
@@ -950,6 +950,10 @@ function run
 	vector_add b ba
 	vector_add bullets b
 	mml_play shoot_sfx 1 0
+
+	if (>= (vector_size bullets) 7) erase_one
+		vector_erase bullets 0
+	:erase_one
 
 	; Do thrust
 
