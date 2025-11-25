@@ -1,57 +1,57 @@
-number font
-font_load font "font.ttf" 96 1
-number small_font
-font_load small_font "font.ttf" 48 1
+var font
+= font (font_load "font.ttf" 96 1)
+var small_font
+= small_font (font_load "font.ttf" 48 1)
 
-number drip_sfx
-number drop_ground_sfx
-mml_create drip_sfx "@PO0 = { 0 1000 0 1000 0 }\nA o3 @TYPE3 @PO0 g32 @PO0"
-mml_create drop_ground_sfx "@PO0 = { 0 1000 0 1000 0 }\nA o4 @TYPE3 @PO0 g32 @PO0"
+var drip_sfx
+var drop_ground_sfx
+= drip_sfx (mml_create "@PO0 = { 0 1000 0 1000 0 }\nA o3 @TYPE3 @PO0 g32 @PO0")
+= drop_ground_sfx (mml_create "@PO0 = { 0 1000 0 1000 0 }\nA o4 @TYPE3 @PO0 g32 @PO0")
 
-number cfg
-cfg_load cfg "com.nooskewl.doomed"
-vector names
-vector scores
-string n
-number s
-cfg_get_string cfg n "name0"
+var cfg
+= cfg (cfg_load "com.nooskewl.doomed")
+var names
+var scores
+var n
+var s
+= n (cfg_get_string cfg "name0")
 vector_add names n
-cfg_get_string cfg n "name1"
+= n (cfg_get_string cfg "name1")
 vector_add names n
-cfg_get_string cfg n "name2"
+= n (cfg_get_string cfg "name2")
 vector_add names n
-cfg_get_string cfg n "name3"
+= n (cfg_get_string cfg "name3")
 vector_add names n
-cfg_get_string cfg n "name4"
+= n (cfg_get_string cfg "name4")
 vector_add names n
-cfg_get_number cfg s "score0"
+= s (cfg_get_number cfg "score0")
 vector_add scores s
-cfg_get_number cfg s "score1"
+= s (cfg_get_number cfg "score1")
 vector_add scores s
-cfg_get_number cfg s "score2"
+= s (cfg_get_number cfg "score2")
 vector_add scores s
-cfg_get_number cfg s "score3"
+= s (cfg_get_number cfg "score3")
 vector_add scores s
-cfg_get_number cfg s "score4"
+= s (cfg_get_number cfg "score4")
 vector_add scores s
-number last_score
-cfg_get_number cfg last_score "last_score"
+var last_score
+= last_score (cfg_get_number cfg "last_score")
 ? last_score 0
 jge scored
 reset "main.boo"
 :scored
-number place
-number i
+var place
+var i
 = i 0
 :check_next_score
-number s
-vector_get scores s i
+var s
+= s [scores i]
 ? last_score s
 jl on_to_the_next_one
 = place i
 goto have_highscore
 :on_to_the_next_one
-+ i 1
+= i (+ i 1)
 ? i 5
 jl check_next_score
 reset "main.boo"
@@ -59,91 +59,86 @@ reset "main.boo"
 :have_highscore
 ? place 4
 jge no_shift
-number i
+var i
 = i 4
 :next_shift
-number j
-= j i
-- j 1
-number s
-string n
-vector_get scores s j
-vector_get names n j
-vector_set scores i s
-vector_set names i n
-- i 1
+var j
+= j (- i 1)
+var s
+var n
+= s [scores j]
+= n [names j]
+= [scores i] s
+= [names i] n
+= i (- i 1)
 ? i place
 jg next_shift
 :no_shift
-vector_set scores place last_score
+= [scores place] last_score
 
-number num_set
+var num_set
 = num_set 0
-number sel
+var sel
 = sel 0
-string curr
+var curr
 = curr "A"
 
-number old_joy_a
+var old_joy_a
 = old_joy_a 0
-number old_joy_u
+var old_joy_u
 = old_joy_u 0
-number old_joy_d
+var old_joy_d
 = old_joy_d 0
 
-vector initials
+var initials
 vector_add initials " "
 vector_add initials " "
 vector_add initials " "
 
 function write_scores name
 {
-	vector_set names place name
+	= [names place] name
 
-	number i
+	var i
 	= i 0
 	:write_next_score
-	number s
-	string n
-	vector_get names n i
-	vector_get scores s i
-	string str
-	string_format str "score%" i
+	var s
+	var n
+	= n [names i]
+	= s [scores i]
+	var str
+	= str (string_format "score%" i)
 	cfg_set_number cfg str s
-	string_format str "name%" i
+	= str (string_format "name%" i)
 	cfg_set_string cfg str n
-	+ i 1
+	= i (+ i 1)
 	? i 5
 	jl write_next_score
 
-	number success
-	cfg_save cfg success "com.nooskewl.doomed"
+	var success
+	= success (cfg_save cfg "com.nooskewl.doomed")
 	reset "highscores.boo"
 }
 
 function draw
 {
-	string text
+	var text
 	= text "HIGH SCORE"
-	number tw
-	number th
-	font_width font tw text
-	font_height font th
-	/ tw 2
-	number dx
-	number dy
-	= dx 320
-	- dx tw
+	var tw
+	var th
+	= tw (font_width font text)
+	= th (font_height font)
+	= tw (/ tw 2)
+	var dx
+	var dy
+	= dx (- 320 tw)
 	= dy 50
 	font_draw font 255 255 255 255 text dx dy
 
-	number dx
-	= dx 320
-	- dx 72
+	var dx
+	= dx (- 320 72)
 
-	= dy 50
-	+ dy th
-	+ dy 20
+	= dy (+ 50 th 20)
 
 	? num_set 3
 	jge done_draw_initials
@@ -151,35 +146,34 @@ function draw
 	? num_set 0
 	jle draw_curr
 
-	number i
+	var i
 	= i 0
 :draw_next_initial
-	string s
-	vector_get initials s i
-	number dx2
+	var s
+	= s [initials i]
+	var dx2
 	= dx2 dx
-	number w
-	font_width small_font w s
-	/ w 2
-	- dx2 w
+	var w
+	= w (font_width small_font s)
+	= w (/ w 2)
+	= dx2 (- dx2 w)
 	font_draw small_font 0 255 0 255 s dx2 dy
-	+ dx 50
-	+ i 1
+	= dx (+ dx 50)
+	= i (+ i 1)
 	? i num_set
 	jl draw_next_initial
 
 :draw_curr
-	number t
-	get_ticks t
-	% t 500
+	var t
+	= t (% (get_ticks) 500)
 	? t 250
 	jl done_draw_initials
-	number dx2
+	var dx2
 	= dx2 dx
-	number w
-	font_width small_font w curr
-	/ w 2
-	- dx2 w
+	var w
+	= w (font_width small_font curr)
+	= w (/ w 2)
+	= dx2 (- dx2 w)
 	font_draw small_font 0 255 0 255 curr dx2 dy
 
 :done_draw_initials
@@ -194,21 +188,19 @@ function run
 	= old_joy_a joy_a
 	? joy_a 1
 	jne no_press
-	vector_set initials num_set curr
-	+ num_set 1
+	= [initials num_set] curr
+	= num_set (+ num_set 1)
 	mml_play drop_ground_sfx 1 0
 	? num_set 3
 	jl no_press
-	string name
-	string c1
-	string c2
-	string c3
-	vector_get initials c1 0
-	vector_get initials c2 1
-	vector_get initials c3 2
-	= name c1
-	+ name c2
-	+ name c3
+	var name
+	var c1
+	var c2
+	var c3
+	= c1 [initials 0]
+	= c2 [initials 1]
+	= c3 [initials 2]
+	= name (+ c1 c2 c3)
 	call write_scores name
 
 :no_press
@@ -219,7 +211,7 @@ function run
 	? joy_d 1
 	jne check_joy_u
 	mml_play drip_sfx 1 0
-	- sel 1
+	= sel (- sel 1)
 	? sel 0
 	jge check_joy_u
 	= sel 35 ; A-Z and 0-9
@@ -231,25 +223,22 @@ function run
 	? joy_u 1
 	jne no_change
 	mml_play drip_sfx 1 0
-	+ sel 1
+	= sel (+ sel 1)
 	? sel 36
 	jl no_change
 	= sel 0
 :no_change
 
-	number ch
+	var ch
 	? sel 26
 	jge is_digit
-	= ch sel
-	+ ch 65
-	string_from_number curr ch
+	= ch (+ sel 65)
+	= curr (string_from_number ch)
 	goto done_set_curr
 
 :is_digit
-	= ch sel
-	- ch 26
-	+ ch 48
-	string_from_number curr ch
+	= ch (+ (- sel 26) 48)
+	= curr (string_from_number ch)
 
 :done_set_curr
 }
