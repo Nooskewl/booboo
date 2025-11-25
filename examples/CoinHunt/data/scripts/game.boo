@@ -789,7 +789,7 @@ function draw
 	var tx
 	= tx 320
 	var w
-	w = (/ (font_width big_font _time) 2)
+	= w (/ (font_width big_font _time) 2)
 	= tx (- tx w)
 	var ty
 	= ty 180

@@ -9,33 +9,33 @@ var enter_sfx
 = enter_sfx (mml_create "@PO0 = { 0 -100 0 100 0 -100 0 }\nA @PO0 a4 @PO0")
 
 var cfg
-= cfg (cfg_load "com.nooskewl.coinhunt""
+= cfg (cfg_load "com.nooskewl.coinhunt")
 var names
 var scores
 var n
 var s
-= n (cfg_get_string "name0")
+= n (cfg_get_string cfg "name0")
 vector_add names n
-= n (cfg_get_string "name1")
+= n (cfg_get_string cfg "name1")
 vector_add names n
-= n (cfg_get_string "name2")
+= n (cfg_get_string cfg "name2")
 vector_add names n
-= n (cfg_get_string "name3")
+= n (cfg_get_string cfg "name3")
 vector_add names n
-= n (cfg_get_string "name4")
+= n (cfg_get_string cfg "name4")
 vector_add names n
-= s (cfg_get_number "score0")
+= s (cfg_get_number cfg "score0")
 vector_add scores s
-= s (cfg_get_number "score1")
+= s (cfg_get_number cfg "score1")
 vector_add scores s
-= s (cfg_get_number "score2")
+= s (cfg_get_number cfg "score2")
 vector_add scores s
-= s (cfg_get_number "score3")
+= s (cfg_get_number cfg "score3")
 vector_add scores s
-= s (cfg_get_number "score4")
+= s (cfg_get_number cfg "score4")
 vector_add scores s
 var last_score
-= last_score (cfg_get_number "last_score")
+= last_score (cfg_get_number cfg "last_score")
 ? last_score 0
 jge scored
 reset "main.boo"
@@ -116,7 +116,7 @@ function write_scores name
 	jl write_next_score
 
 	var success
-	cfg_save cfg success "com.nooskewl.coinhunt"
+	= success (cfg_save cfg "com.nooskewl.coinhunt")
 	reset "highscores.boo"
 }
 
