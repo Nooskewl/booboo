@@ -5097,7 +5097,7 @@ void start_lib_game()
 	add_expression_handler("joy_get_axis", exprfunc_joy_get_axis);
 	add_expression_handler("cfg_load", exprfunc_cfg_load);
 	add_instruction("cfg_destroy", cfgfunc_destroy);
-	add_instruction("cfg_save", cfgfunc_save);
+	add_expression_handler("cfg_save", exprfunc_cfg_save);
 	add_expression_handler("cfg_get_number", exprfunc_cfg_get_number);
 	add_expression_handler("cfg_get_string", exprfunc_cfg_get_string);
 	add_instruction("cfg_set_number", cfgfunc_set_number);
