@@ -1,6 +1,6 @@
-number c
+var c
 = c 0
-number old
+var old
 = old 0
 
 function draw
@@ -10,8 +10,8 @@ function draw
 
 function run
 {
-	number k
-	key_get k KEY_RETURN
+	var k
+	= k (key_get KEY_RETURN)
 	if (&& (== k 1) (== old 0)) change
 		if (== c 0) white black
 			= c 255
