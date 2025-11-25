@@ -3870,7 +3870,7 @@ static Variable exprfunc_billboard_create(Program *prg, const std::vector<Token>
 	return result;
 }
 
-static bool modelfunc_billboard_destroy(Program *prg, const std::vector<Token> &v)
+static bool billboardfunc_destroy(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -3922,7 +3922,7 @@ static Variable exprfunc_billboard_from_sprite(Program *prg, const std::vector<T
 	return result;
 }
 
-static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
+static bool billboardfunc_draw(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(5)
 
@@ -4028,7 +4028,7 @@ static bool modelfunc_billboard_draw(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool modelfunc_billboard_translate(Program *prg, const std::vector<Token> &v)
+static bool billboardfunc_translate(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 
@@ -4048,7 +4048,7 @@ static bool modelfunc_billboard_translate(Program *prg, const std::vector<Token>
 	return true;
 }
 
-static bool modelfunc_billboard_scale(Program *prg, const std::vector<Token> &v)
+static bool billboardfunc_scale(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -5142,10 +5142,10 @@ void start_lib_game()
 	add_expression_handler("model_clone", exprfunc_model_clone);
 	add_expression_handler("billboard_create", exprfunc_billboard_create);
 	add_expression_handler("billboard_from_sprite", exprfunc_billboard_from_sprite);
-	add_instruction("billboard_destroy", modelfunc_billboard_destroy);
-	add_instruction("billboard_draw", modelfunc_billboard_draw);
-	add_instruction("billboard_translate", modelfunc_billboard_translate);
-	add_instruction("billboard_scale", modelfunc_billboard_scale);
+	add_instruction("billboard_destroy", billboardfunc_destroy);
+	add_instruction("billboard_draw", billboardfunc_draw);
+	add_instruction("billboard_translate", billboardfunc_translate);
+	add_instruction("billboard_scale", billboardfunc_scale);
 	add_expression_handler("cd_model_point", exprfunc_cd_model_point);
 	add_expression_handler("cd_model_line_segment", exprfunc_cd_model_line_segment);
 	add_expression_handler("cd_sphere_sphere", exprfunc_cd_sphere_sphere);

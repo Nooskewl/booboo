@@ -85,11 +85,6 @@ few of them:
 </ul>
 
 <p>
-Some of the demo games will auto-play by an AI if a joystick isn't connected.
-I'll leave it as an exercise if you want to play them with keyboard.
-</p>
-
-<p>
 Lots of the demos and examples use a simple Z/X key to A/B button mapping,
 so the keys are Z/X and arrows if you're using a keyboard. Most but not all
 included examples support the keyboard as well as joysticks.
@@ -131,7 +126,6 @@ data/ or data.cpa:
 		palettes
 		shaders
 			glsl
-			hlsl
 	audio
 		mml
 		samples
@@ -179,22 +173,22 @@ The following sections describe the API:
 	e.g. delay 1000
 </pre>
 
-<h3>get_ticks</h3>
+<h3>(get_ticks)</h3>
 <pre>
 	Get milliseconds since BooBoo interpreter launch
-	e.g. get_ticks ticks
+	e.g. = ticks (get_ticks)
 </pre>
 
-<h3>args</h3>
+<h3>(get_args)</h3>
 <pre>
 	Populate a vector with strings of the command line arguments
-	e.g. args v
+	e.g. = v (get_args)
 </pre>
 
-<h3>get_logic_rate</h3>
+<h3>(get_logic_rate)</h3>
 <pre>
 	Query the logic rate (default 60)
-	e.g. get_logic_rate r
+	e.g. = r (get_logic_rate)
 </pre>
 
 <h3>set_logic_rate</h3>
@@ -204,10 +198,10 @@ The following sections describe the API:
 	e.g. set_logic_rate 144
 </pre>
 
-<h3>file_list</h3>
+<h3>(file_list)</h3>
 <pre>
 	Get a list of files in the data/ directory or data.cpa
-	e.g. file_list vec
+	e.g. = vec (file_list)
 </pre>
 
 <a id="Graphics"></a>
@@ -236,23 +230,23 @@ The following sections describe the API:
 	e.g. resize 240 160 ; make a GBA game!
 </pre>
 
-<h3>get_screen_size</h3>
+<h3>(get_screen_size)</h3>
 <pre>
 	Get the size of the window in pixels. This
 	includes "black bars" and scaling, this is
 	the raw pixel-for-pixel size of the window
 	(or fullscreen window)
-	e.g. get_screen_size scr_w scr_h
+	e.g. explode (get_screen_size) scr_w scr_h
 </pre>
 
-<h3>get_buffer_size</h3>
+<h3>(get_buffer_size)</h3>
 <pre>
 	Get the size of the drawing area projection.
 	This is what "resize" changes and it starts at 640x360.
-	e.g. get_buffer_size bw bh
+	e.g. explode (get_buffer_size) bw bh
 </pre>
 
-<h3>get_screen_offset</h3>
+<h3>(get_screen_offset)</h3>
 <pre>
 	The BooBoo window is managed in a way that resizing the screen in
 	any way produces a scaled version of the game at the maximum size
@@ -260,15 +254,15 @@ The following sections describe the API:
 	screen_offset gives you the position of	the top left of the drawing
 	given any black bars. This is mainly useful for some shaders (for
 	example shaders that use gl_FragCoord.)
-	e.g. get_screen_offset ox oy
+	e.g. explode (get_screen_offset) ox oy
 </pre>
 
-<h3>get_scale</h3>
+<h3>(get_scale)</h3>
 <pre>
 	Retrieve the scale of the projection. BooBoo starts in a 1280x720
 	window with a 640x360 buffer, so e.g. the scale would be 2 to start
 	and would change based on window size and buffer size.
-	e.g. get_scale s
+	e.g. = s (get_scale)
 </pre>
 
 <h3>screen_shake</h3>
@@ -278,10 +272,10 @@ The following sections describe the API:
 	e.g. screen_shake amount_in_pixels duration_in_millis
 </pre>
 
-<h3>is_fullscreen</h3>
+<h3>(is_fullscreen)</h3>
 <pre>
 	Find out if the screen is currently fullscreen
-	e.g. is_fullscreen onoff
+	e.g. = onoff (is_fullscreen)
 </pre>
 
 <h3>toggle_fullscreen</h3>
@@ -298,10 +292,10 @@ The following sections describe the API:
 	e.g. add_notification "You won!"
 </pre>
 
-<h3>get_refresh_rate</h3>
+<h3>(get_refresh_rate)</h3>
 <pre>
 	Query the refresh rate of the monitor
-	e.g. get_refresh_rate r
+	e.g. = r (get_refresh_rate)
 </pre>
 
 <h3>set_scissor</h3>
@@ -393,10 +387,10 @@ The following sections describe the API:
 <a id="Image"></a>
 <h2>Image Functions</h2>
 
-<h3>image_create</h3>
+<h3>(image_create)</h3>
 <pre>
 	create a render target
-	e.g. image_create dest w h
+	e.g. = dest (image_create w h)
 </pre>
 
 <h3>set_target</h3>
@@ -412,10 +406,10 @@ The following sections describe the API:
 	e.g. set_target_backbuffer
 </pre>
 
-<h3>image_load</h3>
+<h3>(image_load)</h3>
 <pre>
 	load an image
-	e.g. image_load dest filename ^ lffs
+	e.g. = dest (image_load filename ^ lffs)
 </pre>
 
 <h3>image_save</h3>
@@ -424,21 +418,21 @@ The following sections describe the API:
 	e.g. image_save img "c:/foo.tga"
 </pre>
 
-<h3>image_read_texture</h3>
+<h3>(image_read_texture)</h3>
 <pre>
 	Read a texture into a vector of colour components
-	e.g. image_read_texture img v
+	e.g. = v (image_read_texture img)
 	e.g. = green [v y x 1]
 </pre>
 
-<h3>image_to_texture</h3>
+<h3>(image_to_texture)</h3>
 <pre>
 	Convert a vector of colour components to a image
 	This uses the same format returned by image_read_texture
 	e.g. image_read_texture img v
 	e.g. = [v y x 3] 255 ; change alpha of a pixel
 	e.g. image_destroy img
-	e.g. image_to_texture img v
+	e.g. = img (image_to_texture v)
 </pre>
 
 <h3>image_update</h3>
@@ -494,10 +488,10 @@ The following sections describe the API:
 	e.g. image_end img
 </pre>
 
-<h3>image_size</h3>
+<h3>(image_size)</h3>
 <pre>
 	get image width/height
-	e.g. image_size img w h
+	e.g. explode (image_size img) w h
 </pre>
 
 <h3>image_destroy</h3>
@@ -509,13 +503,13 @@ The following sections describe the API:
 <a id="Sprite"></a>
 <h2>Sprite Functions</h2>
 
-<h3>sprite_load</h3>
+<h3>(sprite_load)</h3>
 <pre>
 	Load a sprite. Please see the example for the format of a sprite.
 	Basically, each animation in a sprite is a sprite sheet exported
 	from Aseprite. Then there is a sprite.json which has a list of
 	animation names.
-	e.g. sprite_load sprite "my_sprite" ^ lffs
+	e.g. = sprite (sprite_load "my_sprite" ^ lffs)
 </pre>
 
 <h3>sprite_draw</h3>
@@ -540,40 +534,40 @@ The following sections describe the API:
 	e.g. sprite_set_animation_lazy sprite "run"
 </pre>
 
-<h3>sprite_get_animation</h3>
+<h3>(sprite_get_animation)</h3>
 <pre>
 	Returns the name of the current animation
-	e.g. sprite_get_animation sprite anim_name
+	e.g. = anim_name (sprite_get_animation sprite)
 </pre>
 
-<h3>sprite_get_previous_animation</h3>
+<h3>(sprite_get_previous_animation)</h3>
 <pre>
 	Returns the name of the previous animation
-	e.g. sprite_get_previous_animation sprite anim_name
+	e.g. = anim_name (sprite_get_previous_animation sprite)
 </pre>
 
-<h3>sprite_length</h3>
+<h3>(sprite_length)</h3>
 <pre>
 	Returns the total length in milliseconds of the current animation
-	e.g. sprite_length sprite l
+	e.g. = l (sprite_length sprite)
 </pre>
 
-<h3>sprite_current_frame</h3>
+<h3>(sprite_current_frame)</h3>
 <pre>
 	Returns the current frame number
-	e.g.  sprite_current_frame sprite n
+	e.g. = n (sprite_current_frame sprite)
 </pre>
 
-<h3>sprite_num_frames</h3>
+<h3>(sprite_num_frames)</h3>
 <pre>
 	Gets the number of frames in the current animation
-	e.g. sprite_num_frames sprite nf
+	e.g. = nf (sprite_num_frames sprite)
 </pre>
 
-<h3>sprite_current_frame_size</h3>
+<h3>(sprite_current_frame_size)</h3>
 <pre>
 	Returns the size of the current frame's image
-	e.g. sprite_current_frame_size sprite w h
+	e.g. explode (sprite_current_frame_size sprite) w h
 </pre>
 
 <h3>sprite_start</h3>
@@ -594,30 +588,30 @@ The following sections describe the API:
 	e.g. sprite_reset sprite
 </pre>
 
-<h3>sprite_bounds</h3>
+<h3>(sprite_bounds)</h3>
 <pre>
 	Returns the top left/bottom rightmost opaque pixels in the sprite
-	e.g. sprite_bounds sprite x1 y1 x2 y2
+	e.g. explode (sprite_bounds sprite) x1 y1 x2 y2
 </pre>
 
-<h3>sprite_elapsed</h3>
+<h3>(sprite_elapsed)</h3>
 <pre>
 	Get the number of milliseconds of elapsed time of the current
 	animation
-	e.g. sprite_elapsed sprite n
+	e.g. = n (sprite_elapsed sprite)
 </pre>
 
-<h3>sprite_frame_times</h3>
+<h3>(sprite_frame_times)</h3>
 <pre>
 	Get a vector of numbers which are the duration of each frame in the
 	sprite in milliseconds
-	e.g. sprite_frame_times sprite v
+	e.g. = v (sprite_frame_times sprite)
 </pre>
 
-<h3>sprite_is_started</h3>
+<h3>(sprite_is_started)</h3>
 <pre>
 	Check if a sprite is started or not
-	e.g. sprite_is_started sprite onoff
+	e.g. = onoff (sprite_is_started sprite)
 </pre>
 
 <h3>sprite_destroy</h3>
@@ -629,11 +623,11 @@ The following sections describe the API:
 <a id="Font"></a>
 <h2>Font Functions</h2>
 
-<h3>font_load</h3>
+<h3>(font_load)</h3>
 <pre>
 	load a TTF font
 	All of the font functions support UTF8
-	e.g. font_load font "DejaVuSans.ttf" px_size smooth_flag ^ lffs
+	e.g. = font (font_load "DejaVuSans.ttf" px_size smooth_flag ^ lffs)
 </pre>
 
 <h3>font_draw</h3>
@@ -647,16 +641,16 @@ The following sections describe the API:
 	font_draw font r g b a "HELLO" x y
 </pre>
 
-<h3>font_width</h3>
+<h3>(font_width)</h3>
 <pre>
 	get width of a string given a font
-	e.g. font_width font dest "FOOBARBAZ"
+	e.g. = dest (font_width font "FOOBARBAZ")
 </pre>
 
-<h3>font_height</h3>
+<h3>(font_height)</h3>
 <pre>
 	get the height of a font
-	e.g. font_height font dest
+	e.g. = dest (font_height font)
 </pre>
 
 <h3>font_add_extra_glyph</h3>
@@ -682,13 +676,13 @@ The following sections describe the API:
 	e.g. set_tile_size 32
 </pre>
 
-<h3>tilemap_load</h3>
+<h3>(tilemap_load)</h3>
 <pre>
 	Load a tilemap from data/misc/maps. Tiles should be located in
 	data/gfx/images/tiles and named tiles0.png, tiles1.png and so on
 	(.tga is also supported.) See AshEdit for more details on maps
 	and creating them.
-	e.g. tilemap_load a_number "map.wm2" ^ lffs
+	e.g. = t (tilemap_load "map.wm2" ^ lffs)
 </pre>
 
 <h3>tilemap_draw</h3>
@@ -698,28 +692,28 @@ The following sections describe the API:
 	e.g. tilemap_draw tilemap start_layer_inclusive end_layer_inclusive x y
 </pre>
 
-<h3>tilemap_num_layers</h3>
+<h3>(tilemap_num_layers)</h3>
 <pre>
 	Get the number of layers in a tilemap
-	e.g. tilemap_num_layers tilemap nl
+	e.g. = nl (tilemap_num_layers tilemap)
 </pre>
 
-<h3>tilemap_size</h3>
+<h3>(tilemap_size)</h3>
 <pre>
 	Get the size of a tilemap in tiles
-	e.g. tilemap_size tilemap w h
+	e.g. explode (tilemap_size tilemap) w h
 </pre>
 
-<h3>tilemap_is_solid</h3>
+<h3>(tilemap_is_solid)</h3>
 <pre>
 	Check if a tile is walkable
-	e.g. tilemap_is_solid tilemap solid x y
+	e.g. = solid (tilemap_is_solid tilemap x y)
 </pre>
 
-<h3>tilemap_get_groups</h3>
+<h3>(tilemap_get_groups)</h3>
 <pre>
 	Get group info about groups in a tilemap
-	e.g. tilemap_get_groups tilemap vec
+	e.g. = vec (tilemap_get_groups tilemap)
 	The vector will be stuffed with type/x/y/w/h vectors
 	See AshEdit for the meaning of groups. They're basically
 	arbitrary integers/bitmasks that rectangles of a tilemap
@@ -737,12 +731,12 @@ The following sections describe the API:
 	e.g. tilemap_set_animated_tiles tilemap delay w h anim_data
 </pre>
 
-<h3>tilemap_find_path</h3>
+<h3>(tilemap_find_path)</h3>
 <pre>
 	A* pathfinding using the tilemap solids and your own supplied points.
 	The path returned is a vector of vectors of x/y values
 	extra is a 2d vector of x/y values to use as extra solids
-	e.g. tilemap_find_path tilemap path extra start_x start_y end_x end_y
+	e.g. = path (tilemap_find_path tilemap extra start_x start_y end_x end_y)
 	path will be empty if there is no path
 </pre>
 
@@ -758,10 +752,10 @@ The following sections describe the API:
 	e.g. tilemap_set_tile tilemap layer posx posy tile_x tile_y solid
 </pre>
 
-<h3>tilemap_get_tile</h3>
+<h3>(tilemap_get_tile)</h3>
 <pre>
 	Get tile x/y and solid flag of layer/position in tilemap
-	e.g. tilemap_get_tile tilemap out_tx out_ty out_solid layer x y
+	e.g. explode (tilemap_get_tile tilemap layer x y) out_tx out_ty out_solid
 	out_tx/ty refers to x/y position within the tile sheet.
 </pre>
 
@@ -774,10 +768,10 @@ The following sections describe the API:
 <a id="Shader"></a>
 <h2>Shader Functions</h2>
 
-<h3>shader_load</h3>
+<h3>(shader_load)</h3>
 <pre>
 	Load a shader
-	e.g. shader_load n "my_vert" "my_frag" ^ lffs
+	e.g. = shader (shader_load "my_vert" "my_frag" ^ lffs)
 	This will load from
 	data/gfx/shaders/glsl/my_vert.txt
 </pre>
@@ -864,10 +858,10 @@ The following sections describe the API:
 	e.g. set_3d
 </pre>
 
-<h3>model_load</h3>
+<h3>(model_load)</h3>
 <pre>
 	Load a model with an optional armature an animations from .x file
-	e.g. model_load model_id "filename.x" ^ lffs
+	e.g. = model (model_load "filename.x" ^ lffs)
 </pre>
 
 <h3>model_draw</h3>
@@ -900,10 +894,10 @@ The following sections describe the API:
 	e.g. model_translate model add_x add_y add_z
 </pre>
 
-<h3>model_get_position</h3>
+<h3>(model_get_position)</h3>
 <pre>
 	Retrieve the models current position
-	e.g. model_get_translate model x y z
+	e.g. explode (model_get_translate model) x y z
 </pre>
 
 <h3>model_set_animation</h3>
@@ -926,10 +920,10 @@ The following sections describe the API:
 	e.g. model_reset model
 </pre>
 
-<h3>model_size</h3>
+<h3>(model_size)</h3>
 <pre>
 	Get the dimensions of a model
-	e.g. model_size model szx szy szz
+	e.g. explode (model_size model) szx szy szz
 </pre>
 
 <h3>model_destroy</h3>
@@ -986,17 +980,17 @@ The following sections describe the API:
 	e.g. draw_3d_textured tex vert_vec face_vec colour_vec normal_vec texcoord_vec num_triangles
 </pre>
 
-<h3>billboard_create</h3>
+<h3>(billboard_create)</h3>
 <pre>
 	Create a billboard
-	e.g. billboard_create result image x y z w h
+	e.g. = result (billboard_create image x y z w h)
 </pre>
 
-<h3>billboard_from_sprite</h3>
+<h3>(billboard_from_sprite)</h3>
 <pre>
 	Create a billboard backed by a sprite
 	unit is the number of pixels that spans 1 3D unit
-	e.g. billboard_from_sprite result sprite x y z w h unit
+	e.g. = result (billboard_from_sprite sprite x y z w h unit)
 </pre>
 
 <h3>billboard_draw</h3>
@@ -1053,12 +1047,12 @@ type, a, b, c and d are the same as for the global 'event' callback, described i
 and h are the calculated position and size of the widget in pixels.
 </p>
 
-<h3>widget_create</h3>
+<h3>(widget_create)</h3>
 <pre>
 	Create a widget
 	Sizes less than equal to 1 are taken as a percentage of the remaining size
 	of the container
-	e.g. widget_create result w h userdata
+	e.g. = result (widget_create w h userdata)
 </pre>
 
 <h3>widget_set_parent</h3>
@@ -1211,40 +1205,40 @@ and h are the calculated position and size of the widget in pixels.
 <a id="Collision"></a>
 <h2>Collision Detection Functions</h2>
 
-<h3>cd_model_point</h3>
+<h3>(cd_model_point)</h3>
 <pre>
 	Check if a point is inside a model
 	The model must be closed for this to work properly
-	e.g. cd_model_point result model x y z
+	e.g. = onoff (cd_model_point model x y z)
 </pre>
 
-<h3>cd_model_line_segment</h3>
+<h3>(cd_model_line_segment)</h3>
 <pre>
 	Check if a line segment intersects or is contained in a model
 	If result is TRUE, outx/outy/outz will have the intersection point
-	e.g. cd_model_line_segment result model x y z x2 y2 z2 outx outy outz
+	e.g. explode (cd_model_line_segment model x y z x2 y2 z2) result outx outy outz
 </pre>
 
-<h3>cd_sphere_sphere</h3>
+<h3>(cd_sphere_sphere)</h3>
 <pre>
 	Check if two sphere intersect
-	e.g. cd_sphere_sphere result x y z r x2 y2 z2 r2
+	e.g. = onoff (cd_sphere_sphere x y z r x2 y2 z2 r2)
 </pre>
 
 <a id="Audio"></a>
 <h2>Audio Functions</h2>
 
-<h3>mml_create</h3>
+<h3>(mml_create)</h3>
 <pre>
 	create an MML from a string. See the Music documentation section.
-	e.g. mml_create dest "A @TYPE3 abcdefg"
+	e.g. = dest (mml_create "A @TYPE3 abcdefg")
 	; this plays a b c d e f g 16th notes with a sine wave generator
 </pre>
 
-<h3>mml_load</h3>
+<h3>(mml_load)</h3>
 <pre>
 	load an MML from file
-	e.g. mml_load dest "sfx/blast.mml" ^ lffs
+	e.g. = dest (mml_load "sfx/blast.mml" ^ lffs)
 </pre>
 
 <h3>mml_play</h3>
@@ -1259,10 +1253,10 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. mml_stop blast
 </pre>
 
-<h3>sample_load</h3>
+<h3>(sample_load)</h3>
 <pre>
 	load a sample
-	e.g. sample_load s "example.wav" ^ lffs
+	e.g. = s (sample_load "example.wav" ^ lffs)
 </pre>
 
 <h3>sample_play</h3>
@@ -1292,16 +1286,10 @@ and h are the calculated position and size of the widget in pixels.
 <a id="Input"></a>
 <h2>Input Functions</h2>
 
-<h3>joystick_poll</h3>
-<pre>
-	poll a joystick for input
-	e.g. joystick_poll joystick_number x1 y1 x2 y2 x3 y3 l r u d a b x y lb rb ls rs back start
-</pre>
-
-<h3>joystick_count</h3>
+<h3>(joy_count)</h3>
 <pre>
 	get number of connected joysticks
-	e.g. joystick_count num_joysticks
+	e.g. = num_joysticks (joy_count)
 </pre>
 
 <h3>rumble</h3>
@@ -1310,39 +1298,39 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. rumble duration_in_ms ^ index
 </pre>
 
-<h3>joystick_get_button</h3>
+<h3>(joy_get_button)</h3>
 <pre>
 	Get the state of a joystick button listed in constants
 	Result is 0 or 1
-	e.g. joystick_get_button joy_num result JOY_A
+	e.g. = result (joy_get_button joy_num JOY_A)
 </pre>
 
-<h3>joystick_get_axis</h3>
+<h3>joy_get_axis</h3>
 <pre>
 	Get the state of a joystick axis listed in constants
 	Results or -1 to 1 except for triggers which are 0 to 1
-	e.g. joystick_get_axis joy_num result JOY_LEFTX
+	e.g. = result (joy_get_axis joy_num JOY_LEFTX)
 </pre>
 
-<h3>mouse_get_position</h3>
+<h3>(mouse_get_position)</h3>
 <pre>
 	Get the mouse position scaled relative to the projection
-	e.g. mouse_get_position mx my
+	e.g. explode (mouse_get_position) mx my
 </pre>
 
-<h3>mouse_get_buttons</h3>
+<h3>(mouse_get_buttons)</h3>
 <pre>
 	Get the mouse button state
 	Wheel will be 1 (forward) 0 (not moved) or -1 (backward)
-	e.g. mouse_get_buttons left middle right wheel
+	e.g. explode (mouse_get_buttons) left middle right wheel
 </pre>
 
-<h3>mouse_get_delta</h3>
+<h3>(mouse_get_delta)</h3>
 <pre>
 	Get the mouse delta movement since last call
 	The first time this is called, the values will be set to 0 and
 	return 0
-	e.g. mouse_get_delta dx dy
+	e.g. explode (mouse_get_delta) dx dy
 </pre>
 
 <h3>mouse_set_relative</h3>
@@ -1351,36 +1339,36 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. mouse_set_relative bonoff
 </pre>
 
-<h3>key_get</h3>
+<h3>(key_get)</h3>
 <pre>
 	Read if a key is pressed or not.
 	See constants for key names
-	e.g. key_get dest KEY_SPACE
+	e.g. = dest (key_get KEY_SPACE)
 </pre>
 
 <a id="JSON"></a>
 <h2>JSON Functions</h2>
 
-<h3>json_load</h3>
+<h3>(json_load)</h3>
 <pre>
 	Load a JSON file
-	e.g. json_load j "file.json" ^ lffs
+	e.g. = j (json_load "file.json" ^ lffs)
 </pre>
 
-<h3>json_get_string</h3>
+<h3>(json_get_string)</h3>
 <pre>
 	Read a string from JSON
 	You can dig down into the file by separating keys with "&gt;"
 	"[0]" "[1]" etc can be used to access arrays.
-	e.g. json_get_string json s "settings&gt;profile&gt;name"
+	e.g. = s (json_get_string json "settings&gt;profile&gt;name")
 </pre>
 
-<h3>json_get_number</h3>
+<h3>(json_get_number)</h3>
 <pre>
 	Read a number from JSON
 	You can dig down into the file by separating keys with "&gt;"
 	"[0]" "[1]" etc can be used to access arrays.
-	e.g. json_get_number json n "settings&gt;mouse&gt;sensitivity"
+	e.g. = n (json_get_number json "settings&gt;mouse&gt;sensitivity")
 </pre>
 
 <h3>json_destroy</h3>
@@ -1392,13 +1380,13 @@ and h are the calculated position and size of the widget in pixels.
 <a id="CFG"></a>
 <h2>Configuration Functions</h2>
 
-<h3>cfg_load</h3>
+<h3>(cfg_load)</h3>
 <pre>
 	load a config file
 	These files are saved in Saved Games\BooBoo along with
 	every BooBoo app, so you should use a domain name or
 	unique name
-	e.g. cfg_load cfg "com.illnorth.example"
+	e.g. = cfg (cfg_load "com.nooskewl.example")
 </pre>
 
 <h3>cfg_save</h3>
@@ -1407,17 +1395,17 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. cfg_save cfg ret_bool_success "com.illnorth.example"
 </pre>
 
-<h3>cfg_get_number</h3>
+<h3>(cfg_get_number)</h3>
 <pre>
 	read a number from config. Doesn't touch dest if the named value doesn't exist
-	e.g. cfg_get_number cfg dest "x"
+	e.g. = dest (cfg_get_number cfg "x")
 </pre>
 
-<h3>cfg_get_string</h3>
+<h3>(cfg_get_string)</h3>
 <pre>
 	Doesn't touch dest if the named value doesn't exist
 	read a string from config
-	e.g. cfg_get_string cfg dest "name"
+	e.g. = dest (cfg_get_string cfg "name")
 </pre>
 
 <h3>cfg_set_number</h3>
@@ -1432,10 +1420,10 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. cfg_set_string cfg "name" "Trent"
 </pre>
 
-<h3>cfg_exists</h3>
+<h3>(cfg_exists)</h3>
 <pre>
 	check if a value exists in a config file
-	e.g. cfg_exists cfg exists "x"
+	e.g. = exists (cfg_exists cfg "x")
 </pre>
 
 <h3>cfg_erase</h3>
