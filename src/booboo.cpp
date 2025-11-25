@@ -2376,6 +2376,28 @@ static std::string typeof_var(Variable &v1)
 	return res;
 }
 
+Variable exprfunc_number(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable res;
+	res.type = Variable::NUMBER;
+	res.n = as_number(prg, v[0]);
+
+	return res;
+}
+
+Variable exprfunc_string(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable res;
+	res.type = Variable::STRING;
+	res.s = as_string(prg, v[0]);
+
+	return res;
+}
+
 Variable exprfunc_typeof(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -3709,6 +3731,8 @@ void start()
 	add_instruction("call", corefunc_call);
 	add_instruction("call_result", corefunc_call_result);
 	add_expression_handler("typeof", exprfunc_typeof);
+	add_expression_handler("number", exprfunc_number);
+	add_expression_handler("string", exprfunc_string);
 
 	add_instruction("for", corefunc_for);
 	add_instruction("if", corefunc_if);
