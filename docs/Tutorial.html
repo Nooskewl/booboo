@@ -52,13 +52,6 @@ function.
 </p>
 
 <p>
-Return values are by convention passed back into the first parameter after
-the function call:
-</p>
-
-&lt;func&gt; &lt;ret&gt; &lt;param1&gt; &lt;param2&gt;
-
-<p>
 Functions can be defined:
 </p>
 
@@ -79,7 +72,7 @@ function derp2 a b c
 	return (+ a b c)
 }
 ...
-number result
+var result
 call_result result derp2 32984 438 13
 </pre>
 
@@ -140,7 +133,7 @@ for example to loop to 10:
 </p>
 
 <pre>
-number i
+var i
 for i 0 (&lt; i 10) 1 again
 	print "%\n" i
 :again
@@ -179,13 +172,12 @@ expression that evaluates to TRUE if i equals 10. You can define operators like
 </p>
 
 <pre>
-function esin x
+function times_7 x
 {
-	sin x
-	return x
+	return (* x 7)
 }
 ...
-= foo (esin 3.14159)
+= foo (times_7 777)
 </pre>
 
 <hr>
