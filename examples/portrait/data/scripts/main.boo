@@ -1,7 +1,7 @@
 resize 448 704
 
-number img
-image_load img "0.png"
+var img
+= img (image_load "0.png")
 
 function draw
 {

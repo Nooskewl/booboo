@@ -1,39 +1,31 @@
-number num_stars
+var num_stars
 = num_stars 128
-number max_trail
+var max_trail
 = max_trail 64
-number velocity
+var velocity
 = velocity 1
 
-vector stars
+var stars
 
-number i
+var i
 for i 0 (< i num_stars) 1 add_another_star
-	vector v
-	number r
-	number x
-	number y
-	rand r 0 639
+	var v r x y
+	= r (rand 0 639)
 	= x r
 	vector_add v r
-	rand r 0 359
+	= r (rand 0 359)
 	= y r
 	vector_add v r
-	number dx
-	number dy
+	var dx
+	var dy
 	= dx (- x 320)
 	= dy (- y 180)
-	number angle
-	= angle dy
-	atan2 angle dx
-	number vx
-	= vx angle
-	cos vx
-	* vx velocity
-	number vy
-	= vy angle
-	sin vy
-	* vy velocity
+	var angle
+	= angle (atan2 dy dx)
+	var vx
+	= vx (* (cos angle) velocity)
+	var vy
+	= vy (* (sin angle) velocity)
 	vector_add v vx
 	vector_add v vy
 	vector_add stars v
@@ -46,22 +38,16 @@ for i 0 (< i 120) 1 next_cycle
 
 function run
 {
-	number sz
-	vector_size stars sz
+	var sz
+	= sz (vector_size stars)
 
 	for i 0 (< i num_stars) 1 next_update
-		vector v
-		vector_get stars v i
-		number x
-		number y
-		number vx
-		number vy
-		vector_get v x 0
-		vector_get v y 1
-		vector_get v vx 2
-		vector_get v vy 3
-		+ x vx
-		+ y vy
+		var v
+		= v [stars i]
+		var x y vx vy
+		explode v x y vx vy
+		= x (+ x vx)
+		= y (+ y vy)
 		? x 0
 		jl regen
 		? y 0
@@ -78,9 +64,9 @@ function run
 		goto done_regen
 
 :done_regen
-		vector_set v 0 x
-		vector_set v 1 y
-		vector_set stars i v
+		= [v 0] x
+		= [v 1] y
+		= [stars i] v
 :next_update
 }
 
@@ -88,56 +74,44 @@ function draw
 {
 	clear 0 0 0
 
-	number sz
-	vector_size stars sz
+	var sz
+	= sz (vector_size stars)
 
 	for i 0 (< i num_stars) 1 next_draw
-		vector v
-		vector_get stars v i
-		number x
-		number y
-		number vx
-		number vy
-		vector_get v x 0
-		vector_get v y 1
-		vector_get v vx 2
-		vector_get v vx 3
-		number cx
-		number cy
+		var v
+		= v [stars i]
+		var x y vx vy
+		explode v x y vx vy
+		var cx
+		var cy
 		= cx 320
 		= cy 180
-		number dx
-		number dy
+		var dx
+		var dy
 		= dx (- cx x)
 		= dy (- cy y)
-		* dx dx
-		* dy dy
-		number dist
+		= dx (* dx dx)
+		= dy (* dy dy)
+		var dist
 		= dist dx
-		+ dist dy
-		sqrt dist
+		= dist (sqrt (+ dist dy))
 		; 410px is about the max it can get from diagonal to center
-		/ dist 410
-		* dist max_trail
-		number dx
-		number dy
+		= dist (/ dist 410)
+		= dist (* dist max_trail)
+		var dx
+		var dy
 		= dx (- 320 x)
 		= dy (- 180 y)
-		number angle
-		= angle dy
-		atan2 angle dx
-		= dx angle
-		cos dx
-		* dx dist
-		= dy angle
-		sin dy
-		* dy dist
-		number trail_x
-		number trail_y
+		var angle
+		= angle (atan2 dy dx)
+		= dx (* (cos angle) dist)
+		= dy (* (sin angle) dist)
+		var trail_x
+		var trail_y
 		= trail_x x
-		- trail_x dx
+		= trail_x (- trail_x dx)
 		= trail_y y
-		- trail_y dy
+		= trail_y (- trail_y dy)
 		line 255 255 255 255 x y trail_x trail_y 1
 :next_draw
 

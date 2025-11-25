@@ -1,17 +1,17 @@
-number shader
-shader_load shader "" "red_fragment"
+var shader
+= shader (shader_load "" "red_fragment")
 
-number tree
-image_load tree "tree.png"
+var tree
+= tree (image_load "tree.png")
 
 function draw
 {
 	shader_use shader
 
-	number w h
-	image_size tree w h
-	/ w 2
-	/ h 2
+	var w h
+	explode (image_size tree) w h
+	= w (/ w 2)
+	= h (/ h 2)
 
 	image_draw tree 255 255 255 255 (- (/ 640 2) w) (- (/ 360 2) h) 0 0
 
