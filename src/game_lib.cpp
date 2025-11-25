@@ -2738,20 +2738,21 @@ static bool cfgfunc_destroy(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool cfgfunc_save(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_cfg_save(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	COUNT_ARGS(2)
 
 	int id = as_number(prg, v[0]);
-	Variable &v1 = as_variable(prg, v[1]);
-	std::string cfg_name = as_string(prg, v[2]);
+	std::string cfg_name = as_string(prg, v[1]);
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
 
 	bool success = save_cfg(prg, id, cfg_name);
 
-	v1.type = Variable::NUMBER;
 	v1.n = success;
 
-	return true;
+	return v1;
 }
 
 static Variable exprfunc_cfg_get_number(Program *prg, const std::vector<Token> &v)
