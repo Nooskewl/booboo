@@ -99,7 +99,7 @@ static Variable exprfunc_mouse_get_position(Program *prg, const std::vector<Toke
 	v2.n = mouse_pos.y;
 
 	Variable vec;
-	vec.type = Variable::NUMBER;
+	vec.type = Variable::VECTOR;
 	vec.v.push_back(v1);
 	vec.v.push_back(v2);
 
