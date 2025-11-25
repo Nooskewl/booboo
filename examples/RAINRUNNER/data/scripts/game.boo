@@ -1,156 +1,156 @@
-number drop_img
-number idle_img
-number jump_img
-number run1_img
-number run2_img
-number umbrella_img
-image_load drop_img "game_gfx/drop.png"
-image_load idle_img "game_gfx/idle.png"
-image_load jump_img "game_gfx/jump.png"
-image_load run1_img "game_gfx/run1.png"
-image_load run2_img "game_gfx/run2.png"
-image_load umbrella_img "game_gfx/umbrella.png"
+var drop_img
+var idle_img
+var jump_img
+var run1_img
+var run2_img
+var umbrella_img
+= drop_img (image_load "game_gfx/drop.png")
+= idle_img (image_load "game_gfx/idle.png")
+= jump_img (image_load "game_gfx/jump.png")
+= run1_img (image_load "game_gfx/run1.png")
+= run2_img (image_load "game_gfx/run2.png")
+= umbrella_img (image_load "game_gfx/umbrella.png")
 
-vector numeral_imgs ; I really should have named these 0-9...
-number img
-image_load img "game_gfx/i.png"
+var numeral_imgs ; I really should have named these 0-9...
+var img
+= img (image_load "game_gfx/i.png")
 vector_add numeral_imgs img
-image_load img "game_gfx/ii.png"
+= img (image_load "game_gfx/ii.png")
 vector_add numeral_imgs img
-image_load img "game_gfx/iii.png"
+= img (image_load "game_gfx/iii.png")
 vector_add numeral_imgs img
-image_load img "game_gfx/iv.png"
+= img (image_load "game_gfx/iv.png")
 vector_add numeral_imgs img
-image_load img "game_gfx/v.png"
+= img (image_load "game_gfx/v.png")
 vector_add numeral_imgs img
-image_load img "game_gfx/vi.png"
+= img (image_load "game_gfx/vi.png")
 vector_add numeral_imgs img
-image_load img "game_gfx/vii.png"
+= img (image_load "game_gfx/vii.png")
 vector_add numeral_imgs img
-image_load img "game_gfx/viii.png"
+= img (image_load "game_gfx/viii.png")
 vector_add numeral_imgs img
-image_load img "game_gfx/ix.png"
+= img (image_load "game_gfx/ix.png")
 vector_add numeral_imgs img
-image_load img "game_gfx/x.png"
+= img (image_load "game_gfx/x.png")
 vector_add numeral_imgs img
 
-number font
-font_load font "font.ttf" 32 1
+var font
+= font (font_load "font.ttf" 32 1)
 
-number hit_sfx
-number jump_sfx
-number collect_sfx
-number drip_sfx
-number drop_ground_sfx
-number hit_umbrella_sfx
-number gameover_sfx
-number win_sfx
-mml_create hit_sfx "A @TYPE1 a16"
-mml_create jump_sfx "@PO0 = { 0 100 }\nA @PO0 a16 @PO0"
-mml_create collect_sfx "A @TYPE0 y32 c32g16"
-mml_create drip_sfx "@PO0 = { 0 1000 }\nA o3 @TYPE3 @PO0 g32 @PO0"
-mml_create drop_ground_sfx "@PO0 = { 0 -1000 0 1000 }\nA @TYPE3 o5 @PO0 a8 @PO0"
-mml_create hit_umbrella_sfx "@PO0 = { 0 -100 }\nA @TYPE3 @PO0 g4 @PO0"
-mml_create gameover_sfx "@PO0 = { 0 -500 100 -300 500 -500 0 -300 }\nA @TYPE1 o8 @PO0 c @PO0"
-mml_load win_sfx "sfx/win.mml"
+var hit_sfx
+var jump_sfx
+var collect_sfx
+var drip_sfx
+var drop_ground_sfx
+var hit_umbrella_sfx
+var gameover_sfx
+var win_sfx
+= hit_sfx (mml_create "A @TYPE1 a16")
+= jump_sfx (mml_create "@PO0 = { 0 100 }\nA @PO0 a16 @PO0")
+= collect_sfx (mml_create "A @TYPE0 y32 c32g16")
+= drip_sfx (mml_create "@PO0 = { 0 1000 }\nA o3 @TYPE3 @PO0 g32 @PO0")
+= drop_ground_sfx (mml_create "@PO0 = { 0 -1000 0 1000 }\nA @TYPE3 o5 @PO0 a8 @PO0")
+= hit_umbrella_sfx (mml_create "@PO0 = { 0 -100 }\nA @TYPE3 @PO0 g4 @PO0")
+= gameover_sfx (mml_create "@PO0 = { 0 -500 100 -300 500 -500 0 -300 }\nA @TYPE1 o8 @PO0 c @PO0")
+= win_sfx (mml_load "sfx/win.mml")
 
-number music
-mml_load music "music/music.mml"
+var music
+= music (mml_load "music/music.mml")
 mml_play music 0.5 1
 
-number ground
+var ground
 = ground 300
 
-number px
-number py
+var px
+var py
 = px 320
 = py ground
 
-number jumping
+var jumping
 = jumping 0
-number jumps
+var jumps
 = jumps 0
-number moving
+var moving
 = moving 1
-number dir
+var dir
 = dir 1
 
-number move_speed
+var move_speed
 = move_speed 5.0
 
-number gravity
+var gravity
 = gravity 20
-number drop_gravity
+var drop_gravity
 = drop_gravity 10
-number jump_accel
+var jump_accel
 = jump_accel -31
-number jump_accel_damp
+var jump_accel_damp
 = jump_accel_damp 0.5
 
-number vy
+var vy
 = vy 0
 
 include "poll_joystick.inc"
-number old_joy_a
+var old_joy_a
 = old_joy_a joy_a
 
-number angle
+var angle
 = angle 0
 
-number score
+var score
 = score 0
 
-vector drops
-number next_drop
+var drops
+var next_drop
 = next_drop 180
-number drop_start_y
+var drop_start_y
 = drop_start_y -50
-number drop_interval
+var drop_interval
 = drop_interval 60
-number speed_up
+var speed_up
 = speed_up 1800
 
-number max_life
+var max_life
 = max_life 10
-number life
+var life
 = life max_life
 
-number next_umbrella
+var next_umbrella
 = next_umbrella 1800
-number umbrella_x
-number umbrella_y
-number umbrella
+var umbrella_x
+var umbrella_y
+var umbrella
 = umbrella 0
 
-number have_umbrella
+var have_umbrella
 = have_umbrella 0
 
-vector numerals
-number i
+var numerals
+var i
 = i 0
 :add_next_numeral
-vector numeral
+var numeral
 vector_add numeral 0
-number r
-rand r 50 589
+var r
+= r (rand 50 589)
 vector_add numeral r
-rand r 50 289
+= r (rand 50 289)
 vector_add numeral r
 vector_add numerals numeral
-+ i 1
+= i (+ i 1)
 ? i 10
 jl add_next_numeral
 
-number won
+var won
 = won 0
-number exit_count
+var exit_count
 
-number start_ticks
-get_ticks start_ticks
+var start_ticks
+= start_ticks (get_ticks)
 
-vector life_r
-vector life_g
-vector life_b
+var life_r
+var life_g
+var life_b
 vector_add life_r 0
 vector_add life_r 255
 vector_add life_r 255

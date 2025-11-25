@@ -1,17 +1,17 @@
 clear 0 0 0
 
-number font
-font_load font "font.ttf" 96 1
-number small_font
-font_load small_font "font.ttf" 32 1
+var font
+= font (font_load "font.ttf" 96 1)
+var small_font
+= small_font (font_load "font.ttf" 32 1)
 
-number highlight
+var highlight
 = highlight -1
 
-number cfg
-cfg_load cfg "com.nooskewl.rainrunner"
-number exists
-cfg_exists cfg exists "last_score"
+var cfg
+= cfg (cfg_load "com.nooskewl.rainrunner")
+var exists
+= exists (cfg_exists cfg "last_score")
 ? exists 0
 jne dont_set_defaults
 cfg_set_number cfg "score0" 2000
@@ -26,97 +26,91 @@ cfg_set_string cfg "name3" "ILL"
 cfg_set_string cfg "name4" "ILL"
 :dont_set_defaults
 
-vector names
-vector scores
-string n
-number s
-cfg_get_string cfg n "name0"
+var names
+var scores
+var n
+var s
+= n (cfg_get_string cfg "name0")
 vector_add names n
-cfg_get_string cfg n "name1"
+= n (cfg_get_string cfg "name1")
 vector_add names n
-cfg_get_string cfg n "name2"
+= n (cfg_get_string cfg "name2")
 vector_add names n
-cfg_get_string cfg n "name3"
+= n (cfg_get_string cfg "name3")
 vector_add names n
-cfg_get_string cfg n "name4"
+= n (cfg_get_string cfg "name4")
 vector_add names n
-cfg_get_number cfg s "score0"
+= s (cfg_get_number cfg "score0")
 vector_add scores s
-cfg_get_number cfg s "score1"
+= s (cfg_get_number cfg "score1")
 vector_add scores s
-cfg_get_number cfg s "score2"
+= s (cfg_get_number cfg "score2")
 vector_add scores s
-cfg_get_number cfg s "score3"
+= s (cfg_get_number cfg "score3")
 vector_add scores s
-cfg_get_number cfg s "score4"
+= s (cfg_get_number cfg "score4")
 vector_add scores s
-number last_score
-cfg_get_number cfg last_score "last_score"
+var last_score
+= last_score (cfg_get_number cfg "last_score")
 ? last_score 0
 jl no_highlight
-number i
+var i
 = i 0
 :next_highlight_check
-number j
-= j 4
-- j i
-number s
-vector_get scores s j
+var j
+= j (- 4 i)
+var s
+= s [scores j]
 ? s last_score
 jne continue_loop
 = highlight j
 goto no_highlight
 :continue_loop
-+ i 1
+= i (+ i 1)
 ? i 5
 jl next_highlight_check
 :no_highlight
 	
-string text
+var text
 = text "HIGH SCORES"
-number tw
-number th
-font_width font tw text
-font_height font th
-/ tw 2
-number dx
-number dy
-= dx 320
-- dx tw
+var tw
+var th
+= tw (font_width font text)
+= th (font_height font)
+= tw (/ tw 2)
+var dx
+var dy
+= dx (- 320 tw)
 = dy 50
 font_draw font 0 216 255 255 text dx dy
 
-number dy
-= dy 50
-+ dy th
-+ dy 20
-number w
-number h
+var dy
+= dy (+ 50 th 20)
+var w
+var h
 = w 256
 = h 32
-number rect_x1
-= rect_x1 320
-- rect_x1 128
+var rect_x1
+= rect_x1 (- 320 128)
 
-number i
+var i
 = i 0
 :draw_next_score2
-number m
-= m i
-% m 2
+var m
+= m (% i 2)
 ? m 1
 jne no_bg2
 filled_rectangle 64 64 64 255 64 64 64 255 64 64 64 255 64 64 64 255 rect_x1 dy w h
 :no_bg2
-string text
-number sc
-vector_get names text i
-vector_get scores sc i
-string text2
-string_format text2 "%" sc
-number tr
-number tg
-number tb
+var text
+var sc
+= text [names i]
+= sc [scores i]
+var text2
+= text2 (string_format "%" sc)
+var tr
+var tg
+var tb
 ? i highlight
 jne white2
 = tr 216
@@ -128,60 +122,51 @@ goto after_colour2
 = tg 255
 = tb 255
 :after_colour2
-number i_x
-number i_y
-number small_h
-font_height small_font small_h
-number pad
-= pad h
-- pad small_h
-/ pad 2
-/ small_h 2
+var i_x
+var i_y
+var small_h
+= small_h (font_height small_font)
+var pad
+= pad (/ (- h small_h) 2)
+= small_h (/ small_h 2)
 = i_x rect_x1
-+ i_x pad
+= i_x (+ i_x pad)
 = i_y dy
-number half
-= half h
-/ half 2
-+ i_y half
-- i_y small_h
+var half
+= half (/ h 2)
+= i_y (- (+ i_y half) small_h)
 ;font_draw small_font tr tg tb 255 text i_x i_y
-= i_x 320
-+ i_x 128
-- i_x pad
-number sw
-font_width small_font sw text2
-- i_x sw
+= i_x (- (+ 320 128) pad)
+var sw
+= sw (font_width small_font text2)
+= i_x (- i_x sw)
 ;font_draw small_font tr tg tb 255 text2 i_x i_y
-+ dy h
-+ i 1
+= dy (+ dy h)
+= i (+ i 1)
 ? i 5
 jl draw_next_score2
 
-number dy
-= dy 50
-+ dy th
-+ dy 20
+var dy
+= dy (+ 50 th 20)
 
-number i
+var i
 = i 0
 :draw_next_score
-number m
-= m i
-% m 2
+var m
+= m (% i 2)
 ? m 1
 jne no_bg
 ;filled_rectangle 64 64 64 255 64 64 64 255 64 64 64 255 64 64 64 255 rect_x1 dy w h
 :no_bg
-string text
-number sc
-vector_get names text i
-vector_get scores sc i
-string text2
-string_format text2 "%" sc
-number tr
-number tg
-number tb
+var text
+var sc
+= text [names i]
+= sc [scores i]
+var text2
+= text2 (string_format "%" sc)
+var tr
+var tg
+var tb
 ? i highlight
 jne white
 = tr 216
@@ -193,39 +178,33 @@ goto after_colour
 = tg 255
 = tb 255
 :after_colour
-number i_x
-number i_y
-number small_h
-font_height small_font small_h
-number pad
-= pad h
-- pad small_h
-/ pad 2
-/ small_h 2
+var i_x
+var i_y
+var small_h
+= small_h (font_height small_font)
+var pad
+= pad (/ (- h small_h) 2)
+= small_h (/ small_h 2)
 = i_x rect_x1
-+ i_x pad
+= i_x (+ i_x pad)
 = i_y dy
-number half
-= half h
-/ half 2
-+ i_y half
-- i_y small_h
+var half
+= half (/ h 2)
+= i_y (- (+ i_y half) small_h)
 font_draw small_font tr tg tb 255 text i_x i_y
-= i_x 320
-+ i_x 128
-- i_x pad
-number sw
-font_width small_font sw text2
-- i_x sw
+= i_x (- (+ 320 128) pad)
+var sw
+= sw (font_width small_font text2)
+= i_x (- i_x sw)
 font_draw small_font tr tg tb 255 text2 i_x i_y
-+ dy h
-+ i 1
+= dy (+ dy h)
+= i (+ i 1)
 ? i 5
 jl draw_next_score
 
 flip
 delay 10000
 cfg_set_number cfg "last_score" -1
-number success
-cfg_save cfg success "com.nooskewl.rainrunner"
+var success
+= success (cfg_save cfg "com.nooskewl.rainrunner")
 reset "main.boo"
