@@ -1,9 +1,9 @@
-number cock fire
-sample_load cock "gun-cocking-01.wav"
-sample_load fire "pistol.ogg"
+var cock fire
+= cock (sample_load "gun-cocking-01.wav")
+= fire (sample_load "pistol.ogg")
 
-number font
-font_load font "font.ttf" 32 1
+var font
+= font (font_load "font.ttf" 32 1)
 
 function event type a b c d
 {
