@@ -1,10 +1,10 @@
-number model
+var model
 
-model_load model "nooskewl.x"
+= model (model_load "nooskewl.x")
 
 set_3d
 
-number rx rz count
+var rx rz count
 = rx 0
 = rz 0
 = count 0
@@ -18,13 +18,13 @@ function draw
 
 function run
 {
-	+ count 1
+	= count (+ count 1)
 	if (> count 480) zero
 		= count 0
 	:zero
 	if (< count 240) rot z
-		+ rx (/ PI 120)
-		+ rz (/ PI 60)
+		= rx (+ rx (/ PI 120))
+		= rz (+ rz (/ PI 60))
 	:rot
 		= rx 0
 		= rz 0
