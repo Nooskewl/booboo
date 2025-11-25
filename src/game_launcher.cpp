@@ -18,6 +18,8 @@ using namespace noo;
 #include "booboo/internal.h"
 using namespace booboo;
 
+const int MAX_OPS_PER_SECOND = 10000000;
+
 Program *prg;
 
 int orig_argc;
@@ -39,6 +41,10 @@ static int mouse_dy;
 static bool delta_got;
 
 static int exit_key = TGUIK_F12;
+
+extern int num_ops;
+Uint64 op_time = 0;
+double ops_sec = 0;
 
 static bool mousefunc_set_relative(Program *prg, const std::vector<Token> &v)
 {
@@ -424,6 +430,31 @@ void draw_all()
 
 	gfx::draw_guis();
 	gfx::draw_notifications();
+
+	if (shim::font && util::bool_arg(shim::debug, shim::argc, shim::argv, "debug")) {
+		Uint64 now = SDL_GetTicks();
+		Uint64 diff = now - op_time;
+		if (diff >= 5000) {
+			ops_sec = num_ops / (diff / 1000.0);
+			num_ops = 0;
+			op_time = now;
+		}
+		if (ops_sec >= MAX_OPS_PER_SECOND) {
+			throw Error("Over 10,000,000 ops per second - bailing...");
+		}
+		std::string d = util::string_printf("%.2f", ops_sec);
+		int w = shim::font->get_text_width(d);
+		for (float y = 0; y < 4; y++) {
+			for (float x = 0; x < 4; x++) {
+				shim::font->draw(shim::white, d, {shim::screen_size.w-w-x, y});
+			}
+		}
+		for (float y = 1; y < 3; y++) {
+			for (float x = 0; x < 4; x++) {
+				shim::font->draw(shim::black, d, {shim::screen_size.w-w-x, y});
+			}
+		}
+	}
 
 	gfx::set_matrices(_mv, _proj);
 	gfx::update_projection();

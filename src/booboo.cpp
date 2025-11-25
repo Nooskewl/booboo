@@ -22,6 +22,8 @@ static std::map<std::string, int> expression_map;
 static std::vector<booboo::expression_func> expression_handlers;
 static std::vector<std::string> special_functions;
 
+int num_ops = 0;
+
 // First off maybe 10 utility functions taken from Nooskewl Shim
 
 static void skip_whitespace(booboo::Program *prg)
@@ -2040,6 +2042,8 @@ bool interpret(Program *prg)
 	if (pc_bak == prg->s->pc) {
 		prg->s->pc++;
 	}
+
+	num_ops++;
 
 	return ret;
 }
