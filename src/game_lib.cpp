@@ -1603,13 +1603,13 @@ static Variable exprfunc_image_read_texture(Program *prg, const std::vector<Toke
 			var2.type = Variable::VECTOR;
 			Variable var3;
 			var3.type = Variable::NUMBER;
-			var3.n = pixels[y*img->size.w*4+x*4+0];
+			var3.n = pixels[(img->size.h-y-1)*img->size.w*4+x*4+0];
 			var2.v.push_back(var3);
-			var3.n = pixels[y*img->size.w*4+x*4+1];
+			var3.n = pixels[(img->size.h-y-1)*img->size.w*4+x*4+1];
 			var2.v.push_back(var3);
-			var3.n = pixels[y*img->size.w*4+x*4+2];
+			var3.n = pixels[(img->size.h-y-1)*img->size.w*4+x*4+2];
 			var2.v.push_back(var3);
-			var3.n = pixels[y*img->size.w*4+x*4+3];
+			var3.n = pixels[(img->size.h-y-1)*img->size.w*4+x*4+3];
 			var2.v.push_back(var3);
 			var.v.push_back(var2);
 		}
@@ -1641,7 +1641,7 @@ static Variable exprfunc_image_to_texture(Program *prg, const std::vector<Token>
 
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
-			int yy = y;
+			int yy = h-y-1;
 			pixels[yy*w*4+x*4+0] = v2.v[y].v[x].v[0].n;
 			pixels[yy*w*4+x*4+1] = v2.v[y].v[x].v[1].n;
 			pixels[yy*w*4+x*4+2] = v2.v[y].v[x].v[2].n;
@@ -1683,10 +1683,10 @@ static bool imagefunc_update(Program *prg, const std::vector<Token> &v)
 
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
-			pixels[y*w*4+x*4+0] = v1.v[y].v[x].v[0].n;
-			pixels[y*w*4+x*4+1] = v1.v[y].v[x].v[1].n;
-			pixels[y*w*4+x*4+2] = v1.v[y].v[x].v[2].n;
-			pixels[y*w*4+x*4+3] = v1.v[y].v[x].v[3].n;
+			pixels[(h-y-1)*w*4+x*4+0] = v1.v[y].v[x].v[0].n;
+			pixels[(h-y-1)*w*4+x*4+1] = v1.v[y].v[x].v[1].n;
+			pixels[(h-y-1)*w*4+x*4+2] = v1.v[y].v[x].v[2].n;
+			pixels[(h-y-1)*w*4+x*4+3] = v1.v[y].v[x].v[3].n;
 		}
 	}
 
