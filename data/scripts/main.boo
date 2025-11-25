@@ -1,66 +1,66 @@
-number scanline_skip scanline_alpha
+var scanline_skip scanline_alpha
 = scanline_skip 2
 ;= scanline_alpha 128
 = scanline_alpha 0 ; disable the effect
 
-number TOP
+var TOP
 = TOP 20
 
-number widget
-mml_load widget "sfx/widget.mml"
-number button
-mml_load button "sfx/button.mml"
+var widget
+= widget (mml_load "sfx/widget.mml")
+var button
+= button (mml_load "sfx/button.mml")
 
-number W H
-number font
-number small_font
-number fh
-number num
+var W H
+var font
+var small_font
+var fh
+var num
 
 call rsz FALSE
 
-number more_down
-image_load more_down "ui/more_down.png"
+var more_down
+= more_down (image_load "ui/more_down.png")
 
-number go_ok
+var go_ok
 = go_ok 0
 
-number old_a old_b
+var old_a old_b
 = old_a 0
 = old_b 0
 
-number u_time d_time
+var u_time d_time
 = u_time 0
 = d_time 0
 
-number old_b1 old_b3
+var old_b1 old_b3
 = old_b1 0
 = old_b3 0
 
-number old_esc
+var old_esc
 = old_esc 0
 
-number old_home old_end
+var old_home old_end
 = old_home 0
 = old_end 0
 
-number selected
-number top
-vector filenames
-string dir
+var selected
+var top
+var filenames
+var dir
 
-vector argv
-args argv
-number i
-number sz
-vector_size argv sz
-number found
+var argv
+= argv (get_args)
+var i
+var sz
+= sz (vector_size argv)
+var found
 = found 0
 for i 0 (< i sz) 1 check_arg
-	string arg
+	var arg
 	= arg [argv i]
 	if (&& (== arg "+dir") (< i (- sz 1))) list_other
-		string s
+		var s
 		= s [argv (+ i 1)]
 		call list_dir [argv (+ i 1)]
 		= found 1
@@ -80,36 +80,34 @@ function rsz destroy_fonts
 		font_destroy small_font
 	:destroy
 
-	get_screen_size W H
+	explode (get_screen_size) W H
 	resize W H
 
-	font_load font "font.ttf" (/ H 25) 1
-	font_load small_font "font.ttf" (/ H 35) 1
+	= font (font_load "font.ttf" (/ H 25) 1)
+	= small_font (font_load "font.ttf" (/ H 35) 1)
 
-	font_height font fh
+	= fh (font_height font)
 
-	= num (- (- H (* fh 3.5)) 20)
-	/ num fh
-	floor num
+	= num (floor (/ (- (- H (* fh 3.5)) 20) fh))
 }
 
 function chop_dir s
 {
-	number p
-	string_length p s
-	- p 2
+	var p
+	= p (string_length s)
+	= p (- p 2)
 	if (< p 0) none
 		return s
 	:none
-	number i
+	var i
 	for i p (>= i 0) -1 loop
-		number c
-		string_char_at c s i
-		string cs
-		string_from_number cs c
+		var c
+		= c (string_char_at s i)
+		var cs
+		= cs (string_from_number c)
 		if (|| (== cs "/") (== cs "\\\\")) found
-			+ i 1
-			string_substr s i
+			= i (+ i 1)
+			= s (string_substr s i)
 			return s
 		:found
 	:loop
@@ -119,40 +117,37 @@ function chop_dir s
 
 function matches s regex
 {
-	number m
-	string_matches m s regex
+	var m
+	= m (string_matches s regex)
 	return m
 }
 
 function list_dir name
 {
-	get_full_path name
-	string_replace name "[\\\\]" "/"
+	= name (get_full_path name)
+	= name (string_replace name "[\\\\]" "/")
 
-	number len
-	string_length len name
-	string sub
-	= sub name
-	string_substr sub (- len 3)
+	var len
+	= len (string_length name)
+	var sub
+	= sub (string_substr name (- len 3))
 	if (&& (== sub "../") (>= len 6)) check_collapse
-		string sub
-		= sub name
-		string_substr sub (- len 6)
+		var sub
+		= sub (string_substr name (- len 6))
 		if (&& (!= sub "../../") (!= sub "..\\../")) collapse
-			number count
+			var count
 			= count 0
-			number p
+			var p
 			for p (- len 1) (>= p 0) -1 scan
-				number c
-				string_char_at c name p
-				string ch
-				string_from_number ch c
+				var c
+				= c (string_char_at name p)
+				var ch
+				= ch (string_from_number c)
 				if (|| (== ch "/") (== ch "\\")) found_slash
-					+ count 1
+					= count (+ count 1)
 					if (== count 3) really_collapse
-						string sub
-						= sub name
-						string_substr sub 0 (+ p 1)
+						var sub
+						= sub (string_substr name 0 (+ p 1))
 						= name sub
 						goto done_collapse
 					:really_collapse
@@ -163,29 +158,28 @@ function list_dir name
 	:done_collapse
 
 	= dir name
-	+ name "*"
-	list_directory filenames name
+	= name (+ name "*")
+	= filenames (list_directory name)
 
 	if (|| (matches dir "^.:[/\\\\]$") (matches dir "^/$")) no_up has_up
-		vector drives
-		list_drives drives
-		number sz
-		vector_size drives sz
-		number i
-		number place
+		var drives
+		= drives (list_drives)
+		var sz
+		= sz (vector_size drives)
+		var i
+		var place
 		= place 0
 		for i 0 (< i sz) 1 add_drive
-			string drive
+			var drive
 			= drive [drives i]
-			+ drive ":/"
-			string sub
-			= sub dir
-			string_substr sub 0 1
-			string tmp
+			= drive (+ drive ":/")
+			var sub
+			= sub (string_substr dir 0 1)
+			var tmp
 			= tmp [drives i]
 			if (!= sub [drives i]) really_add_drive
 				vector_insert filenames place drive
-				+ place 1
+				= place (+ place 1)
 			:really_add_drive
 		:add_drive
 	:no_up
@@ -195,11 +189,11 @@ function list_dir name
 	= selected 0
 	= top 0
 	= go_ok 0
-	number sz
-	vector_size filenames sz
-	number i
+	var sz
+	= sz (vector_size filenames)
+	var i
 	for i 0 (< i sz) 1 loop_good
-		string s
+		var s
 		= s [filenames i]
 		call_result s chop_dir s
 		if (== s "data.cpa") is_cpa
@@ -207,11 +201,10 @@ function list_dir name
 			goto done_list
 		:is_cpa
 		if (== s "data/") is_data_dir
-			string orig
-			= orig [filenames i]
-			+ orig "scripts/main.boo"
-			number f
-			file_open f orig "r"
+			var orig
+			= orig (+ [filenames i] "scripts/main.boo")
+			var f
+			= f (file_open orig "r")
 			if (!= -1 f) is_booboo_app
 				file_close f
 				= go_ok 1
@@ -221,7 +214,7 @@ function list_dir name
 	:loop_good
 :done_list
 	for i 0 (< i sz) 1 loop_bad
-		string s
+		var s
 		= s [filenames i]
 		call_result s chop_dir s
 		if (|| (== s "BooBoo.exe") (== s "BooBoo")) dont_relaunch
@@ -234,20 +227,20 @@ function list_dir name
 
 function draw
 {
-	number sz
-	vector_size filenames sz
-	number i
-	number y
+	var sz
+	= sz (vector_size filenames)
+	var i
+	var y
 	= y TOP
 
-	number bg_r bg_g bg_b fg_r fg_g fg_b
+	var bg_r bg_g bg_b fg_r fg_g fg_b
 	= bg_r 255
 	= bg_g 0
 	= bg_b 216
 
 	filled_rectangle 0 0 0 255 0 0 0 255 bg_r bg_g bg_b 255 bg_r bg_g bg_b 255 0 (- H (* fh 3.5)) W (* fh 3.5)
-	string found_text
-	number found_r found_g found_b
+	var found_text
+	var found_r found_g found_b
 	if (== go_ok 1) show_found not_found
 		= found_text "BooBoo app detected! Launch: B/Space/RMB"
 		= found_r 255
@@ -260,23 +253,22 @@ function draw
 		= found_b 255
 	:not_found
 	font_draw font 255 255 255 255 "Enter Directory: A/Return/LMB" 25 (+ 5 (- H (* fh 3.5)))
-	number w
-	font_width font w found_text
+	var w
+	= w (font_width font found_text)
 	font_draw font found_r found_g found_b 255 found_text (- (- W w) 26) (+ 5 (- H (* fh 3.5)))
 
-	number w
-	font_width small_font w dir
-	/ w 2
-	number sfh
-	font_height small_font sfh
+	var w
+	= w (/ (font_width small_font dir) 2)
+	var sfh
+	= sfh (font_height small_font)
 	filled_rectangle 255 0 216 255 255 0 216 255 255 0 216 255 255 0 216 255 (- (/ W 2) w 5) (+ 10 fh (- H (* fh 3.5))) (+ 10 (* w 2)) (+ sfh 4)
 	font_draw small_font 0 0 0 255 dir (- (/ W 2) w) (+ 12 fh (- H (* fh 3.5)))
 
 	for i top (&& (< i sz) (< i (+ top num))) 1 loop
-		string s
+		var s
 		= s [filenames i]
 		call_result s chop_dir s
-		number c
+		var c
 		= c 128
 		if (== i selected) draw_bg
 			= c 255
@@ -284,7 +276,7 @@ function draw
 			filled_rectangle 0 216 255 255 0 216 255 255 0 0 0 255 0 0 0 255 0 (+ y (/ fh 2)) W (/ fh 2)
 		:draw_bg
 		font_draw font c c c 255 s 25 y
-		+ y fh
+		= y (+ y fh)
 	:loop
 
 	if (> top 0) draw_more_up
@@ -297,7 +289,7 @@ function draw
 
 	start_primitives
 
-	number i
+	var i
 	for i 0 (< i H) scanline_skip do_scanline
 		line 0 0 0 scanline_alpha 0 (+ i 0.5) W (+ i 0.5) 1
 	:do_scanline
@@ -310,7 +302,7 @@ function sel_up sound
 	if (== sound 1) play
 		mml_play widget 1 0
 	:play
-	- selected 1
+	= selected (- selected 1)
 	if (< selected 0) zero
 		= selected 0
 	:zero
@@ -324,9 +316,9 @@ function sel_down sound
 	if (== sound 1) play
 		mml_play widget 1 0
 	:play
-	number sz
-	vector_size filenames sz
-	+ selected 1
+	var sz
+	= sz (vector_size filenames)
+	= selected (+ selected 1)
 	if (>= selected sz) fix
 		= selected (- sz 1)
 	:fix
@@ -338,22 +330,21 @@ function sel_down sound
 function navigate
 {
 	mml_play button 1 0
-	string s
+	var s
 	= s [filenames selected]
 	call_result s chop_dir s
-	number len
-	string_length len s
-	number c
-	string_char_at c s (- len 1)
-	string cs
-	string_from_number cs c
+	var len
+	= len (string_length s)
+	var c
+	= c (string_char_at s (- len 1))
+	var cs
+	= cs (string_from_number c)
 	if (|| (== cs "/") (== cs "\\\\")) go_dir
-		string d
+		var d
 		if (matches s "^.:[/\\\\]$") is_root_windows not_root
 			= d s
 		:is_root_windows
-			= d dir
-			+ d s
+			= d (+ dir s)
 		:not_root
 		call list_dir d
 	:go_dir
@@ -365,27 +356,26 @@ function launch
 	if (== go_ok 0) cant
 		return
 	:cant
-	number cfg
-	cfg_load cfg "com.nooskewl.launcher.reload"
+	var cfg
+	= cfg (cfg_load "com.nooskewl.launcher.reload")
 	cfg_set_string cfg "launch" dir
-	number success
-	cfg_save cfg success "com.nooskewl.launcher.reload"
+	var success
+	= success (cfg_save cfg "com.nooskewl.launcher.reload")
 	exit 0
 }
 
 function run
 {
-	number b1 b2 b3 wheel mx my
-	mouse_get_buttons b1 b2 b3 wheel
-	mouse_get_position mx my
+	var b1 b2 b3 wheel mx my
+	explode (mouse_get_buttons) b1 b2 b3 wheel
+	explode (mouse_get_position) mx my
 
 	if (&& (== b1 1) (== old_b1 0)) mouse_b1 (&& (== b3 1) (== old_b3 0)) mouse_b3
 		if (&& (>= my TOP) (< my (+ TOP (* num fh)))) check_click
-			number sel
-			= sel (+ top (/ (- my TOP) fh))
-			floor sel
-			number sz
-			vector_size filenames sz
+			var sel
+			= sel (floor (+ top (/ (- my TOP) fh)))
+			var sz
+			= sz (vector_size filenames)
 			if (&& (>= sel 0) (< sel sz)) check_click2
 				mml_play button 1 0
 				if (== sel selected) nav select
@@ -402,20 +392,20 @@ function run
 	= old_b1 b1
 	= old_b3 b3
 
-	number sz
-	vector_size filenames sz
+	var sz
+	= sz (vector_size filenames)
 
 	include "poll_joystick.inc"
 
-	number kret kspace
-	key_get kret KEY_RETURN
-	key_get kspace KEY_SPACE
+	var kret kspace
+	= kret (key_get KEY_RETURN)
+	= kspace (key_get KEY_SPACE)
 
 	= joy_a (|| joy_a kret)
 	= joy_b (|| joy_b kspace)
 
-	number kesc
-	key_get kesc KEY_ESCAPE
+	var kesc
+	= kesc (key_get KEY_ESCAPE)
 	if (&& (== kesc 1) (== old_esc 0)) quick_up
 		= selected 0
 		call navigate
@@ -423,13 +413,13 @@ function run
 
 	= old_esc kesc
 
-	number home _end
-	key_get home KEY_HOME
-	key_get _end KEY_END
+	var home _end
+	= home (key_get KEY_HOME)
+	= _end (key_get KEY_END)
 
-	number sz
-	vector_size filenames sz
-	number i
+	var sz
+	= sz (vector_size filenames)
+	var i
 
 	if (&& (== home 1) (== old_home 0)) do_home (&& (== _end 1) (== old_end 0)) do_end
 		mml_play widget 1 0
@@ -457,8 +447,8 @@ function run
 	= old_a joy_a
 	= old_b joy_b
 
-	number sw sh
-	get_screen_size sw sh
+	var sw sh
+	explode (get_screen_size) sw sh
 	if (|| (!= sw W) (!= sh H)) do_rsz
 		call rsz TRUE
 	:do_rsz
@@ -467,15 +457,15 @@ function run
 function event type a b c d
 {
 	if (== type EVENT_MOUSE_WHEEL) is_wheel
-		number old_top
+		var old_top
 		= old_top top
-		number i
+		var i
 		if (> b 0) is_up (< b 0) is_down
 			for i 0 (< i b) 1 do_up
 				call sel_up (== i 0)
 			:do_up
 			if (== top old_top) dec_top
-				- top b
+				= top (- top b)
 				if (< top 0) equal_0
 					= top 0
 				:equal_0
@@ -485,9 +475,9 @@ function event type a b c d
 				call sel_down (== i 0)
 			:do_down
 			if (== top old_top) inc_top
-				+ top (* b -1)
-				number sz
-				vector_size filenames sz
+				= top (+ top (* b -1))
+				var sz
+				= sz (vector_size filenames)
 				if (> (+ top num) sz) adjust2
 					= top (- sz num)
 					if (< top 0) zero
@@ -506,7 +496,7 @@ function event type a b c d
 		:is_joy_down
 	:is_joy_b
 
-	number _do_pgup _do_pgdn
+	var _do_pgup _do_pgdn
 	= _do_pgup FALSE
 	= _do_pgdn FALSE
 
@@ -531,17 +521,16 @@ function event type a b c d
 	:do_joy_down
 
 	if (== 1 _do_pgup) pgup (== 1 _do_pgdn) pgdn
-		number i
+		var i
 		mml_play widget 1 0
 		for i 0 (< i num) 1 pgup_slowly
 			call sel_up 0
 		:pgup_slowly
 	:pgup
-		number i
+		var i
 		mml_play widget 1 0
 		for i 0 (< i num) 1 pgdn_slowly
 			call sel_down 0
 		:pgdn_slowly
 	:pgdn
 }
-
