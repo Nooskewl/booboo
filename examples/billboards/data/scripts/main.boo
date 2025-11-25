@@ -1,36 +1,30 @@
-number tree
-image_load tree "tree.png"
+var tree
+= tree (image_load "tree.png")
 
-vector billboards
+var billboards
 
-number num_billboards
+var num_billboards
 = num_billboards 100
 
-number i
+var i
 for i 0 (< i num_billboards) 1 loop
-	number b
-	number x
-	rand x 0 1000
-	- x 500
-	/ x 500
-	* x 10
-	number z
-	rand z 0 1000
-	- z 500
-	/ z 500
-	* z 10
-	billboard_create b tree x 0 z 0.55 0.8
+	var b
+	var x
+	= x (* (/ (- (rand 0 1000) 500) 500) 10)
+	var z
+	= z (* (/ (- (rand 0 1000) 500) 500) 10)
+	= b (billboard_create tree x 0 z 0.55 0.8)
 	vector_add billboards b
 :loop
 	
 set_3d
 
-number angle
+var angle
 = angle 0
-number anglex
+var anglex
 = anglex 0
 
-number x y z
+var x y z
 = x 0
 = y 0
 = z 0
@@ -41,7 +35,7 @@ function draw
 {
 	clear 100 100 255
 
-	number i
+	var i
 	for i 0 (< i num_billboards) 1 loop
 		billboard_draw [billboards i] 255 255 255 255
 	:loop
@@ -50,7 +44,7 @@ function draw
 function eabs x
 {
 	if (< x 0) switch
-		neg x
+		= x (neg x)
 	:switch
 	return x
 }
@@ -59,8 +53,8 @@ function run
 {
 	include "poll_joystick.inc"
 
-	number dx dy
-	mouse_get_delta dx dy
+	var dx dy
+	explode (mouse_get_delta) dx dy
 	if (!= 0 dx) set_x2
 		= joy_x2 (/ dx 10)
 	:set_x2
@@ -68,11 +62,11 @@ function run
 		= joy_y2 (/ dy 10)
 	:set_y2
 
-	number w a s d
-	key_get w KEY_W
-	key_get a KEY_A
-	key_get s KEY_S
-	key_get d KEY_D
+	var w a s d
+	= w (key_get KEY_W)
+	= a (key_get KEY_A)
+	= s (key_get KEY_S)
+	= d (key_get KEY_D)
 	if (!= 0 w) set_forward
 		= joy_y1 -1
 	:set_forward
@@ -99,16 +93,16 @@ function run
 		= joy_y2 0
 	:clip_y2
 
-	neg joy_x1
-	neg joy_y1
+	= joy_x1 (neg joy_x1)
+	= joy_y1 (neg joy_y1)
 
-	/ joy_x1 10
-	/ joy_x2 10
-	/ joy_y1 10
-	/ joy_y2 10
+	= joy_x1 (/ joy_x1 10)
+	= joy_x2 (/ joy_x2 10)
+	= joy_y1 (/ joy_y1 10)
+	= joy_y2 (/ joy_y2 10)
 
-	+ angle joy_x2
-	+ anglex joy_y2
+	= angle (+ angle joy_x2)
+	= anglex (+ anglex joy_y2)
 
 	if (< anglex (* -1 (/ PI 2))) cliplow (> anglex (/ PI 2)) cliphigh
 		= anglex (* -1 (/ PI 2))
@@ -116,27 +110,27 @@ function run
 		= anglex (/ PI 2)
 	:cliphigh
 
-	number xi yi zi
+	var xi yi zi
 	= xi (+ angle (/ PI 2))
-	cos xi
+	= xi (cos xi)
 	= xi (* xi joy_y1)
 	= yi 0
 	= zi (+ angle (/ PI 2))
-	sin zi
+	= zi (sin zi)
 	= zi (* zi joy_y1)
 
-	number xi2 yi2 zi2
+	var xi2 yi2 zi2
 	= xi2 angle
-	cos xi2
+	= xi2 (cos xi2)
 	= xi2 (* xi2 joy_x1)
 	= yi2 0
 	= zi2 angle
-	sin zi2
+	= zi2 (sin zi2)
 	= zi2 (* zi2 joy_x1)
 
-	+ x xi xi2
-	+ y yi yi2
-	+ z zi zi2
+	= x (+ x xi xi2)
+	= y (+ y yi yi2)
+	= z (+ z zi zi2)
 
 	identity_3d
 	rotate_3d anglex 1 0 0
