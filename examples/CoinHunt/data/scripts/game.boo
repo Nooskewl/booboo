@@ -1,85 +1,83 @@
-number music
-mml_load music "music/game.mml"
+var music
+= music (mml_load "music/game.mml")
 mml_play music 0.5 1
 
-number ship_img
-image_load ship_img "misc/ship.png"
-number enemy_img
-image_load enemy_img "misc/enemy.png"
-number coin_img
-image_load coin_img "misc/coin.png"
-number bullet_img
-image_load bullet_img "misc/bullet.png"
-number coin_sfx
-mml_load coin_sfx "sfx/coin.mml"
-number hit_sfx
-mml_load hit_sfx "sfx/hit.mml"
-number shoot_sfx
-mml_load shoot_sfx "sfx/shoot.mml"
-number shot_coin_sfx
-mml_load shot_coin_sfx "sfx/shot_coin.mml"
-number count_sfx
-mml_create count_sfx "A a32"
-number small_font
-number big_font
-font_load small_font "font.ttf" 12 1
-font_load big_font "font.ttf" 36 1
+var ship_img
+= ship_img (image_load "misc/ship.png")
+var enemy_img
+= enemy_img (image_load "misc/enemy.png")
+var coin_img
+= coin_img (image_load "misc/coin.png")
+var bullet_img
+= bullet_img (image_load "misc/bullet.png")
+var coin_sfx
+= coin_sfx (mml_load "sfx/coin.mml")
+var hit_sfx
+= hit_sfx (mml_load "sfx/hit.mml")
+var shoot_sfx
+= shoot_sfx (mml_load "sfx/shoot.mml")
+var shot_coin_sfx
+= shot_coin_sfx (mml_load "sfx/shot_coin.mml")
+var count_sfx
+= count_sfx (mml_create "A a32")
+var small_font
+var big_font
+= small_font (font_load "font.ttf" 12 1)
+= big_font (font_load "font.ttf" 36 1)
 
-number pos_x
-number pos_y
-number ship_a
-number real_a
-number ship_acc
-number ship_vel
-number dead
-number dead_time
-number collected
+var pos_x
+var pos_y
+var ship_a
+var real_a
+var ship_acc
+var ship_vel
+var dead
+var dead_time
+var collected
 
-number screens
+var screens
 = screens 4
 
-number size_w
-number size_h
-= size_w screens
-* size_w 640
-= size_h screens
-* size_h 360
+var size_w
+var size_h
+= size_w (* screens 640)
+= size_h (* screens 360)
 
-number ox
-number oy
+var ox
+var oy
 
-number ticks
+var ticks
 = ticks 0
-number next_fire_ticks
+var next_fire_ticks
 = next_fire_ticks 0
-number game_ticks
+var game_ticks
 
-vector stars
-vector coins
-vector enemies
-vector bullets
-vector explosions
+var stars
+var coins
+var enemies
+var bullets
+var explosions
 
-number got_coins_ticks
+var got_coins_ticks
 = got_coins_ticks 0
-number killed_all_ticks
+var killed_all_ticks
 = killed_all_ticks 0
-number got_coins
+var got_coins
 = got_coins 0
-number killed_all
+var killed_all
 = killed_all 0
-number won
+var won
 = won 0
-number total_ticks
-number total_time
-number after_win_delay
+var total_ticks
+var total_time
+var after_win_delay
 = after_win_delay 300
 
-number NUM_COINS
+var NUM_COINS
 = NUM_COINS 7
-number NUM_ENEMIES
+var NUM_ENEMIES
 = NUM_ENEMIES 32
-number num_stars
+var num_stars
 = num_stars 1024
 
 call start_game
@@ -101,10 +99,8 @@ function start_game
 
 function start_player
 {
-	= pos_x size_w
-	/ pos_x 2
-	= pos_y size_h
-	/ pos_y 2
+	= pos_x (/ size_w 2)
+	= pos_y (/ size_h 2)
 
 	= ship_a 0
 	= ship_acc 0
@@ -118,129 +114,111 @@ function start_stars
 {
 	vector_clear stars
 
-	number i
+	var i
 	= i 0
 :add_another_star
-	vector star
-	number star_w
-	= star_w size_w
-	- star_w 1
-	number star_h
-	= star_h size_h
-	- star_h 1
-	number star_x
-	number star_y
-	rand star_x 0 star_w
-	rand star_y 0 star_h
+	var star
+	var star_w
+	= star_w (- size_w 1)
+	var star_h
+	= star_h (- size_h 1)
+	var star_x
+	var star_y
+	= star_x (rand 0 star_w)
+	= star_y (rand 0 star_h)
 	vector_add star star_x
 	vector_add star star_y
 	vector_add stars star
-	+ i 1
+	= i (+ i 1)
 	? i num_stars
 	jl add_another_star
 }
 
 function start_coins
 {
-	vector possibilities
+	var possibilities
 	call_result possibilities get_quadrants
 
 	vector_clear coins
 
-	number i
+	var i
 	= i 0
 :another_coin
-	number sz
-	vector_size possibilities sz
-	- sz 1
-	number r
-	rand r 0 sz
-	vector tmp
-	vector_get possibilities tmp r
+	var sz
+	= sz (- (vector_size possibilities) 1)
+	var r
+	= r (rand 0 sz)
+	var tmp
+	= tmp [possibilities r]
 	vector_erase possibilities r
-	number x
-	number y
-	vector_get tmp x 0
-	vector_get tmp y 1
-	number coin_x
-	number coin_y
-	= coin_x x
-	* coin_x 640
-	= coin_y y
-	* coin_y 360
-	number f
-	= f 640
-	- f 64
-	rand r 0 f
-	+ r 32
-	+ coin_x r
-	= f 360
-	- f 64
-	rand r 0 f
-	+ r 32
-	+ coin_y r
-	vector coin
+	var x
+	var y
+	explode tmp x y
+	var coin_x
+	var coin_y
+	= coin_x (* x 640)
+	= coin_y (* y 360)
+	var f
+	= f (- 640 64)
+	= r (+ (rand 0 f) 32)
+	= coin_x (+ coin_x r)
+	= f (- 360 64)
+	= r (+ (rand 0 f) 32)
+	= coin_y (+ coin_y r)
+	var coin
 	vector_add coin coin_x
 	vector_add coin coin_y
 	vector_add coin 1
 	vector_add coins coin
-	+ i 1
+	= i (+ i 1)
 	? i NUM_COINS
 	jl another_coin
 }
 
 function start_enemies
 {
-	vector possibilities
+	var possibilities
 	call_result possibilities get_quadrants
 
 	vector_clear enemies
 
-	number i
+	var i
 	= i 0
 :add_another_enemy
-	number sz
-	vector_size possibilities sz
-	- sz 1
-	number r
-	rand r 0 sz
-	vector tmp
-	vector_get possibilities tmp r
-	number x
-	number y
-	vector_get tmp x 0
-	vector_get tmp y 1
-	number ex
-	number ey
-	= ex x
-	* ex 640
-	= ey y
-	* ey 360
-	number f
-	= f 640
-	- f 64
-	rand f 0 f
-	+ f 32
-	+ ex f
-	= f 360
-	- f 64
-	rand f 0 f
-	+ f 32
-	+ ey f
-	vector tmp
+	var sz
+	= sz (- (vector_size possibilities) 1)
+	var r
+	= r (rand 0 sz)
+	var tmp
+	= tmp [possibilities r]
+
+	var x
+	var y
+	explode tmp x y
+	var ex
+	var ey
+	= ex (* x 640)
+	= ey (* y 360)
+	var f
+	= f (- 640 64)
+	= f (+ (rand 0 f) 32)
+	= ex (+ ex f)
+	= f (- 360 64)
+	= f (+ (rand 0 f) 32)
+	= ey (+ ey f)
+	var tmp
 	vector_add tmp ex
 	vector_add tmp ey
 	vector_add tmp 1
-	vector next
+	var next
 	call_result next get_next_enemy_pos ex ey
-	number next_x
-	number next_y
-	vector_get next next_x 0
-	vector_get next next_y 1
+	var next_x
+	var next_y
+	explode next next_x next_y
 	vector_add tmp next_x
 	vector_add tmp next_y
 	vector_add enemies tmp
-	+ i 1
+	= i (+ i 1)
 	? i NUM_ENEMIES
 	jl add_another_enemy
 }
@@ -248,14 +226,12 @@ function start_enemies
 function get_next_enemy_pos x y
 {
 :try_again
-	number x_dir
-	number y_dir
-	rand x_dir 0 2
-	rand y_dir 0 2
-	- x_dir 1
-	- y_dir 1
-	number r
-	rand r 0 1
+	var x_dir
+	var y_dir
+	= x_dir (- (rand 0 2) 1)
+	= y_dir (- (rand 0 2) 1)
+	var r
+	= r (rand 0 1)
 	? r 0
 	je blank_x
 	= y_dir 0
@@ -270,30 +246,22 @@ function get_next_enemy_pos x y
 	goto try_again
 
 :got_one
-	number len
-	rand len 32 256
-	number xinc
-	number yinc
-	= xinc x_dir
-	* xinc len
-	= yinc y_dir
-	* yinc len
-	number new_x
-	number new_y
-	= new_x x
-	+ new_x xinc
-	= new_y y
-	+ new_y yinc
+	var len
+	= len (rand 32 256)
+	var xinc
+	var yinc
+	= xinc (* x_dir len)
+	= yinc (* y_dir len)
+	var new_x
+	var new_y
+	= new_x (+ x xinc)
+	= new_y (+ y yinc)
 
-	number max_x
-	= max_x size_w
-	- max_x 1
-	- max_x 32
+	var max_x
+	= max_x (- size_w 1 32)
 
-	number max_y
-	= max_y size_h
-	- max_y 1
-	- max_y 32
+	var max_y
+	= max_y (- size_h 1 32)
 
 	? new_x 32
 	jl try_again
@@ -304,7 +272,7 @@ function get_next_enemy_pos x y
 	? new_y max_y
 	jge try_again
 
-	vector result
+	var result
 	vector_add result new_x
 	vector_add result new_y
 	return result
@@ -312,24 +280,24 @@ function get_next_enemy_pos x y
 
 function get_quadrants
 {
-	vector v
+	var v
 
-	number i
+	var i
 	= i 0
-	number x
-	number y
+	var x
+	var y
 	= y 0
 :repeat_y
 	= x 0
 :repeat_x
-	vector tmp
+	var tmp
 	vector_add tmp x
 	vector_add tmp y
 	vector_add v tmp
-	+ x 1
+	= x (+ x 1)
 	? x screens
 	jl repeat_x
-	+ y 1
+	= y (+ y 1)
 	? y screens
 	jl repeat_y
 
@@ -338,29 +306,25 @@ function get_quadrants
 
 function calc_offset
 {
-	= ox pos_x
-	- ox 320
+	= ox (- pos_x 320)
 	? ox 0
 	jge do_x_offset2
 	= ox 0
 :do_x_offset2
-	number max_x
-	= max_x size_w
-	- max_x 640
+	var max_x
+	= max_x (- size_w 640)
 	? ox max_x
 	jle do_y_offset
 	= ox max_x
 
 :do_y_offset
-	= oy pos_y
-	- oy 180
+	= oy (- pos_y 180)
 	? oy 0
 	jge do_y_offset2
 	= oy 0
 :do_y_offset2
-	number max_y
-	= max_y size_h
-	- max_y 360
+	var max_y
+	= max_y (- size_h 360)
 	? oy max_y
 	jle done_offset
 	= oy max_y
@@ -370,44 +334,36 @@ function calc_offset
 
 function calc_real_a
 {
-	= real_a 3.14159
-	* real_a 3
-	/ real_a 2
-	+ real_a ship_a
+	= real_a (+ (/ (* PI 3) 2) ship_a)
 }
 
 function bullet_collide bx by
 {
 	; Check coins
 
-	number i
+	var i
 
 	= i 0
 :next_coin
-	vector coin
-	vector_get coins coin i
-	number cx
-	number cy
-	number exists
-	vector_get coin cx 0
-	vector_get coin cy 1
-	vector_get coin exists 2
+	var coin
+	= coin [coins i]
+	var cx
+	var cy
+	var exists
+	explode coin cx cy exists
 	? exists 0
 	je skip_it
-	number dx
-	number dy
-	= dx bx
-	- dx cx
-	= dy by
-	- dy cy
-	* dx dx
-	* dy dy
-	+ dx dy
-	sqrt dx
+	var dx
+	var dy
+	= dx (- bx cx)
+	= dy (- by cy)
+	= dx (* dx dx)
+	= dy (* dy dy)
+	= dx (sqrt (+ dx dy))
 	? dx 18
 	jge skip_it
-	vector_set coin 2 0
-	vector_set coins i coin
+	= [coin 2] 0
+	= [coins i] coin
 	mml_play hit_sfx 1 0
 	mml_play shot_coin_sfx 1 0
 	call do_explode cx cy 64 251 242 54
@@ -419,46 +375,41 @@ function bullet_collide bx by
 	call do_explode pos_x pos_y 64 255 255 255
 	return 1
 :skip_it
-	+ i 1
+	= i (+ i 1)
 	? i NUM_COINS
 	jl next_coin
 
 	; Check enemies
 
-	number num_enemies
-	vector_size enemies num_enemies
+	var num_enemies
+	= num_enemies (vector_size enemies)
 
 	= i 0
 :check_next_enemy
-	vector e
-	vector_get enemies e i
-	number ex
-	number ey
-	number exists
-	vector_get e ex 0
-	vector_get e ey 1
-	vector_get e exists 2
+	var e
+	= e [enemies i]
+	var ex
+	var ey
+	var exists
+	explode e ex ey exists
 	? exists 0
 	je not_a_hit2
-	number dx
-	number dy
-	= dx bx
-	- dx ex
-	= dy by
-	- dy ey
-	* dx dx
-	* dy dy
-	+ dx dy
-	sqrt dx
+	var dx
+	var dy
+	= dx (- bx ex)
+	= dy (- by ey)
+	= dx (* dx dx)
+	= dy (* dy dy)
+	= dx (sqrt (+ dx dy))
 	? dx 14
 	jge not_a_hit2
-	vector_set e 2 0
-	vector_set enemies i e
+	= [e 2] 0
+	= [enemies i] e
 	mml_play hit_sfx 1 0
 	call do_explode ex ey 48 223 113 38
 	return 1
 :not_a_hit2
-	+ i 1
+	= i (+ i 1)
 	? i num_enemies
 	jl check_next_enemy
 
@@ -467,7 +418,7 @@ function bullet_collide bx by
 
 function do_explode x y max_r r g b
 {
-	vector e
+	var e
 	vector_add e x
 	vector_add e y
 	vector_add e 0
@@ -481,14 +432,14 @@ function do_explode x y max_r r g b
 
 function zero_padded_string_from_number n
 {
-	string s
+	var s
 
 	? n 10
 	jl pad
-	string_format s "%" n
+	= s (string_format "%" n)
 	goto done_pad
 :pad
-	string_format s "0%" n
+	= s (string_format "0%" n)
 :done_pad
 	return s
 }
@@ -497,109 +448,86 @@ function draw_time_playing
 {
 	; Time
 
-	number seconds
-	= seconds killed_all_ticks
-	/ seconds 60
-	floor seconds
+	var seconds
+	= seconds (floor (/ killed_all_ticks 60))
 
-	number hundredths
-	= hundredths killed_all_ticks
-	/ hundredths 60
-	- hundredths seconds
-	* hundredths 100
-	floor hundredths
+	var hundredths
+	= hundredths (floor (* (- (/ killed_all_ticks 60) seconds) 100))
 
-	number minutes
-	= minutes seconds
-	/ minutes 60
-	floor minutes
-	number tmp
-	= tmp minutes
-	* tmp 60
-	- seconds tmp
+	var minutes
+	= minutes (floor (/ seconds 60))
+	var tmp
+	= tmp (* minutes 60)
+	= seconds (- seconds tmp)
 
-	string ms
-	string ss
-	string hs
+	var ms
+	var ss
+	var hs
 	call_result ms zero_padded_string_from_number minutes
 	call_result ss zero_padded_string_from_number seconds
 	call_result hs zero_padded_string_from_number hundredths
 
-	string _time
-	string_format _time "%:%.%" ms ss hs
+	var _time
+	= _time (string_format "%:%.%" ms ss hs)
 
-	number tx
-	= tx 639
-	- tx 16
-	number w
-	font_width small_font w _time
-	- tx w
+	var tx
+	= tx (- 639 16)
+	var w
+	= w (font_width small_font _time)
+	= tx (- tx w)
 
 	font_draw small_font 223 113 38 255 _time tx 0
 
-	number seconds
-	= seconds got_coins_ticks
-	/ seconds 60
-	floor seconds
+	var seconds
+	= seconds (floor (/ got_coins_ticks 60))
 
-	number hundredths
-	= hundredths got_coins_ticks
-	/ hundredths 60
-	- hundredths seconds
-	* hundredths 100
-	floor hundredths
+	var hundredths
+	= hundredths (floor (* (- (/ got_coins_ticks 60) seconds) 100))
 
-	number minutes
-	= minutes seconds
-	/ minutes 60
-	floor minutes
-	number tmp
-	= tmp minutes
-	* tmp 60
-	- seconds tmp
+	var minutes
+	= minutes (floor (/ seconds 60))
+	var tmp
+	= tmp (* minutes 60)
+	= seconds (- seconds tmp)
 
-	string ms
-	string ss
-	string hs
+	var ms
+	var ss
+	var hs
 	call_result ms zero_padded_string_from_number minutes
 	call_result ss zero_padded_string_from_number seconds
 	call_result hs zero_padded_string_from_number hundredths
 
-	string _time
-	string_format _time "%:%.%" ms ss hs
+	var _time
+	= _time (string_format "%:%.%" ms ss hs)
 
-	number tx
-	= tx 639
-	- tx 16
-	number w2
-	font_width small_font w2 _time
-	- tx w
-	- tx w2
-	- tx 16
+	var tx
+	= tx (- 639 16)
+	var w2
+	= w2 (font_width small_font _time)
+	= tx (- tx w w2 16)
 
 	font_draw small_font 251 242 54 255 _time tx 0
 }
 
 function draw_time_won
 {
-	number tmp
-	number tmp2
+	var tmp
+	var tmp2
 	= tmp2 killed_all_ticks
-	number remain
-	= tmp got_coins_ticks
-	- tmp total_time
+	var remain
+	= tmp (- got_coins_ticks total_time)
 	? tmp 0
 	jge still_counting_coins_time
 	= remain tmp
-	neg remain
+	= remain (neg remain)
 	= tmp 0
 
-	- tmp2 remain
+	= tmp2 (- tmp2 remain)
 
 :still_counting_coins_time
 
-	number bak1
-	number bak2
+	var bak1
+	var bak2
 	= bak1 got_coins_ticks
 	= bak2 killed_all_ticks
 	= got_coins_ticks tmp
@@ -628,23 +556,21 @@ function draw
 
 	; Draw stars
 
-	number i
+	var i
 	= i 0
 	start_primitives
 :draw_next_star
-	vector star
-	vector_get stars star i
-	number star_x
-	number star_y
-	vector_get star star_x 0
-	vector_get star star_y 1
-	- star_x ox
-	- star_y oy
-	+ star_y 16
+	var star
+	= star [stars i]
+	var star_x
+	var star_y
+	explode star star_x star_y
+	= star_x (- star_x ox)
+	= star_y (+ (- star_y oy) 16)
 	if (&& (>= star_x 0) (>= star_y 0) (< star_x 640) (< star_y 360)) draw_it
 		filled_rectangle 255 255 255 255 255 255 255 255 255 255 255 255 255 255 255 255 star_x star_y 1 1
 	:draw_it
-	+ i 1
+	= i (+ i 1)
 	? i num_stars
 	jl draw_next_star
 
@@ -654,44 +580,39 @@ function draw
 
 	image_start coin_img
 	
-	number coin_x_scale
+	var coin_x_scale
 
-	number tmp
+	var tmp
 	= tmp ticks
-	% tmp 10
+	= tmp (% tmp 10)
 	? tmp 5
 	jge pingpong
-	/ tmp 5
+	= tmp (/ tmp 5)
 	= coin_x_scale tmp
 	goto done_coin_scale
 :pingpong
-	- tmp 5
-	number tmp2
-	= tmp2 5
-	- tmp2 tmp
-	/ tmp2 5
+	= tmp (- tmp 5)
+	var tmp2
+	= tmp2 (/ (- 5 tmp) 5)
 	= coin_x_scale tmp2
 
 :done_coin_scale
 
 	= i 0
 :draw_next_coin
-	vector tmpv
-	vector_get coins tmpv i
-	number coin_x
-	number coin_y
-	number coin_exists
-	vector_get tmpv coin_x 0
-	vector_get tmpv coin_y 1
-	vector_get tmpv coin_exists 2
+	var tmpv
+	= tmpv [coins i]
+	var coin_x
+	var coin_y
+	var coin_exists
+	explode tmpv coin_x coin_y coin_exists
 	? coin_exists 0
 	je skip_coin
-	- coin_x ox
-	- coin_y oy
-	+ coin_y 16
+	= coin_x (- coin_x ox)
+	= coin_y (+ (- coin_y oy) 16)
 	image_draw_rotated_scaled coin_img 255 255 255 255 16 16 coin_x coin_y 0 coin_x_scale 1 0 0
 :skip_coin
-	+ i 1
+	= i (+ i 1)
 	? i NUM_COINS
 	jl draw_next_coin
 
@@ -701,40 +622,34 @@ function draw
 
 	image_start enemy_img
 
-	number e_angle
+	var e_angle
 	= e_angle ticks
-	% e_angle 30
-	/ e_angle 30
-	* e_angle 3.14159
-	* e_angle 2
+	= e_angle (% e_angle 30)
+	= e_angle (* (/ e_angle 30) PI 2)
 
-	number num_enemies
-	vector_size enemies num_enemies
+	var num_enemies
+	= num_enemies (vector_size enemies)
 
 	= i 0
 :draw_next_enemy
-	vector e
-	vector_get enemies e i
-	number x
-	number y
-	number exists
-	vector_get e x 0
-	vector_get e y 1
-	vector_get e exists 2
+	var e
+	= e [enemies i]
+	var x
+	var y
+	var exists
+	explode e x y exists
 	? exists 0
 	je done_draw_enemy
-	number xx
-	number yy
-	= xx x
-	- xx ox
-	= yy y
-	- yy oy
+	var xx
+	var yy
+	= xx (- x ox)
+	= yy (- y oy)
 	if (&& (>= xx -10) (>= yy -10) (< xx 650) (< yy 370)) draw_the_enemy
-		+ yy 16
+		= yy (+ yy 16)
 		image_draw_rotated_scaled enemy_img 255 255 255 255 12 12 xx yy e_angle 1 1 0 0
 	:draw_the_enemy
 :done_draw_enemy
-	+ i 1
+	= i (+ i 1)
 	? i num_enemies
 	jl draw_next_enemy
 
@@ -744,26 +659,25 @@ function draw
 
 	image_start bullet_img
 
-	number num_bullets
-	vector_size bullets num_bullets
+	var num_bullets
+	= num_bullets (vector_size bullets)
 	? num_bullets 0
 	je no_bullets
 
 	= i 0
 :draw_next_bullet
-	vector b
-	vector_get bullets b i
-	number bx
-	number by
-	vector_get b bx 0
-	vector_get b by 1
-	- bx ox
-	- by oy
+	var b
+	= b [bullets i]
+	var bx
+	var by
+	explode b bx by
+	= bx (- bx ox)
+	= by (- by oy)
 	if (&& (>= bx -5) (>= by -5) (< bx 645) (< by 365)) draw_the_bullet
-		+ by 16
+		= by (+ by 16)
 		image_draw_rotated_scaled bullet_img 255 255 255 255 4 4 bx by 0 1 1 0 0
 	:draw_the_bullet
-	+ i 1
+	= i (+ i 1)
 	? i num_bullets
 	jl draw_next_bullet
 
@@ -776,14 +690,12 @@ function draw
 	? dead 1
 	je skip_draw_player	
 
-	number xx
-	= xx pos_x
-	- xx ox
-	number yy
-	= yy pos_y
-	- yy oy
+	var xx
+	= xx (- pos_x ox)
+	var yy
+	= yy (- pos_y oy)
 
-	+ yy 16
+	= yy (+ yy 16)
 
 	image_draw_rotated_scaled ship_img 255 255 255 255 8 8 xx yy ship_a 1 1 0 0
 
@@ -793,32 +705,26 @@ function draw
 
 	start_primitives
 
-	number ne
-	vector_size explosions ne
+	var ne
+	= ne (vector_size explosions)
 	? ne 0
 	je no_explosions2
 
 	= i 0
 :draw_next_explosion
-	vector ex
-	vector_get explosions ex i
-	number x
-	number y
-	number r
-	number cr
-	number cg
-	number cb
-	vector_get ex x 0
-	vector_get ex y 1
-	vector_get ex r 2
-	vector_get ex cr 4
-	vector_get ex cg 5
-	vector_get ex cb 6
-	- x ox
-	- y oy
-	+ y 16
+	var ex
+	= ex [explosions i]
+	var x
+	var y
+	var r
+	var cr
+	var cg
+	var cb
+	explode ex x y r cr cg cb
+	= x (- x ox)
+	= y (+ (- y oy) 16)
 	circle cr cg cb 255 x y r 1 -1
-	+ i 1
+	= i (+ i 1)
 	? i ne
 	jl draw_next_explosion
 
@@ -837,14 +743,14 @@ function draw
 
 	? collected 0
 	je after_draw_coin_icons
-	number loops
+	var loops
 	= loops collected
-	number cx
+	var cx
 	= cx 16
 :draw_next_coin_icon
 	image_stretch_region coin_img 255 255 255 255 0 0 32 32 cx 2 12 12 0 0
-	+ cx 16
-	- loops 1
+	= cx (+ cx 16)
+	= loops (- loops 1)
 	? loops 0
 	jg draw_next_coin_icon
 
@@ -858,49 +764,38 @@ function draw
 
 	filled_rectangle 16 16 16 128 16 16 16 128 16 16 16 128 16 16 16 128 0 140 640 80
 
-	number seconds
-	= seconds total_time
-	/ seconds 60
-	floor seconds
+	var seconds
+	= seconds (floor (/ total_time 60))
 
-	number hundredths
-	= hundredths total_time
-	/ hundredths 60
-	- hundredths seconds
-	* hundredths 100
-	floor hundredths
+	var hundredths
+	= hundredths (floor (* (- (/ total_time 60) seconds) 100))
 
-	number minutes
-	= minutes seconds
-	/ minutes 60
-	floor minutes
-	number tmp
-	= tmp minutes
-	* tmp 60
-	- seconds tmp
+	var minutes
+	= minutes (floor (/ seconds 60))
+	var tmp
+	= tmp (* minutes 60)
+	= seconds (- seconds tmp)
 
-	string ms
-	string ss
-	string hs
+	var ms
+	var ss
+	var hs
 	call_result ms zero_padded_string_from_number minutes
 	call_result ss zero_padded_string_from_number seconds
 	call_result hs zero_padded_string_from_number hundredths
 
-	string _time
-	string_format _time "%:%.%" ms ss hs
+	var _time
+	= _time (string_format "%:%.%" ms ss hs)
 
-	number tx
+	var tx
 	= tx 320
-	number w
-	font_width big_font w _time
-	/ w 2
-	- tx w
-	number ty
+	var w
+	w = (/ (font_width big_font _time) 2)
+	= tx (- tx w)
+	var ty
 	= ty 180
-	number h
-	font_height big_font h
-	/ h 2
-	- ty h
+	var h
+	= h (/ (font_height big_font) 2)
+	= ty (- ty h)
 
 	font_draw big_font 255 255 255 255 _time tx ty
 
@@ -909,10 +804,10 @@ function draw
 
 function write_config score
 {
-	number cfg
-	cfg_load cfg "com.nooskewl.coinhunt"
-	number exists
-	cfg_exists cfg exists "last_score"
+	var cfg
+	= cfg (cfg_load "com.nooskewl.coinhunt")
+	var exists
+	= exists (cfg_exists cfg "last_score")
 	? exists 0
 	jne dont_set_defaults
 	cfg_set_number cfg "score0" 14400
@@ -926,10 +821,10 @@ function write_config score
 	cfg_set_string cfg "name3" "ILL"
 	cfg_set_string cfg "name4" "ILL"
 :dont_set_defaults
-	floor score
+	= score (floor score)
 	cfg_set_number cfg "last_score" score
-	number success
-	cfg_save cfg success "com.nooskewl.coinhunt"
+	var success
+	= success (cfg_save cfg "com.nooskewl.coinhunt")
 }
 
 function run
@@ -942,23 +837,22 @@ function run
 	jne no_win
 	= won 1
 	= total_time 0
-	= total_ticks got_coins_ticks
-	+ total_ticks killed_all_ticks
+	= total_ticks (+ got_coins_ticks killed_all_ticks)
 
 :no_win
 
 	? won 1
 	jne dont_count_score
 	
-	number i
+	var i
 	= i 0
 :next_score_count
 	? total_ticks 0
 	jle dont_count_score
-	+ total_time 1
-	- total_ticks 1
+	= total_time (+ total_time 1)
+	= total_ticks (- total_ticks 1)
 	mml_play count_sfx 1 0
-	+ i 1
+	= i (+ i 1)
 	? i 20
 	jl next_score_count
 
@@ -968,29 +862,29 @@ function run
 	jne dont_exit
 	? total_ticks 0
 	jne dont_exit
-	- after_win_delay 1
+	= after_win_delay (- after_win_delay 1)
 	? after_win_delay 0
 	jg dont_exit
 	call write_config total_time
 	reset "enter_score.boo"
 
 :dont_exit
-	+ ticks 1
-	+ next_fire_ticks 1
+	= ticks (+ ticks 1)
+	= next_fire_ticks (+ next_fire_ticks 1)
 
 	? got_coins 1
 	je check_killed_all
-	+ got_coins_ticks 1
+	= got_coins_ticks (+ got_coins_ticks 1)
 
 :check_killed_all
 	? killed_all 1
 	je after_killed_all_check
-	+ killed_all_ticks 1
+	= killed_all_ticks (+ killed_all_ticks 1)
 
 :after_killed_all_check
 	? dead 0
 	je no_tick
-	+ dead_time 1
+	= dead_time (+ dead_time 1)
 	? dead_time 300
 	jl no_tick
 	call start_game
@@ -1000,9 +894,9 @@ function run
 	? dead 1
 	je skip_player_movement
 	
-	+ game_ticks 1
+	= game_ticks (+ game_ticks 1)
 
-	+ ship_vel ship_acc
+	= ship_vel (+ ship_vel ship_acc)
 	? ship_vel 8
 	jle done_clamp
 	= ship_vel 8
@@ -1011,7 +905,7 @@ function run
 
 	? ship_acc 0
 	jne done_vel_damp
-	- ship_vel 0.1
+	= ship_vel (- ship_vel 0.1)
 	? ship_vel 0
 	jge done_vel_damp
 	= ship_vel 0
@@ -1038,23 +932,19 @@ function run
 	jl do_thrust
 	= next_fire_ticks 0
 	
-	vector b
-	number bx
-	number by
-	number ba
+	var b
+	var bx
+	var by
+	var ba
 	call calc_real_a
 	= ba real_a
 	= bx pos_x
 	= by pos_y
-	number f
-	= f ba
-	cos f
-	* f 8
-	+ bx f
-	= f ba
-	sin f
-	* f 8
-	+ by f
+	var f
+	= f (* (cos ba) 8)
+	= bx (+ bx f)
+	= f (* (sin ba) 8)
+	= by (+ by f)
 	vector_add b bx
 	vector_add b by
 	vector_add b ba
@@ -1072,26 +962,20 @@ function run
 
 	call calc_real_a
 
-	number f
+	var f
 
-	= f real_a
-	cos f
-	* f ship_vel
-	+ pos_x f
+	= f (* (cos real_a) ship_vel)
+	= pos_x (+ pos_x f)
 
-	= f real_a
-	sin f
-	* f ship_vel
-	+ pos_y f
+	= f (* (sin real_a) ship_vel)
+	= pos_y (+ pos_y f)
 
 	? pos_x 32
 	jge x_ok1
 	= pos_x 32
 :x_ok1
-	number max_x
-	= max_x size_w
-	- max_x 1
-	- max_x 32
+	var max_x
+	= max_x (- size_w 1 32)
 	? pos_x max_x
 	jle x_ok2
 	= pos_x max_x
@@ -1101,107 +985,95 @@ function run
 	jge y_ok1
 	= pos_y 32
 :y_ok1
-	number max_y
-	= max_y size_h
-	- max_y 1
-	- max_y 32
+	var max_y
+	= max_y (- size_h 1 32)
 	? pos_y max_y
 	jle y_ok2
 	= pos_y max_y
 :y_ok2
 
-	number a_inc
+	var a_inc
 	= a_inc 0
 
 	? joy_l 0
 	je no_rot_l
-	- a_inc 0.1
+	= a_inc (- a_inc 0.1)
 :no_rot_l
 	? joy_r 0
 	je no_rot_r
-	+ a_inc 0.1
+	= a_inc (+ a_inc 0.1)
 :no_rot_r
 
-	+ ship_a a_inc
+	= ship_a (+ ship_a a_inc)
 
 	; Check if colliding with any coins
 
-	number i
+	var i
 	= i 0
 :check_next_coin
-	vector tmp
-	vector_get coins tmp i
-	number coin_x
-	number coin_y
-	number coin_exists
-	vector_get tmp coin_x 0
-	vector_get tmp coin_y 1
-	vector_get tmp coin_exists 2
+	var tmp
+	= tmp [coins i]
+	var coin_x
+	var coin_y
+	var coin_exists
+	explode tmp coin_x coin_y coin_exists
 	? coin_exists 0
 	je not_a_hit
-	number xx
-	number yy
-	= xx pos_x
-	= yy pos_y
-	- xx coin_x
-	- yy coin_y
-	* xx xx
-	* yy yy
-	+ xx yy
-	number dist
-	= dist xx
-	sqrt dist
+	var xx
+	var yy
+	= xx (- pos_x coin_x)
+	= yy (- pos_y coin_y)
+	= xx (* xx xx)
+	= yy (* yy yy)
+	= xx (+ xx yy)
+	var dist
+	= dist (sqrt xx)
 	? dist 18
 	jge not_a_hit
-	vector_set tmp 2 0
-	vector_set coins i tmp
+	= [tmp 2] 0
+	= [coins i] tmp
 	mml_play coin_sfx 1 0
-	+ collected 1
+	= collected (+ collected 1)
 	? collected NUM_COINS
 	jl not_a_hit
 	= got_coins 1
 :not_a_hit
-	+ i 1
+	= i (+ i 1)
 	? i NUM_COINS
 	jl check_next_coin
 
 	; Check for player-enemy collisions
 
-	number ne
-	vector_size enemies ne
+	var ne
+	= ne (vector_size enemies)
 
 	= i 0
 :check_next_enemy_with_player
-	vector e
-	vector_get enemies e i
-	number ex
-	number ey
-	number exists
-	vector_get e ex 0
-	vector_get e ey 1
-	vector_get e exists 2
+	var e
+	= e [enemies i]
+	var ex
+	var ey
+	var exists
+	explode e ex ey exists
 	? exists 0
 	je player_didnt_hit_enemy
-	number dx
-	number dy
-	= dx ex
-	= dy ey
-	- dx pos_x
-	- dy pos_y
-	* dx dx
-	* dy dy
-	+ dx dy
-	sqrt dx
+	var dx
+	var dy
+	= dx (- ex pos_x)
+	= dy (- ey pos_y)
+	= dx (* dx dx)
+	= dy (* dy dy)
+	= dx (sqrt (+ dx dy))
 	? dx 14
 	jge player_didnt_hit_enemy
 	= dead 1
 	call do_explode ex ey 48 223 113 38
 	call do_explode pos_x pos_y 64 255 255 255
 	mml_play hit_sfx 1 0
-	vector_set e 2 0
-	vector_set enemies i e
+	= [e 2] 0
+	= [enemies i] e
 :player_didnt_hit_enemy
-	+ i 1
+	= i (+ i 1)
 	? i ne
 	jl check_next_enemy_with_player
 
@@ -1209,36 +1081,30 @@ function run
 
 	; Move the enemies
 
-	number num_enemies
-	vector_size enemies num_enemies
+	var num_enemies
+	= num_enemies (vector_size enemies)
 
 	= i 0
 :move_next_enemy
-	vector e
-	vector_get enemies e i
-	number ex
-	number ey
-	number exists
-	number dest_x
-	number dest_y
-	vector_get e ex 0
-	vector_get e ey 1
-	vector_get e exists 2
-	vector_get e dest_x 3
-	vector_get e dest_y 4
+	var e
+	= e [enemies i]
+	var ex
+	var ey
+	var exists
+	var dest_x
+	var dest_y
+	explode e ex ey exists dest_x dest_y
 	? ex dest_x
 	je move_y
 	jl move_right
 :move_left
-	- ex 1
+	= ex (- ex 1)
 	goto done_x
 :move_right
-	+ ex 1
+	= ex (+ ex 1)
 :done_x
-	number diff
-	= diff ex
-	- diff dest_x
-	abs diff
+	var diff
+	= diff (abs (- ex dest_x))
 	? diff 2
 	jl set_next_dest
 	goto done_move
@@ -1246,70 +1112,65 @@ function run
 	? ey dest_y
 	jl move_down
 :move_up
-	- ey 1
+	= ey (- ey 1)
 	goto done_y
 :move_down
-	+ ey 1
+	= ey (+ ey 1)
 :done_y
-	number diff
-	= diff ey
-	- diff dest_y
-	abs diff
+	var diff
+	= diff (abs (- ey dest_y))
 	? diff 2
 	jl set_next_dest
 	goto done_move
 :set_next_dest
-	vector next_dest
+	var next_dest
 	call_result next_dest get_next_enemy_pos ex ey
-	vector_get next_dest dest_x 0
-	vector_get next_dest dest_y 1
+	explode next_dest dest_x dest_y
 :done_move
-	vector_set e 0 ex
-	vector_set e 1 ey
-	vector_set e 3 dest_x
-	vector_set e 4 dest_y
-	vector_set enemies i e
-	+ i 1
+	= [e 0] ex
+	= [e 1] ey
+	= [e 3] dest_x
+	= [e 4] dest_y
+	= [enemies i] e
+	= i (+ i 1)
 	? i num_enemies
 	jl move_next_enemy
 
 	; Move the bullets
 
-	number num_bullets
-	vector_size bullets num_bullets
+	var num_bullets
+	= num_bullets (vector_size bullets)
 	? num_bullets 0
 	je no_bullets2
 
 	= i 0
 :move_next_bullet
-	number was_erased
+	var was_erased
 	= was_erased 0
-	number bx
-	number by
-	number ba
+	var bx
+	var by
+	var ba
 	= bx [b 0]
 	= by [b 1]
 	= ba [b 2]
-	number c
-	= c ba
-	cos c
-	number s
-	= s ba
-	sin s
-	number speed
+	var c
+	= c (cos ba)
+	var s
+	= s (sin ba)
+	var speed
 	= speed 16
-	number step
+	var step
 	= step 1
 :next_step
-	+ bx (* c step)
-	+ by (* s step)
-	number hit_something
+	= bx (+ bx (* c step))
+	= by (+ by (* s step))
+	var hit_something
 	call_result hit_something bullet_collide bx by
 	? hit_something 0
 	je hit_nothing
 	goto erase_it
 :hit_nothing
-	- speed step
+	= speed (- speed step)
 	? speed 0
 	jg next_step
 :done_steps
@@ -1317,51 +1178,49 @@ function run
 	jl erase_it
 	? by 0
 	jl erase_it
-	number max_
-	= max_ size_w
-	- max_ 1
+	var max_
+	= max_ (- size_w 1)
 	? bx max_
 	jge erase_it
-	= max_ size_h
-	- max_ 1
+	= max_ (- size_h 1)
 	? by max_
 	jge erase_it
 	goto in_zone
 :erase_it
 	vector_erase bullets i
 	= was_erased 1
-	- i 1
-	- num_bullets 1
+	= i (- i 1)
+	= num_bullets (- num_bullets 1)
 :in_zone
 	? was_erased 1
 	je no_update
-	vector_set b 0 bx
-	vector_set b 1 by
-	vector_set bullets i b
+	= [b 0] bx
+	= [b 1] by
+	= [bullets i] b
 :no_update
-	+ i 1
+	= i (+ i 1)
 	? i num_bullets
 	jl move_next_bullet
 
 :no_bullets2
 
 	; Check if all enemies are dead
-	number num_enemies
-	vector_size enemies num_enemies
-	number all_dead
+	var num_enemies
+	= num_enemies (vector_size enemies)
+	var all_dead
 	= all_dead 1
-	number i
+	var i
 	= i 0
 :check_if_next_enemy_is_dead
-	vector e
-	vector_get enemies e i
-	number exists
-	vector_get e exists 2
+	var e
+	= e [enemies i]
+	var exists
+	= exists [e 2]
 	? exists 1
 	jne its_dead
 	= all_dead 0
 :its_dead
-	+ i 1
+	= i (+ i 1)
 	? i num_enemies
 	jl check_if_next_enemy_is_dead
 
@@ -1372,31 +1231,31 @@ function run
 	; Update explosions
 
 :update_explosions
-	number ne
-	vector_size explosions ne
+	var ne
+	= ne (vector_size explosions)
 	? ne 0
 	je no_explosions
 
 	= i 0
 :update_next_explosion
-	vector exv
-	vector_get explosions exv i
-	number r
-	number max_r
-	vector_get exv r 2
-	vector_get exv max_r 3
-	+ r 5
+	var exv
+	= exv [explosions i]
+	var r
+	var max_r
+	= r [exv 2]
+	= max_r [exv 3]
+	= r (+ r 5)
 	? r max_r
 	jle its_fine
 	vector_erase explosions i
-	- i 1
-	- ne 1
+	= i (- i 1)
+	= ne (- ne 1)
 	goto finished_explosion_update
 :its_fine
-	vector_set exv 2 r
-	vector_set explosions i exv
+	= [exv 2] r
+	= [explosions i] exv
 :finished_explosion_update
-	+ i 1
+	= i (+ i 1)
 	? i ne
 	jl update_next_explosion
 
