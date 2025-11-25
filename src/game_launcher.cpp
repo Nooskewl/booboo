@@ -45,6 +45,7 @@ static int exit_key = TGUIK_F12;
 extern int num_ops;
 Uint64 op_time = 0;
 double ops_sec = 0;
+bool limits = true;
 
 static bool mousefunc_set_relative(Program *prg, const std::vector<Token> &v)
 {
@@ -160,6 +161,10 @@ static Variable exprfunc_key_get(Program *prg, const std::vector<Token> &v)
 
 bool start()
 {
+	if (util::bool_arg(true, shim::argc, shim::argv, "limits") == false) {
+		limits = false;
+	}
+
 	mouse_pos.x = 0;
 	mouse_pos.y = 0;
 	mouse_b1 = false;
@@ -439,7 +444,7 @@ void draw_all()
 			num_ops = 0;
 			op_time = now;
 		}
-		if (ops_sec >= MAX_OPS_PER_SECOND) {
+		if (limits && ops_sec >= MAX_OPS_PER_SECOND) {
 			throw Error("Over 10,000,000 ops per second - bailing...");
 		}
 		std::string d = util::string_printf("%.2f", ops_sec);
