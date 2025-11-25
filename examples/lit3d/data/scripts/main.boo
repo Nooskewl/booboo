@@ -1,10 +1,10 @@
-number shader
-shader_load shader "lit_3d_vertex" ""
+var shader
+= shader (shader_load "lit_3d_vertex" "")
 
-number tex
-image_load tex "brick.png"
+var tex
+= tex (image_load "brick.png")
 
-vector verts faces colours normals texcoords
+var verts faces colours normals texcoords
 
 ; top
 vector_add verts -0.5 0.5 0.5
@@ -126,13 +126,13 @@ vector_add normals 0 0 1
 vector_add normals 0 0 1
 vector_add normals 0 0 1
 
-number rx ry
+var rx ry
 = rx 0
 = ry 0
 
 set_3d
 
-vector light_pos
+var light_pos
 vector_init light_pos 0 100 0
 
 function draw
@@ -148,8 +148,8 @@ function draw
 
 function run
 {
-	+ rx 0.01
-	+ ry 0.02
+	= rx (+ rx 0.01)
+	= ry (+ ry 0.02)
 	identity_3d
 	translate_3d 0 0 -5
 	rotate_3d rx 1 0 0
