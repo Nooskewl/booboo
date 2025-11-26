@@ -2402,6 +2402,61 @@ Variable exprfunc_string(Program *prg, const std::vector<Token> &v)
 	return res;
 }
 
+Variable exprfunc_vector(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable res;
+	res.type = Variable::VECTOR;
+	res.v = as_variable_resolve(prg, v[0]).v;
+
+	return res;
+}
+
+Variable exprfunc_map(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable res;
+	res.type = Variable::VECTOR;
+	res.m = as_variable_resolve(prg, v[0]).m;
+
+	return res;
+}
+
+Variable exprfunc_function(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable res;
+	res.type = Variable::VECTOR;
+	res.n = as_function(prg, v[0]);
+
+	return res;
+}
+
+Variable exprfunc_label(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable res;
+	res.type = Variable::VECTOR;
+	res.n = as_label(prg, v[0]);
+
+	return res;
+}
+
+Variable exprfunc_pointer(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable res;
+	res.type = Variable::VECTOR;
+	res.p = as_variable_resolve(prg, v[0]).p;
+
+	return res;
+}
+
 Variable exprfunc_typeof(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -3751,6 +3806,11 @@ void start()
 	add_expression_handler("typeof", exprfunc_typeof);
 	add_expression_handler("number", exprfunc_number);
 	add_expression_handler("string", exprfunc_string);
+	add_expression_handler("vector", exprfunc_vector);
+	add_expression_handler("map", exprfunc_map);
+	add_expression_handler("function", exprfunc_function);
+	add_expression_handler("label", exprfunc_label);
+	add_expression_handler("pointer", exprfunc_pointer);
 
 	add_instruction("for", corefunc_for);
 	add_instruction("if", corefunc_if);

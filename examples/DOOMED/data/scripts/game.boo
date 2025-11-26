@@ -56,6 +56,7 @@ for i 0 (< i num_billboards) 1 loop
 :loop
 
 var enemies
+= enemies (vector enemies)
 
 call spawn_enemy
 
@@ -99,6 +100,7 @@ var x y z
 mouse_set_relative TRUE
 
 var bullets
+= bullets (vector bullets)
 
 var fire_down
 = fire_down FALSE
@@ -224,11 +226,7 @@ function draw
 	:loop
 
 	var sz
-	if (!= (typeof enemies) "vector") zero_sz set_it
-		= sz 0
-	:zero_sz
-		= sz (vector_size enemies)
-	:set_it
+	= sz (vector_size enemies)
 
 	for i 0 (< i sz) 1 loop2
 		if (== TRUE [[enemies i] "dead"]) is_dead (== TRUE [[enemies i] "attacking"]) do_attacking not_dead
@@ -273,11 +271,7 @@ function draw
 		billboard_draw [[enemies i] "billboard"] 255 255 255 255
 	:loop2
 
-	if (!= (typeof bullets) "vector") zero_sz2 set_it2
-		= sz 0
-	:zero_sz2
-		= sz (vector_size bullets)
-	:set_it2
+	= sz (vector_size bullets)
 
 	for i 0 (< i sz) 1 next_bullet
 		billboard_draw [[bullets i] "billboard"] 255 255 255 255
@@ -445,11 +439,7 @@ function run
 	:decz
 
 	var sz i
-	if (!= (typeof enemies) "vector") zero_sz set_it
-		= sz 0
-	:zero_sz
-		= sz (vector_size enemies)
-	:set_it
+	= sz (vector_size enemies)
 	for i 0 (< i sz) 1 loop
 		var v1 v2
 		vector_init v1 [[enemies i] "x"] [[enemies i] "y"] [[enemies i] "z"]
@@ -483,11 +473,7 @@ function run
 		= next_spawn 0
 	:spawn
 
-	if (!= (typeof bullets) "vector") zero_sz2 set_it2
-		= sz 0
-	:zero_sz2
-		= sz (vector_size bullets)
-	:set_it2
+	= sz (vector_size bullets)
 	? sz 0
 	jle done_bullets
 	= i 0
@@ -536,16 +522,8 @@ function run
 	= fire_down (== joy_a 1)
 
 	var ne nb j
-	if (!= (typeof enemies) "vector") zero_sz3 set_it3
-		= ne 0
-	:zero_sz3
-		= ne (vector_size enemies)
-	:set_it3
-	if (!= (typeof bullets) "vector") zero_sz4 set_it4
-		= nb 0
-	:zero_sz4
-		= nb (vector_size bullets)
-	:set_it4
+	= ne (vector_size enemies)
+	= nb (vector_size bullets)
 
 	= i 0
 :next_e

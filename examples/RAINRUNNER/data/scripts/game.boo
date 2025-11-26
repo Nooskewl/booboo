@@ -101,6 +101,7 @@ var score
 = score 0
 
 var drops
+= drops (vector drops)
 var next_drop
 = next_drop 180
 var drop_start_y

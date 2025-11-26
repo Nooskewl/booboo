@@ -67,11 +67,7 @@ function draw
 	; draw drops
 
 	var num_drops
-	if (!= (typeof drops) "vector") zero_drops set_it
-		= num_drops 0
-	:zero_drops
-		= num_drops (vector_size drops)
-	:set_it
+	= num_drops (vector_size drops)
 
 	? num_drops 0
 	je no_drops_to_draw

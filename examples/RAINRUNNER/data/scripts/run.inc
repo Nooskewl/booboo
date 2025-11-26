@@ -198,11 +198,7 @@ function run
 :no_score
 
 	var num_drops
-	if (!= (typeof drops) "vector") zero_drops set_it
-		= num_drops 0
-	:zero_drops
-		= num_drops (vector_size drops)
-	:set_it
+	= num_drops (vector_size drops)
 
 	? num_drops 0
 	je no_drops_to_move
@@ -256,11 +252,7 @@ function run
 	; check for collisions
 
 	var num_drops
-	if (!= (typeof drops) "vector") zero_drops2 set_it2
-		= num_drops 0
-	:zero_drops2
-		= num_drops (vector_size drops)
-	:set_it2
+	= num_drops (vector_size drops)
 
 	? num_drops 0
 	jle no_drops_for_cd
