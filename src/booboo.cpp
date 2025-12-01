@@ -1091,6 +1091,7 @@ static void insert_constant(Program *prg, std::string name, double value, Pass p
 	v.name = name;
 	v.type = Variable::NUMBER;
 	v.n = value;
+	v.constant = true;
 	char buf[1000];
 	snprintf(buf, 1000, "%f", value);
 	v.obfuscated = buf;
@@ -1110,6 +1111,7 @@ static void insert_pointer(Program *prg, std::string name, Variable *value, Pass
 	v.name = name;
 	v.type = Variable::POINTER;
 	v.p = value;
+	v.constant = true;
 	char buf[1000];
 	snprintf(buf, 1000, "%p", value);
 	v.obfuscated = buf;
@@ -1471,6 +1473,7 @@ top:
 			v.type = Variable::FUNCTION;
 			v.n = func_i++;
 			v.obfuscated = nm;
+			v.constant = true;
 			std::map<std::string, int> tmp;
 			prg->locals.push_back(tmp);
 			prg->variables_map[func_name] = var_i++;
@@ -1512,6 +1515,7 @@ func_top:
 					v.type = Variable::LABEL;
 					v.n = func.s->program.size();
 					v.obfuscated = obfuscated_name(prg);
+					v.constant = true;
 
 					Statement s;
 					s.method = library_map[tok];
@@ -1538,6 +1542,140 @@ func_top:
 						prg->variables_map[tok2] = prg->locals[func_index][tok2];
 					}
 					var_i++;
+				}
+				else if (tok == "const") {
+					Statement s;
+					s.method = library_map[tok];
+					s.name = tok;
+					func.s->program.push_back(s);
+					func.s->line_numbers.push_back(prg->s->line);
+					int count = 0;
+					while (true) {
+						std::string tok2 = token(prg, tt);
+						if (tok2 == "" || (count != 0 && (tok2 == "{" || tok2 == "}" || tok2 == ":" || tok2 == "function" || tok2[0] == '(' || tok2[0] == '[' || library_map.find(tok2) != library_map.end()))) {
+							tok = tok2;
+							goto func_top;
+						}
+						if (tok2[0] != '_' && !isalpha(tok2[0])) {
+							throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok2 + " at " + get_error_info(&func));
+						}
+						count++;
+						if (pass == PASS1) {
+							prg->locals[func_index][tok2] = var_i++;
+						}
+						else {
+							prg->variables_map[tok2] = prg->locals[func_index][tok2];
+							var_i++;
+						}
+						Variable v;
+						v.name = tok2;
+						v.type = Variable::UNTYPED;
+						v.obfuscated = obfuscated_name(prg);
+						v.constant = true;
+						std::map<std::string, int>::iterator it;
+						it = prg->variables_map.find(tok2);
+						if (it != prg->variables_map.end()) {
+							Variable &var = prg->variables[(*it).second];
+							if (var.type != v.type) {
+								throw Error("Type for " + tok2 + " changed at " + get_error_info(&func));
+							}
+						}
+						if (pass == PASS1) {
+							prg->variables.push_back(v);
+						}
+						Token t;
+						t.type = Token::SYMBOL;
+						if (pass == PASS2) {
+							t.i = prg->variables_map[tok2];
+						}
+						t.s = tok2;
+						t.token = tok2;
+						t.dereference = false;
+						is_deref = false;
+						func.s->program[func.s->program.size()-1].data.push_back(t);
+						std::string valtok = token(prg, tt);
+						if (valtok[0] == '(') {
+							Variable v;
+							v.name = "__expr" + itos(expression_i++);
+							v.obfuscated = v.name;
+							v.type = Variable::EXPRESSION;
+
+							int var_index = var_i;
+							var_i++;
+
+							if (pass == PASS1) {
+								prg->locals[func_index][v.name] = var_index;
+								prg->variables.push_back(v);
+							}
+							else {
+								prg->variables_map[v.name] = prg->locals[func_index][v.name];
+							}
+
+							prg->variables[var_index].e = parse_expression(prg, &func, valtok, var_i, expression_i, fish_i, pass);
+
+							Token t;
+							t.token = valtok;
+							t.type = Token::SYMBOL;
+							t.s = v.name;
+							if (pass == PASS2) {
+								t.i = prg->variables_map[v.name];
+							}
+							t.dereference = is_deref;
+							is_deref = false;
+
+							func.s->program[func.s->program.size()-1].data.push_back(t);
+						}
+						else if (valtok[0] == '[') {
+							Variable v;
+							v.name = "__fish" + itos(fish_i++);
+							v.obfuscated = v.name;
+							v.type = Variable::FISH;
+
+							int var_index = var_i;
+							var_i++;
+
+							if (pass == PASS1) {
+								prg->locals[func_index][v.name] = var_index;
+								prg->variables.push_back(v);
+							}
+							else {
+								prg->variables_map[v.name] = prg->locals[func_index][v.name];
+							}
+
+							prg->variables[var_index].f = parse_fish(prg, &func, valtok, var_i, expression_i, fish_i, pass);
+
+							Token t;
+							t.token = valtok;
+							t.type = Token::SYMBOL;
+							t.s = v.name;
+							if (pass == PASS2) {
+								t.i = prg->variables_map[v.name];
+							}
+							t.dereference = is_deref;
+							is_deref = false;
+
+							func.s->program[func.s->program.size()-1].data.push_back(t);
+						}
+						else {
+							Token t2;
+							t2.type = tt;
+							if (pass == PASS2 && tt == Token::SYMBOL) {
+								t2.i = prg->variables_map[valtok];
+							}
+							else if (tt == Token::STRING) {
+								t2.s = valtok;
+							}
+							else if (tt == Token::NUMBER) {
+								t2.n = atof(valtok.c_str());
+							}
+							t2.s = valtok;
+							t2.n = atof(valtok.c_str());
+							t2.token = valtok;
+							t2.dereference = false;
+							is_deref = false;
+							func.s->program[func.s->program.size()-1].data.push_back(t2);
+						}
+					}
 				}
 				else if (tok == "var") {
 					Statement s;
@@ -1745,6 +1883,7 @@ func_top:
 			v.type = Variable::LABEL;
 			v.n = prg->s->program.size();
 			v.obfuscated = obfuscated_name(prg);
+			v.constant = true;
 
 			Statement s;
 			s.method = library_map[tok];
@@ -1768,6 +1907,123 @@ func_top:
 			prg->variables.push_back(v);
 			prg->variables_map[tok2] = var_i;
 			var_i++;
+		}
+		else if (tok == "const") {
+			Statement s;
+			s.method = library_map[tok];
+			s.name = tok;
+			prg->s->program.push_back(s);
+			prg->s->line_numbers.push_back(prg->s->line);
+			int count = 0;
+			while (true) {
+				std::string tok2 = token(prg, tt);
+				if (tok2 == "" || (count != 0 && (tok2 == "{" || tok2 == "}" || tok2 == ":" || tok2 == "function" || tok2[0] == '(' || tok2[0] == '[' || library_map.find(tok2) != library_map.end()))) {
+					tok = tok2;
+					goto top;
+				}
+				if (tok2[0] != '_' && !isalpha(tok2[0])) {
+					throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok2 + " at " + get_error_info(prg));
+				}
+				count++;
+				int var_index = var_i;
+				var_i++;
+				if (pass == PASS2) {
+					prg->variables_map[tok2] = var_index;
+				}
+				Variable v;
+				v.name = tok2;
+				v.type = Variable::UNTYPED;
+				v.obfuscated = obfuscated_name(prg);
+				v.constant = true;
+				if (pass == PASS1) {
+					prg->variables.push_back(v);
+				}
+				Token t;
+				t.type = Token::SYMBOL;
+				if (pass == PASS2) {
+					t.i = prg->variables_map[tok2];
+				}
+				t.s = tok2;
+				t.token = tok2;
+				t.dereference = false;
+				_is_deref = false;
+				prg->s->program[prg->s->program.size()-1].data.push_back(t);
+				std::string valtok = token(prg, tt);
+				if (valtok[0] == '(') {
+					Variable v;
+					v.name = "__expr" + itos(expression_i++);
+					v.obfuscated = v.name;
+					v.type = Variable::EXPRESSION;
+
+					int var_index = var_i;
+					var_i++;
+
+					if (pass == PASS1) {
+						prg->variables.push_back(v);
+					}
+					else if (pass == PASS2) {
+						prg->variables_map[v.name] = var_index;
+					}
+					prg->variables[var_index].e = parse_expression(prg, prg, valtok, var_i, expression_i, fish_i, pass);
+
+					Token t;
+					t.token = valtok;
+					t.type = Token::SYMBOL;
+					t.s = v.name;
+					if (pass == PASS2) {
+						t.i = prg->variables_map[v.name];
+					}
+					t.dereference = _is_deref;
+					_is_deref = false;
+
+					prg->s->program[prg->s->program.size()-1].data.push_back(t);
+				}
+				else if (valtok[0] == '[') {
+					Variable v;
+					v.name = "__fish" + itos(fish_i++);
+					v.obfuscated = v.name;
+					v.type = Variable::FISH;
+
+					int var_index = var_i;
+					var_i++;
+
+					if (pass == PASS1) {
+						prg->variables.push_back(v);
+					}
+					else if (pass == PASS2) {
+						prg->variables_map[v.name] = var_index;
+					}
+					prg->variables[var_index].f = parse_fish(prg, prg, valtok, var_i, expression_i, fish_i, pass);
+
+					Token t;
+					t.token = valtok;
+					t.type = Token::SYMBOL;
+					t.s = v.name;
+					if (pass == PASS2) {
+						t.i = prg->variables_map[v.name];
+					}
+					t.dereference = _is_deref;
+					_is_deref = false;
+
+					prg->s->program[prg->s->program.size()-1].data.push_back(t);
+				}
+				else {
+					Token t2;
+					t2.type = tt;
+					if (pass == PASS2 && tt == Token::SYMBOL) {
+						t2.i = prg->variables_map[valtok];
+					}
+					else if (tt == Token::STRING) {
+						t2.s = valtok;
+					}
+					else if (tt == Token::NUMBER) {
+						t2.n = atof(valtok.c_str());
+					}
+					t2.token = valtok;
+					t2.dereference = false;
+					prg->s->program[prg->s->program.size()-1].data.push_back(t2);
+				}
+			}
 		}
 		else if (tok == "var") {
 			Statement s;
@@ -2079,7 +2335,7 @@ void add_expression_handler(std::string name, expression_func func)
 	expression_handlers.push_back(func);
 }
 
-bool breaker_reset(Program *prg, const std::vector<Token> &v)
+static bool breaker_reset(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2088,7 +2344,7 @@ bool breaker_reset(Program *prg, const std::vector<Token> &v)
 	return false;
 }
 
-bool breaker_exit(Program *prg, const std::vector<Token> &v)
+static bool breaker_exit(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2098,7 +2354,7 @@ bool breaker_exit(Program *prg, const std::vector<Token> &v)
 	return false;
 }
 
-bool breaker_return(Program *prg, const std::vector<Token> &v)
+static bool breaker_return(Program *prg, const std::vector<Token> &v)
 {
 	Variable &v1 = prg->s->result;
 
@@ -2121,17 +2377,7 @@ bool breaker_return(Program *prg, const std::vector<Token> &v)
 	return false;
 }
 
-bool corefunc_var(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(1)
-	for (size_t i = 0; i < v.size(); i++) {
-		prg->variables[v[i].i].v.clear();
-		prg->variables[v[i].i].m.clear();
-	}
-	return true;
-}
-
-bool corefunc_set(Program *prg, const std::vector<Token> &v)
+static bool do_set(Program *prg, const std::vector<Token> &v, bool const_ok)
 {
 	COUNT_ARGS(2)
 
@@ -2151,6 +2397,10 @@ bool corefunc_set(Program *prg, const std::vector<Token> &v)
 		v1 = &as_variable(prg, v[0]);
 	}
 
+	if (const_ok == false && v1->constant == true) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to set constant at " + get_error_info(prg));
+	}
+
 	if (v[1].type == Token::NUMBER) {
 		v1->type = Variable::NUMBER;
 		v1->n = as_number(prg, v[1]);
@@ -2164,22 +2414,59 @@ bool corefunc_set(Program *prg, const std::vector<Token> &v)
 
 		std::string name = v1->name;
 		std::string obfuscated = v1->obfuscated;
+		bool constant = v1->constant;
 		*v1 = v2;
 		v1->name = name;
 		v1->obfuscated = obfuscated;
+		v1->constant = constant;
 	}
 
 	return true;
 }
 
-bool corefunc_label(Program *prg, const std::vector<Token> &v)
+static bool corefunc_set(Program *prg, const std::vector<Token> &v)
+{
+	return do_set(prg, v, false);
+}
+
+static bool corefunc_var(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(1)
+	for (size_t i = 0; i < v.size(); i++) {
+		prg->variables[v[i].i].v.clear();
+		prg->variables[v[i].i].m.clear();
+	}
+	return true;
+}
+
+static bool corefunc_const(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+	if (v.size() % 2 != 0) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Incorrect number of arguments to const at " + get_error_info(prg));
+	}
+	for (size_t i = 0; i < v.size(); i++) {
+		prg->variables[v[i].i].v.clear();
+		prg->variables[v[i].i].m.clear();
+	}
+	for (size_t i = 0; i < v.size(); i += 2) {
+		// hack :)
+		std::vector<Token> toks;
+		toks.push_back(v[i]);
+		toks.push_back(v[i+1]);
+		do_set(prg, toks, true);
+	}
+	return true;
+}
+
+static bool corefunc_label(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
 	return true;
 }
 
-bool corefunc_goto(Program *prg, const std::vector<Token> &v)
+static bool corefunc_goto(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2188,7 +2475,7 @@ bool corefunc_goto(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_compare(Program *prg, const std::vector<Token> &v)
+static bool corefunc_compare(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -2260,7 +2547,7 @@ bool corefunc_compare(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_je(Program *prg, const std::vector<Token> &v)
+static bool corefunc_je(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2271,7 +2558,7 @@ bool corefunc_je(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_jne(Program *prg, const std::vector<Token> &v)
+static bool corefunc_jne(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2282,7 +2569,7 @@ bool corefunc_jne(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_jl(Program *prg, const std::vector<Token> &v)
+static bool corefunc_jl(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2293,7 +2580,7 @@ bool corefunc_jl(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_jle(Program *prg, const std::vector<Token> &v)
+static bool corefunc_jle(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2304,7 +2591,7 @@ bool corefunc_jle(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_jg(Program *prg, const std::vector<Token> &v)
+static bool corefunc_jg(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2315,7 +2602,7 @@ bool corefunc_jg(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_jge(Program *prg, const std::vector<Token> &v)
+static bool corefunc_jge(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2326,7 +2613,7 @@ bool corefunc_jge(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_call(Program *prg, const std::vector<Token> &v)
+static bool corefunc_call(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 
@@ -2337,7 +2624,7 @@ bool corefunc_call(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_call_result(Program *prg, const std::vector<Token> &v)
+static bool corefunc_call_result(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -2380,7 +2667,7 @@ static std::string typeof_var(Variable &v1)
 	return res;
 }
 
-Variable exprfunc_number(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_number(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2391,7 +2678,7 @@ Variable exprfunc_number(Program *prg, const std::vector<Token> &v)
 	return res;
 }
 
-Variable exprfunc_string(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_string(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2402,7 +2689,7 @@ Variable exprfunc_string(Program *prg, const std::vector<Token> &v)
 	return res;
 }
 
-Variable exprfunc_vector(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_vector(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2413,7 +2700,7 @@ Variable exprfunc_vector(Program *prg, const std::vector<Token> &v)
 	return res;
 }
 
-Variable exprfunc_map(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_map(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2424,7 +2711,7 @@ Variable exprfunc_map(Program *prg, const std::vector<Token> &v)
 	return res;
 }
 
-Variable exprfunc_function(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_function(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2435,7 +2722,7 @@ Variable exprfunc_function(Program *prg, const std::vector<Token> &v)
 	return res;
 }
 
-Variable exprfunc_label(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_label(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2446,7 +2733,7 @@ Variable exprfunc_label(Program *prg, const std::vector<Token> &v)
 	return res;
 }
 
-Variable exprfunc_pointer(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_pointer(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2457,7 +2744,7 @@ Variable exprfunc_pointer(Program *prg, const std::vector<Token> &v)
 	return res;
 }
 
-Variable exprfunc_typeof(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_typeof(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2483,7 +2770,7 @@ Variable exprfunc_typeof(Program *prg, const std::vector<Token> &v)
 	return res;
 }
 
-bool corefunc_for(Program *prg, const std::vector<Token> &v)
+static bool corefunc_for(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(5)
 
@@ -2529,7 +2816,7 @@ bool corefunc_for(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool corefunc_if(Program *prg, const std::vector<Token> &v)
+static bool corefunc_if(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -2584,7 +2871,7 @@ bool corefunc_if(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-Variable exprfunc_time(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_time(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 	Variable var;
@@ -2593,7 +2880,7 @@ Variable exprfunc_time(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-bool corefunc_srand(Program *prg, const std::vector<Token> &v)
+static bool corefunc_srand(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -2638,7 +2925,7 @@ static bool corefunc_explode(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 {
 	Variable ret;
 	ret.name = "-booboo-";
@@ -2739,7 +3026,7 @@ Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 	return ret;
 }
 
-Variable exprfunc_subtract(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_subtract(Program *prg, const std::vector<Token> &v)
 {
 	double n = as_number(prg, v[0]);
 
@@ -2754,7 +3041,7 @@ Variable exprfunc_subtract(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_multiply(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_multiply(Program *prg, const std::vector<Token> &v)
 {
 	double n = as_number(prg, v[0]);
 
@@ -2769,7 +3056,7 @@ Variable exprfunc_multiply(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_divide(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_divide(Program *prg, const std::vector<Token> &v)
 {
 	double n = as_number(prg, v[0]);
 
@@ -2784,7 +3071,7 @@ Variable exprfunc_divide(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_modulus(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_modulus(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -2795,7 +3082,7 @@ Variable exprfunc_modulus(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_and(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_and(Program *prg, const std::vector<Token> &v)
 {
 	bool b = (bool)as_number(prg, v[0]);
 
@@ -2810,7 +3097,7 @@ Variable exprfunc_and(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_or(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_or(Program *prg, const std::vector<Token> &v)
 {
 	bool b = (bool)as_number(prg, v[0]);
 
@@ -2825,7 +3112,7 @@ Variable exprfunc_or(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_not(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_not(Program *prg, const std::vector<Token> &v)
 {
 	bool b = !(bool)as_number(prg, v[0]);
 
@@ -2836,7 +3123,7 @@ Variable exprfunc_not(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_greater(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_greater(Program *prg, const std::vector<Token> &v)
 {
 	bool b = true;
 
@@ -2871,7 +3158,7 @@ Variable exprfunc_greater(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_less(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_less(Program *prg, const std::vector<Token> &v)
 {
 	bool b = true;
 	
@@ -2906,7 +3193,7 @@ Variable exprfunc_less(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_greaterequal(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_greaterequal(Program *prg, const std::vector<Token> &v)
 {
 	bool b = true;
 	
@@ -2941,7 +3228,7 @@ Variable exprfunc_greaterequal(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_lessequal(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_lessequal(Program *prg, const std::vector<Token> &v)
 {
 	bool b = true;
 	
@@ -2976,7 +3263,7 @@ Variable exprfunc_lessequal(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_equal(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_equal(Program *prg, const std::vector<Token> &v)
 {
 	if (v[0].type == Token::SYMBOL) {
 		Variable *v1;
@@ -3043,7 +3330,7 @@ Variable exprfunc_equal(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_notequal(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_notequal(Program *prg, const std::vector<Token> &v)
 {
 	if (v[0].type == Token::SYMBOL) {
 		Variable var1 = as_variable_resolve(prg, v[0]);
@@ -3096,7 +3383,7 @@ Variable exprfunc_notequal(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_bitor(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_bitor(Program *prg, const std::vector<Token> &v)
 {
 	int n = (int)as_number(prg, v[0]);
 
@@ -3111,7 +3398,7 @@ Variable exprfunc_bitor(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_xor(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_xor(Program *prg, const std::vector<Token> &v)
 {
 	int n = (int)as_number(prg, v[0]);
 
@@ -3126,7 +3413,7 @@ Variable exprfunc_xor(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_bitand(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_bitand(Program *prg, const std::vector<Token> &v)
 {
 	int n = (int)as_number(prg, v[0]);
 
@@ -3141,7 +3428,7 @@ Variable exprfunc_bitand(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_leftshift(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_leftshift(Program *prg, const std::vector<Token> &v)
 {
 	int n = (int)as_number(prg, v[0]);
 
@@ -3156,7 +3443,7 @@ Variable exprfunc_leftshift(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_rightshift(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_rightshift(Program *prg, const std::vector<Token> &v)
 {
 	int n = (int)as_number(prg, v[0]);
 
@@ -3303,7 +3590,7 @@ static Variable matmul(Program *prg, Variable ret, Variable vec2)
 	return ret;
 }
 
-Variable exprfunc_mul(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_mul(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -3376,7 +3663,7 @@ static Variable identity(int sz)
 	return var;
 }
 
-Variable exprfunc_identity(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_identity(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 	
@@ -3385,7 +3672,7 @@ Variable exprfunc_identity(Program *prg, const std::vector<Token> &v)
 	return identity(sz);
 }
 
-Variable exprfunc_scale(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_scale(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -3402,7 +3689,7 @@ Variable exprfunc_scale(Program *prg, const std::vector<Token> &v)
 	return mat;
 }
 
-Variable exprfunc_rotate(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_rotate(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
 	
@@ -3430,7 +3717,7 @@ Variable exprfunc_rotate(Program *prg, const std::vector<Token> &v)
 	return mat;
 }
 
-Variable exprfunc_translate(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_translate(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -3455,7 +3742,7 @@ static double veclen(const Variable &vec)
 	return sqrt(pow(vec.v[0].n, 2) + pow(vec.v[1].n, 2) + pow(vec.v[2].n, 2));
 }
 
-Variable exprfunc_length(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_length(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -3479,7 +3766,7 @@ static double vecdot(const Variable &vec1, const Variable &vec2)
 	return vec1.v[0].n * vec2.v[0].n + vec1.v[1].n * vec2.v[1].n + vec1.v[2].n * vec2.v[2].n;
 }
 
-Variable exprfunc_dot(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_dot(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -3509,7 +3796,7 @@ static Variable veccross(Variable vec, Variable vec2)
 	return vec;
 }
 
-Variable exprfunc_angle(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_angle(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -3546,7 +3833,7 @@ Variable exprfunc_angle(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_cross(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_cross(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -3566,7 +3853,7 @@ Variable exprfunc_cross(Program *prg, const std::vector<Token> &v)
 	return vec;
 }
 
-Variable exprfunc_normalize(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_normalize(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -3581,7 +3868,7 @@ Variable exprfunc_normalize(Program *prg, const std::vector<Token> &v)
 	return matmul(prg, vec, len);
 }
 
-Variable exprfunc_vadd(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_vadd(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -3618,7 +3905,7 @@ Variable exprfunc_vadd(Program *prg, const std::vector<Token> &v)
 	return vec;
 }
 
-Variable exprfunc_vsub(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_vsub(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -3655,7 +3942,7 @@ Variable exprfunc_vsub(Program *prg, const std::vector<Token> &v)
 	return vec;
 }
 
-Variable exprfunc_inverse(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_inverse(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -3668,7 +3955,7 @@ Variable exprfunc_inverse(Program *prg, const std::vector<Token> &v)
 	return from_glm_mat4(m);
 }
 
-Variable exprfunc_transpose(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_transpose(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -3681,7 +3968,7 @@ Variable exprfunc_transpose(Program *prg, const std::vector<Token> &v)
 	return from_glm_mat4(m);
 }
 
-Variable exprfunc_address(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_address(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -3692,7 +3979,7 @@ Variable exprfunc_address(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
-Variable exprfunc_toptr(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_toptr(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -3789,6 +4076,7 @@ void start()
 	add_instruction("return", breaker_return);
 
 	add_instruction("var", corefunc_var);
+	add_instruction("const", corefunc_const);
 	
 	add_instruction("=", corefunc_set);
 	

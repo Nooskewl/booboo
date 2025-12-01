@@ -79,6 +79,12 @@ struct Variable
 	Fish f;
 
 	std::string obfuscated;
+
+	bool constant;
+
+	Variable() {
+		constant = false;
+	}
 };
 
 typedef bool (*library_func)(Program *prg, const std::vector<Token> &v);

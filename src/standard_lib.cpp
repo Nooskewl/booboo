@@ -1271,7 +1271,7 @@ static bool filefunc_write(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-bool filefunc_print(Program *prg, const std::vector<Token> &v)
+static bool filefunc_print(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
