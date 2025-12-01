@@ -993,6 +993,7 @@ static bool vectorfunc_init(Program *prg, const std::vector<Token> &v)
 		}
 		else {
 			Variable var = as_variable_resolve(prg, v[i]);
+			var.constant = false;
 			vec.v.push_back(var);
 		}
 	}
@@ -1009,6 +1010,8 @@ static bool vectorfunc_add(Program *prg, const std::vector<Token> &v)
 
 	for (size_t i  = 1; i < v.size(); i++) {
 		Variable var = as_variable_resolve(prg, v[i]);
+
+		var.constant = false;
 
 		id.v.push_back(var);
 	}
@@ -1053,6 +1056,7 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 	}
 	else if (v[2].type == Token::SYMBOL) {
 		var = as_variable(prg, v[2]);
+		var.constant = false;
 	}
 	else {
 		var.type = Variable::STRING;
