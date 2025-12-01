@@ -975,6 +975,11 @@ static bool vectorfunc_init(Program *prg, const std::vector<Token> &v)
 	MIN_ARGS(1)
 
 	Variable &vec = as_variable(prg, v[0]);
+	
+	if (vec.constant) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
+	}
+
 	vec.type = Variable::VECTOR;
 	vec.v.clear();
 
@@ -1006,6 +1011,11 @@ static bool vectorfunc_add(Program *prg, const std::vector<Token> &v)
 	MIN_ARGS(2)
 
 	Variable &id = as_variable(prg, v[0]);
+	
+	if (id.constant) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
+	}
+
 	id.type = Variable::VECTOR;
 
 	for (size_t i  = 1; i < v.size(); i++) {
@@ -1039,6 +1049,11 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(3)
 
 	Variable &id = as_variable(prg, v[0]);
+	
+	if (id.constant) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
+	}
+
 	double index = as_number(prg, v[1]);
 
 	id.type = Variable::VECTOR;
@@ -1075,6 +1090,11 @@ static bool vectorfunc_erase(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	Variable &id = as_variable(prg, v[0]);
+	
+	if (id.constant) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
+	}
+
 	double index = as_number(prg, v[1]);
 
 	CHECK_VECTOR(id)
@@ -1094,6 +1114,10 @@ static bool vectorfunc_clear(Program *prg, const std::vector<Token> &v)
 
 	Variable &id = as_variable(prg, v[0]);
 
+	if (id.constant) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
+	}
+
 	id.type = Variable::VECTOR;
 
 	id.v.clear();
@@ -1106,6 +1130,11 @@ static bool vectorfunc_reserve(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	Variable &id = as_variable(prg, v[0]);
+	
+	if (id.constant) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
+	}
+
 	int n = as_number(prg, v[1]);
 
 	id.type = Variable::VECTOR;
@@ -1121,6 +1150,10 @@ static bool mapfunc_clear(Program *prg, const std::vector<Token> &v)
 
 	Variable &id = as_variable(prg, v[0]);
 
+	if (id.constant) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant map at " + get_error_info(prg));
+	}
+
 	id.type = Variable::MAP;
 
 	id.m.clear();
@@ -1133,6 +1166,11 @@ static bool mapfunc_erase(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	Variable &id = as_variable(prg, v[0]);
+	
+	if (id.constant) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant map at " + get_error_info(prg));
+	}
+
 	std::string key = as_string(prg, v[1]);
 
 	CHECK_MAP(id)

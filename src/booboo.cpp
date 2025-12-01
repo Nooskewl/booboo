@@ -4602,10 +4602,12 @@ Variable &go_fish(Program *prg, const Variable::Fish &f)
 {
 	Variable *v = &prg->variables[f.c_i];
 	int type = v->type;
+	bool constant = v->constant;
 
 	while (type == Variable::FISH) {
 		v = &go_fish(prg, v->f);
 		type = v->type;
+		constant = v->constant;
 	}
 
 	int index = 0;
@@ -4629,9 +4631,11 @@ Variable &go_fish(Program *prg, const Variable::Fish &f)
 	}
 
 	if (type == Variable::VECTOR) {
+		v->v[index].constant = constant;
 		return v->v[index];
 	}
 	else {
+		v->m[key].constant = constant;
 		return v->m[key];
 	}
 }
