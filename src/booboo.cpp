@@ -398,7 +398,7 @@ static std::string tokenfunc_ref(Program *prg)
 static std::string tokenfunc_deref(Program *prg)
 {
 	prg->s->p++;
-	return "`";
+	return "*";
 }
 
 static std::string token(Program *prg, Token::Token_Type &ret_type)
@@ -807,7 +807,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 				tok.i = prg->variables_map[sym];
 			}
 		}
-		else if (c == '`') {
+		else if (c == '*') {
 			deref = true;
 			p++;
 			continue;
@@ -1065,7 +1065,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 				tok.i = prg->variables_map[sym];
 			}
 		}
-		else if (c == '`') {
+		else if (c == '*') {
 			deref = true;
 			p++;
 			continue;
@@ -1450,7 +1450,7 @@ static void compile(Program *prg, Pass pass)
 
 	while ((tok = token(prg, tt)) != "") {
 top:
-		if (tok == "`") {
+		if (tok == "*") {
 			_is_deref = true;
 		}
 		else if (tok == "function") {
@@ -1496,7 +1496,7 @@ top:
 			while ((tok = token(prg, tt)) != "") {
 func_top:
 				func.s->line = prg->s->line;
-				if (tok == "`") {
+				if (tok == "*") {
 					is_deref = true;
 				}
 				else if (tok == "{") {
@@ -4024,7 +4024,7 @@ static void init_token_map()
 	add_token_handler('>', tokenfunc_rightshift);
 	add_token_handler('#', tokenfunc_hex);
 	add_token_handler('~', tokenfunc_ref);
-	add_token_handler('`', tokenfunc_deref);
+	add_token_handler('*', tokenfunc_deref);
 }
 
 void start()
@@ -4268,7 +4268,7 @@ static void obfuscate_tokens(Program *prg, std::vector<Token> &v)
 				break;
 			case Token::SYMBOL:
 				if (v[j].dereference) {
-					printf("`");
+					printf("*");
 				}
 				Variable &var = prg->variables[v[j].i];
 				if (var.type == Variable::EXPRESSION) {

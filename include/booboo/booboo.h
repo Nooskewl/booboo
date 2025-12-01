@@ -58,20 +58,41 @@ struct Variable
 		int i;
 		std::string name;
 		std::vector<Token> v;
+
+		Expression() {
+		}
+
+		Expression(const Expression &e) {
+			i = e.i;
+			name = e.name;
+			v = e.v;
+		}
+
+		~Expression() {
+		}
 	};
 
 	struct Fish
 	{
 		int c_i;
 		std::vector<Token> v;
+
+		Fish() {
+		}
+
+		Fish(const Fish &f) {
+			c_i = f.c_i;
+			v = f.v;
+		}
+
+		~Fish() {
+		}
 	};
 
 	std::string name;
 
-	union {
-		double n;
-		Variable *p;
-	};
+	double n;
+	Variable *p;
 	std::string s;
 	std::vector<Variable> v;
 	std::map<std::string, Variable> m;
@@ -82,8 +103,30 @@ struct Variable
 
 	bool constant;
 
-	Variable() {
-		constant = false;
+	Variable(const Variable &var)
+	{
+		type = var.type;
+		name = var.name;
+		obfuscated = var.obfuscated;
+		constant = var.constant;
+
+		n = var.n;
+		s = var.s;
+		v = var.v;
+		m = var.m;
+		e = var.e;
+		f = var.f;
+		p = var.p;
+	}
+
+	Variable() :
+		type(UNTYPED),
+		constant(false)
+	{
+	}
+
+	~Variable()
+	{
 	}
 };
 
