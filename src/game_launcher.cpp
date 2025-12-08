@@ -46,6 +46,7 @@ extern int num_ops;
 Uint64 op_time = 0;
 double ops_sec = 0;
 bool limits = true;
+bool show_ops;
 
 static bool mousefunc_set_relative(Program *prg, const std::vector<Token> &v)
 {
@@ -268,6 +269,8 @@ bool start()
 	
 	util::JSON::Node *root = shim::shim_json->get_root();
 	exit_key = root->get_nested_int("booboo>input>exit_key", &exit_key, TGUIK_F12);
+	show_ops = util::bool_arg(false, shim::argc, shim::argv, "ops");
+	show_ops = root->get_nested_bool("booboo>game>show_ops", &show_ops, show_ops);
 
 	return true;
 }
@@ -436,7 +439,7 @@ void draw_all()
 	gfx::draw_guis();
 	gfx::draw_notifications();
 
-	if (shim::font && util::bool_arg(shim::debug, shim::argc, shim::argv, "debug")) {
+	if (shim::font && show_ops) {
 		Uint64 now = SDL_GetTicks();
 		Uint64 diff = now - op_time;
 		if (diff >= 5000) {
@@ -837,7 +840,7 @@ int main(int argc, char **argv)
 	shim::static_start_all();
 	
 	shim::use_cwd = true;
-	shim::font_size = 24;
+	shim::font_size = 16;
 	shim::convert_directions_to_focus_events = false;
 	shim::create_depth_buffer = true;
 

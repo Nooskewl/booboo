@@ -42,5 +42,13 @@
 		"input": {
 			"fullscreen_key": 1073741892
 		}
+	},
+	"booboo": {
+		"game": {
+			"show_ops": false
+		},
+		"input": {
+			"exit_key": 1073741893
+		}
 	}
 }
