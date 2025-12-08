@@ -1,6 +1,9 @@
 var json
 = json (json_load "colours.json")
 
+var font
+= font (font_load "NotoSansArabic.ttf" 32 1)
+
 function draw
 {
 	var r1 g1 b1 r2 g2 b2 r3 g3 b3 r4 g4 b4
@@ -18,4 +21,8 @@ function draw
 	= b4 (json_get_number json "bottomleft>[2]")
 
 	filled_rectangle r1 g1 b1 255 r2 g2 b2 255 r3 g3 b3 255 r4 g4 b4 255 0 0 640 360
+
+	var text
+	= text (json_get_string json "message")
+	font_draw font 255 255 255 255 text (- 640 10) (- 360 10) 1
 }
