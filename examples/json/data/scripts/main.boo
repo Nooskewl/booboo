@@ -25,4 +25,6 @@ function draw
 	var text
 	= text (json_get_string json "message")
 	font_draw font 255 255 255 255 text (- 640 10) (- 360 10) 1
+
+	font_draw font 255 255 255 255 "Hello, world!" 10 10
 }
