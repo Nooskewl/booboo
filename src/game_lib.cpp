@@ -57,19 +57,6 @@ struct Sprite_Info {
 	std::map<int, gfx::Sprite *> sprites;
 };
 
-struct Config_Value
-{
-	Variable::Variable_Type type;
-
-	double n;
-	std::string s;
-};
-
-struct CFG_Info {
-	unsigned int cfg_id;
-	std::map<int, std::map<std::string, Config_Value> > cfgs;
-};
-
 struct Shader_Info {
 	unsigned int shader_id;
 	std::map<int, gfx::Shader *> shaders;
@@ -191,17 +178,6 @@ static Sprite_Info *sprite_info(Program *prg)
 	return info;
 }
 
-static CFG_Info *cfg_info(Program *prg)
-{
-	CFG_Info *info = (CFG_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.cfg");
-	if (info == nullptr) {
-		info = new CFG_Info;
-		info->cfg_id = 0;
-		booboo::set_black_box(prg, "com.nooskewl.booboo.cfg", info);
-	}
-	return info;
-}
-
 static Shader_Info *shader_info(Program *prg)
 {
 	Shader_Info *info = (Shader_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.shader");
@@ -255,83 +231,6 @@ static Widget_Info *widget_info(Program *prg)
 		booboo::set_black_box(prg, "com.nooskewl.booboo.widget", info);
 	}
 	return info;
-}
-
-static std::string cfg_path(std::string cfg_name)
-{
-	std::string path = util::get_savegames_dir() + "/" + cfg_name + ".txt";
-	return path;
-}
-
-static std::map<std::string, Config_Value> load_cfg(Program *prg, std::string cfg_name)
-{
-	std::map<std::string, Config_Value> v;
-
-	std::string text;
-
-	try {
-		text = util::load_text_from_filesystem(cfg_path(cfg_name));
-	}
-	catch (util::Error &e) {
-		return v;
-	}
-
-	util::Tokenizer t(text, '\n');
-
-	std::string line;
-
-	while ((line = t.next()) != "") {
-		util::Tokenizer t2(line, '=');
-		std::string name = t2.next();
-		std::string value = t2.next();
-		util::trim(value);
-
-		if (name == "") {
-			continue;
-		}
-
-		Config_Value val;
-		
-		if (value.length() > 0 && value[0] == '"') {
-			val.type = Variable::STRING;
-			val.s = util::remove_quotes(value);
-		}
-		else {
-			val.type = Variable::NUMBER;
-			val.n = atof(value.c_str());
-		}
-
-		v[name] = val;
-	}
-
-	return v;
-}
-
-static bool save_cfg(Program *prg, int id, std::string cfg_name)
-{
-	FILE *f = fopen(cfg_path(cfg_name).c_str(), "w");
-	if (f == nullptr) {
-		return false;
-	}
-
-	std::map<std::string, Config_Value>::iterator it;
-
-	CFG_Info *info = cfg_info(prg);
-
-	for (it = info->cfgs[id].begin(); it != info->cfgs[id].end(); it++) {
-		std::string name = (*it).first;
-		Config_Value &v = (*it).second;
-		if (IS_NUMBER(v)) {
-			fprintf(f, "%s=%g\n", name.c_str(), v.n);
-		}
-		else {
-			fprintf(f, "%s=\"%s\"\n", name.c_str(), v.s.c_str());
-		}
-	}
-
-	fclose(f);
-
-	return true;
 }
 
 static bool miscfunc_inspect(Program *prg, const std::vector<Token> &v)
@@ -2742,184 +2641,6 @@ static Variable exprfunc_joy_get_axis(Program *prg, const std::vector<Token> &v)
 	return v1;
 }
 
-static Variable exprfunc_cfg_load(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-
-	std::string cfg_name = as_string(prg, v[0]);
-
-	CFG_Info *info = cfg_info(prg);
-
-	Variable v1;
-	v1.type = Variable::NUMBER;
-
-	std::map<std::string, Config_Value> val = load_cfg(prg, cfg_name);
-	int id = info->cfg_id++;
-	v1.n = id;
-	info->cfgs[id] = val;
-
-	return v1;
-}
-
-static bool cfgfunc_destroy(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-
-	int id = as_number(prg, v[0]);
-	CFG_Info *info = cfg_info(prg);
-	INFO_EXISTS(info->cfgs, id)
-	info->cfgs.erase(id);
-
-	return true;
-}
-
-static Variable exprfunc_cfg_save(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(2)
-
-	int id = as_number(prg, v[0]);
-	std::string cfg_name = as_string(prg, v[1]);
-
-	Variable v1;
-	v1.type = Variable::NUMBER;
-
-	bool success = save_cfg(prg, id, cfg_name);
-
-	v1.n = success;
-
-	return v1;
-}
-
-static Variable exprfunc_cfg_get_number(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(2)
-
-	int id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-
-	CFG_Info *info = cfg_info(prg);
-	
-	INFO_EXISTS(info->cfgs, id)
-
-	Variable v1;
-	v1.type = Variable::NUMBER;
-
-	if (info->cfgs[id].find(name) == info->cfgs[id].end()) {
-		v1.n = 0;
-	}
-	else {
-		v1.n = info->cfgs[id][name].n;
-	}
-
-	return v1;
-}
-
-static Variable exprfunc_cfg_get_string(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(2)
-
-	int id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-
-	CFG_Info *info = cfg_info(prg);
-	
-	INFO_EXISTS(info->cfgs, id)
-
-	Variable v1;
-	v1.type = Variable::STRING;
-
-	if (info->cfgs[id].find(name) == info->cfgs[id].end()) {
-		v1.s = "";
-	}
-	else {
-		v1.s = info->cfgs[id][name].s;
-	}
-
-	return v1;
-}
-
-static bool cfgfunc_set_number(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(3)
-
-	int id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-	double val = as_number(prg, v[2]);
-
-	CFG_Info *info = cfg_info(prg);
-	
-	INFO_EXISTS(info->cfgs, id)
-
-	Config_Value value;
-	value.type = Variable::NUMBER;
-	value.n = val;
-
-	info->cfgs[id][name] = value;
-
-	return true;
-}
-
-static bool cfgfunc_set_string(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(3)
-
-	int id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-	std::string val = as_string(prg, v[2]);
-
-	CFG_Info *info = cfg_info(prg);
-	
-	INFO_EXISTS(info->cfgs, id)
-
-	Config_Value value;
-	value.type = Variable::STRING;
-	value.s = val;
-
-	info->cfgs[id][name] = value;
-
-	return true;
-}
-
-static Variable exprfunc_cfg_exists(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(2)
-
-	int id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-
-	CFG_Info *info = cfg_info(prg);
-
-	INFO_EXISTS(info->cfgs, id)
-
-	bool found = info->cfgs[id].find(name) != info->cfgs[id].end();
-
-	Variable v1;
-	v1.type = Variable::NUMBER;
-	v1.n = found;
-
-	return v1;
-}
-
-static bool cfgfunc_erase(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(2)
-
-	int id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-
-	CFG_Info *info = cfg_info(prg);
-	
-	INFO_EXISTS(info->cfgs, id)
-
-	std::map<std::string, Config_Value>::iterator it;
-	if ((it = info->cfgs[id].find(name)) == info->cfgs[id].end()) {
-		return true;
-	}
-	info->cfgs[id].erase(it);
-
-	return true;
-}
-
 static Variable exprfunc_shader_load(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
@@ -5164,15 +4885,6 @@ void start_lib_game()
 	add_instruction("rumble", joyfunc_rumble);
 	add_expression_handler("joy_get_button", exprfunc_joy_get_button);
 	add_expression_handler("joy_get_axis", exprfunc_joy_get_axis);
-	add_expression_handler("cfg_load", exprfunc_cfg_load);
-	add_instruction("cfg_destroy", cfgfunc_destroy);
-	add_expression_handler("cfg_save", exprfunc_cfg_save);
-	add_expression_handler("cfg_get_number", exprfunc_cfg_get_number);
-	add_expression_handler("cfg_get_string", exprfunc_cfg_get_string);
-	add_instruction("cfg_set_number", cfgfunc_set_number);
-	add_instruction("cfg_set_string", cfgfunc_set_string);
-	add_expression_handler("cfg_exists", exprfunc_cfg_exists);
-	add_instruction("cfg_erase", cfgfunc_erase);
 	add_expression_handler("shader_load", exprfunc_shader_load);
 	add_instruction("shader_destroy", shaderfunc_destroy);
 	add_instruction("shader_use", shaderfunc_use);
@@ -5307,7 +5019,6 @@ void game_lib_destroy_program(Program *prg)
 	for (std::map<int, Widget *>::iterator i = widget_i->widgets.begin(); i != widget_i->widgets.end(); i++) {
 		delete widget_i->widgets[(*i).first];
 	}
-	CFG_Info *cfg_i = cfg_info(prg);
 
 	delete mml_i;
 	delete sample_i;
@@ -5319,7 +5030,6 @@ void game_lib_destroy_program(Program *prg)
 	delete model_i;
 	delete billboard_i;
 	delete widget_i;
-	delete cfg_i;
 
 	booboo::set_black_box(prg, "com.nooskewl.booboo.mml", nullptr);
 	booboo::set_black_box(prg, "com.nooskewl.booboo.sample", nullptr);
@@ -5327,7 +5037,6 @@ void game_lib_destroy_program(Program *prg)
 	booboo::set_black_box(prg, "com.nooskewl.booboo.font", nullptr);
 	booboo::set_black_box(prg, "com.nooskewl.booboo.tilemap", nullptr);
 	booboo::set_black_box(prg, "com.nooskewl.booboo.sprite", nullptr);
-	booboo::set_black_box(prg, "com.nooskewl.booboo.cfg", nullptr);
 	booboo::set_black_box(prg, "com.nooskewl.booboo.shader", nullptr);
 	booboo::set_black_box(prg, "com.nooskewl.booboo.json", nullptr);
 	booboo::set_black_box(prg, "com.nooskewl.booboo.model", nullptr);

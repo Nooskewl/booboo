@@ -21,11 +21,28 @@ using namespace noo;
 #include "booboo/internal.h"
 using namespace booboo;
 
+#define INFO_EXISTS(m, i) if (m.find(i) == m.end()) { \
+	throw Error(std::string(__FUNCTION__) + ": " + "Invalid handle at " + get_error_info(prg)); \
+}
+
 template <typename T> T sign(T v) { return (T(0) < v) - (v < T(0)); }
 
 struct File_Info {
 	int file_id;
 	std::map<int, std::fstream *> files;
+};
+
+struct Config_Value
+{
+	Variable::Variable_Type type;
+
+	double n;
+	std::string s;
+};
+
+struct CFG_Info {
+	unsigned int cfg_id;
+	std::map<int, std::map<std::string, Config_Value> > cfgs;
 };
 
 File_Info *file_info(Program *prg)
@@ -37,6 +54,94 @@ File_Info *file_info(Program *prg)
 		set_black_box(prg, "com.nooskewl.booboo.files", info);
 	}
 	return info;
+}
+
+static CFG_Info *cfg_info(Program *prg)
+{
+	CFG_Info *info = (CFG_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.cfg");
+	if (info == nullptr) {
+		info = new CFG_Info;
+		info->cfg_id = 0;
+		booboo::set_black_box(prg, "com.nooskewl.booboo.cfg", info);
+	}
+	return info;
+}
+
+static std::string cfg_path(std::string cfg_name)
+{
+	std::string path = util::get_savegames_dir() + "/" + cfg_name + ".txt";
+	return path;
+}
+
+static std::map<std::string, Config_Value> load_cfg(Program *prg, std::string cfg_name)
+{
+	std::map<std::string, Config_Value> v;
+
+	std::string text;
+
+	try {
+		text = util::load_text_from_filesystem(cfg_path(cfg_name));
+	}
+	catch (util::Error &e) {
+		return v;
+	}
+
+	util::Tokenizer t(text, '\n');
+
+	std::string line;
+
+	while ((line = t.next()) != "") {
+		util::Tokenizer t2(line, '=');
+		std::string name = t2.next();
+		std::string value = t2.next();
+		util::trim(value);
+
+		if (name == "") {
+			continue;
+		}
+
+		Config_Value val;
+		
+		if (value.length() > 0 && value[0] == '"') {
+			val.type = Variable::STRING;
+			val.s = util::remove_quotes(value);
+		}
+		else {
+			val.type = Variable::NUMBER;
+			val.n = atof(value.c_str());
+		}
+
+		v[name] = val;
+	}
+
+	return v;
+}
+
+static bool save_cfg(Program *prg, int id, std::string cfg_name)
+{
+	FILE *f = fopen(cfg_path(cfg_name).c_str(), "w");
+	if (f == nullptr) {
+		return false;
+	}
+
+	std::map<std::string, Config_Value>::iterator it;
+
+	CFG_Info *info = cfg_info(prg);
+
+	for (it = info->cfgs[id].begin(); it != info->cfgs[id].end(); it++) {
+		std::string name = (*it).first;
+		Config_Value &v = (*it).second;
+		if (IS_NUMBER(v)) {
+			fprintf(f, "%s=%g\n", name.c_str(), v.n);
+		}
+		else {
+			fprintf(f, "%s=\"%s\"\n", name.c_str(), v.s.c_str());
+		}
+	}
+
+	fclose(f);
+
+	return true;
 }
 
 static Variable exprfunc_getenv(Program *prg, const std::vector<Token> &v)
@@ -1519,6 +1624,184 @@ static bool twinklefunc_clear(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static Variable exprfunc_cfg_load(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	std::string cfg_name = as_string(prg, v[0]);
+
+	CFG_Info *info = cfg_info(prg);
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	std::map<std::string, Config_Value> val = load_cfg(prg, cfg_name);
+	int id = info->cfg_id++;
+	v1.n = id;
+	info->cfgs[id] = val;
+
+	return v1;
+}
+
+static bool cfgfunc_destroy(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number(prg, v[0]);
+	CFG_Info *info = cfg_info(prg);
+	INFO_EXISTS(info->cfgs, id)
+	info->cfgs.erase(id);
+
+	return true;
+}
+
+static Variable exprfunc_cfg_save(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string cfg_name = as_string(prg, v[1]);
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	bool success = save_cfg(prg, id, cfg_name);
+
+	v1.n = success;
+
+	return v1;
+}
+
+static Variable exprfunc_cfg_get_number(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+
+	CFG_Info *info = cfg_info(prg);
+	
+	INFO_EXISTS(info->cfgs, id)
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	if (info->cfgs[id].find(name) == info->cfgs[id].end()) {
+		v1.n = 0;
+	}
+	else {
+		v1.n = info->cfgs[id][name].n;
+	}
+
+	return v1;
+}
+
+static Variable exprfunc_cfg_get_string(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+
+	CFG_Info *info = cfg_info(prg);
+	
+	INFO_EXISTS(info->cfgs, id)
+
+	Variable v1;
+	v1.type = Variable::STRING;
+
+	if (info->cfgs[id].find(name) == info->cfgs[id].end()) {
+		v1.s = "";
+	}
+	else {
+		v1.s = info->cfgs[id][name].s;
+	}
+
+	return v1;
+}
+
+static bool cfgfunc_set_number(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	double val = as_number(prg, v[2]);
+
+	CFG_Info *info = cfg_info(prg);
+	
+	INFO_EXISTS(info->cfgs, id)
+
+	Config_Value value;
+	value.type = Variable::NUMBER;
+	value.n = val;
+
+	info->cfgs[id][name] = value;
+
+	return true;
+}
+
+static bool cfgfunc_set_string(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	std::string val = as_string(prg, v[2]);
+
+	CFG_Info *info = cfg_info(prg);
+	
+	INFO_EXISTS(info->cfgs, id)
+
+	Config_Value value;
+	value.type = Variable::STRING;
+	value.s = val;
+
+	info->cfgs[id][name] = value;
+
+	return true;
+}
+
+static Variable exprfunc_cfg_exists(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+
+	CFG_Info *info = cfg_info(prg);
+
+	INFO_EXISTS(info->cfgs, id)
+
+	bool found = info->cfgs[id].find(name) != info->cfgs[id].end();
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+	v1.n = found;
+
+	return v1;
+}
+
+static bool cfgfunc_erase(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+
+	CFG_Info *info = cfg_info(prg);
+	
+	INFO_EXISTS(info->cfgs, id)
+
+	std::map<std::string, Config_Value>::iterator it;
+	if ((it = info->cfgs[id].find(name)) == info->cfgs[id].end()) {
+		return true;
+	}
+	info->cfgs[id].erase(it);
+
+	return true;
+}
+
 void start_lib_standard()
 {
 	add_expression_handler("getenv", exprfunc_getenv);
@@ -1588,6 +1871,16 @@ void start_lib_standard()
 	add_instruction("text_reset", twinklefunc_reset);
 	add_expression_handler("getch", exprfunc_twinkle_getch);
 	add_instruction("text_clear", twinklefunc_clear);
+	
+	add_expression_handler("cfg_load", exprfunc_cfg_load);
+	add_instruction("cfg_destroy", cfgfunc_destroy);
+	add_expression_handler("cfg_save", exprfunc_cfg_save);
+	add_expression_handler("cfg_get_number", exprfunc_cfg_get_number);
+	add_expression_handler("cfg_get_string", exprfunc_cfg_get_string);
+	add_instruction("cfg_set_number", cfgfunc_set_number);
+	add_instruction("cfg_set_string", cfgfunc_set_string);
+	add_expression_handler("cfg_exists", exprfunc_cfg_exists);
+	add_instruction("cfg_erase", cfgfunc_erase);
 }
 
 void end_lib_standard()
@@ -1603,5 +1896,9 @@ void standard_lib_destroy_program(Program *prg)
 	}
 	delete file_i;
 
+	CFG_Info *cfg_i = cfg_info(prg);
+	delete cfg_i;
+
 	set_black_box(prg, "com.nooskewl.booboo.files", nullptr);
+	set_black_box(prg, "com.nooskewl.booboo.cfg", nullptr);
 }

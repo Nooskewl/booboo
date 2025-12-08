@@ -53,6 +53,9 @@ static std::string load_text_from_filesystem(std::string filename)
 
 int main(int argc, char **argv)
 {
+	shim::organisation_name = "Nooskewl";
+	shim::game_name = "BooBoo";
+
 	booboo::load_text = util::load_text_from_filesystem;
 
 	std::string fn = argc >= 2 ? argv[1] : "";
