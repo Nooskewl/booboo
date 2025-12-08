@@ -1002,9 +1002,14 @@ static Variable exprfunc_mml_create(Program *prg, const std::vector<Token> &v)
 
 	Uint8 *bytes = (Uint8 *)str.c_str();
 	SDL_IOStream *file = SDL_IOFromMem(bytes, str.length());
-	audio::MML *mml = new audio::MML(file); // this closes the file
 
-	info->mmls[info->mml_id++] = mml;
+	try {
+		audio::MML *mml = new audio::MML(file); // this closes the file
+		info->mmls[info->mml_id++] = mml;
+	}
+	catch (util::Error &e) {
+		v1.n = -1;
+	}
 
 	return v1;
 }
@@ -1040,9 +1045,13 @@ static Variable exprfunc_mml_load(Program *prg, const std::vector<Token> &v)
 		load_from_filesystem = as_number(prg, v[1]);
 	}
 
-	audio::MML *mml = new audio::MML(name, load_from_filesystem);
-
-	info->mmls[info->mml_id++] = mml;
+	try {
+		audio::MML *mml = new audio::MML(name, load_from_filesystem);
+		info->mmls[info->mml_id++] = mml;
+	}
+	catch (util::Error &e) {
+		v1.n = -1;
+	}
 
 	return v1;
 }
@@ -1116,9 +1125,13 @@ static Variable exprfunc_sample_load(Program *prg, const std::vector<Token> &v)
 		load_from_filesystem = as_number(prg, v[1]);
 	}
 
-	audio::Sample *sample = new audio::Sample(name, load_from_filesystem);
-
-	info->samples[info->sample_id++] = sample;
+	try {
+		audio::Sample *sample = new audio::Sample(name, load_from_filesystem);
+		info->samples[info->sample_id++] = sample;
+	}
+	catch (util::Error &e) {
+		v1.n = -1;
+	}
 
 	return v1;
 }
@@ -1201,14 +1214,19 @@ static Variable exprfunc_image_create(Program *prg, const std::vector<Token> &v)
 
 	v1.n = info->image_id;
 
-	gfx::Image *img = new gfx::Image(util::Size<int>(w, h));
+	try {
+		gfx::Image *img = new gfx::Image(util::Size<int>(w, h));
 
-	Image *i = new Image;
-	i->image = img;
-	i->created = true;
-	i->size = util::Size<int>(w, h);
+		Image *i = new Image;
+		i->image = img;
+		i->created = true;
+		i->size = util::Size<int>(w, h);
 
-	info->images[info->image_id++] = i;
+		info->images[info->image_id++] = i;
+	}
+	catch (util::Error &e) {
+		v1.n = -1;
+	}
 
 	return v1;
 }
@@ -1231,13 +1249,18 @@ static Variable exprfunc_image_load(Program *prg, const std::vector<Token> &v)
 		load_from_filesystem = as_number(prg, v[1]);
 	}
 
-	gfx::Image *img = new gfx::Image(name, false, load_from_filesystem);
+	try {
+		gfx::Image *img = new gfx::Image(name, false, load_from_filesystem);
 
-	Image *i = new Image;
-	i->image = img;
-	i->created = false;
+		Image *i = new Image;
+		i->image = img;
+		i->created = false;
 
-	info->images[info->image_id++] = i;
+		info->images[info->image_id++] = i;
+	}
+	catch (util::Error &e) {
+		v1.n = -1;
+	}
 
 	return v1;
 }
@@ -1717,10 +1740,14 @@ static Variable exprfunc_font_load(Program *prg, const std::vector<Token> &v)
 		load_from_filesystem = as_number(prg, v[3]);
 	}
 
-	gfx::TTF *font = new gfx::TTF(name, size, 1024, load_from_filesystem);
-	font->set_smooth(smooth);
-
-	info->fonts[info->font_id++] = font;
+	try {
+		gfx::TTF *font = new gfx::TTF(name, size, 1024, load_from_filesystem);
+		font->set_smooth(smooth);
+		info->fonts[info->font_id++] = font;
+	}
+	catch (util::Error &e) {
+		v1.n = -1;
+	}
 
 	return v1;
 }
@@ -1867,9 +1894,13 @@ static Variable exprfunc_tilemap_load(Program *prg, const std::vector<Token> &v)
 		load_from_filesystem = as_number(prg, v[1]);
 	}
 
-	gfx::Tilemap *tilemap = new gfx::Tilemap(name, load_from_filesystem);
-
-	info->tilemaps[info->tilemap_id++] = tilemap;
+	try {
+		gfx::Tilemap *tilemap = new gfx::Tilemap(name, load_from_filesystem);
+		info->tilemaps[info->tilemap_id++] = tilemap;
+	}
+	catch (util::Error &e) {
+		v1.n = -1;
+	}
 
 	return v1;
 }
@@ -2227,9 +2258,13 @@ static Variable exprfunc_sprite_load(Program *prg, const std::vector<Token> &v)
 		load_from_filesystem = as_number(prg, v[1]);
 	}
 
-	gfx::Sprite *sprite = new gfx::Sprite(name, name, load_from_filesystem);
-
-	info->sprites[info->sprite_id++] = sprite;
+	try {
+		gfx::Sprite *sprite = new gfx::Sprite(name, name, load_from_filesystem);
+		info->sprites[info->sprite_id++] = sprite;
+	}
+	catch (util::Error &e) {
+		v1.n = -1;
+	}
 
 	return v1;
 }
@@ -2927,12 +2962,17 @@ static Variable exprfunc_shader_load(Program *prg, const std::vector<Token> &v)
 		fs = load_text("gfx/shaders/glsl/" + fname + ".txt");
 	}
 
-	gfx::Shader::OpenGL_Shader *vert = gfx::Shader::load_opengl_vertex_shader(vs, gfx::Shader::HIGH);
-	gfx::Shader::OpenGL_Shader *frag = gfx::Shader::load_opengl_fragment_shader(fs, gfx::Shader::HIGH);
+	try {
+		gfx::Shader::OpenGL_Shader *vert = gfx::Shader::load_opengl_vertex_shader(vs, gfx::Shader::HIGH);
+		gfx::Shader::OpenGL_Shader *frag = gfx::Shader::load_opengl_fragment_shader(fs, gfx::Shader::HIGH);
 
-	shader = new gfx::Shader(vert, frag);
+		shader = new gfx::Shader(vert, frag);
 
-	info->shaders[info->shader_id++] = shader;
+		info->shaders[info->shader_id++] = shader;
+	}
+	catch (util::Error &e) {
+		v1.n = -1;
+	}
 
 	return v1;
 }
@@ -3168,9 +3208,14 @@ static Variable exprfunc_json_load(Program *prg, const std::vector<Token> &v)
 		load_from_filesystem = as_number(prg, v[1]);
 	}
 
-	util::JSON *json = new util::JSON(name, load_from_filesystem);
+	try {
+		util::JSON *json = new util::JSON(name, load_from_filesystem);
 
-	info->jsons[info->json_id++] = json;
+		info->jsons[info->json_id++] = json;
+	}
+	catch (util::Error &e) {
+		v1.n = -1;
+	}
 
 	return v1;
 }
@@ -3271,14 +3316,19 @@ static Variable exprfunc_model_load(Program *prg, const std::vector<Token> &v)
 		load_from_filesystem = as_number(prg, v[1]);
 	}
 
-	gfx::Model *model = new gfx::Model(name, load_from_filesystem);
+	try {
+		gfx::Model *model = new gfx::Model(name, load_from_filesystem);
 
-	Model *m = new Model;
-	m->mat = glm::mat4();
-	m->model = model;
-	m->is_clone = false;
+		Model *m = new Model;
+		m->mat = glm::mat4();
+		m->model = model;
+		m->is_clone = false;
 
-	info->models[info->model_id++] = m;
+		info->models[info->model_id++] = m;
+	}
+	catch (util::Error &e) {
+		v1.n = -1;
+	}
 
 	return v1;
 }
@@ -3850,24 +3900,31 @@ static Variable exprfunc_billboard_create(Program *prg, const std::vector<Token>
 	Image_Info *info = image_info(prg);
 	INFO_EXISTS(info->images, image_id)
 	gfx::Image *image = info->images[image_id]->image;
-	
+		
 	Billboard_Info *info2 = billboard_info(prg);
-	Billboard *billboard = new Billboard;
-	billboard->image = image;
-	billboard->sprite = nullptr;
-	billboard->x = x;
-	billboard->y = y;
-	billboard->z = z;
-	billboard->w = w;
-	billboard->h = h;
-	billboard->tx = 0;
-	billboard->ty = 0;
-	billboard->tz = 0;
-	billboard->sx = 1;
-	billboard->sy = 1;
-	billboard->unit = 0;
 	result.n = info2->billboard_id;
-	info2->billboards[info2->billboard_id++] = billboard;
+
+	try {	
+		Billboard *billboard = new Billboard;
+		billboard->image = image;
+		billboard->sprite = nullptr;
+		billboard->x = x;
+		billboard->y = y;
+		billboard->z = z;
+		billboard->w = w;
+		billboard->h = h;
+		billboard->tx = 0;
+		billboard->ty = 0;
+		billboard->tz = 0;
+		billboard->sx = 1;
+		billboard->sy = 1;
+		billboard->unit = 0;
+		info2->billboards[info2->billboard_id++] = billboard;
+	}
+	catch (util::Error &e) {
+		result.n = -1;
+	}
+
 	return result;
 }
 
@@ -3904,22 +3961,29 @@ static Variable exprfunc_billboard_from_sprite(Program *prg, const std::vector<T
 	gfx::Sprite *sprite = info->sprites[sprite_id];
 	
 	Billboard_Info *info2 = billboard_info(prg);
-	Billboard *billboard = new Billboard;
-	billboard->image = nullptr;
-	billboard->sprite = sprite;
-	billboard->x = x;
-	billboard->y = y;
-	billboard->z = z;
-	billboard->w = w;
-	billboard->h = h;
-	billboard->tx = 0;
-	billboard->ty = 0;
-	billboard->tz = 0;
-	billboard->sx = 1;
-	billboard->sy = 1;
-	billboard->unit = unit;
 	result.n = info2->billboard_id;
-	info2->billboards[info2->billboard_id++] = billboard;
+
+	try {
+		Billboard *billboard = new Billboard;
+		billboard->image = nullptr;
+		billboard->sprite = sprite;
+		billboard->x = x;
+		billboard->y = y;
+		billboard->z = z;
+		billboard->w = w;
+		billboard->h = h;
+		billboard->tx = 0;
+		billboard->ty = 0;
+		billboard->tz = 0;
+		billboard->sx = 1;
+		billboard->sy = 1;
+		billboard->unit = unit;
+		info2->billboards[info2->billboard_id++] = billboard;
+	}
+	catch (util::Error &e) {
+		result.n = -1;
+	}
+
 	return result;
 }
 
@@ -4366,25 +4430,30 @@ static Variable exprfunc_widget_create(Program *prg, const std::vector<Token> &v
 
 	v1.n = info->widget_id;
 
-	Widget *widget = new Widget;
-	widget->data = &data;
+	try {
+		Widget *widget = new Widget;
+		widget->data = &data;
 
-	if (w <= 1.0 && h <= 1.0) {
-		widget->widget = new BooBoo_Widget(prg, info->widget_id, (float)w, (float)h);
-	}
-	else if (w <= 1.0) {
-		widget->widget = new BooBoo_Widget(prg, info->widget_id, (float)w, (int)h);
-	}
-	else if (h <= 1.0) {
-		widget->widget = new BooBoo_Widget(prg, info->widget_id, (int)w, (float)h);
-	}
-	else {
-		widget->widget = new BooBoo_Widget(prg, info->widget_id, (int)w, (int)h);
-	}
+		if (w <= 1.0 && h <= 1.0) {
+			widget->widget = new BooBoo_Widget(prg, info->widget_id, (float)w, (float)h);
+		}
+		else if (w <= 1.0) {
+			widget->widget = new BooBoo_Widget(prg, info->widget_id, (float)w, (int)h);
+		}
+		else if (h <= 1.0) {
+			widget->widget = new BooBoo_Widget(prg, info->widget_id, (int)w, (float)h);
+		}
+		else {
+			widget->widget = new BooBoo_Widget(prg, info->widget_id, (int)w, (int)h);
+		}
 
-	widget->widget->set_accepts_focus(true);
+		widget->widget->set_accepts_focus(true);
 
-	info->widgets[info->widget_id++] = widget;
+		info->widgets[info->widget_id++] = widget;
+	}
+	catch (util::Error &e) {
+		v1.n = -1;
+	}
 
 	return v1;
 }
