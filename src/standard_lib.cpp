@@ -249,10 +249,37 @@ static bool corefunc_print(Program *prg, const std::vector<Token> &v)
 				val = buf;
 			}
 			else if (IS_EXPRESSION(*v1)) {
-				format = (format == "") ? "g" : format;
-				char buf[1000];
-				snprintf(buf, 1000, ("%" + format).c_str(), evaluate_expression(prg, v1->e).n);
-				val = buf;
+				Variable var = evaluate_expression(prg, v1->e);
+				if (IS_NUMBER(var)) {
+					format = (format == "") ? "g" : format;
+					char buf[1000];
+					snprintf(buf, 1000, ("%" + format).c_str(), var.n);
+					val = buf;
+				}
+				else {
+					if (IS_STRING(var)) {
+						val = var.s;
+					}
+					else if (IS_VECTOR(var)) {
+						val = "-vector-";
+					}
+					else if (IS_MAP(var)) {
+						val = "-map-";
+					}
+					else if (IS_FUNCTION(var)) {
+						val = "-function-";
+					}
+					else if (IS_LABEL(var)) {
+						val = "-label-";
+					}
+					else {
+						val = "-unknown-";
+					}
+					format = (format == "") ? "s" : format;
+					char buf[1000];
+					snprintf(buf, 1000, ("%" + format).c_str(), val.c_str());
+					val = buf;
+				}
 			}
 			else if (IS_FISH(*v1)) {
 				Variable &var = go_fish(prg, v1->f);
@@ -557,10 +584,37 @@ static Variable exprfunc_string_format(Program *prg, const std::vector<Token> &v
 				val = buf;
 			}
 			else if (IS_EXPRESSION(v1)) {
-				format = (format == "") ? "g" : format;
-				char buf[1000];
-				snprintf(buf, 1000, ("%" + format).c_str(), evaluate_expression(prg, v1.e).n);
-				val = buf;
+				Variable var = evaluate_expression(prg, v1.e);
+				if (IS_NUMBER(var)) {
+					format = (format == "") ? "g" : format;
+					char buf[1000];
+					snprintf(buf, 1000, ("%" + format).c_str(), var.n);
+					val = buf;
+				}
+				else {
+					if (IS_STRING(var)) {
+						val = var.s;
+					}
+					else if (IS_VECTOR(var)) {
+						val = "-vector-";
+					}
+					else if (IS_MAP(var)) {
+						val = "-map-";
+					}
+					else if (IS_FUNCTION(var)) {
+						val = "-function-";
+					}
+					else if (IS_LABEL(var)) {
+						val = "-label-";
+					}
+					else {
+						val = "-unknown-";
+					}
+					format = (format == "") ? "s" : format;
+					char buf[1000];
+					snprintf(buf, 1000, ("%" + format).c_str(), val.c_str());
+					val = buf;
+				}
 			}
 			else if (IS_FISH(v1)) {
 				Variable &var = go_fish(prg, v1.f);
