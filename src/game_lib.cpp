@@ -570,6 +570,18 @@ static bool gfxfunc_unset_scissor(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool gfxfunc_set_blend_mode(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	gfx::Blend_Mode src = (gfx::Blend_Mode)as_number(prg, v[0]);
+	gfx::Blend_Mode dest = (gfx::Blend_Mode)as_number(prg, v[1]);
+
+	gfx::set_blend_mode(src, dest);
+
+	return true;
+}
+
 static bool primfunc_start_primitives(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -4809,6 +4821,7 @@ void start_lib_game()
 	add_expression_handler("get_refresh_rate", exprfunc_gfx_get_refresh_rate);
 	add_instruction("set_scissor", gfxfunc_set_scissor);
 	add_instruction("unset_scissor", gfxfunc_unset_scissor);
+	add_instruction("set_blend_mode", gfxfunc_set_blend_mode);
 	add_instruction("start_primitives", primfunc_start_primitives);
 	add_instruction("end_primitives", primfunc_end_primitives);
 	add_instruction("line", primfunc_line);

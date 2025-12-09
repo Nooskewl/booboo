@@ -165,6 +165,8 @@ bool start()
 	if (util::bool_arg(true, shim::argc, shim::argv, "limits") == false) {
 		limits = false;
 	}
+	util::JSON::Node *root = shim::shim_json->get_root();
+	limits = root->get_nested_bool("booboo>game>limits", &limits, limits);
 
 	mouse_pos.x = 0;
 	mouse_pos.y = 0;
@@ -267,7 +269,6 @@ bool start()
 
 	TGUI::set_focus_sloppiness(0);
 	
-	util::JSON::Node *root = shim::shim_json->get_root();
 	exit_key = root->get_nested_int("booboo>input>exit_key", &exit_key, TGUIK_F12);
 	show_ops = util::bool_arg(false, shim::argc, shim::argv, "ops");
 	show_ops = root->get_nested_bool("booboo>game>show_ops", &show_ops, show_ops);
@@ -450,18 +451,23 @@ void draw_all()
 		if (limits && ops_sec >= MAX_OPS_PER_SECOND) {
 			throw Error("Over 10,000,000 ops per second - bailing...");
 		}
-		std::string d = util::string_printf("%.2f", ops_sec);
+		std::string d;
+		if (ops_sec > 1000000) {
+			d = util::string_printf("%.2f", ops_sec/1000000) + "m";
+		}
+		else if (ops_sec > 1000) {
+			d = util::string_printf("%.2f", ops_sec/1000) + "k";
+		}
+		else {
+			d = util::string_printf("%.2f", ops_sec);
+		}
 		int w = shim::font->get_text_width(d);
 		for (float y = 0; y < 4; y++) {
 			for (float x = 0; x < 4; x++) {
 				shim::font->draw(shim::white, d, {shim::screen_size.w-w-x, y});
 			}
 		}
-		for (float y = 1; y < 3; y++) {
-			for (float x = 0; x < 4; x++) {
-				shim::font->draw(shim::black, d, {shim::screen_size.w-w-x, y});
-			}
-		}
+		shim::font->draw(shim::black, d, {shim::screen_size.w-w-2, 2});
 	}
 
 	gfx::set_matrices(_mv, _proj);
