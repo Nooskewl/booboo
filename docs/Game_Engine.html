@@ -399,6 +399,7 @@ The following sections describe the API:
 <pre>
 	create a render target
 	e.g. = dest (image_create w h)
+	Returns -1 on fail
 </pre>
 
 <h3>set_target</h3>
@@ -418,6 +419,7 @@ The following sections describe the API:
 <pre>
 	load an image
 	e.g. = dest (image_load filename ^ lffs)
+	Returns -1 on fail
 </pre>
 
 <h3>image_save</h3>
@@ -518,6 +520,7 @@ The following sections describe the API:
 	from Aseprite. Then there is a sprite.json which has a list of
 	animation names.
 	e.g. = sprite (sprite_load "my_sprite" ^ lffs)
+	Returns -1 on fail
 </pre>
 
 <h3>sprite_draw</h3>
@@ -636,6 +639,7 @@ The following sections describe the API:
 	load a TTF font
 	All of the font functions support UTF8
 	e.g. = font (font_load "DejaVuSans.ttf" px_size smooth_flag ^ lffs)
+	Returns -1 on fail
 </pre>
 
 <h3>font_draw</h3>
@@ -692,6 +696,7 @@ The following sections describe the API:
 	(.tga is also supported.) See AshEdit for more details on maps
 	and creating them.
 	e.g. = t (tilemap_load "map.wm2" ^ lffs)
+	Returns -1 on fail
 </pre>
 
 <h3>tilemap_draw</h3>
@@ -783,6 +788,7 @@ The following sections describe the API:
 	e.g. = shader (shader_load "my_vert" "my_frag" ^ lffs)
 	This will load from
 	data/gfx/shaders/glsl/my_vert.txt
+	Returns -1 on fail
 </pre>
 
 <h3>shader_use</h3>
@@ -871,6 +877,7 @@ The following sections describe the API:
 <pre>
 	Load a model with an optional armature an animations from .x file
 	e.g. = model (model_load "filename.x" ^ lffs)
+	Returns -1 on fail
 </pre>
 
 <h3>model_draw</h3>
@@ -993,6 +1000,7 @@ The following sections describe the API:
 <pre>
 	Create a billboard
 	e.g. = result (billboard_create image x y z w h)
+	Returns -1 on fail
 </pre>
 
 <h3>(billboard_from_sprite)</h3>
@@ -1000,6 +1008,7 @@ The following sections describe the API:
 	Create a billboard backed by a sprite
 	unit is the number of pixels that spans 1 3D unit
 	e.g. = result (billboard_from_sprite sprite x y z w h unit)
+	Returns -1 on fail
 </pre>
 
 <h3>billboard_draw</h3>
@@ -1062,6 +1071,7 @@ and h are the calculated position and size of the widget in pixels.
 	Sizes less than equal to 1 are taken as a percentage of the remaining size
 	of the container
 	e.g. = result (widget_create w h userdata)
+	Returns -1 on fail
 </pre>
 
 <h3>widget_set_parent</h3>
@@ -1242,12 +1252,14 @@ and h are the calculated position and size of the widget in pixels.
 	create an MML from a string. See the Music documentation section.
 	e.g. = dest (mml_create "A @TYPE3 abcdefg")
 	; this plays a b c d e f g 16th notes with a sine wave generator
+	Returns -1 on fail
 </pre>
 
 <h3>(mml_load)</h3>
 <pre>
 	load an MML from file
 	e.g. = dest (mml_load "sfx/blast.mml" ^ lffs)
+	Returns -1 on fail
 </pre>
 
 <h3>mml_play</h3>
@@ -1266,6 +1278,7 @@ and h are the calculated position and size of the widget in pixels.
 <pre>
 	load a sample
 	e.g. = s (sample_load "example.wav" ^ lffs)
+	Returns -1 on fail
 </pre>
 
 <h3>sample_play</h3>
@@ -1362,6 +1375,7 @@ and h are the calculated position and size of the widget in pixels.
 <pre>
 	Load a JSON file
 	e.g. = j (json_load "file.json" ^ lffs)
+	Returns -1 on fail
 </pre>
 
 <h3>(json_get_string)</h3>
