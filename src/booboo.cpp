@@ -820,18 +820,55 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 	}
 	else {
 		std::string name;
-		while (!isspace(expr[p]) && p < (int)expr.length()) {
-			char buf[2];
-			buf[0] = expr[p];
-			buf[1] = 0;
-			name += buf;
+		if (expr[p] == '(') {
+			int start = p;
+			int open = 1;
 			p++;
-		}
-		if (pass == PASS2) {
-			if (prg->variables_map.find(name) == prg->variables_map.end()) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Unknown variable at " + get_error_info(prg));
+			while (p < (int)expr.length()) {
+				if (expr[p] == '(') {
+					open++;
+				}
+				else if (expr[p] == ')') {
+					open--;
+					if (open == 0) {
+						p++;
+						break;
+					}
+				}
+				p++;
 			}
-			e.c_i = prg->variables_map[name];
+
+			Variable v;
+			v.name = "__expr" + itos(expression_i++);
+			v.obfuscated = v.name;
+			v.type = Variable::EXPRESSION;
+
+			if (pass == PASS1) {
+				prg->variables.push_back(v);
+			}
+			else if (pass == PASS2) {
+				prg->variables_map[v.name] = var_i;
+			}
+			e.c_i = var_i;
+			var_i++;
+
+			std::string s = expr.substr(start, p-start);
+			prg->variables[e.c_i].e = parse_expression(prg, func, s, var_i, expression_i, fish_i, pass);
+		}
+		else {
+			while (!isspace(expr[p]) && p < (int)expr.length()) {
+				char buf[2];
+				buf[0] = expr[p];
+				buf[1] = 0;
+				name += buf;
+				p++;
+			}
+			if (pass == PASS2) {
+				if (prg->variables_map.find(name) == prg->variables_map.end()) {
+					throw Error(std::string(__FUNCTION__) + ": " + "Unknown variable at " + get_error_info(prg));
+				}
+				e.c_i = prg->variables_map[name];
+			}
 		}
 	}
 
@@ -1390,6 +1427,12 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "BAR_BOTTOM", gfx::BAR_BOTTOM, pass, var_i);
 	insert_constant(prg, "BAR_LEFT", gfx::BAR_LEFT, pass, var_i);
 	insert_constant(prg, "BAR_RIGHT", gfx::BAR_RIGHT, pass, var_i);
+	insert_constant(prg, "BLEND_ZERO", gfx::BLEND_ZERO, pass, var_i);
+	insert_constant(prg, "BLEND_ONE", gfx::BLEND_ONE, pass, var_i);
+	insert_constant(prg, "BLEND_SRCCOLOR", gfx::BLEND_SRCCOLOR, pass, var_i);
+	insert_constant(prg, "BLEND_INVSRCCOLOR", gfx::BLEND_INVSRCCOLOR, pass, var_i);
+	insert_constant(prg, "BLEND_SRCALPHA", gfx::BLEND_SRCALPHA, pass, var_i);
+	insert_constant(prg, "BLEND_INVSRCALPHA", gfx::BLEND_INVSRCALPHA, pass, var_i);
 #endif
 
 	bool _is_deref = false;
@@ -4542,11 +4585,24 @@ Variable &go_fish(Program *prg, const Variable::Fish &f)
 	Variable *v = &prg->variables[f.c_i];
 	int type = v->type;
 	bool constant = v->constant;
+	static Variable tmp;
 
-	while (type == Variable::FISH) {
-		v = &go_fish(prg, v->f);
-		type = v->type;
-		constant = v->constant;
+	while (type == Variable::FISH || type == Variable::EXPRESSION) {
+		if (type == Variable::FISH) {
+			v = &go_fish(prg, v->f);
+			type = v->type;
+			constant = v->constant;
+		}
+		else {
+			tmp = evaluate_expression(prg, v->e);
+			v = &tmp;
+			type = v->type;
+			//constant = v->constant;
+		}
+	}
+
+	if (type != Variable::VECTOR && type != Variable::MAP) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected vector or map at " + get_error_info(prg));
 	}
 
 	int index = 0;
