@@ -34,7 +34,7 @@ function draw
 
 	var i
 	for i 0 (< i 10) 1 again
-		image_draw sphere 255 255 255 255 (- [spheres i 0] (/ [(image_size sphere) 0]) 2) (- [spheres i 1] (/ [(image_size sphere) 1] 2))
+		image_draw sphere 255 255 255 255 (- [spheres i 0] (/ [(image_size sphere) 0] 2)) (- [spheres i 1] (/ [(image_size sphere) 1] 2))
 	:again
 	
 	set_blend_mode BLEND_ONE BLEND_INVSRCALPHA
