@@ -2796,6 +2796,9 @@ static bool corefunc_for(Program *prg, const std::vector<Token> &v)
 
 	prg->s->pc++;
 
+	prg->break_flag = false;
+	prg->continue_flag = false;
+
 	unsigned int start = prg->s->pc;
 
 	while (true) {
