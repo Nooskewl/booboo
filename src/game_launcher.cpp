@@ -197,19 +197,6 @@ bool start()
 		gfx::Image::premultiply_alpha = false;
 	}
 
-	/* get_desktop_resolution uses shim::adapter, but it's not normally set until shim::start is called, so set it here since
-	 * it's used below.
-	 */
-	int adapter_i = util::check_args(shim::argc, shim::argv, "+adapter");
-	if (adapter_i >= 0) {
-		shim::adapter = atoi(shim::argv[adapter_i+1]);
-		int count;
-		SDL_DisplayID *disp = SDL_GetDisplays(&count);
-		if (shim::adapter >= count) {
-			shim::adapter = 0;
-		}
-	}
-
 	gfx::set_minimum_window_size(util::Size<int>(640, 360));
 	util::Size<int> desktop_resolution = gfx::get_desktop_resolution();
 	//gfx::set_maximum_window_size(desktop_resolution);
@@ -667,7 +654,7 @@ void set_shim_args(bool initial, bool force_windowed, bool force_fullscreen)
 {
 	if (initial) {
 		for (int i = 0; i < orig_argc; i++) {
-			if (std::string(orig_argv[i]) == "+windowed" || std::string(orig_argv[i]) == "+fullscreen" || std::string(orig_argv[i]) == "+width" || std::string(orig_argv[i]) == "+height" || std::string(orig_argv[i]) == "+adapter") {
+			if (std::string(orig_argv[i]) == "+windowed" || std::string(orig_argv[i]) == "+fullscreen" || std::string(orig_argv[i]) == "+width" || std::string(orig_argv[i]) == "+height") {
 				force_windowed = false;
 				force_fullscreen = false;
 				break;
