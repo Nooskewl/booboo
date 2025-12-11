@@ -1,22 +1,22 @@
-number f
-file_open f "rounds.txt" "r"
-string s
-file_read f s
+var f
+= f (file_open "rounds.txt" "r")
+var s
+= s (file_read f)
 file_close f
-number rounds
+var rounds
 = rounds (+ 3 (* s 2))
 
-number x
+var x
 = x 1
-number pi
+var pi
 = pi 1
-number i
+var i
 
 for i 3 (< i rounds) 2 loop_end
-neg x
-+ pi (/ x i)
+= x (neg x)
+= pi (+ pi (/ x i))
 :loop_end
 
-* pi 4
+= pi (* pi 4)
 
 print "%(3.16g)\n" pi
