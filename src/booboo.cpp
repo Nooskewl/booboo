@@ -2418,6 +2418,20 @@ static bool corefunc_set(Program *prg, const std::vector<Token> &v)
 	return do_set(prg, v, false);
 }
 
+static bool corefunc_break(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+	prg->break_flag = true;
+	return true;
+}
+
+static bool corefunc_continue(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+	prg->continue_flag = true;
+	return true;
+}
+
 static bool corefunc_var(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
@@ -2788,8 +2802,17 @@ static bool corefunc_for(Program *prg, const std::vector<Token> &v)
 		if (interpret(prg) == false) {
 			return false;
 		}
-		if (prg->s->pc < start || prg->s->pc > end_label) {
+		if (prg->break_flag) {
+			prg->break_flag = false;
+			prg->s->pc = end_label;
+			return true;
+		}
+		else if (prg->s->pc < start || prg->s->pc > end_label) {
 			break;
+		}
+		if (prg->continue_flag) {
+			prg->continue_flag = false;
+			prg->s->pc = end_label;
 		}
 		if (prg->s->pc == end_label) {
 			count.n += increment;
@@ -4057,6 +4080,9 @@ void start()
 	add_instruction("exit", breaker_exit);
 	add_instruction("return", breaker_return);
 
+	add_instruction("break", corefunc_break);
+	add_instruction("continue", corefunc_continue);
+
 	add_instruction("var", corefunc_var);
 	add_instruction("const", corefunc_const);
 	
@@ -4103,7 +4129,8 @@ Program *create_program(std::string code)
 {
 	Program *prg = new Program;
 
-	prg->tmps = 0;
+	prg->break_flag = false;
+	prg->continue_flag = false;
 
 	prg->s = new Function_Swap;
 

@@ -39,9 +39,9 @@ struct Program {
 	Function_Swap *s;
 
 	int compare_flag;
+	bool break_flag;
+	bool continue_flag;
 	Pass complete_pass;
-
-	int tmps;
 
 	std::vector<Variable> variables;
 	std::map<std::string, int> variables_map;
