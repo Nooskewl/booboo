@@ -45,7 +45,8 @@
 	},
 	"booboo": {
 		"game": {
-			"show_ops": false
+			"show_ops": false,
+			"limits": true
 		},
 		"input": {
 			"exit_key": 1073741893
