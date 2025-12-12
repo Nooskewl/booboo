@@ -2708,7 +2708,7 @@ static Variable exprfunc_map(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	Variable res;
-	res.type = Variable::VECTOR;
+	res.type = Variable::MAP;
 	res.m = as_variable_resolve(prg, v[0]).m;
 
 	return res;

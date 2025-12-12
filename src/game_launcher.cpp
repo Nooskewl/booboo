@@ -197,7 +197,7 @@ bool start()
 		gfx::Image::premultiply_alpha = false;
 	}
 
-	gfx::set_minimum_window_size(util::Size<int>(640, 360));
+	gfx::set_minimum_window_size(util::Size<int>(400, 225));
 	util::Size<int> desktop_resolution = gfx::get_desktop_resolution();
 	//gfx::set_maximum_window_size(desktop_resolution);
 
