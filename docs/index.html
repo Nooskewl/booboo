@@ -41,6 +41,7 @@ Sections:
 <li><a href="#Vector">Vectors</a></li>
 <li><a href="#Map">Maps</a></li>
 <li><a href="#Files">Files</a></li>
+<li><a href="#CFG">Configuration Functions</a></li>
 <li><a href="#Other">Other</a></li>
 <li><a href="#Constants">Constants</a></li>
 </ul>
@@ -683,6 +684,67 @@ Sections:
 <pre>
 	Print to a file. Behaves exactly like print but takes a file
 	e.g. file_print f "%(20s)%(20s)%(20s)" x y z
+</pre>
+
+<a id="CFG"></a>
+<h2>Configuration Functions</h2>
+
+<h3>(cfg_load)</h3>
+<pre>
+	load a config file
+	These files are saved in Saved Games\BooBoo along with
+	every BooBoo app, so you should use a domain name or
+	unique name
+	e.g. = cfg (cfg_load "com.nooskewl.example")
+</pre>
+
+<h3>(cfg_save)</h3>
+<pre>
+	save a config file
+	e.g. = success (cfg_save cfg "com.illnorth.example")
+</pre>
+
+<h3>(cfg_get_number)</h3>
+<pre>
+	read a number from config. Doesn't touch dest if the named value doesn't exist
+	e.g. = dest (cfg_get_number cfg "x")
+</pre>
+
+<h3>(cfg_get_string)</h3>
+<pre>
+	Doesn't touch dest if the named value doesn't exist
+	read a string from config
+	e.g. = dest (cfg_get_string cfg "name")
+</pre>
+
+<h3>cfg_set_number</h3>
+<pre>
+	set a value to be saved in a config file
+	e.g. cfg_set_number cfg "x" 1
+</pre>
+
+<h3>cfg_set_string</h3>
+<pre>
+	set a string value in a config file
+	e.g. cfg_set_string cfg "name" "Trent"
+</pre>
+
+<h3>(cfg_exists)</h3>
+<pre>
+	check if a value exists in a config file
+	e.g. = exists (cfg_exists cfg "x")
+</pre>
+
+<h3>cfg_erase</h3>
+<pre>
+	Erase a value in a config file
+	e.g. cfg_erase cfg "example"
+</pre>
+
+<h3>cfg_destroy</h3>
+<pre>
+	Free a configuration object
+	e.g. cfg_destroy cfg
 </pre>
 
 <a id="Other"></a>
