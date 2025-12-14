@@ -13,10 +13,6 @@ number wc wc_both wc_left wc_right wll wlr wl1 wl2 wl3 wl4 wl5 wl6 wr1 wr2 wr3 w
 
 function start_gui
 {
-	= c (map c)
-	= c_both (map c_both)
-	= c_left (map c_left)
-	= c_right (map c_right)
 	= [c "draw"] draw_window
 	= [c "event"] null_event
 	= [c_both "draw"] draw_nothing
@@ -236,7 +232,6 @@ function radio_event type a b c d x y w h focussed ~data
 function mkbutton text callback
 {
 	var m
-	= m (map m)
 	= [m "text"] text
 	= [m "draw"] draw_button
 	= [m "event"] button_event
@@ -248,7 +243,6 @@ function mkbutton text callback
 function mklabel text
 {
 	var m
-	= m (map m)
 	= [m "text"] text
 	= [m "draw"] draw_label
 	= [m "event"] null_event
@@ -258,7 +252,6 @@ function mklabel text
 function mkradio group index text
 {
 	var m
-	= m (map m)
 	= [m "text"] text
 	= [m "draw"] draw_radio
 	= [m "event"] radio_event

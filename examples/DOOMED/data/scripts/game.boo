@@ -120,7 +120,6 @@ function spawn_enemy
 	= pleasant (billboard_from_sprite sprite x 0.25 z 0 0 32)
 
 	var enemy
-	= enemy (map enemy)
 	= [enemy "sprite"] sprite
 	= [enemy "billboard"] pleasant
 	= [enemy "x"] x
@@ -177,7 +176,6 @@ function spawn_bullet x y z dx dy dz friendly
 	= billboard (billboard_create projectile x y z 0.25 0.25)
 
 	var bullet
-	= bullet (map bullet)
 	= [bullet "x"] x
 	= [bullet "y"] y
 	= [bullet "z"] z

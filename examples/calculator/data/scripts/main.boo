@@ -14,9 +14,6 @@ var font
 resize 1280 720
 
 var mc mc1 mc2 m9 m8 m7 m6 m5 m4 m3 m2 m1 m0 mdec mneg madd msub mmul mdiv meq
-= mc (map mc)
-= mc1 (map mc1)
-= mc2 (map mc2)
 = [mc "draw"] draw_window
 = [mc "event"] null_event
 = [mc1 "draw"] draw_window
@@ -89,7 +86,6 @@ widget_set_parent _sub c2
 widget_set_parent _eq c2
 
 var ops
-= ops (map ops)
 = [ops "9"] i_num
 = [ops "8"] i_num
 = [ops "7"] i_num
@@ -195,7 +191,6 @@ function button_event type a b c d x y w h focussed ~data
 function mkbutton text
 {
 	var m
-	= m (map m)
 	= [m "text"] text
 	= [m "draw"] draw_button
 	= [m "event"] button_event

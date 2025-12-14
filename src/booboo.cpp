@@ -4631,19 +4631,34 @@ Variable &go_fish(Program *prg, const Variable::Fish &f)
 		}
 	}
 
-	if (type != Variable::VECTOR && type != Variable::MAP) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Expected vector or map at " + get_error_info(prg));
-	}
-
 	int index = 0;
 	std::string key;
 
 	for (size_t i = 0; i < f.v.size(); i++) {
-		if (type == Variable::VECTOR) {
+		Variable *var;
+		if (f.v[i].type == Token::NUMBER) {
+			type = Variable::VECTOR;
 			index = as_number(prg, f.v[i]);
 		}
-		else {
+		else if (f.v[i].type == Token::STRING) {
+			type = Variable::MAP;
 			key = as_string(prg, f.v[i]);
+		}
+		else if (f.v[i].type == Token::SYMBOL) {
+			if (f.v[i].dereference) {
+				var = prg->variables[f.v[i].i].p;
+			}
+			else {
+				var = &prg->variables[f.v[i].i];
+			}
+			if (var->type == Variable::NUMBER) {
+				index = as_number(prg, f.v[i]);
+				type = Variable::VECTOR;
+			}
+			else {
+				key = as_string(prg, f.v[i]);
+				type = Variable::MAP;
+			}
 		}
 		if (i < f.v.size()-1) {
 			if (type == Variable::VECTOR) {
@@ -4655,6 +4670,7 @@ Variable &go_fish(Program *prg, const Variable::Fish &f)
 		}
 	}
 
+	v->type = (Variable::Variable_Type)type;
 	if (type == Variable::VECTOR) {
 		v->v[index].constant = constant;
 		return v->v[index];
