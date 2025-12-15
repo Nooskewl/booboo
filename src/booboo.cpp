@@ -4670,7 +4670,29 @@ Variable &go_fish(Program *prg, const Variable::Fish &f)
 			else {
 				var = &prg->variables[f.v[i].i];
 			}
-			if (var->type == Variable::NUMBER) {
+			if (var->type == Variable::EXPRESSION) {
+				Variable v2 = evaluate_expression(prg, var->e);
+				if (v2.type == Variable::NUMBER) {
+					index = v2.n;
+					type = Variable::VECTOR;
+				}
+				else {
+					key = v2.s;
+					type = Variable::MAP;
+				}
+			}
+			else if (var->type == Variable::FISH) {
+				Variable &v2 = go_fish(prg, var->f);
+				if (v2.type == Variable::NUMBER) {
+					index = v2.n;
+					type = Variable::VECTOR;
+				}
+				else {
+					key = v2.s;
+					type = Variable::MAP;
+				}
+			}
+			else if (var->type == Variable::NUMBER) {
 				index = as_number(prg, f.v[i]);
 				type = Variable::VECTOR;
 			}
