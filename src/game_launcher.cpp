@@ -18,8 +18,6 @@ using namespace noo;
 #include "booboo/internal.h"
 using namespace booboo;
 
-const int MAX_OPS_PER_SECOND = 10000000;
-
 Program *prg;
 
 int orig_argc;
@@ -45,7 +43,6 @@ static int exit_key = TGUIK_F12;
 extern int num_ops;
 Uint64 op_time = 0;
 double ops_sec = 0;
-bool limits = true;
 bool show_ops;
 
 static bool mousefunc_set_relative(Program *prg, const std::vector<Token> &v)
@@ -162,12 +159,6 @@ static Variable exprfunc_key_get(Program *prg, const std::vector<Token> &v)
 
 bool start()
 {
-	if (util::bool_arg(true, shim::argc, shim::argv, "limits") == false) {
-		limits = false;
-	}
-	util::JSON::Node *root = shim::shim_json->get_root();
-	limits = root->get_nested_bool("booboo>game>limits", &limits, limits);
-
 	mouse_pos.x = 0;
 	mouse_pos.y = 0;
 	mouse_b1 = false;
@@ -256,9 +247,10 @@ bool start()
 
 	TGUI::set_focus_sloppiness(0);
 	
+	util::JSON::Node *root = shim::shim_json->get_root();
 	exit_key = root->get_nested_int("booboo>input>exit_key", &exit_key, TGUIK_F12);
 	show_ops = util::bool_arg(false, shim::argc, shim::argv, "ops");
-	show_ops = root->get_nested_bool("booboo>game>show_ops", &show_ops, show_ops);
+	show_ops = root->get_nested_bool("booboo>misc>show_ops", &show_ops, show_ops);
 
 	return true;
 }
@@ -434,9 +426,6 @@ void draw_all()
 			ops_sec = num_ops / (diff / 1000.0);
 			num_ops = 0;
 			op_time = now;
-		}
-		if (limits && ops_sec >= MAX_OPS_PER_SECOND) {
-			throw Error("Over 10,000,000 ops per second - bailing...");
 		}
 		std::string d;
 		if (ops_sec > 1000000) {
