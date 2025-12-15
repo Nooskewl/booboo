@@ -1392,6 +1392,44 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. = n (json_get_number json "settings&gt;mouse&gt;sensitivity")
 </pre>
 
+<h3>(json_get_bool)</h3>
+<pre>
+	Read a boolean from JSON
+	You can dig down into the file by separating keys with "&gt;"
+	"[0]" "[1]" etc can be used to access arrays.
+	e.g. = n (json_get_boolean json "settings&gt;gfx&gt;crt_filter")
+</pre>
+
+<h3>json_set_string</h3>
+<pre>
+	Set a string in a JSON object
+	You can dig down into the file by separating keys with "&gt;"
+	"[0]" "[1]" etc can be used to access arrays.
+	e.g. json_set_string json "foo&gt;bar&gt;baz" "TURNIPS"
+</pre>
+
+<h3>json_set_number</h3>
+<pre>
+	Set a number in a JSON object
+	You can dig down into the file by separating keys with "&gt;"
+	"[0]" "[1]" etc can be used to access arrays.
+	e.g. json_set_number json "foo&gt;bar&gt;baz" 762.4
+</pre>
+
+<h3>json_set_bool</h3>
+<pre>
+	Set a boolean in a JSON object
+	You can dig down into the file by separating keys with "&gt;"
+	"[0]" "[1]" etc can be used to access arrays.
+	e.g. json_set_bool json "foo&gt;bar&gt;baz" TRUE
+</pre>
+
+<h3>(json_save)</h3>
+<pre>
+	Save a json object to json file
+	e.g. = succeeded (json_save json "foo.json")
+</pre>
+
 <h3>json_destroy</h3>
 <pre>
 	Free a JSON object
