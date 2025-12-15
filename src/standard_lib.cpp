@@ -1194,8 +1194,6 @@ static Variable exprfunc_vector_size(Program *prg, const std::vector<Token> &v)
 
 	Variable id = as_variable_resolve(prg, v[0]);
 
-	CHECK_VECTOR(id)
-	
 	Variable var;
 	var.type = Variable::NUMBER;
 	var.n = id.v.size();

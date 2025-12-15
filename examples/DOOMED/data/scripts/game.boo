@@ -56,7 +56,6 @@ for i 0 (< i num_billboards) 1 loop
 :loop
 
 var enemies
-= enemies (vector enemies)
 
 call spawn_enemy
 
@@ -100,7 +99,6 @@ var x y z
 mouse_set_relative TRUE
 
 var bullets
-= bullets (vector bullets)
 
 var fire_down
 = fire_down FALSE
