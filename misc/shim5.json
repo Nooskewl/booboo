@@ -17,7 +17,27 @@
 				"transparent.r": 0,
 				"transparent.g": 0,
 				"transparent.b": 0,
-				"transparent.a": 0
+				"transparent.a": 0,
+				"interface_bg.r": 50,
+				"interface_bg.g": 150,
+				"interface_bg.b": 200,
+				"interface_bg.a": 255,
+				"interface_highlight.r": 50,
+				"interface_highlight.g": 200,
+				"interface_highlight.b": 250,
+				"interface_highlight.a": 255,
+				"interface_text.r": 255,
+				"interface_text.g": 255,
+				"interface_text.b": 255,
+				"interface_text.a": 255,
+				"interface_edit_fg.r": 0,
+				"interface_edit_fg.g": 0,
+				"interface_edit_fg.b": 0,
+				"interface_edit_fg.a": 255,
+				"interface_edit_bg.r": 255,
+				"interface_edit_bg.g": 255,
+				"interface_edit_bg.b": 255,
+				"interface_edit_bg.a": 255
 			},
 			"notification_duration": 3000,
 			"notification_fade_duration": 500,
@@ -28,25 +48,35 @@
 			"cursor_hotspot.y": 0,
 			"multisampling": true,
 			"aa_samples": 4,
-			"linear_filtering": false
+			"linear_filtering": false,
+			"fullscreen": false,
+			"width": 1280,
+			"height": 720
+
 		},
 		"misc": {
 			"window_title": "BooBoo",
 			"organisation_name": "ILLUMINATI NORTH",
 			"game_name": "BooBoo",
-			"logic_rate": 60
+			"logic_rate": 60,
+			"debug": false
 		},
 		"audio": {
-			"samplerate": 0
+			"samplerate": 0,
+			"mute": false,
+			"float_samples": false,
+			"freq": 48000
 		},
 		"input": {
-			"fullscreen_key": 1073741892
+			"fullscreen_key": 1073741892,
+			"devsettings_key": 1073741890,
+			"screenshot_key": 1073741891
+
 		}
 	},
 	"booboo": {
-		"game": {
-			"show_ops": false,
-			"limits": true
+		"misc": {
+			"show_ops": false
 		},
 		"input": {
 			"exit_key": 1073741893
