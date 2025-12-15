@@ -318,6 +318,72 @@ The following sections describe the API:
 	e.g. set_blend_mode BLEND_ONE BLEND_ONE ; additive blending
 </pre>
 
+<h3>clear_depth_buffer</h3>
+<pre>
+	Clear the depth buffer. Expects a double
+	e.g. clear_depth_buffer 1.0
+</pre>
+
+<h3>clear_stencil_buffer</h3>
+<pre>
+	Clear the stencil buffer. Expects an int
+	e.g. clear_stencil_buffer #FFFFFFFF
+</pre>
+
+<h3>enable_depth_test</h3>
+<pre>
+	Enable/disable depth test
+	e.g. enable_depth_test onoff
+</pre>
+
+<h3>enable_depth_write</h3>
+<pre>
+	Enable/disable writing into the depth buffer
+	e.g. enable_depth_write onoff
+</pre>
+
+<h3>set_depth_mode</h3>
+<pre>
+	Set the depth buffer mode, one of the COMPARE_ functions listed in constants.
+	e.g. set_depth_mode COMPARE_LESSEQUAL
+</pre>
+
+<h3>enable_stencil</h3>
+<pre>
+	Enable/disable stencil buffer
+	e.g. enable_stencil onoff
+</pre>
+
+<h3>enable_two_sided_stencil</h3>
+<pre>
+	Enable/disable two sided stencil
+	e.g. enable_two_sided_stencil onoff
+</pre>
+
+<h3>set_stencil_mode</h3>
+<pre>
+	Set the stencil mode for frontfaces
+	e.g. set_stencil_mode COMPARE_LESS STENCILOP_REPALCE STENCILOP_REPLACE STENCILOP_KEEP #FF #00
+</pre>
+
+<h3>set_stencil_mode_backfaces</h3>
+<pre>
+	Set the stencil mode for backfaces
+	e.g. set_stencil_mode_backfaces COMPARE_LESS STENCILOP_REPALCE STENCILOP_REPLACE STENCILOP_KEEP #FF #00
+</pre>
+
+<h3>set_cull_mode</h3>
+<pre>
+	Set which faces are culled
+	e.g. set_cull_mode FRONT_FACE
+</pre>
+
+<h3>enable_colour_write</h3>
+<pre>
+	Enable/disable writing into the colour buffer
+	e.g. enable_colour_write onoff
+</pre>
+
 <a id="Primitives"></a>
 <h2>Primitive Functions</h2>
 
@@ -1782,6 +1848,40 @@ GUI constants:
 	<li>BLEND_INVSRCCOLOR</li>
 	<li>BLEND_SRCALPHA</li>
 	<li>BLEND_INVSRCALPHA</li>
+</ul>
+
+<p>Compare functions for depth/stencil buffers</p>
+
+<ul>
+	<li>COMPARE_NEVER</li>
+	<li>COMPARE_LESS</li>
+	<li>COMPARE_EQUAL</li>
+	<li>COMPARE_LESSEQUAL</li>
+	<li>COMPARE_GREATER</li>
+	<li>COMPARE_NOTEQUAL</li>
+	<li>COMPARE_GREATEREQUAL</li>
+	<li>COMPARE_ALWAYS</li>
+</ul>
+
+<p>Stencil operations</p>
+
+<ul>
+	<li>STENCILOP_KEEP</li>
+	<li>STENCILOP_ZERO</li>
+	<li>STENCILOP_REPLACE</li>
+	<li>STENCILOP_INCRSAT</li>
+	<li>STENCILOP_DECRSAT</li>
+	<li>STENCILOP_INVERT</li>
+	<li>STENCILOP_INCR</li>
+	<li>STENCILOP_DECR</li>
+</ul>
+
+<p>Triangle faces</p>
+
+<ul>
+	<li>NO_FACE</li>
+	<li>FRONT_FACE</li>
+	<li>BACK_FACE</li>
 </ul>
 
 <a id="Events"></a>

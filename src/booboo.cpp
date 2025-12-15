@@ -1433,6 +1433,25 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "BLEND_INVSRCCOLOR", gfx::BLEND_INVSRCCOLOR, pass, var_i);
 	insert_constant(prg, "BLEND_SRCALPHA", gfx::BLEND_SRCALPHA, pass, var_i);
 	insert_constant(prg, "BLEND_INVSRCALPHA", gfx::BLEND_INVSRCALPHA, pass, var_i);
+	insert_constant(prg, "COMPARE_NEVER", gfx::COMPARE_NEVER, pass, var_i);
+	insert_constant(prg, "COMPARE_LESS", gfx::COMPARE_LESS, pass, var_i);
+	insert_constant(prg, "COMPARE_EQUAL", gfx::COMPARE_EQUAL, pass, var_i);
+	insert_constant(prg, "COMPARE_LESSEQUAL", gfx::COMPARE_LESSEQUAL, pass, var_i);
+	insert_constant(prg, "COMPARE_GREATER", gfx::COMPARE_GREATER, pass, var_i);
+	insert_constant(prg, "COMPARE_NOTEQUAL", gfx::COMPARE_NOTEQUAL, pass, var_i);
+	insert_constant(prg, "COMPARE_GREATEREQUAL", gfx::COMPARE_GREATEREQUAL, pass, var_i);
+	insert_constant(prg, "COMPARE_ALWAYS", gfx::COMPARE_ALWAYS, pass, var_i);
+	insert_constant(prg, "STENCILOP_KEEP", gfx::STENCILOP_KEEP, pass, var_i);
+	insert_constant(prg, "STENCILOP_ZERO", gfx::STENCILOP_ZERO, pass, var_i);
+	insert_constant(prg, "STENCILOP_REPLACE", gfx::STENCILOP_REPLACE, pass, var_i);
+	insert_constant(prg, "STENCILOP_INCRSAT", gfx::STENCILOP_INCRSAT, pass, var_i);
+	insert_constant(prg, "STENCILOP_DECRSAT", gfx::STENCILOP_DECRSAT, pass, var_i);
+	insert_constant(prg, "STENCILOP_INVERT", gfx::STENCILOP_INVERT, pass, var_i);
+	insert_constant(prg, "STENCILOP_INCR", gfx::STENCILOP_INCR, pass, var_i);
+	insert_constant(prg, "STENCILOP_DECR", gfx::STENCILOP_DECR, pass, var_i);
+	insert_constant(prg, "NO_FACE", gfx::NO_FACE, pass, var_i);
+	insert_constant(prg, "FRONT_FACE", gfx::FRONT_FACE, pass, var_i);
+	insert_constant(prg, "BACK_FACE", gfx::BACK_FACE, pass, var_i);
 #endif
 
 	bool _is_deref = false;

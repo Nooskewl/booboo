@@ -582,6 +582,137 @@ static bool gfxfunc_set_blend_mode(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool gfxfunc_clear_depth_buffer(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	float val = as_number(prg, v[0]);
+
+	gfx::clear_depth_buffer(val);
+
+	return true;
+}
+
+static bool gfxfunc_clear_stencil_buffer(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int val = (int)as_number(prg, v[0]);
+
+	gfx::clear_stencil_buffer(val);
+
+	return true;
+}
+
+static bool gfxfunc_enable_depth_test(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	bool onoff = (bool)as_number(prg, v[0]);
+
+	gfx::enable_depth_test(onoff);
+
+	return true;
+}
+
+static bool gfxfunc_enable_depth_write(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	bool onoff = (bool)as_number(prg, v[0]);
+
+	gfx::enable_depth_write(onoff);
+
+	return true;
+}
+
+static bool gfxfunc_set_depth_mode(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int val = (int)as_number(prg, v[0]);
+
+	gfx::set_depth_mode((gfx::Compare_Func)val);
+
+	return true;
+}
+
+static bool gfxfunc_enable_stencil(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	bool onoff = (bool)as_number(prg, v[0]);
+
+	gfx::enable_stencil(onoff);
+
+	return true;
+}
+
+static bool gfxfunc_enable_two_sided_stencil(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	bool onoff = (bool)as_number(prg, v[0]);
+
+	gfx::enable_two_sided_stencil(onoff);
+
+	return true;
+}
+
+static bool gfxfunc_set_stencil_mode(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(6)
+
+	int func = (int)as_number(prg, v[0]);
+	int fail = (int)as_number(prg, v[1]);
+	int zfail = (int)as_number(prg, v[2]);
+	int pass = (int)as_number(prg, v[3]);
+	int reference = (int)as_number(prg, v[4]);
+	int mask = (int)as_number(prg, v[5]);
+
+	gfx::set_stencil_mode((gfx::Compare_Func)func, (gfx::Stencil_Op)fail, (gfx::Stencil_Op)zfail, (gfx::Stencil_Op)pass, reference, mask);
+
+	return true;
+}
+
+static bool gfxfunc_set_stencil_mode_backfaces(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(6)
+
+	int func = (int)as_number(prg, v[0]);
+	int fail = (int)as_number(prg, v[1]);
+	int zfail = (int)as_number(prg, v[2]);
+	int pass = (int)as_number(prg, v[3]);
+	int reference = (int)as_number(prg, v[4]);
+	int mask = (int)as_number(prg, v[5]);
+
+	gfx::set_stencil_mode_backfaces((gfx::Compare_Func)func, (gfx::Stencil_Op)fail, (gfx::Stencil_Op)zfail, (gfx::Stencil_Op)pass, reference, mask);
+
+	return true;
+}
+
+static bool gfxfunc_set_cull_mode(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int val = (int)as_number(prg, v[0]);
+
+	gfx::set_cull_mode((gfx::Faces)val);
+
+	return true;
+}
+
+static bool gfxfunc_enable_colour_write(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	bool val = (bool)as_number(prg, v[0]);
+
+	gfx::enable_colour_write(val);
+
+	return true;
+}
+
 static bool primfunc_start_primitives(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -4926,6 +5057,17 @@ void start_lib_game()
 	add_instruction("set_scissor", gfxfunc_set_scissor);
 	add_instruction("unset_scissor", gfxfunc_unset_scissor);
 	add_instruction("set_blend_mode", gfxfunc_set_blend_mode);
+	add_instruction("clear_depth_buffer", gfxfunc_clear_depth_buffer);
+	add_instruction("clear_stencil_buffer", gfxfunc_clear_stencil_buffer);
+	add_instruction("enable_depth_test", gfxfunc_enable_depth_test);
+	add_instruction("enable_depth_write", gfxfunc_enable_depth_write);
+	add_instruction("set_depth_mode", gfxfunc_set_depth_mode);
+	add_instruction("enable_stencil", gfxfunc_enable_stencil);
+	add_instruction("enable_two_sided_stencil", gfxfunc_enable_two_sided_stencil);
+	add_instruction("set_stencil_mode", gfxfunc_set_stencil_mode);
+	add_instruction("set_stencil_mode_backfaces", gfxfunc_set_stencil_mode_backfaces);
+	add_instruction("set_cull_mode", gfxfunc_set_cull_mode);
+	add_instruction("enable_colour_write", gfxfunc_enable_colour_write);
 	add_instruction("start_primitives", primfunc_start_primitives);
 	add_instruction("end_primitives", primfunc_end_primitives);
 	add_instruction("line", primfunc_line);
