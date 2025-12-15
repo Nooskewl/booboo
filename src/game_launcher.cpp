@@ -825,6 +825,9 @@ int main(int argc, char **argv)
 	shim::font_size = 16;
 	shim::convert_directions_to_focus_events = false;
 	shim::create_depth_buffer = true;
+	shim::create_stencil_buffer = true;
+	gfx::Image::create_depth_buffer = true;
+	gfx::Image::create_stencil_buffer = true;
 
 	::start();
 
