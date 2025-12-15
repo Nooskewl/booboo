@@ -48,8 +48,8 @@ There is another global callback you can define, draw_black_bar:
 </pre>
 <p>x, y are the top left coordinate of where to draw, w/h are the width and
 height in pixels. See BAR_* in constants for the bar types. This is used to
-draw a letterbox when the window size and aspect ratio you requested don't
-match.
+draw a custom letterbox when the window size and aspect ratio you requested don't
+match. A default letterbox will be drawn in case you don't draw anything.
 </p>
 
 <p>
@@ -1470,7 +1470,6 @@ and h are the calculated position and size of the widget in pixels.
 <pre>
 	Set a string in a JSON object
 	You can dig down into the file by separating keys with "&gt;"
-	"[0]" "[1]" etc can be used to access arrays.
 	e.g. json_set_string json "foo&gt;bar&gt;baz" "TURNIPS"
 </pre>
 
@@ -1478,7 +1477,6 @@ and h are the calculated position and size of the widget in pixels.
 <pre>
 	Set a number in a JSON object
 	You can dig down into the file by separating keys with "&gt;"
-	"[0]" "[1]" etc can be used to access arrays.
 	e.g. json_set_number json "foo&gt;bar&gt;baz" 762.4
 </pre>
 
@@ -1486,7 +1484,6 @@ and h are the calculated position and size of the widget in pixels.
 <pre>
 	Set a boolean in a JSON object
 	You can dig down into the file by separating keys with "&gt;"
-	"[0]" "[1]" etc can be used to access arrays.
 	e.g. json_set_bool json "foo&gt;bar&gt;baz" TRUE
 </pre>
 
