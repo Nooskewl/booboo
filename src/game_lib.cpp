@@ -3006,6 +3006,110 @@ static Variable exprfunc_json_get_number(Program *prg, const std::vector<Token> 
 	return v1;
 }
 
+static Variable exprfunc_json_get_bool(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	JSON_Info *info = json_info(prg);
+	INFO_EXISTS(info->jsons, id)
+	util::JSON *json = info->jsons[id];
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	util::JSON::Node *n = json->get_root()->find(name);
+	v1.n = n->as_bool();
+
+	return v1;
+}
+
+static bool jsonfunc_set_string(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	std::string val = as_string(prg, v[2]);
+	
+	JSON_Info *info = json_info(prg);
+	INFO_EXISTS(info->jsons, id)
+	util::JSON *json = info->jsons[id];
+
+	util::JSON::Node *n = json->get_root();
+	n->add_nested_string(name, nullptr, val, NULL, true);
+
+	return true;
+}
+
+static bool jsonfunc_set_number(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	double val = as_number(prg, v[2]);
+	
+	JSON_Info *info = json_info(prg);
+	INFO_EXISTS(info->jsons, id)
+	util::JSON *json = info->jsons[id];
+
+	util::JSON::Node *n = json->get_root();
+	n->add_nested_double(name, nullptr, val, NULL, true);
+
+	return true;
+}
+
+static bool jsonfunc_set_bool(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	bool val = (bool)as_number(prg, v[2]);
+	
+	JSON_Info *info = json_info(prg);
+	INFO_EXISTS(info->jsons, id)
+	util::JSON *json = info->jsons[id];
+
+	util::JSON::Node *n = json->get_root();
+	n->add_nested_bool(name, nullptr, val, NULL, true);
+
+	return true;
+}
+
+static Variable exprfunc_json_save(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string fn = as_string(prg, v[1]);
+	
+	JSON_Info *info = json_info(prg);
+	INFO_EXISTS(info->jsons, id)
+	util::JSON *json = info->jsons[id];
+
+	Variable var;
+	var.type = Variable::NUMBER;
+
+	util::JSON::Node *n = json->get_root();
+	std::string s = n->to_json();
+
+	FILE *f = fopen(fn.c_str(), "w");
+	if (f == nullptr) {
+		var.n = 0;
+	}
+	else {
+		fprintf(f, "%s", s.c_str());
+		fclose(f);
+		var.n = 1;
+	}
+
+	return var;
+}
+
 bool is_3d = false;
 
 void set_3d()
@@ -4914,6 +5018,11 @@ void start_lib_game()
 	add_instruction("json_destroy", jsonfunc_destroy);
 	add_expression_handler("json_get_string", exprfunc_json_get_string);
 	add_expression_handler("json_get_number", exprfunc_json_get_number);
+	add_expression_handler("json_get_bool", exprfunc_json_get_bool);
+	add_instruction("json_set_string", jsonfunc_set_string);
+	add_instruction("json_set_number", jsonfunc_set_number);
+	add_instruction("json_set_bool", jsonfunc_set_bool);
+	add_expression_handler("json_save", exprfunc_json_save);
 	add_expression_handler("model_load", exprfunc_model_load);
 	add_instruction("model_destroy", modelfunc_destroy);
 	add_instruction("model_draw", modelfunc_draw);
