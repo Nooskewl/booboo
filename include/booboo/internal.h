@@ -61,7 +61,8 @@ struct Program {
 	std::map<std::string, void *> black_box;
 };
 
-std::string itos(int i);
+glm::mat4 to_glm_mat4(Variable &v);
+Variable from_glm_mat4(glm::mat4 m);
 
 extern std::vector<booboo::library_func> library;
 

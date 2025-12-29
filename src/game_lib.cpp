@@ -11,8 +11,16 @@ using namespace booboo;
 
 #include "booboo/game_lib.h"
 
-GUI_Transition_Type transition_in_type = TRANSITION_ENLARGE;
-GUI_Transition_Type transition_out_type = TRANSITION_SHRINK;
+static GUI_Transition_Type transition_in_type = TRANSITION_ENLARGE;
+static GUI_Transition_Type transition_out_type = TRANSITION_SHRINK;
+static int orig_viewport_x;
+static int orig_viewport_y;
+static int orig_viewport_w;
+static int orig_viewport_h;
+static bool custom_viewport_set = false;
+static bool custom_projection_set = false;
+static glm::mat4 custom_mv;
+static glm::mat4 custom_proj;
 
 extern bool quit;
 extern Program *prg;
@@ -709,6 +717,84 @@ static bool gfxfunc_enable_colour_write(Program *prg, const std::vector<Token> &
 	bool val = (bool)as_number(prg, v[0]);
 
 	gfx::enable_colour_write(val);
+
+	return true;
+}
+
+static bool gfxfunc_set_viewport(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int x = as_number(prg, v[0]);
+	int y = as_number(prg, v[1]);
+	int w = as_number(prg, v[2]);
+	int h = as_number(prg, v[3]);
+
+	if (custom_viewport_set == false) {
+		GLint vp[4];
+
+		glGetIntegerv_ptr(GL_VIEWPORT, vp);
+
+		orig_viewport_x = vp[0];
+		orig_viewport_y = vp[1];
+		orig_viewport_w = vp[2];
+		orig_viewport_h = vp[3];
+	}
+
+	glViewport_ptr(x, y, w, h);
+
+	custom_viewport_set = true;
+
+	return true;
+}
+
+static bool gfxfunc_unset_viewport(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	if (custom_viewport_set == true) {
+		custom_viewport_set = false;
+		glViewport_ptr(orig_viewport_x, orig_viewport_y, orig_viewport_w, orig_viewport_h);
+	}
+
+	return true;
+}
+
+static bool gfxfunc_set_projection(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &mv = as_variable(prg, v[0]);
+	Variable &proj = as_variable(prg, v[1]);
+
+	CHECK_VECTOR(mv)
+	CHECK_VECTOR(proj)
+
+	glm::mat4 glm_mv = to_glm_mat4(mv);
+	glm::mat4 glm_proj = to_glm_mat4(proj);
+
+	gfx::set_matrices(glm_mv, glm_proj);
+	gfx::update_projection();
+
+	custom_projection_set = true;
+	custom_mv = glm_mv;
+	custom_proj = glm_proj;
+
+	return true;
+}
+
+static bool gfxfunc_set_default_projection(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	if (is_3d) {
+		set_3d();
+	}
+	else {
+		set_2d();
+	}
+
+	custom_projection_set = false;
 
 	return true;
 }
@@ -3254,6 +3340,8 @@ void set_3d()
 	gfx::update_projection();
 
 	is_3d = true;
+	
+	custom_projection_set = false;
 }
 
 void set_2d()
@@ -3264,6 +3352,8 @@ void set_2d()
 	gfx::apply_screen_shake();
 
 	is_3d = false;
+
+	custom_projection_set = false;
 }
 
 static Variable exprfunc_model_load(Program *prg, const std::vector<Token> &v)
@@ -5011,11 +5101,17 @@ static void lost_device_callback()
 
 static void found_device_callback()
 {
-	if (is_3d) {
-		set_3d();
+	if (custom_projection_set) {
+		gfx::set_matrices(custom_mv, custom_proj);
+		gfx::update_projection();
 	}
 	else {
-		set_2d();
+		if (is_3d) {
+			set_3d();
+		}
+		else {
+			set_2d();
+		}
 	}
 }
 
@@ -5068,6 +5164,10 @@ void start_lib_game()
 	add_instruction("set_stencil_mode_backfaces", gfxfunc_set_stencil_mode_backfaces);
 	add_instruction("set_cull_mode", gfxfunc_set_cull_mode);
 	add_instruction("enable_colour_write", gfxfunc_enable_colour_write);
+	add_instruction("set_viewport", gfxfunc_set_viewport);
+	add_instruction("unset_viewport", gfxfunc_unset_viewport);
+	add_instruction("set_projection", gfxfunc_set_projection);
+	add_instruction("set_default_projection", gfxfunc_set_default_projection);
 	add_instruction("start_primitives", primfunc_start_primitives);
 	add_instruction("end_primitives", primfunc_end_primitives);
 	add_instruction("line", primfunc_line);

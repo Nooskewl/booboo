@@ -147,7 +147,7 @@ int get_line_num(Program *prg)
 
 std::string get_error_info(Program *prg)
 {
-	return get_file_name(prg) + ":" + itos(get_line_num(prg));
+	return get_file_name(prg) + ":" + util::itos(get_line_num(prg));
 }
 
 static std::string tokenfunc_label(Program *prg)
@@ -591,7 +591,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 
 	if (name.length() > 0 && name[0] == '(') {
 		Variable v1;
-		v1.name = "__expr" + itos(expression_i++);
+		v1.name = "__expr" + util::itos(expression_i++);
 		v1.obfuscated = v1.name;
 		v1.type = Variable::EXPRESSION;
 
@@ -611,7 +611,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 	}
 	else if (name.length() > 0 && name[0] == '[') {
 		Variable v1;
-		v1.name = "__fish" + itos(fish_i++);
+		v1.name = "__fish" + util::itos(fish_i++);
 		v1.obfuscated = v1.name;
 		v1.type = Variable::FISH;
 
@@ -699,7 +699,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			deref = false;
 
 			Variable v1;
-			v1.name = "__expr" + itos(expression_i++);
+			v1.name = "__expr" + util::itos(expression_i++);
 			v1.obfuscated = v1.name;
 			v1.type = Variable::EXPRESSION;
 
@@ -743,7 +743,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			deref = false;
 
 			Variable v1;
-			v1.name = "__fish" + itos(fish_i++);
+			v1.name = "__fish" + util::itos(fish_i++);
 			v1.obfuscated = v1.name;
 			v1.type = Variable::FISH;
 
@@ -867,7 +867,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 		}
 
 		Variable v;
-		v.name = "__fish" + itos(fish_i++);
+		v.name = "__fish" + util::itos(fish_i++);
 		v.obfuscated = v.name;
 		v.type = Variable::FISH;
 
@@ -904,7 +904,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			}
 
 			Variable v;
-			v.name = "__expr" + itos(expression_i++);
+			v.name = "__expr" + util::itos(expression_i++);
 			v.obfuscated = v.name;
 			v.type = Variable::EXPRESSION;
 
@@ -994,7 +994,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			deref = false;
 
 			Variable v1;
-			v1.name = "__expr" + itos(expression_i++);
+			v1.name = "__expr" + util::itos(expression_i++);
 			v1.obfuscated = v1.name;
 			v1.type = Variable::EXPRESSION;
 
@@ -1033,7 +1033,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			deref = false;
 
 			Variable v1;
-			v1.name = "__fish" + itos(fish_i++);
+			v1.name = "__fish" + util::itos(fish_i++);
 			v1.obfuscated = v1.name;
 			v1.type = Variable::FISH;
 
@@ -1669,7 +1669,7 @@ func_top:
 						std::string valtok = token(prg, tt);
 						if (valtok[0] == '(') {
 							Variable v;
-							v.name = "__expr" + itos(expression_i++);
+							v.name = "__expr" + util::itos(expression_i++);
 							v.obfuscated = v.name;
 							v.type = Variable::EXPRESSION;
 
@@ -1700,7 +1700,7 @@ func_top:
 						}
 						else if (valtok[0] == '[') {
 							Variable v;
-							v.name = "__fish" + itos(fish_i++);
+							v.name = "__fish" + util::itos(fish_i++);
 							v.obfuscated = v.name;
 							v.type = Variable::FISH;
 
@@ -1803,7 +1803,7 @@ func_top:
 				}
 				else if (tok[0] == '(') {
 					Variable v;
-					v.name = "__expr" + itos(expression_i++);
+					v.name = "__expr" + util::itos(expression_i++);
 					v.obfuscated = v.name;
 					v.type = Variable::EXPRESSION;
 
@@ -1834,7 +1834,7 @@ func_top:
 				}
 				else if (tok[0] == '[') {
 					Variable v;
-					v.name = "__fish" + itos(fish_i++);
+					v.name = "__fish" + util::itos(fish_i++);
 					v.obfuscated = v.name;
 					v.type = Variable::FISH;
 
@@ -2024,7 +2024,7 @@ func_top:
 				std::string valtok = token(prg, tt);
 				if (valtok[0] == '(') {
 					Variable v;
-					v.name = "__expr" + itos(expression_i++);
+					v.name = "__expr" + util::itos(expression_i++);
 					v.obfuscated = v.name;
 					v.type = Variable::EXPRESSION;
 
@@ -2053,7 +2053,7 @@ func_top:
 				}
 				else if (valtok[0] == '[') {
 					Variable v;
-					v.name = "__fish" + itos(fish_i++);
+					v.name = "__fish" + util::itos(fish_i++);
 					v.obfuscated = v.name;
 					v.type = Variable::FISH;
 
@@ -2141,7 +2141,7 @@ func_top:
 		}
 		else if (tok[0] == '(') {
 			Variable v;
-			v.name = "__expr" + itos(expression_i++);
+			v.name = "__expr" + util::itos(expression_i++);
 			v.obfuscated = v.name;
 			v.type = Variable::EXPRESSION;
 
@@ -2170,7 +2170,7 @@ func_top:
 		}
 		else if (tok[0] == '[') {
 			Variable v;
-			v.name = "__fish" + itos(fish_i++);
+			v.name = "__fish" + util::itos(fish_i++);
 			v.obfuscated = v.name;
 			v.type = Variable::FISH;
 
@@ -3707,29 +3707,28 @@ static Variable exprfunc_mul(Program *prg, const std::vector<Token> &v)
 	return ret;
 }
 
-static glm::mat4 to_glm_mat4(Variable &v)
+glm::mat4 to_glm_mat4(Variable &v)
 {
 	glm::mat4 m;
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
-			m[i][j] = v.v[i].v[j].n;
+			m[i][j] = (float)v.v[i].v[j].n;
 		}
 	}
 	return m;
 }
 
-static Variable from_glm_mat4(glm::mat4 m)
+Variable from_glm_mat4(glm::mat4 m)
 {
 	Variable var;
 	var.type = Variable::VECTOR;
 	for (int i = 0; i < 4; i++) {
-		glm::vec4 v = m[i];
 		Variable v2;
 		v2.type = Variable::VECTOR;
 		for (int j = 0; j < 4; j++) {
 			Variable v3;
 			v3.type = Variable::NUMBER;
-			v3.n = v[j];
+			v3.n = m[i][j];
 			v2.v.push_back(v3);
 		}
 		var.v.push_back(v2);
@@ -3760,6 +3759,50 @@ static Variable identity(int sz)
 	}
 
 	return var;
+}
+
+static Variable exprfunc_frustum(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(6)
+
+	float left = as_number(prg, v[0]);
+	float right = as_number(prg, v[1]);
+	float bottom = as_number(prg, v[2]);
+	float top = as_number(prg, v[3]);
+	float nearval = as_number(prg, v[4]);
+	float farval = as_number(prg, v[5]);
+
+	glm::mat4 m = glm::frustum(left, right, bottom, top, nearval, farval);
+
+	return from_glm_mat4(m);
+}
+
+static Variable exprfunc_perspective(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	float fovy = as_number(prg, v[0]);
+	float aspect = as_number(prg, v[1]);
+	float nearval = as_number(prg, v[2]);
+	float farval = as_number(prg, v[3]);
+
+	glm::mat4 m = glm::perspective(fovy, aspect, nearval, farval);
+
+	return from_glm_mat4(m);
+}
+
+static Variable exprfunc_ortho(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	float left = as_number(prg, v[0]);
+	float right = as_number(prg, v[1]);
+	float bottom = as_number(prg, v[2]);
+	float top = as_number(prg, v[3]);
+
+	glm::mat4 m = glm::ortho(left, right, bottom, top);
+
+	return from_glm_mat4(m);
 }
 
 static Variable exprfunc_identity(Program *prg, const std::vector<Token> &v)
@@ -4147,6 +4190,9 @@ void start()
 	add_expression_handler("<<", exprfunc_leftshift);
 	add_expression_handler(">>", exprfunc_rightshift);
 	add_expression_handler("mul", exprfunc_mul);
+	add_expression_handler("frustum", exprfunc_frustum);
+	add_expression_handler("perspective", exprfunc_perspective);
+	add_expression_handler("ortho", exprfunc_ortho);
 	add_expression_handler("identity", exprfunc_identity);
 	add_expression_handler("scale", exprfunc_scale);
 	add_expression_handler("rotate", exprfunc_rotate);
@@ -4662,13 +4708,6 @@ Error::~Error()
 }
 
 // Internal stuff
-
-std::string itos(int i)
-{
-	char buf[20];
-	snprintf(buf, 20, "%d", i);
-	return std::string(buf);
-}
 
 Variable evaluate_expression(Program *prg, const Variable::Expression &e)
 {
