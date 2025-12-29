@@ -551,8 +551,33 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid expression at " + get_error_info(prg));
 	}
 	p++; // skip (
+	while (isspace(expr[p]) && p < (int)expr.length()) {
+		p++;
+	}
 	std::string name;
-	while (p < (int)expr.length() && !isspace(expr[p]) && expr[p] != '(' && expr[p] != '[' && expr[p] != ')') {
+	char buf[2];
+	buf[0] = expr[p];
+	buf[1] = 0;
+	name += buf;
+	p++;
+	int first = name[0];
+	int open_count = name[0] == '[' || name[0] == '(';
+	while (p < (int)expr.length()) {
+		if ((expr[p] == ' ' || expr[p] == ')') && open_count == 0) {
+			break;
+		}
+		else if (first == '[' && expr[p] == '[') {
+			open_count++;
+		}
+		else if (first == '[' && expr[p] == ']') {
+			open_count--;
+		}
+		if (first == '(' && expr[p] == '(') {
+			open_count++;
+		}
+		else if (first == '(' && expr[p] == ')') {
+			open_count--;
+		}
 		char buf[2];
 		buf[0] = expr[p];
 		buf[1] = 0;
@@ -564,7 +589,47 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 	
 	e.name = name;
 
-	if (expression_map.find(name) == expression_map.end()) {
+	if (name.length() > 0 && name[0] == '(') {
+		Variable v1;
+		v1.name = "__expr" + itos(expression_i++);
+		v1.obfuscated = v1.name;
+		v1.type = Variable::EXPRESSION;
+
+		int i = var_i++;
+
+		if (pass == PASS1) {
+			prg->variables.push_back(v1);
+		}
+		else if (pass == PASS2) {
+			prg->variables_map[v1.name] = i;
+		}
+
+		prg->variables[i].e = parse_expression(prg, func, e.name, var_i, expression_i, fish_i, pass);
+
+		e.name = " expr ";
+		e.i = i;
+	}
+	else if (name.length() > 0 && name[0] == '[') {
+		Variable v1;
+		v1.name = "__fish" + itos(fish_i++);
+		v1.obfuscated = v1.name;
+		v1.type = Variable::FISH;
+
+		int i = var_i++;
+
+		if (pass == PASS1) {
+			prg->variables.push_back(v1);
+		}
+		else if (pass == PASS2) {
+			prg->variables_map[v1.name] = i;
+		}
+
+		prg->variables[i].f = parse_fish(prg, func, e.name, var_i, expression_i, fish_i, pass);
+
+		e.name = " fish ";
+		e.i = i;
+	}
+	else if (expression_map.find(name) == expression_map.end()) {
 		e.i = -1;
 		for (size_t i = 0; i < prg->orig_function_names.size(); i++) {
 			if (prg->orig_function_names[i] == name) {
@@ -4622,6 +4687,24 @@ Variable evaluate_expression(Program *prg, const Variable::Expression &e)
 		Variable result;
 
 		call_function(prg, i, e.v, result);
+
+		return result;
+	}
+	else if (e.name == " expr ") {
+		Variable var = evaluate_expression(prg, prg->variables[e.i].e);
+
+		Variable result;
+
+		call_function(prg, var.n, e.v, result);
+
+		return result;
+	}
+	else if (e.name == " fish ") {
+		Variable &var = go_fish(prg, prg->variables[e.i].f);
+
+		Variable result;
+
+		call_function(prg, var.n, e.v, result);
 
 		return result;
 	}
