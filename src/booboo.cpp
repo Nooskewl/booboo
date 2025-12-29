@@ -234,16 +234,6 @@ static std::string tokenfunc_compare(Program *prg)
 	return "?";
 }
 
-static std::string tokenfunc_multiply(Program *prg)
-{
-	prg->s->p++;
-	if (prg->s->p < prg->s->code.length() && prg->s->code[prg->s->p] == '/') {
-		prg->s->p++;
-		return "*/";
-	}
-	return "*";
-}
-
 static std::string tokenfunc_divide(Program *prg)
 {
 	prg->s->p++;
@@ -344,6 +334,10 @@ static std::string tokenfunc_ref(Program *prg)
 static std::string tokenfunc_deref(Program *prg)
 {
 	prg->s->p++;
+	if (prg->s->p < prg->s->code.length() && prg->s->code[prg->s->p] == '/') {
+		prg->s->p++;
+		return "*/";
+	}
 	return "*";
 }
 
@@ -4153,7 +4147,6 @@ static void init_token_map()
 	add_token_handler('-', tokenfunc_subtract);
 	add_token_handler('=', tokenfunc_equals);
 	add_token_handler('?', tokenfunc_compare);
-	add_token_handler('*', tokenfunc_multiply);
 	add_token_handler('/', tokenfunc_divide);
 	add_token_handler('(', tokenfunc_expression);
 	add_token_handler('[', tokenfunc_fish);
