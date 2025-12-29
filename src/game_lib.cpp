@@ -13,14 +13,13 @@ using namespace booboo;
 
 static GUI_Transition_Type transition_in_type = TRANSITION_ENLARGE;
 static GUI_Transition_Type transition_out_type = TRANSITION_SHRINK;
-static int orig_viewport_x;
-static int orig_viewport_y;
-static int orig_viewport_w;
-static int orig_viewport_h;
-static bool custom_viewport_set = false;
 static bool custom_projection_set = false;
 static glm::mat4 custom_mv;
 static glm::mat4 custom_proj;
+static int my_scissor[4];
+static bool custom_scissor_set;
+static int my_viewport[4];
+static bool custom_viewport_set;
 
 extern bool quit;
 extern Program *prg;
@@ -378,6 +377,54 @@ static bool gfxfunc_set_scissor(Program *prg, const std::vector<Token> &v)
 
 	gfx::set_scissor(x, y, w, h);
 
+	custom_scissor_set = true;
+	my_scissor[0] = x;
+	my_scissor[1] = y;
+	my_scissor[2] = w;
+	my_scissor[3] = h;
+
+	return true;
+}
+
+static bool gfxfunc_unset_scissor(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	gfx::unset_scissor();
+	
+	custom_scissor_set = false;
+
+	return true;
+}
+
+static bool gfxfunc_set_viewport(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(4)
+
+	int x = as_number(prg, v[0]);
+	int y = as_number(prg, v[1]);
+	int w = as_number(prg, v[2]);
+	int h = as_number(prg, v[3]);
+
+	gfx::set_viewport(x, y, w, h);
+
+	custom_viewport_set = true;
+	my_viewport[0] = x;
+	my_viewport[1] = y;
+	my_viewport[2] = w;
+	my_viewport[3] = h;
+
+	return true;
+}
+
+static bool gfxfunc_unset_viewport(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	gfx::unset_viewport();
+
+	custom_viewport_set = false;
+
 	return true;
 }
 
@@ -569,15 +616,6 @@ static Variable exprfunc_gfx_get_refresh_rate(Program *prg, const std::vector<To
 	return v1;
 }
 
-static bool gfxfunc_unset_scissor(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(0)
-
-	gfx::unset_scissor();
-
-	return true;
-}
-
 static bool gfxfunc_set_blend_mode(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -717,45 +755,6 @@ static bool gfxfunc_enable_colour_write(Program *prg, const std::vector<Token> &
 	bool val = (bool)as_number(prg, v[0]);
 
 	gfx::enable_colour_write(val);
-
-	return true;
-}
-
-static bool gfxfunc_set_viewport(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(4)
-
-	int x = as_number(prg, v[0]);
-	int y = as_number(prg, v[1]);
-	int w = as_number(prg, v[2]);
-	int h = as_number(prg, v[3]);
-
-	if (custom_viewport_set == false) {
-		GLint vp[4];
-
-		glGetIntegerv_ptr(GL_VIEWPORT, vp);
-
-		orig_viewport_x = vp[0];
-		orig_viewport_y = vp[1];
-		orig_viewport_w = vp[2];
-		orig_viewport_h = vp[3];
-	}
-
-	glViewport_ptr(x, y, w, h);
-
-	custom_viewport_set = true;
-
-	return true;
-}
-
-static bool gfxfunc_unset_viewport(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(0)
-
-	if (custom_viewport_set == true) {
-		custom_viewport_set = false;
-		glViewport_ptr(orig_viewport_x, orig_viewport_y, orig_viewport_w, orig_viewport_h);
-	}
 
 	return true;
 }
@@ -5113,6 +5112,12 @@ static void found_device_callback()
 			set_2d();
 		}
 	}
+	if (custom_scissor_set) {
+		gfx::set_scissor(my_scissor[0], my_scissor[1], my_scissor[2], my_scissor[3]);
+	}
+	if (custom_viewport_set) {
+		gfx::set_viewport(my_viewport[0], my_viewport[1], my_viewport[2], my_viewport[3]);
+	}
 }
 
 void register_game_callbacks()
@@ -5152,6 +5157,8 @@ void start_lib_game()
 	add_expression_handler("get_refresh_rate", exprfunc_gfx_get_refresh_rate);
 	add_instruction("set_scissor", gfxfunc_set_scissor);
 	add_instruction("unset_scissor", gfxfunc_unset_scissor);
+	add_instruction("set_viewport", gfxfunc_set_viewport);
+	add_instruction("unset_viewport", gfxfunc_unset_viewport);
 	add_instruction("set_blend_mode", gfxfunc_set_blend_mode);
 	add_instruction("clear_depth_buffer", gfxfunc_clear_depth_buffer);
 	add_instruction("clear_stencil_buffer", gfxfunc_clear_stencil_buffer);
@@ -5164,8 +5171,6 @@ void start_lib_game()
 	add_instruction("set_stencil_mode_backfaces", gfxfunc_set_stencil_mode_backfaces);
 	add_instruction("set_cull_mode", gfxfunc_set_cull_mode);
 	add_instruction("enable_colour_write", gfxfunc_enable_colour_write);
-	add_instruction("set_viewport", gfxfunc_set_viewport);
-	add_instruction("unset_viewport", gfxfunc_unset_viewport);
 	add_instruction("set_projection", gfxfunc_set_projection);
 	add_instruction("set_default_projection", gfxfunc_set_default_projection);
 	add_instruction("start_primitives", primfunc_start_primitives);

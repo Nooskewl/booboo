@@ -140,7 +140,7 @@ The following sections describe the API:
 </p>
 
 <ul>
-<li><a href="#Core">Core Functions</a></li>
+<li><a href="#Misc">Miscellaneous Functions</a></li>
 <li><a href="#Graphics">Graphics Functions</a></li>
 <li><a href="#Primitives">Primitives Functions</a></li>
 <li><a href="#Image">Image Functions</a></li>
@@ -158,8 +158,8 @@ The following sections describe the API:
 <li><a href="#Events">Events</a></li>
 </ul>
 
-<a id="Core"></a>
-<h2>Core Functions</h2>
+<a id="Misc"></a>
+<h2>Miscellaneous Functions</h2>
 
 <h3>inspect</h3>
 <pre>
@@ -312,6 +312,18 @@ The following sections describe the API:
 	e.g. unset_scissor
 </pre>
 
+<h3>set_viewport</h3>
+<pre>
+	Set a custom viewport
+	e.g. set_viewport x y w h
+</pre>
+
+<h3>unset_viewport</h3>
+<pre>
+	Reset the viewport after custom setting
+	e.g. unset_viewport
+</pre>
+
 <h3>set_blend_mode</h3>
 <pre>
 	Set the colour blending mode. Default is ONE/INVSRCALPHA. See constants.
@@ -382,18 +394,6 @@ The following sections describe the API:
 <pre>
 	Enable/disable writing into the colour buffer
 	e.g. enable_colour_write onoff
-</pre>
-
-<h3>set_viewport</h3>
-<pre>
-	Set a custom viewport
-	e.g. set_viewport x y w h
-</pre>
-
-<h3>unset_viewport</h3>
-<pre>
-	Reset the viewport after custom setting
-	e.g. unset_viewport
 </pre>
 
 <h3>set_projection</h3>
