@@ -397,7 +397,7 @@ void handle_event(TGUI_Event *event)
 	}
 	
 	if (go) {
-		call_void_function_obfuscated(prg, "event", args);
+		call_void_function(prg, "event", args);
 	}
 }
 
@@ -408,7 +408,7 @@ void draw_all()
 	gfx::set_cull_mode(gfx::NO_FACE);
 	
 	std::vector<Token> tmp;
-	call_void_function_obfuscated(prg, "draw", tmp);
+	call_void_function(prg, "draw", tmp);
 
 	glm::mat4 _mv, _proj;
 	gfx::get_matrices(_mv, _proj);
@@ -554,7 +554,7 @@ static void loop()
 			}
 
 			std::vector<Token> tmp;
-			call_void_function_obfuscated(prg, "run", tmp);
+			call_void_function(prg, "run", tmp);
 
 			mouse_wheel_y = 0;
 
@@ -948,7 +948,7 @@ again:
 		}
 
 		std::vector<Token> tmp;
-		call_void_function_obfuscated(prg, "end", tmp);
+		call_void_function(prg, "end", tmp);
 
 		unregister_game_callbacks();
 	}

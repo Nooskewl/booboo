@@ -2317,26 +2317,6 @@ void call_function(Program *prg, std::string function_name, const std::vector<To
 	call_function(prg, (*it).second, params, result, ignore_params);
 }
 
-void call_function_obfuscated(Program *prg, std::string function_name, const std::vector<Token> &params, Variable &result, int ignore_params)
-{
-	int i;
-	for (i = 0; i < (int)prg->orig_function_names.size(); i++) {
-		if (function_name == prg->orig_function_names[i]) {
-			break;
-		}
-	}
-	if (i >= (int)prg->orig_function_names.size()) {
-		return;
-	}
-	call_function(prg, i, params, result, ignore_params);
-}
-
-void call_void_function_obfuscated(Program *prg, std::string function, const std::vector<Token> &params, int ignore_params)
-{
-	static Variable tmp;
-	call_function_obfuscated(prg, function, params, tmp, ignore_params);
-}
-
 void call_void_function(Program *prg, int function, const std::vector<Token> &params, int ignore_params)
 {
 	static Variable tmp;

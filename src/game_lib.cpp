@@ -4388,7 +4388,7 @@ void BooBoo_Widget::draw()
 	t.i = prg->variables_map[info->widgets[id]->data->name];
 	tmp.push_back(t);
 
-	call_void_function_obfuscated(prg, "gui_draw", tmp);
+	call_void_function(prg, "gui_draw", tmp);
 }
 
 void BooBoo_Widget::handle_event(TGUI_Event *event)
@@ -4469,7 +4469,7 @@ void BooBoo_Widget::handle_event(TGUI_Event *event)
 	}
 	
 	if (go) {
-		call_void_function_obfuscated(prg, "gui_event", tmp);
+		call_void_function(prg, "gui_event", tmp);
 	}
 }
 
@@ -5092,7 +5092,7 @@ static void black_bars_callback(gfx::Black_Bar_Type type, int x, int y, int w, i
 	v.push_back(t);
 	t.n = h;
 	v.push_back(t);
-	call_void_function_obfuscated(prg, "draw_black_bar", v, 0);
+	call_void_function(prg, "draw_black_bar", v, 0);
 }
 
 static void lost_device_callback()

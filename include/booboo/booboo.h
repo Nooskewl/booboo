@@ -149,8 +149,6 @@ void add_special_function(std::string name);
 // Functions calling
 void call_function(Program *prg, int function, const std::vector<Token> &params, Variable &result, int ignore_params = 0);
 void call_function(Program *prg, std::string function, const std::vector<Token> &params, Variable &result, int ignore_params = 0);
-void call_function_obfuscated(Program *prg, std::string function, const std::vector<Token> &params, Variable &result, int ignore_params = 0);
-void call_void_function_obfuscated(Program *prg, std::string function, const std::vector<Token> &params, int ignore_params = 0);
 void call_void_function(Program *prg, int function, const std::vector<Token> &params, int ignore_params = 0);
 void call_void_function(Program *prg, std::string function, const std::vector<Token> &params, int ignore_params = 0);
 
