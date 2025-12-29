@@ -78,11 +78,15 @@ function htile img x y w h scale
 	var img_w img_h
 	explode (image_size img) img_w img_h
 
+	image_start img
+
 :top
 	image_stretch_region img 255 255 255 255 0 0 img_w img_h x y (* img_w scale) (* img_h scale) 0 0
 	= x (+ x (* img_w scale))
 	? x w
 	jl top
+
+	image_end img
 }
 
 function vtile img x y w h scale
@@ -90,9 +94,13 @@ function vtile img x y w h scale
 	var img_w img_h
 	explode (image_size img) img_w img_h
 
+	image_start img
+
 :top
 	image_stretch_region img 255 255 255 255 0 0 img_w img_h x y (* img_w scale) (* img_h scale) 0 0
 	= y (+ y (* img_h scale))
 	? y h
 	jl top
+
+	image_end img
 }
