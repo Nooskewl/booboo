@@ -300,9 +300,9 @@ The following sections describe the API:
 
 <h3>set_scissor</h3>
 <pre>
-	Set a scissor rectangle. This is based on the projection (buffer size)
-	you're using, not actual window size/coordinates/black bars to make it
-	easier.	Anything drawn outside of this will not be drawn.
+	Set a scissor rectangle. Anything drawn outside of this will not be drawn.
+	This is based on the projection (buffer size) you're using, not actual
+	window size/coordinates/black bars to make it easier.
 	e.g. set_scissor x y w h
 </pre>
 
@@ -315,6 +315,8 @@ The following sections describe the API:
 <h3>set_viewport</h3>
 <pre>
 	Set a custom viewport
+	This is based on the projection (buffer size) you're using, not actual
+	window size/coordinates/black bars to make it easier.
 	e.g. set_viewport x y w h
 </pre>
 
@@ -406,6 +408,16 @@ The following sections describe the API:
 <pre>
 	Restore the default projection
 	e.g. set_default_projection
+</pre>
+
+<h3>resize_vertex_cache</h3>
+<pre>
+	Normally not needed, but if you draw a tonne of geometry between
+	image_start/image_end or start_primitives/end_primitives, the vertex
+	cache could need to be resized frequently on first frame, so you can
+	use this to reserve a larger amount. This is in addition to whatever
+	has already been reserved.
+	e.g. resize_vertex_cache (* 1024 256)
 </pre>
 
 <a id="Primitives"></a>

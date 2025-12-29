@@ -798,6 +798,17 @@ static bool gfxfunc_set_default_projection(Program *prg, const std::vector<Token
 	return true;
 }
 
+static bool gfxfunc_resize_vertex_cache(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int increase = as_number(prg, v[0]);
+
+	gfx::Vertex_Cache::instance()->maybe_resize_cache(increase);
+
+	return true;
+}
+
 static bool primfunc_start_primitives(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -5173,6 +5184,7 @@ void start_lib_game()
 	add_instruction("enable_colour_write", gfxfunc_enable_colour_write);
 	add_instruction("set_projection", gfxfunc_set_projection);
 	add_instruction("set_default_projection", gfxfunc_set_default_projection);
+	add_instruction("resize_vertex_cache", gfxfunc_resize_vertex_cache);
 	add_instruction("start_primitives", primfunc_start_primitives);
 	add_instruction("end_primitives", primfunc_end_primitives);
 	add_instruction("line", primfunc_line);
