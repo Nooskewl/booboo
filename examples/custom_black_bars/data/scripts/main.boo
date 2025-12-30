@@ -21,12 +21,12 @@ function draw_black_bar type x y w h
 	var xx yy
 
 	if (== type BAR_TOP) top (== type BAR_BOTTOM) bottom (== type BAR_LEFT) left right
-		= xx (neg (/ (- (* (+ (floor (/ w (* h_w scale))) 1) (* h_w scale) w) 2)))
+		= xx (neg (/ (- (* (+ (floor (/ w (* h_w scale))) 1) (* h_w scale)) 2)))
 		= yy (- (+ y h) (* h_h scale))
 		image_start ih
 		call htile ih xx yy w h scale
 		image_end ih
-		= xx (neg (/ (- (* (+ (floor (/ w (* t_w scale))) 1) (* t_w scale) w) 2)))
+		= xx (neg (/ (- (* (+ (floor (/ w (* t_w scale))) 1) (* t_w scale)) 2)))
 		if (> yy 0) tile
 			image_start it
 			:again
@@ -37,12 +37,12 @@ function draw_black_bar type x y w h
 			image_end it
 		:tile
 	:top
-		= xx (neg (/ (- (* (+ (floor (/ w (* h_w scale))) 1) (* h_w scale) w) 2)))
+		= xx (neg (/ (- (* (+ (floor (/ w (* h_w scale))) 1) (* h_w scale)) 2)))
 		= yy y
 		image_start ih
 		call htile ih xx yy w h scale
 		image_end ih
-		= xx (neg (/ (- (* (+ (floor (/ w (* t_w scale))) 1) (* t_w scale) w) 2)))
+		= xx (neg (/ (- (* (+ (floor (/ w (* t_w scale))) 1) (* t_w scale)) 2)))
 		= yy (+ yy (* h_h scale))
 		if (< yy scr_h) tile2
 			image_start it
@@ -54,12 +54,12 @@ function draw_black_bar type x y w h
 			image_end it
 		:tile2
 	:bottom
-		= yy (neg (/ (- (* (+ (floor (/ h (* v_h scale))) 1) (* v_h scale) h) 2)))
+		= yy (neg (/ (- (* (+ (floor (/ h (* v_h scale))) 1) (* v_h scale)) 2)))
 		= xx (- (+ x w) (* v_w scale))
 		image_start iv
 		call vtile iv xx yy w h scale
 		image_end iv
-		= yy (neg (/ (- (* (+ (floor (/ h (* t_h scale))) 1) (* t_h scale) h) 2)))
+		= yy (neg (/ (- (* (+ (floor (/ h (* t_h scale))) 1) (* t_h scale)) 2)))
 		if (> xx 0) tile3
 			image_start it
 			:again3
@@ -70,12 +70,12 @@ function draw_black_bar type x y w h
 			image_end it
 		:tile3
 	:left
-		= yy (neg (/ (- (* (+ (floor (/ h (* v_h scale))) 1) (* v_h scale) h) 2)))
+		= yy (neg (/ (- (* (+ (floor (/ h (* v_h scale))) 1) (* v_h scale)) 2)))
 		= xx x
 		image_start iv
 		call vtile iv xx yy w h scale
 		image_end iv
-		= yy (neg (/ (- (* (+ (floor (/ h (* t_h scale))) 1) (* t_h scale) h) 2)))
+		= yy (neg (/ (- (* (+ (floor (/ h (* t_h scale))) 1) (* t_h scale)) 2)))
 		= xx (+ xx (* v_w scale))
 		if (< xx scr_w) tile4
 			image_start it
