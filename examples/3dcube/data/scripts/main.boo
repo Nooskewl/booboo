@@ -1,73 +1,29 @@
-set_cull_mode NO_FACE
-
 var verts faces colours normals texcoords
-vector_add verts -0.5
-vector_add verts 0.5
-vector_add verts 0.5
-vector_add verts 0.5
-vector_add verts 0.5
-vector_add verts 0.5
-vector_add verts -0.5
-vector_add verts 0.5
-vector_add verts -0.5
-vector_add verts 0.5
-vector_add verts 0.5
-vector_add verts -0.5
 
-vector_add verts -0.5
-vector_add verts -0.5
-vector_add verts 0.5
-vector_add verts 0.5
-vector_add verts -0.5
-vector_add verts 0.5
-vector_add verts -0.5
-vector_add verts -0.5
-vector_add verts -0.5
-vector_add verts 0.5
-vector_add verts -0.5
-vector_add verts -0.5
+vector_add verts -0.5 0.5 0.5
+vector_add verts 0.5 0.5 0.5
+vector_add verts 0.5 0.5 -0.5
+vector_add verts -0.5 0.5 -0.5
 
-vector_add faces 0
-vector_add faces 1
-vector_add faces 2
-vector_add faces 1
-vector_add faces 2
-vector_add faces 3
+vector_add verts -0.5 -0.5 0.5
+vector_add verts 0.5 -0.5 0.5
+vector_add verts 0.5 -0.5 -0.5
+vector_add verts -0.5 -0.5 -0.5
 
-vector_add faces 4
-vector_add faces 5
-vector_add faces 6
-vector_add faces 5
-vector_add faces 6
-vector_add faces 7
+vector_add faces 2 1 0
+vector_add faces 3 2 0
+vector_add faces 4 5 6
+vector_add faces 4 6 7
 
-vector_add faces 0
-vector_add faces 2
-vector_add faces 4
-vector_add faces 2
-vector_add faces 4
-vector_add faces 6
+vector_add faces 7 2 3
+vector_add faces 7 6 2
+vector_add faces 0 1 4
+vector_add faces 1 5 4
 
-vector_add faces 1
-vector_add faces 3
-vector_add faces 5
-vector_add faces 3
-vector_add faces 5
-vector_add faces 7
-
-vector_add faces 0
-vector_add faces 1
-vector_add faces 4
-vector_add faces 1
-vector_add faces 4
-vector_add faces 5
-
-vector_add faces 2
-vector_add faces 3
-vector_add faces 6
-vector_add faces 3
-vector_add faces 6
-vector_add faces 7
+vector_add faces 4 3 0
+vector_add faces 4 7 3
+vector_add faces 5 1 2
+vector_add faces 6 5 2
 
 vector_add colours 255
 vector_add colours 216
@@ -226,7 +182,7 @@ vector_add colours 255
 vector_add colours 255
 
 var vertex_buffer
-= vertex_buffer (create_vertex_buffer (@ verts) (@ faces) (@ colours) (@ normals) (@ texcoords) 12)
+= vertex_buffer (create_vertex_buffer (@ verts) (@ faces) (@ colours) (@ normals) (@ texcoords) (/ (vector_size faces) 3))
 
 var rx ry
 = rx 0
