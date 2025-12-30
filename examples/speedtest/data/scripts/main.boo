@@ -51,8 +51,6 @@ function run
 	var sz i
 	= sz (vector_size imgs)
 
-	image_start img
-
 	for i 0 (< i sz) 1 next
 		= [imgs i 0] (+ [imgs i 0] [imgs i 2])
 		= [imgs i 1] (+ [imgs i 1] [imgs i 3])
