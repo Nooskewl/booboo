@@ -1,3 +1,5 @@
+set_cull_mode NO_FACE
+
 var shader
 = shader (shader_load "lit_3d_vertex" "")
 

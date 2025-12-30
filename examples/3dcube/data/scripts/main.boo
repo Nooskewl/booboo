@@ -1,3 +1,5 @@
+set_cull_mode NO_FACE
+
 var verts faces colours normals texcoords
 vector_add verts -0.5
 vector_add verts 0.5

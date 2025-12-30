@@ -68,21 +68,19 @@ var texture
 
 var positions
 vector_add positions -1000 -0.01 -1000
-vector_add positions -1000 -0.01 1000
-vector_add positions 1000 -0.01 -1000
-vector_add positions -1000 -0.01 1000
 vector_add positions 1000 -0.01 -1000
 vector_add positions 1000 -0.01 1000
+vector_add positions -1000 -0.01 1000
 var texcoords
 vector_add texcoords 0 0
-vector_add texcoords 0 10000
-vector_add texcoords 10000 0
-vector_add texcoords 0 10000
 vector_add texcoords 10000 0
 vector_add texcoords 10000 10000
+vector_add texcoords 10000 0
+vector_add texcoords 10000 10000
+vector_add texcoords 0 10000
 var faces
 vector_add faces 0 1 2
-vector_add faces 3 4 5
+vector_add faces 0 2 3
 var colours
 var normals
 

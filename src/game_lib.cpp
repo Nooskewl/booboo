@@ -4091,12 +4091,12 @@ static bool billboardfunc_draw(Program *prg, const std::vector<Token> &v)
 		0.5f, 0.5f, 0.0f,
 	};
 	const int faces[] = {
-		0, 1, 2, 1, 2, 3
+		0, 2, 1, 1, 2, 3
 	};
 	float texcoords[] = {
 		0.0f, 0.0f,
-		1.0f, 0.0f,
 		0.0f, 1.0f,
+		1.0f, 0.0f,
 		1.0f, 0.0f,
 		0.0f, 1.0f,
 		1.0f, 1.0f
