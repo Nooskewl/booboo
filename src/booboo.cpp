@@ -3015,29 +3015,7 @@ static Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 {
 	Variable ret;
 
-	if (v[0].type == Token::NUMBER) {
-		double n = as_number(prg, v[0]);
-
-		for (size_t i = 1; i < v.size(); i++) {
-			n += as_number(prg, v[i]);
-		}
-
-		ret.type = Variable::NUMBER;
-		ret.n = n;
-		return ret;
-	}
-	else if (v[0].type == Token::STRING) {
-		std::string s = as_string(prg, v[0]);
-
-		for (size_t i = 1; i < v.size(); i++) {
-			s += as_string(prg, v[i]);
-		}
-
-		ret.type = Variable::STRING;
-		ret.s = s;
-		return ret;
-	}
-	else {
+	if (v[0].type == Token::SYMBOL) {
 		Variable var = as_variable_resolve(prg, v[0]);
 
 		if (var.type == Variable::NUMBER) {
@@ -3065,6 +3043,28 @@ static Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 		else {
 			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 		}
+	}
+	else if (v[0].type == Token::NUMBER) {
+		double n = as_number(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			n += as_number(prg, v[i]);
+		}
+
+		ret.type = Variable::NUMBER;
+		ret.n = n;
+		return ret;
+	}
+	else if (v[0].type == Token::STRING) {
+		std::string s = as_string(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			s += as_string(prg, v[i]);
+		}
+
+		ret.type = Variable::STRING;
+		ret.s = s;
+		return ret;
 	}
 
 	return ret;
