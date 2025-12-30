@@ -3001,7 +3001,6 @@ static bool corefunc_explode(Program *prg, const std::vector<Token> &v)
 static Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 {
 	Variable ret;
-	ret.name = "-booboo-";
 
 	if (v[0].type == Token::NUMBER) {
 		double n = as_number(prg, v[0]);
@@ -3026,21 +3025,10 @@ static Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 		return ret;
 	}
 	else {
-		Variable &var = get_variable(prg, v[0].i);
-		Variable var2;
+		Variable var = as_variable_resolve(prg, v[0]);
 
-		if (IS_EXPRESSION(var)) {
-			var2 = evaluate_expression(prg, var.e);
-		}
-		else if (IS_FISH(var)) {
-			var2 = go_fish(prg, var.f);
-		}
-		else {
-			var2 = var;
-		}
-
-		if (var2.type == Variable::NUMBER) {
-			double n = var2.n;
+		if (var.type == Variable::NUMBER) {
+			double n = var.n;
 
 			for (size_t i = 1; i < v.size(); i++) {
 				n += as_number(prg, v[i]);
@@ -3050,8 +3038,8 @@ static Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 			ret.n = n;
 			return ret;
 		}
-		else if (IS_STRING(var2)) {
-			std::string s = var2.s;
+		else if (IS_STRING(var)) {
+			std::string s = var.s;
 
 			for (size_t i = 1; i < v.size(); i++) {
 				s += as_string(prg, v[i]);
@@ -3059,36 +3047,6 @@ static Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 
 			ret.type = Variable::STRING;
 			ret.s = s;
-			return ret;
-		}
-		else if (IS_VECTOR(var2)) {
-			std::vector<Variable> vec = var2.v;
-
-			for (size_t i = 1; i < v.size(); i++) {
-				Variable v2 = as_variable_resolve(prg, v[i]);
-				if (IS_VECTOR(v2) == false) {
-					throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-				}
-				vec.insert(vec.end(), v2.v.begin(), v2.v.end());
-			}
-
-			ret.type = Variable::VECTOR;
-			ret.v = vec;
-			return ret;
-		}
-		else if (IS_MAP(var2)) {
-			std::map<std::string, Variable> m = var2.m;
-
-			for (size_t i = 1; i < v.size(); i++) {
-				Variable v2 = as_variable_resolve(prg, v[i]);
-				if (IS_MAP(v2) == false) {
-					throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-				}
-				m.insert(v2.m.begin(), v2.m.end());
-			}
-
-			ret.type = Variable::MAP;
-			ret.m = m;
 			return ret;
 		}
 		else {
@@ -3109,7 +3067,6 @@ static Variable exprfunc_subtract(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = n;
 	return var;
 }
@@ -3124,7 +3081,6 @@ static Variable exprfunc_multiply(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = n;
 	return var;
 }
@@ -3139,7 +3095,6 @@ static Variable exprfunc_divide(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = n;
 	return var;
 }
@@ -3150,7 +3105,6 @@ static Variable exprfunc_modulus(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = (int)as_number(prg, v[0]) % (int)as_number(prg, v[1]);
 	return var;
 }
@@ -3165,7 +3119,6 @@ static Variable exprfunc_and(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = b;
 	return var;
 }
@@ -3180,7 +3133,6 @@ static Variable exprfunc_or(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = b;
 	return var;
 }
@@ -3191,7 +3143,6 @@ static Variable exprfunc_not(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = b;
 	return var;
 }
@@ -3203,7 +3154,7 @@ static Variable exprfunc_greater(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable var = as_variable_resolve(prg, v[0]);
+		Variable &var = prg->variables[v[0].i];
 		if (IS_STRING(var)) {
 			string = true;
 		}
@@ -3226,7 +3177,6 @@ static Variable exprfunc_greater(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = b;
 	return var;
 }
@@ -3238,7 +3188,7 @@ static Variable exprfunc_less(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable var = as_variable_resolve(prg, v[0]);
+		Variable &var = prg->variables[v[0].i];
 		if (IS_STRING(var)) {
 			string = true;
 		}
@@ -3261,7 +3211,6 @@ static Variable exprfunc_less(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = b;
 	return var;
 }
@@ -3273,7 +3222,7 @@ static Variable exprfunc_greaterequal(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable var = as_variable_resolve(prg, v[0]);
+		Variable &var = prg->variables[v[0].i];
 		if (IS_STRING(var)) {
 			string = true;
 		}
@@ -3296,7 +3245,6 @@ static Variable exprfunc_greaterequal(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = b;
 	return var;
 }
@@ -3308,7 +3256,7 @@ static Variable exprfunc_lessequal(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable var = as_variable_resolve(prg, v[0]);
+		Variable &var = prg->variables[v[0].i];
 		if (IS_STRING(var)) {
 			string = true;
 		}
@@ -3331,7 +3279,6 @@ static Variable exprfunc_lessequal(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = b;
 	return var;
 }
@@ -3360,7 +3307,6 @@ static Variable exprfunc_equal(Program *prg, const std::vector<Token> &v)
 			if (var2.type == Variable::POINTER) {
 				Variable var;
 				var.type = Variable::NUMBER;
-				var.name = "-booboo-";
 				var.n = v1->p == var2.p;
 				return var;
 			}
@@ -3375,7 +3321,7 @@ static Variable exprfunc_equal(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable var = as_variable_resolve(prg, v[0]);
+		Variable &var = prg->variables[v[0].i];
 		if (IS_STRING(var)) {
 			string = true;
 		}
@@ -3398,7 +3344,6 @@ static Variable exprfunc_equal(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = b;
 	return var;
 }
@@ -3413,7 +3358,6 @@ static Variable exprfunc_notequal(Program *prg, const std::vector<Token> &v)
 			if (var2.type == Variable::POINTER) {
 				Variable var;
 				var.type = Variable::NUMBER;
-				var.name = "-booboo-";
 				var.n = var1.p != var2.p;
 				return var;
 			}
@@ -3428,7 +3372,7 @@ static Variable exprfunc_notequal(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable var = as_variable_resolve(prg, v[0]);
+		Variable &var = prg->variables[v[0].i];
 		if (IS_STRING(var)) {
 			string = true;
 		}
@@ -3451,7 +3395,6 @@ static Variable exprfunc_notequal(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = b;
 	return var;
 }
@@ -3466,7 +3409,6 @@ static Variable exprfunc_bitor(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = n;
 	return var;
 }
@@ -3481,7 +3423,6 @@ static Variable exprfunc_xor(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = n;
 	return var;
 }
@@ -3496,7 +3437,6 @@ static Variable exprfunc_bitand(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = n;
 	return var;
 }
@@ -3511,7 +3451,6 @@ static Variable exprfunc_leftshift(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = n;
 	return var;
 }
@@ -3526,7 +3465,6 @@ static Variable exprfunc_rightshift(Program *prg, const std::vector<Token> &v)
 
 	Variable var;
 	var.type = Variable::NUMBER;
-	var.name = "-booboo-";
 	var.n = n;
 	return var;
 }
@@ -4457,19 +4395,21 @@ Variable as_variable_resolve(Program *prg, const Token &t)
 		var.n = t.n;
 		return var;
 	}
-	if (t.type == Token::STRING) {
+	else if (t.type == Token::STRING) {
 		Variable var;
 		var.type = Variable::STRING;
 		var.s = t.s;
 		return var;
 	}
-	if (prg->variables[t.i].type == Variable::FISH) {
+	else if (prg->variables[t.i].type == Variable::FISH) {
 		return go_fish(prg, prg->variables[t.i].f);
 	}
-	if (prg->variables[t.i].type == Variable::EXPRESSION) {
+	else if (prg->variables[t.i].type == Variable::EXPRESSION) {
 		return evaluate_expression(prg, prg->variables[t.i].e);
 	}
-	return prg->variables[t.i];
+	else {
+		return prg->variables[t.i];
+	}
 }
 
 double as_number(Program *prg, const Token &t)
@@ -4510,9 +4450,6 @@ double as_number(Program *prg, const Token &t)
 				throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 			}
 		}
-		else if (v->type == Variable::STRING) {
-			return atof(v->s.c_str());
-		}
 		else if (v->type == Variable::FISH) {
 			Variable &var = go_fish(prg, v->f);
 			if (var.type == Variable::NUMBER) {
@@ -4524,6 +4461,9 @@ double as_number(Program *prg, const Token &t)
 			else {
 				throw Error(std::string(__FUNCTION__) + ": " + "Fished out the wrong type at " + get_error_info(prg));
 			}
+		}
+		else if (v->type == Variable::STRING) {
+			return atof(v->s.c_str());
 		}
 		else {
 			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));

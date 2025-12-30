@@ -436,7 +436,6 @@ static Variable exprfunc_list_drives(Program *prg, const std::vector<Token> &v)
 		if (set) {
 			Variable s;
 			s.type = Variable::STRING;
-			s.name = "-booboo-";
 			char buf[10];
 			snprintf(buf, 10, "%c", 'A' + i);
 			s.s = buf;
@@ -490,7 +489,6 @@ static Variable exprfunc_list_directory(Program *prg, const std::vector<Token> &
 #endif
 		Variable v;
 		v.type = Variable::STRING;
-		v.name = "-booboo-";
 		v.s = fn;
 		vec.v.push_back(v);
 	}
@@ -828,7 +826,6 @@ static Variable exprfunc_string_match(Program *prg, const std::vector<Token> &v)
 			std::ssub_match sub = match[i];
 			Variable v;
 			v.type = Variable::STRING;
-			v.name = "-booboo-";
 			v.s = sub.str();
 			v1.v.push_back(v);
 		}
@@ -1223,7 +1220,6 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 
 	if (v[2].type == Token::NUMBER) {
 		var.type = Variable::NUMBER;
-		var.name = "-booboo-";
 		var.n = v[2].n;
 	}
 	else if (v[2].type == Token::SYMBOL) {
@@ -1232,7 +1228,6 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 	}
 	else {
 		var.type = Variable::STRING;
-		var.name = "-booboo-";
 		var.s = v[2].s;
 	}
 
@@ -1360,7 +1355,6 @@ static Variable exprfunc_map_keys(Program *prg, const std::vector<Token> &v)
 		std::pair<std::string, Variable> p = *it;
 		Variable var;
 		var.type = Variable::STRING;
-		var.name = "-booboo-";
 		var.s = p.first;
 		v1.v.push_back(var);
 	}

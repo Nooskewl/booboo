@@ -120,7 +120,6 @@ struct Variable
 	}
 
 	Variable() :
-		type(UNTYPED),
 		constant(false)
 	{
 	}
