@@ -1526,6 +1526,14 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. json_set_bool json "foo&gt;bar&gt;baz" TRUE
 </pre>
 
+<h3>json_remove</h3>
+<pre>
+	Remove a child from JSON tree
+	You can dig down into the file by separating keys with "&gt;"
+	"[0]" "[1]" etc can be used to access arrays.
+	e.g. json_remove json "foo&gt;bar&gt;baz"
+</pre>
+
 <h3>(json_save)</h3>
 <pre>
 	Save a json object to json file

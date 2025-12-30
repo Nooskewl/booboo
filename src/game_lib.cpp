@@ -3307,6 +3307,22 @@ static bool jsonfunc_set_bool(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool jsonfunc_remove(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	JSON_Info *info = json_info(prg);
+	INFO_EXISTS(info->jsons, id)
+	util::JSON *json = info->jsons[id];
+
+	json->remove(name);
+
+	return true;
+}
+
 static Variable exprfunc_json_save(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -5281,6 +5297,7 @@ void start_lib_game()
 	add_instruction("json_set_string", jsonfunc_set_string);
 	add_instruction("json_set_number", jsonfunc_set_number);
 	add_instruction("json_set_bool", jsonfunc_set_bool);
+	add_instruction("json_remove", jsonfunc_remove);
 	add_expression_handler("json_save", exprfunc_json_save);
 	add_expression_handler("model_load", exprfunc_model_load);
 	add_instruction("model_destroy", modelfunc_destroy);
