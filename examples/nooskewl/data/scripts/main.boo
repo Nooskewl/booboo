@@ -1,3 +1,5 @@
+set_cull_mode NO_FACE
+
 var model
 
 = model (model_load "nooskewl.x")
