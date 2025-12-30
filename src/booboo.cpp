@@ -586,7 +586,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 	if (name.length() > 0 && name[0] == '(') {
 		Variable v1;
 		v1.name = "__e" + util::itos(expression_i++);
-		v1.obfuscated = v1.name;
+		//v1.obfuscated = v1.name;
 		v1.type = Variable::EXPRESSION;
 
 		int i = var_i++;
@@ -606,7 +606,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 	else if (name.length() > 0 && name[0] == '[') {
 		Variable v1;
 		v1.name = "__f" + util::itos(fish_i++);
-		v1.obfuscated = v1.name;
+		//v1.obfuscated = v1.name;
 		v1.type = Variable::FISH;
 
 		int i = var_i++;
@@ -694,7 +694,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 
 			Variable v1;
 			v1.name = "__e" + util::itos(expression_i++);
-			v1.obfuscated = v1.name;
+			//v1.obfuscated = v1.name;
 			v1.type = Variable::EXPRESSION;
 
 			if (pass == PASS1) {
@@ -738,7 +738,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 
 			Variable v1;
 			v1.name = "__f" + util::itos(fish_i++);
-			v1.obfuscated = v1.name;
+			//v1.obfuscated = v1.name;
 			v1.type = Variable::FISH;
 
 			if (pass == PASS1) {
@@ -862,7 +862,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 
 		Variable v;
 		v.name = "__f" + util::itos(fish_i++);
-		v.obfuscated = v.name;
+		//v.obfuscated = v.name;
 		v.type = Variable::FISH;
 
 		if (pass == PASS1) {
@@ -899,7 +899,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 
 			Variable v;
 			v.name = "__e" + util::itos(expression_i++);
-			v.obfuscated = v.name;
+			//v.obfuscated = v.name;
 			v.type = Variable::EXPRESSION;
 
 			if (pass == PASS1) {
@@ -989,7 +989,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 
 			Variable v1;
 			v1.name = "__e" + util::itos(expression_i++);
-			v1.obfuscated = v1.name;
+			//v1.obfuscated = v1.name;
 			v1.type = Variable::EXPRESSION;
 
 			if (pass == PASS1) {
@@ -1028,7 +1028,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 
 			Variable v1;
 			v1.name = "__f" + util::itos(fish_i++);
-			v1.obfuscated = v1.name;
+			//v1.obfuscated = v1.name;
 			v1.type = Variable::FISH;
 
 			if (pass == PASS1) {
@@ -1664,7 +1664,7 @@ func_top:
 						if (valtok[0] == '(') {
 							Variable v;
 							v.name = "__e" + util::itos(expression_i++);
-							v.obfuscated = v.name;
+							//v.obfuscated = v.name;
 							v.type = Variable::EXPRESSION;
 
 							int var_index = var_i;
@@ -1695,7 +1695,7 @@ func_top:
 						else if (valtok[0] == '[') {
 							Variable v;
 							v.name = "__f" + util::itos(fish_i++);
-							v.obfuscated = v.name;
+							//v.obfuscated = v.name;
 							v.type = Variable::FISH;
 
 							int var_index = var_i;
@@ -1798,7 +1798,7 @@ func_top:
 				else if (tok[0] == '(') {
 					Variable v;
 					v.name = "__e" + util::itos(expression_i++);
-					v.obfuscated = v.name;
+					//v.obfuscated = v.name;
 					v.type = Variable::EXPRESSION;
 
 					int var_index = var_i;
@@ -1829,7 +1829,7 @@ func_top:
 				else if (tok[0] == '[') {
 					Variable v;
 					v.name = "__f" + util::itos(fish_i++);
-					v.obfuscated = v.name;
+					//v.obfuscated = v.name;
 					v.type = Variable::FISH;
 
 					int var_index = var_i;
@@ -2019,7 +2019,7 @@ func_top:
 				if (valtok[0] == '(') {
 					Variable v;
 					v.name = "__e" + util::itos(expression_i++);
-					v.obfuscated = v.name;
+					//v.obfuscated = v.name;
 					v.type = Variable::EXPRESSION;
 
 					int var_index = var_i;
@@ -2048,7 +2048,7 @@ func_top:
 				else if (valtok[0] == '[') {
 					Variable v;
 					v.name = "__f" + util::itos(fish_i++);
-					v.obfuscated = v.name;
+					//v.obfuscated = v.name;
 					v.type = Variable::FISH;
 
 					int var_index = var_i;
@@ -2136,7 +2136,7 @@ func_top:
 		else if (tok[0] == '(') {
 			Variable v;
 			v.name = "__e" + util::itos(expression_i++);
-			v.obfuscated = v.name;
+			//v.obfuscated = v.name;
 			v.type = Variable::EXPRESSION;
 
 			int var_index = var_i;
@@ -2165,7 +2165,7 @@ func_top:
 		else if (tok[0] == '[') {
 			Variable v;
 			v.name = "__f" + util::itos(fish_i++);
-			v.obfuscated = v.name;
+			//v.obfuscated = v.name;
 			v.type = Variable::FISH;
 
 			int var_index = var_i;
@@ -2266,9 +2266,9 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 			var = go_fish(prg, prg->variables[param.i].f);
 		}
 		else {
-			std::string tmp = var.obfuscated;
+			//std::string tmp = var.obfuscated;
 			var = prg->variables[param.i];
-			var.obfuscated = tmp;
+			//var.obfuscated = tmp;
 		}
 	}
 
@@ -2299,21 +2299,21 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 			if (prg->variables[param.i].type == Variable::FISH) {
 				Variable &v2 = go_fish(prg, prg->variables[param.i].f);
 				std::string name = v2.name;
-				std::string obfuscated = v2.obfuscated;
+				//std::string obfuscated = v2.obfuscated;
 				bool constant = v2.constant;
 			       	v2 = var;
 				v2.name = name;
-				v2.obfuscated = obfuscated;
+				//v2.obfuscated = obfuscated;
 				v2.constant = constant;
 			}
 			else {
 				Variable &v2 = prg->variables[param.i];
 				std::string name = v2.name;
-				std::string obfuscated = v2.obfuscated;
+				//std::string obfuscated = v2.obfuscated;
 				bool constant = v2.constant;
 				v2 = var;
 				v2.name = name;
-				v2.obfuscated = obfuscated;
+				//v2.obfuscated = obfuscated;
 				v2.constant = constant;
 			}
 		}
@@ -2473,11 +2473,11 @@ static bool do_set(Program *prg, const std::vector<Token> &v, bool const_ok)
 		Variable v2 = as_variable_resolve(prg, v[1]);
 
 		std::string name = v1->name;
-		std::string obfuscated = v1->obfuscated;
+		//std::string obfuscated = v1->obfuscated;
 		bool constant = v1->constant;
 		*v1 = v2;
 		v1->name = name;
-		v1->obfuscated = obfuscated;
+		//v1->obfuscated = obfuscated;
 		v1->constant = constant;
 	}
 
@@ -3002,10 +3002,10 @@ static bool corefunc_explode(Program *prg, const std::vector<Token> &v)
 	for (size_t i = 1; i < v.size(); i++) {
 		Variable &v1 = as_variable(prg, v[i]);
 		std::string name = v1.name;
-		std::string obfuscated = v1.obfuscated;
+		//std::string obfuscated = v1.obfuscated;
 		v1 = vec.v[i-1];
 		v1.name = name;
-		v1.obfuscated = obfuscated;
+		//v1.obfuscated = obfuscated;
 	}
 
 	return true;
@@ -4453,18 +4453,6 @@ double as_number(Program *prg, const Token &t)
 		if (v->type == Variable::NUMBER) {
 			return v->n;
 		}
-		else if (v->type == Variable::EXPRESSION) {
-			Variable var = evaluate_expression(prg, v->e);
-			if (var.type == Variable::NUMBER) {
-				return var.n;
-			}
-			else if (var.type == Variable::STRING) {
-				return atof(var.s.c_str());
-			}
-			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
-			}
-		}
 		else if (v->type == Variable::FISH) {
 			Variable &var = go_fish(prg, v->f);
 			if (var.type == Variable::NUMBER) {
@@ -4475,6 +4463,18 @@ double as_number(Program *prg, const Token &t)
 			}
 			else {
 				throw Error(std::string(__FUNCTION__) + ": " + "Fished out the wrong type at " + get_error_info(prg));
+			}
+		}
+		else if (v->type == Variable::EXPRESSION) {
+			Variable var = evaluate_expression(prg, v->e);
+			if (var.type == Variable::NUMBER) {
+				return var.n;
+			}
+			else if (var.type == Variable::STRING) {
+				return atof(var.s.c_str());
+			}
+			else {
+				throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 			}
 		}
 		else if (v->type == Variable::STRING) {
