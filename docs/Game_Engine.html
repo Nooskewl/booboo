@@ -1078,7 +1078,7 @@ The following sections describe the API:
 	e.g. translate_3d x y z
 </pre>
 
-<h3>draw_3d</h3>
+<h3>create_vertex_buffer</h3>
 <pre>
 	Draw arbitrary 3d geometry
 	All vectors are vectors of numbers
@@ -1088,20 +1088,25 @@ The following sections describe the API:
 	empty colour vector = white
 	empty normal vector = 0.0
 	Pass vectors as pointers to avoid array copies
-	e.g. draw_3d (@ vert_vec) (@ face_vec) (@ colour_vec) (@ normal_vec) num_triangles
+	e.g. = vb (create_vertex_buffer (@ vert_vec) (@ face_vec) (@ colour_vec) (@ normal_vec) (@ texcoord_vec) num_triangles)
+</pre>
+
+<h3>destroy_vertex_buffer</h3>
+<pre>
+	Destroy a vertex buffer
+	e.g. destroy_vertex_buffer vb
+</pre>
+
+<h3>draw_3d</h3>
+<pre>
+	Draw arbitrary 3d geometry
+	e.g. draw_3d vertex_buf
 </pre>
 
 <h3>draw_3d_textured</h3>
 <pre>
 	Draw arbitrary 3d geometry textured
-	All vectors are vectors of numbers
-	e.g., one vertex is 3 numbers, one face is 3 numbers, one colour is 4
-	faces are vertex indices
-	colours are per-face-vertex
-	empty colour vector = white
-	empty normal vector = 0.0
-	Pass vectors as pointers to avoid array copies
-	e.g. draw_3d_textured tex (@ vert_vec) (@ face_vec) (@ colour_vec) (@ normal_vec) (@ texcoord_vec) num_triangles
+	e.g. draw_3d_textured tex vertex_buf texture
 </pre>
 
 <h3>(billboard_create)</h3>

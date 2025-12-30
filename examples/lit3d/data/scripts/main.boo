@@ -130,6 +130,9 @@ var rx ry
 = rx 0
 = ry 0
 
+var vertex_buffer
+= vertex_buffer (create_vertex_buffer (@ verts) (@ faces) (@ colours) (@ normals) (@ texcoords) 12)
+
 set_3d
 
 var light_pos
@@ -143,7 +146,7 @@ function draw
 	shader_set_float_vector shader "light_pos" light_pos
 	shader_set_colour shader "ground_colour" 255 255 255 255
 
-	draw_3d_textured tex (@ verts) (@ faces) (@ colours) (@ normals) (@ texcoords) 12
+	draw_3d_textured vertex_buffer tex
 }
 
 function run

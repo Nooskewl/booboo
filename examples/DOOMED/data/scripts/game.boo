@@ -85,6 +85,9 @@ vector_add faces 0 1 2
 vector_add faces 3 4 5
 var colours
 var normals
+
+var vertex_buffer
+= vertex_buffer (create_vertex_buffer (@ positions) (@ faces) (@ colours) (@ normals) (@ texcoords) 2)
 	
 var angle
 = angle 0
@@ -216,7 +219,7 @@ function draw
 	rotate_3d angle 0 1 0
 	translate_3d x (- y 0.1) z
 
-	draw_3d_textured texture (@ positions) (@ faces) (@ colours) (@ normals) (@ texcoords) 2
+	draw_3d_textured vertex_buffer texture
 
 	var i
 	for i 0 (< i num_billboards) 1 loop

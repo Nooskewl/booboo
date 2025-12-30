@@ -1,4 +1,4 @@
-var verts faces colours
+var verts faces colours normals texcoords
 vector_add verts -0.5
 vector_add verts 0.5
 vector_add verts 0.5
@@ -223,7 +223,8 @@ vector_add colours 216
 vector_add colours 255
 vector_add colours 255
 
-var normals
+var vertex_buffer
+= vertex_buffer (create_vertex_buffer (@ verts) (@ faces) (@ colours) (@ normals) (@ texcoords) 12)
 
 var rx ry
 = rx 0
@@ -235,7 +236,7 @@ function draw
 {
 	clear 100 100 255
 
-	draw_3d (@ verts) (@ faces) (@ colours) (@ normals) 12
+	draw_3d vertex_buffer
 }
 
 function run

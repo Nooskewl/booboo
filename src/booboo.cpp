@@ -2852,7 +2852,7 @@ static bool corefunc_for(Program *prg, const std::vector<Token> &v)
 	count.type = Variable::NUMBER;
 
 	count.n = as_number(prg, v[1]);
-	Variable &expr = as_variable(prg, v[2]);
+	Variable &expr = prg->variables[v[2].i];
 	double increment = as_number(prg, v[3]);
 	unsigned int end_label = as_label(prg, v[4]);
 
@@ -4398,6 +4398,11 @@ Variable &as_variable(Program *prg, const Token &t)
 	}
 	if (prg->variables[t.i].type == Variable::FISH) {
 		return go_fish(prg, prg->variables[t.i].f);
+	}
+	else if (prg->variables[t.i].type == Variable::EXPRESSION) {
+		static Variable var;
+		var = evaluate_expression(prg, prg->variables[t.i].e);
+		return var;
 	}
 	return prg->variables[t.i];
 }

@@ -74,6 +74,16 @@ struct JSON_Info {
 	std::map<int, util::JSON *> jsons;
 };
 
+struct Vertex_Buffer {
+	float *v;
+	int num_triangles;
+};
+
+struct Vertex_Buffer_Info {
+	unsigned int vertex_buffer_id;
+	std::map<int, Vertex_Buffer *> vertex_buffers;
+};
+
 struct Model {
 	glm::mat4 mat;
 	gfx::Model *model;
@@ -203,6 +213,17 @@ static JSON_Info *json_info(Program *prg)
 		info = new JSON_Info;
 		info->json_id = 0;
 		booboo::set_black_box(prg, "com.nooskewl.booboo.json", info);
+	}
+	return info;
+}
+
+static Vertex_Buffer_Info *vertex_buffer_info(Program *prg)
+{
+	Vertex_Buffer_Info *info = (Vertex_Buffer_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.vertex_buffer");
+	if (info == nullptr) {
+		info = new Vertex_Buffer_Info;
+		info->vertex_buffer_id = 0;
+		booboo::set_black_box(prg, "com.nooskewl.booboo.vertex_buffer", info);
 	}
 	return info;
 }
@@ -1158,7 +1179,7 @@ static bool mmlfunc_destroy(Program *prg, const std::vector<Token> &v)
 	MML_Info *info = mml_info(prg);
 	INFO_EXISTS(info->mmls, id)
 	delete info->mmls[id];
-	info->mmls.erase(id);
+	info->mmls.erase(info->mmls.find(id));
 
 	return true;
 }
@@ -1280,7 +1301,7 @@ static bool samplefunc_destroy(Program *prg, const std::vector<Token> &v)
 	Sample_Info *info = sample_info(prg);
 	INFO_EXISTS(info->samples, id)
 	delete info->samples[id];
-	info->samples.erase(id);
+	info->samples.erase(info->samples.find(id));
 
 	return true;
 }
@@ -1468,7 +1489,7 @@ static bool imagefunc_destroy(Program *prg, const std::vector<Token> &v)
 	Image_Info *info = image_info(prg);
 	INFO_EXISTS(info->images, id)
 	delete info->images[id]->image;
-	info->images.erase(id);
+	info->images.erase(info->images.find(id));
 
 	return true;
 }
@@ -1896,7 +1917,7 @@ static bool fontfunc_destroy(Program *prg, const std::vector<Token> &v)
 	Font_Info *info = font_info(prg);
 	INFO_EXISTS(info->fonts, id)
 	delete info->fonts[id];
-	info->fonts.erase(id);
+	info->fonts.erase(info->fonts.find(id));
 
 	return true;
 }
@@ -2049,7 +2070,7 @@ static bool tilemapfunc_destroy(Program *prg, const std::vector<Token> &v)
 	Tilemap_Info *info = tilemap_info(prg);
 	INFO_EXISTS(info->tilemaps, id)
 	delete info->tilemaps[id];
-	info->tilemaps.erase(id);
+	info->tilemaps.erase(info->tilemaps.find(id));
 
 	return true;
 }
@@ -2404,7 +2425,7 @@ static bool spritefunc_destroy(Program *prg, const std::vector<Token> &v)
 	Sprite_Info *info = sprite_info(prg);
 	INFO_EXISTS(info->sprites, id)
 	delete info->sprites[id];
-	info->sprites.erase(id);
+	info->sprites.erase(info->sprites.find(id));
 
 	return true;
 }
@@ -2933,7 +2954,7 @@ static bool shaderfunc_destroy(Program *prg, const std::vector<Token> &v)
 	Shader_Info *info = shader_info(prg);
 	INFO_EXISTS(info->shaders, id)
 	delete info->shaders[id];
-	info->shaders.erase(id);
+	info->shaders.erase(info->shaders.find(id));
 
 	return true;
 }
@@ -3176,7 +3197,7 @@ static bool jsonfunc_destroy(Program *prg, const std::vector<Token> &v)
 	JSON_Info *info = json_info(prg);
 	INFO_EXISTS(info->jsons, id)
 	delete info->jsons[id];
-	info->jsons.erase(id);
+	info->jsons.erase(info->jsons.find(id));
 
 	return true;
 }
@@ -3416,7 +3437,7 @@ static bool modelfunc_destroy(Program *prg, const std::vector<Token> &v)
 		delete info->models[id]->model;
 	}
 	delete info->models[id];
-	info->models.erase(id);
+	info->models.erase(info->models.find(id));
 
 	return true;
 }
@@ -3775,100 +3796,28 @@ static Variable exprfunc_model_size(Program *prg, const std::vector<Token> &v)
 	return vec;
 }
 
-static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_model_create_vertex_buffer(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(5)
+	COUNT_ARGS(6)
 
 	Variable *verts = as_variable(prg, v[0]).p;
 	Variable *faces = as_variable(prg, v[1]).p;
 	Variable *colours = as_variable(prg, v[2]).p;
 	Variable *normals = as_variable(prg, v[3]).p;
-	int num_triangles = as_number(prg, v[4]);
+	Variable *texcoords = as_variable(prg, v[4]).p;
+	int num_triangles = as_number(prg, v[5]);
 
-	static float *vert_vec = nullptr;
-	static int vec_sz = 0;
+	Vertex_Buffer_Info *info = vertex_buffer_info(prg);
 
-	if (vert_vec == nullptr) {
-		vert_vec = (float *)malloc(12*3*num_triangles*sizeof(float));
-		vec_sz = num_triangles;
-	}
-	else if (num_triangles > vec_sz) {
-		vert_vec = (float *)realloc(vert_vec, 12*3*num_triangles*sizeof(float));
-		vec_sz = num_triangles;
-	}
+	Variable v1;
+	v1.type = Variable::NUMBER;
+	v1.n = info->vertex_buffer_id;
 
-	int count = 0;
-	int ccount = 0;
-	int ncount = 0;
+	Vertex_Buffer *vb = new Vertex_Buffer;
+	vb->v = (float *)malloc(12*3*num_triangles*sizeof(float));
+	vb->num_triangles = num_triangles;
 
-	for (int i = 0; i < num_triangles; i++) {
-		for (int j = 0; j < 3; j++) {
-			int index = faces->v[i*3+j].n;
-			// xyz
-			vert_vec[count++] = verts->v[index*3+0].n;
-			vert_vec[count++] = verts->v[index*3+1].n;
-			vert_vec[count++] = verts->v[index*3+2].n;
-			// normals
-			if (normals->v.size() > 0) {
-				vert_vec[count++] = normals->v[ncount++].n;
-				vert_vec[count++] = normals->v[ncount++].n;
-				vert_vec[count++] = normals->v[ncount++].n;
-			}
-			else {
-				/*
-				vert_vec[count++] = 0.0f;
-				vert_vec[count++] = 0.0f;
-				vert_vec[count++] = 0.0f;
-				*/
-				count += 3;
-			}
-			// texcoord
-			/*
-			vert_vec[count++] = 0.0f;
-			vert_vec[count++] = 0.0f;
-			*/
-			count += 2;
-			// colour
-			if (colours->v.size() > 0) {
-				vert_vec[count++] = colours->v[ccount++].n / 255.0f;
-				vert_vec[count++] = colours->v[ccount++].n / 255.0f;
-				vert_vec[count++] = colours->v[ccount++].n / 255.0f;
-				vert_vec[count++] = colours->v[ccount++].n / 255.0f;
-			}
-			else {
-				for (int k = 0; k < 4; k++) {
-					vert_vec[count++] = 1.0f;
-				}
-			}
-		}
-	}
-
-	gfx::enable_depth_write(true);
-	gfx::enable_depth_test(true);
-
-	gfx::Vertex_Cache::instance()->start();
-	gfx::Vertex_Cache::instance()->cache_3d_immediate(vert_vec, num_triangles);
-	gfx::Vertex_Cache::instance()->end();
-
-	gfx::enable_depth_test(false);
-	gfx::enable_depth_write(false);
-
-	return true;
-}
-
-static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(7)
-
-	int tex = as_number(prg, v[0]);
-	Variable *verts = as_variable(prg, v[1]).p;
-	Variable *faces = as_variable(prg, v[2]).p;
-	Variable *colours = as_variable(prg, v[3]).p;
-	Variable *normals = as_variable(prg, v[4]).p;
-	Variable *texcoords = as_variable(prg, v[5]).p;
-	int num_triangles = as_number(prg, v[6]);
-
-	float vert_vec[12*3*num_triangles];
+	info->vertex_buffers[info->vertex_buffer_id++] = vb;
 
 	int count = 0;
 	int ccount = 0;
@@ -3879,41 +3828,94 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 		for (int j = 0; j < 3; j++) {
 			int index = faces->v[i*3+j].n;
 			// xyz
-			vert_vec[count++] = verts->v[index*3+0].n;
-			vert_vec[count++] = verts->v[index*3+1].n;
-			vert_vec[count++] = verts->v[index*3+2].n;
+			vb->v[count++] = verts->v[index*3+0].n;
+			vb->v[count++] = verts->v[index*3+1].n;
+			vb->v[count++] = verts->v[index*3+2].n;
 			// normals
 			if (normals->v.size() > 0) {
-				vert_vec[count++] = normals->v[ncount++].n;
-				vert_vec[count++] = normals->v[ncount++].n;
-				vert_vec[count++] = normals->v[ncount++].n;
+				vb->v[count++] = normals->v[ncount++].n;
+				vb->v[count++] = normals->v[ncount++].n;
+				vb->v[count++] = normals->v[ncount++].n;
 			}
 			else {
-				/*
-				vert_vec[count++] = 0.0f;
-				vert_vec[count++] = 0.0f;
-				vert_vec[count++] = 0.0f;
-				*/
-				count += 3;
+				vb->v[count++] = 0.0f;
+				vb->v[count++] = 0.0f;
+				vb->v[count++] = 0.0f;
 			}
 			// texcoord
-			vert_vec[count++] = texcoords->v[tcount++].n;
-			vert_vec[count++] = texcoords->v[tcount++].n;
+			if (texcoords->v.size() > 0) {
+				vb->v[count++] = texcoords->v[tcount++].n;
+				vb->v[count++] = texcoords->v[tcount++].n;
+			}
+			else {
+				vb->v[count++] = 0.0f;
+				vb->v[count++] = 0.0f;
+			}
 			// colour
 			if (colours->v.size() > 0) {
-				vert_vec[count++] = colours->v[ccount++].n / 255.0f;
-				vert_vec[count++] = colours->v[ccount++].n / 255.0f;
-				vert_vec[count++] = colours->v[ccount++].n / 255.0f;
-				vert_vec[count++] = colours->v[ccount++].n / 255.0f;
+				vb->v[count++] = colours->v[ccount++].n / 255.0f;
+				vb->v[count++] = colours->v[ccount++].n / 255.0f;
+				vb->v[count++] = colours->v[ccount++].n / 255.0f;
+				vb->v[count++] = colours->v[ccount++].n / 255.0f;
 			}
 			else {
 				for (int k = 0; k < 4; k++) {
-					vert_vec[count++] = 1.0f;
+					vb->v[count++] = 1.0f;
 				}
 			}
 		}
 	}
-	
+
+	return v1;
+}
+
+static bool modelfunc_destroy_vertex_buffer(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number(prg, v[0]);
+	Vertex_Buffer_Info *info = vertex_buffer_info(prg);
+	INFO_EXISTS(info->vertex_buffers, id)
+	free(info->vertex_buffers[id]->v);
+	delete info->vertex_buffers[id];
+	info->vertex_buffers.erase(info->vertex_buffers.find(id));
+
+	return true;
+}
+
+static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number(prg, v[0]);
+
+	Vertex_Buffer_Info *info = vertex_buffer_info(prg);
+	INFO_EXISTS(info->vertex_buffers, id)
+	Vertex_Buffer *vb = info->vertex_buffers[id];
+
+	gfx::enable_depth_write(true);
+	gfx::enable_depth_test(true);
+
+	gfx::Vertex_Cache::instance()->start();
+	gfx::Vertex_Cache::instance()->cache_3d_immediate(vb->v, vb->num_triangles);
+	gfx::Vertex_Cache::instance()->end();
+
+	gfx::enable_depth_test(false);
+	gfx::enable_depth_write(false);
+
+	return true;
+}
+
+static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	int tex = as_number(prg, v[1]);
+
+	Vertex_Buffer_Info *info = vertex_buffer_info(prg);
+	Vertex_Buffer *vb = info->vertex_buffers[id];
+
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
 
@@ -3929,7 +3931,7 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 	PRINT_GL_ERROR("glTexParameteri\n");
 	
 	gfx::Vertex_Cache::instance()->start(image);
-	gfx::Vertex_Cache::instance()->cache_3d_immediate(vert_vec, num_triangles);
+	gfx::Vertex_Cache::instance()->cache_3d_immediate(vb->v, vb->num_triangles);
 	gfx::Vertex_Cache::instance()->end();
 
 	gfx::enable_depth_test(false);
@@ -4017,7 +4019,7 @@ static bool billboardfunc_destroy(Program *prg, const std::vector<Token> &v)
 	Billboard_Info *info = billboard_info(prg);
 	INFO_EXISTS(info->billboards, id)
 	delete info->billboards[id];
-	info->billboards.erase(id);
+	info->billboards.erase(info->billboards.find(id));
 
 	return true;
 }
@@ -5314,6 +5316,8 @@ void start_lib_game()
 	add_instruction("model_stop", modelfunc_stop);
 	add_instruction("model_reset", modelfunc_reset);
 	add_expression_handler("model_size", exprfunc_model_size);
+	add_expression_handler("create_vertex_buffer", exprfunc_model_create_vertex_buffer);
+	add_instruction("destroy_vertex_buffer", modelfunc_destroy_vertex_buffer);
 	add_instruction("draw_3d", modelfunc_draw_3d);
 	add_instruction("draw_3d_textured", modelfunc_draw_3d_textured);
 	add_expression_handler("model_clone", exprfunc_model_clone);
@@ -5399,6 +5403,11 @@ void game_lib_destroy_program(Program *prg)
 	for (std::map<int, util::JSON *>::iterator i = json_i->jsons.begin(); i != json_i->jsons.end(); i++) {
 		delete json_i->jsons[(*i).first];
 	}
+	Vertex_Buffer_Info *vertex_buffer_i = vertex_buffer_info(prg);
+	for (std::map<int, Vertex_Buffer *>::iterator i = vertex_buffer_i->vertex_buffers.begin(); i != vertex_buffer_i->vertex_buffers.end(); i++) {
+		delete vertex_buffer_i->vertex_buffers[(*i).first]->v;
+		delete vertex_buffer_i->vertex_buffers[(*i).first];
+	}
 	Model_Info *model_i = model_info(prg);
 	for (std::map<int, Model *>::iterator i = model_i->models.begin(); i != model_i->models.end(); i++) {
 		if (model_i->models[(*i).first]->is_clone == false) {
@@ -5422,6 +5431,7 @@ void game_lib_destroy_program(Program *prg)
 	delete tilemap_i;
 	delete shader_i;
 	delete json_i;
+	delete vertex_buffer_i;
 	delete model_i;
 	delete billboard_i;
 	delete widget_i;
@@ -5434,6 +5444,7 @@ void game_lib_destroy_program(Program *prg)
 	booboo::set_black_box(prg, "com.nooskewl.booboo.sprite", nullptr);
 	booboo::set_black_box(prg, "com.nooskewl.booboo.shader", nullptr);
 	booboo::set_black_box(prg, "com.nooskewl.booboo.json", nullptr);
+	booboo::set_black_box(prg, "com.nooskewl.booboo.vertex_buffer", nullptr);
 	booboo::set_black_box(prg, "com.nooskewl.booboo.model", nullptr);
 	booboo::set_black_box(prg, "com.nooskewl.booboo.billboard", nullptr);
 	booboo::set_black_box(prg, "com.nooskewl.booboo.widget", nullptr);
