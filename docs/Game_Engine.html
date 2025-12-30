@@ -386,6 +386,12 @@ The following sections describe the API:
 	e.g. set_stencil_mode_backfaces COMPARE_LESS STENCILOP_REPALCE STENCILOP_REPLACE STENCILOP_KEEP #FF #00
 </pre>
 
+<h3>set_front_face</h3>
+<pre>
+	Set the winding order for front faces (see constants)
+	e.g. set_front_face FACE_CCW
+</pre>
+
 <h3>set_cull_mode</h3>
 <pre>
 	Set which faces are culled
@@ -1939,6 +1945,13 @@ GUI constants:
 	<li>NO_FACE</li>
 	<li>FRONT_FACE</li>
 	<li>BACK_FACE</li>
+</ul>
+
+<p>Front faces</p>
+
+<ul>
+	<li>FACE_CW</li>
+	<li>FACE_CCW</li>
 </ul>
 
 <a id="Events"></a>

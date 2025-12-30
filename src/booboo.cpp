@@ -1511,6 +1511,8 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "NO_FACE", gfx::NO_FACE, pass, var_i);
 	insert_constant(prg, "FRONT_FACE", gfx::FRONT_FACE, pass, var_i);
 	insert_constant(prg, "BACK_FACE", gfx::BACK_FACE, pass, var_i);
+	insert_constant(prg, "FACE_CW", gfx::FACE_CW, pass, var_i);
+	insert_constant(prg, "FACE_CCW", gfx::FACE_CCW, pass, var_i);
 #endif
 
 	bool _is_deref = false;

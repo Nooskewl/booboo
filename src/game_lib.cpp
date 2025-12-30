@@ -756,6 +756,17 @@ static bool gfxfunc_set_stencil_mode_backfaces(Program *prg, const std::vector<T
 	return true;
 }
 
+static bool gfxfunc_set_front_face(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int val = (int)as_number(prg, v[0]);
+
+	gfx::set_front_face((gfx::Front_Face)val);
+
+	return true;
+}
+
 static bool gfxfunc_set_cull_mode(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -5195,6 +5206,7 @@ void start_lib_game()
 	add_instruction("enable_two_sided_stencil", gfxfunc_enable_two_sided_stencil);
 	add_instruction("set_stencil_mode", gfxfunc_set_stencil_mode);
 	add_instruction("set_stencil_mode_backfaces", gfxfunc_set_stencil_mode_backfaces);
+	add_instruction("set_front_face", gfxfunc_set_front_face);
 	add_instruction("set_cull_mode", gfxfunc_set_cull_mode);
 	add_instruction("enable_colour_write", gfxfunc_enable_colour_write);
 	add_instruction("set_projection", gfxfunc_set_projection);
