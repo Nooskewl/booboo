@@ -3779,10 +3779,40 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(5)
 
-	Variable verts = as_variable_resolve(prg, v[0]);
-	Variable faces = as_variable_resolve(prg, v[1]);
-	Variable colours = as_variable_resolve(prg, v[2]);
-	Variable normals = as_variable_resolve(prg, v[3]);
+	Variable *verts, _v;
+	Variable *faces,  _f;
+	Variable *colours, _c;
+	Variable *normals, _n;
+
+	if (v[0].type == Token::SYMBOL && as_variable(prg, v[0]).type == Variable::VECTOR) {
+		verts = &as_variable(prg, v[0]);
+	}
+	else {
+		_v = as_variable_resolve(prg, v[0]);
+		verts = &_v;
+	}
+	if (v[1].type == Token::SYMBOL && as_variable(prg, v[1]).type == Variable::VECTOR) {
+		faces = &as_variable(prg, v[1]);
+	}
+	else {
+		_f = as_variable_resolve(prg, v[1]);
+		faces = &_f;
+	}
+	if (v[2].type == Token::SYMBOL && as_variable(prg, v[2]).type == Variable::VECTOR) {
+		colours = &as_variable(prg, v[2]);
+	}
+	else {
+		_c = as_variable_resolve(prg, v[2]);
+		colours = &_c;
+	}
+	if (v[3].type == Token::SYMBOL && as_variable(prg, v[3]).type == Variable::VECTOR) {
+		normals = &as_variable(prg, v[3]);
+	}
+	else {
+		_n = as_variable_resolve(prg, v[3]);
+		normals = &_n;
+	}
+
 	int num_triangles = as_number(prg, v[4]);
 
 	static float *vert_vec = nullptr;
@@ -3803,31 +3833,37 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 
 	for (int i = 0; i < num_triangles; i++) {
 		for (int j = 0; j < 3; j++) {
-			int index = faces.v[i*3+j].n;
+			int index = faces->v[i*3+j].n;
 			// xyz
-			vert_vec[count++] = verts.v[index*3+0].n;
-			vert_vec[count++] = verts.v[index*3+1].n;
-			vert_vec[count++] = verts.v[index*3+2].n;
+			vert_vec[count++] = verts->v[index*3+0].n;
+			vert_vec[count++] = verts->v[index*3+1].n;
+			vert_vec[count++] = verts->v[index*3+2].n;
 			// normals
-			if (normals.v.size() > 0) {
-				vert_vec[count++] = normals.v[ncount++].n;
-				vert_vec[count++] = normals.v[ncount++].n;
-				vert_vec[count++] = normals.v[ncount++].n;
+			if (normals->v.size() > 0) {
+				vert_vec[count++] = normals->v[ncount++].n;
+				vert_vec[count++] = normals->v[ncount++].n;
+				vert_vec[count++] = normals->v[ncount++].n;
 			}
 			else {
+				/*
 				vert_vec[count++] = 0.0f;
 				vert_vec[count++] = 0.0f;
 				vert_vec[count++] = 0.0f;
+				*/
+				count += 3;
 			}
 			// texcoord
+			/*
 			vert_vec[count++] = 0.0f;
 			vert_vec[count++] = 0.0f;
+			*/
+			count += 2;
 			// colour
-			if (colours.v.size() > 0) {
-				vert_vec[count++] = colours.v[ccount++].n / 255.0f;
-				vert_vec[count++] = colours.v[ccount++].n / 255.0f;
-				vert_vec[count++] = colours.v[ccount++].n / 255.0f;
-				vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+			if (colours->v.size() > 0) {
+				vert_vec[count++] = colours->v[ccount++].n / 255.0f;
+				vert_vec[count++] = colours->v[ccount++].n / 255.0f;
+				vert_vec[count++] = colours->v[ccount++].n / 255.0f;
+				vert_vec[count++] = colours->v[ccount++].n / 255.0f;
 			}
 			else {
 				for (int k = 0; k < 4; k++) {
@@ -3854,12 +3890,49 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 {
 	COUNT_ARGS(7)
 
+	Variable *verts, _v;
+	Variable *faces,  _f;
+	Variable *colours, _c;
+	Variable *normals, _n;
+	Variable *texcoords, _t;
+
+	if (v[1].type == Token::SYMBOL && as_variable(prg, v[1]).type == Variable::VECTOR) {
+		verts = &as_variable(prg, v[1]);
+	}
+	else {
+		_v = as_variable_resolve(prg, v[1]);
+		verts = &_v;
+	}
+	if (v[2].type == Token::SYMBOL && as_variable(prg, v[2]).type == Variable::VECTOR) {
+		faces = &as_variable(prg, v[2]);
+	}
+	else {
+		_f = as_variable_resolve(prg, v[2]);
+		faces = &_f;
+	}
+	if (v[3].type == Token::SYMBOL && as_variable(prg, v[3]).type == Variable::VECTOR) {
+		colours = &as_variable(prg, v[3]);
+	}
+	else {
+		_c = as_variable_resolve(prg, v[3]);
+		colours = &_c;
+	}
+	if (v[4].type == Token::SYMBOL && as_variable(prg, v[4]).type == Variable::VECTOR) {
+		normals = &as_variable(prg, v[4]);
+	}
+	else {
+		_n = as_variable_resolve(prg, v[4]);
+		normals = &_n;
+	}
+	if (v[5].type == Token::SYMBOL && as_variable(prg, v[5]).type == Variable::VECTOR) {
+		texcoords = &as_variable(prg, v[5]);
+	}
+	else {
+		_t = as_variable_resolve(prg, v[5]);
+		texcoords = &_t;
+	}
+
 	int tex = as_number(prg, v[0]);
-	Variable verts = as_variable_resolve(prg, v[1]);
-	Variable faces = as_variable_resolve(prg, v[2]);
-	Variable colours = as_variable_resolve(prg, v[3]);
-	Variable normals = as_variable_resolve(prg, v[4]);
-	Variable texcoords = as_variable_resolve(prg, v[5]);
 	int num_triangles = as_number(prg, v[6]);
 
 	float vert_vec[12*3*num_triangles];
@@ -3871,31 +3944,34 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 
 	for (int i = 0; i < num_triangles; i++) {
 		for (int j = 0; j < 3; j++) {
-			int index = faces.v[i*3+j].n;
+			int index = faces->v[i*3+j].n;
 			// xyz
-			vert_vec[count++] = verts.v[index*3+0].n;
-			vert_vec[count++] = verts.v[index*3+1].n;
-			vert_vec[count++] = verts.v[index*3+2].n;
+			vert_vec[count++] = verts->v[index*3+0].n;
+			vert_vec[count++] = verts->v[index*3+1].n;
+			vert_vec[count++] = verts->v[index*3+2].n;
 			// normals
-			if (normals.v.size() > 0) {
-				vert_vec[count++] = normals.v[ncount++].n;
-				vert_vec[count++] = normals.v[ncount++].n;
-				vert_vec[count++] = normals.v[ncount++].n;
+			if (normals->v.size() > 0) {
+				vert_vec[count++] = normals->v[ncount++].n;
+				vert_vec[count++] = normals->v[ncount++].n;
+				vert_vec[count++] = normals->v[ncount++].n;
 			}
 			else {
+				/*
 				vert_vec[count++] = 0.0f;
 				vert_vec[count++] = 0.0f;
 				vert_vec[count++] = 0.0f;
+				*/
+				count += 3;
 			}
 			// texcoord
-			vert_vec[count++] = texcoords.v[tcount++].n;
-			vert_vec[count++] = texcoords.v[tcount++].n;
+			vert_vec[count++] = texcoords->v[tcount++].n;
+			vert_vec[count++] = texcoords->v[tcount++].n;
 			// colour
-			if (colours.v.size() > 0) {
-				vert_vec[count++] = colours.v[ccount++].n / 255.0f;
-				vert_vec[count++] = colours.v[ccount++].n / 255.0f;
-				vert_vec[count++] = colours.v[ccount++].n / 255.0f;
-				vert_vec[count++] = colours.v[ccount++].n / 255.0f;
+			if (colours->v.size() > 0) {
+				vert_vec[count++] = colours->v[ccount++].n / 255.0f;
+				vert_vec[count++] = colours->v[ccount++].n / 255.0f;
+				vert_vec[count++] = colours->v[ccount++].n / 255.0f;
+				vert_vec[count++] = colours->v[ccount++].n / 255.0f;
 			}
 			else {
 				for (int k = 0; k < 4; k++) {
