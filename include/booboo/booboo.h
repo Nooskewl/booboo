@@ -106,20 +106,48 @@ struct Variable
 	Variable(const Variable &var)
 	{
 		type = var.type;
-		name = var.name;
-		obfuscated = var.obfuscated;
+		//name = var.name;
+		//obfuscated = var.obfuscated;
 		constant = var.constant;
 
-		n = var.n;
-		s = var.s;
-		v = var.v;
-		m = var.m;
-		e = var.e;
-		f = var.f;
-		p = var.p;
+		switch (type) {
+			case NUMBER:
+			case FUNCTION:
+			case LABEL:
+				n = var.n;
+				break;
+			case STRING:
+				s = var.s;
+				break;
+			case VECTOR:
+				v = var.v;
+				break;
+			case MAP:
+				m = var.m;
+				break;
+			case EXPRESSION:
+				e = var.e;
+				break;
+			case FISH:
+				f = var.f;
+				break;
+			case POINTER:
+				p = var.p;
+				break;
+			default:
+				n = var.n;
+				s = var.s;
+				v = var.v;
+				m = var.m;
+				e = var.e;
+				f = var.f;
+				p = var.p;
+				break;
+		}
 	}
 
 	Variable() :
+		type(UNTYPED),
 		constant(false)
 	{
 	}
