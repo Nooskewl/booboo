@@ -38,4 +38,8 @@ You can obfuscate code with the +obfuscate switch. Examples:
 
 --
 
+The portrait example uses a screenshot from the game Broken Pearl
+
+--
+
 Please visit https://nooskewl.com for updates!

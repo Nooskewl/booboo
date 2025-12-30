@@ -1,4 +1,0 @@
-The Leibniz benchmarks other than BooBoo are from:
-https://github.com/niklas-heer/speed-comparison
-
-The portrait example uses a screenshot from the game Broken Pearl
