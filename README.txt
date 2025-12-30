@@ -7,6 +7,9 @@ to get a launcher (point the launcher to where there is a data/
 directory from a BooBoo game or a data.cpa from one.) Press F12 to
 exit, F11 to toggle fullscreen.
 
+data/ in the root of the distribution is the default launcher. You can
+replace it with your own to autolaunch your game.
+
 Many of the games only read joystick input, but fudge some keys into
 joystick events... so the keys are arrows and z/x.
 
