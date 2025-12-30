@@ -2429,11 +2429,10 @@ static bool do_set(Program *prg, const std::vector<Token> &v, bool const_ok)
 	COUNT_ARGS(2)
 
 	Variable *v1;
-	Variable tmp;
 
 	if (v[0].dereference) {
 		if (prg->variables[v[0].i].type == Variable::EXPRESSION) {
-			tmp = as_variable_resolve(prg, v[0]);
+			Variable tmp = as_variable_resolve(prg, v[0]);
 			v1 = tmp.p;
 		}
 		else {
@@ -3154,7 +3153,7 @@ static Variable exprfunc_greater(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = prg->variables[v[0].i];
+		Variable var = as_variable_resolve(prg, v[0]);
 		if (IS_STRING(var)) {
 			string = true;
 		}
@@ -3188,7 +3187,7 @@ static Variable exprfunc_less(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = prg->variables[v[0].i];
+		Variable var = as_variable_resolve(prg, v[0]);
 		if (IS_STRING(var)) {
 			string = true;
 		}
@@ -3222,7 +3221,7 @@ static Variable exprfunc_greaterequal(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = prg->variables[v[0].i];
+		Variable var = as_variable_resolve(prg, v[0]);
 		if (IS_STRING(var)) {
 			string = true;
 		}
@@ -3256,7 +3255,7 @@ static Variable exprfunc_lessequal(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = prg->variables[v[0].i];
+		Variable var = as_variable_resolve(prg, v[0]);
 		if (IS_STRING(var)) {
 			string = true;
 		}
@@ -3321,7 +3320,7 @@ static Variable exprfunc_equal(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = prg->variables[v[0].i];
+		Variable var = as_variable_resolve(prg, v[0]);
 		if (IS_STRING(var)) {
 			string = true;
 		}
@@ -3372,7 +3371,7 @@ static Variable exprfunc_notequal(Program *prg, const std::vector<Token> &v)
 	bool string = v[0].type == Token::STRING ? true : false;
 
 	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = prg->variables[v[0].i];
+		Variable var = as_variable_resolve(prg, v[0]);
 		if (IS_STRING(var)) {
 			string = true;
 		}
