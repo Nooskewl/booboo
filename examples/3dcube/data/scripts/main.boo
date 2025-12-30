@@ -235,7 +235,7 @@ function draw
 {
 	clear 100 100 255
 
-	draw_3d verts faces colours normals 12
+	draw_3d (@ verts) (@ faces) (@ colours) (@ normals) 12
 }
 
 function run

@@ -216,7 +216,7 @@ function draw
 	rotate_3d angle 0 1 0
 	translate_3d x (- y 0.1) z
 
-	draw_3d_textured texture positions faces colours normals texcoords 2
+	draw_3d_textured texture (@ positions) (@ faces) (@ colours) (@ normals) (@ texcoords) 2
 
 	var i
 	for i 0 (< i num_billboards) 1 loop

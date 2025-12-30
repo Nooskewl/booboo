@@ -143,7 +143,7 @@ function draw
 	shader_set_float_vector shader "light_pos" light_pos
 	shader_set_colour shader "ground_colour" 255 255 255 255
 
-	draw_3d_textured tex verts faces colours normals texcoords 12
+	draw_3d_textured tex (@ verts) (@ faces) (@ colours) (@ normals) (@ texcoords) 12
 }
 
 function run
