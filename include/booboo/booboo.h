@@ -106,8 +106,8 @@ struct Variable
 	Variable(const Variable &var)
 	{
 		type = var.type;
-		//name = var.name;
-		//obfuscated = var.obfuscated;
+		name = var.name;
+		obfuscated = var.obfuscated;
 		constant = var.constant;
 
 		switch (type) {

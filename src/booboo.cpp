@@ -2297,10 +2297,24 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 
 		if (func.ref[j] && param.type != Token::NUMBER && param.type != Token::STRING && prg->variables[param.i].type != Variable::EXPRESSION) {
 			if (prg->variables[param.i].type == Variable::FISH) {
-				go_fish(prg, prg->variables[param.i].f) = var;
+				Variable &v2 = go_fish(prg, prg->variables[param.i].f);
+				std::string name = v2.name;
+				std::string obfuscated = v2.obfuscated;
+				bool constant = v2.constant;
+			       	v2 = var;
+				v2.name = name;
+				v2.obfuscated = obfuscated;
+				v2.constant = constant;
 			}
 			else {
-				prg->variables[param.i] = var;
+				Variable &v2 = prg->variables[param.i];
+				std::string name = v2.name;
+				std::string obfuscated = v2.obfuscated;
+				bool constant = v2.constant;
+				v2 = var;
+				v2.name = name;
+				v2.obfuscated = obfuscated;
+				v2.constant = constant;
 			}
 		}
 	}
@@ -2823,7 +2837,7 @@ static Variable exprfunc_typeof(Program *prg, const std::vector<Token> &v)
 		}
 	}
 	else {
-		Variable &v1 = prg->variables[v[0].i];
+		Variable v1 = as_variable_resolve(prg, v[0]);
 		res.s = typeof_var(v1);
 	}
 
