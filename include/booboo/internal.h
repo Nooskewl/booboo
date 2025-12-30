@@ -42,6 +42,7 @@ struct Program {
 	bool break_flag;
 	bool continue_flag;
 	Pass complete_pass;
+	int obfuscated_count;
 
 	std::vector<Variable> variables;
 	std::map<std::string, int> variables_map;
