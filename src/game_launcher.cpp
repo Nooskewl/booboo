@@ -443,7 +443,7 @@ void draw_all()
 				shim::font->draw(shim::white, d, {shim::screen_size.w-w-x, y});
 			}
 		}
-		shim::font->draw(shim::black, d, {shim::screen_size.w-w-2, 2});
+		shim::font->draw(shim::black, d, {(float)(shim::screen_size.w-w-2), 2.0});
 	}
 
 	gfx::set_matrices(_mv, _proj);
