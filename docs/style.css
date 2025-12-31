@@ -1,0 +1,39 @@
+html {
+	font-family: sans-serif;
+	background-color: black;
+	color: #aaa;
+	line-height: 1.5;
+	background-image: url("bg.png");
+	background-position: top center;
+	background-repeat: repeat;
+}
+a, a:visited {
+	color: #00d8ff;
+	text-decoration: none;
+}
+h1, h2, h3 {
+	padding: 10px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	background-color: #400036;
+	border: 5px solid #ff00d8;
+	color: #ff00d8;
+	border-radius: 5px;
+}
+::selection {
+	color: white;
+	background-color: #00d8ff;
+}
+#footer {
+	margin-top: 50px;
+	text-align: center;
+}
+#outer {
+	max-width: 100%;
+	width: 1200px;
+	margin-left: auto;
+	margin-right: auto;
+}
+#nooskewl {
+	height: 128px;
+}
