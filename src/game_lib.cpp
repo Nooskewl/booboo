@@ -79,7 +79,6 @@ struct Vertex_Buffer {
 	int num_triangles;
 	bool has_vbo;
 	GLuint vbo;
-	GLuint vao;
 };
 
 struct Vertex_Buffer_Info {
@@ -3887,20 +3886,17 @@ static Variable exprfunc_model_create_vertex_buffer(Program *prg, const std::vec
 
 	if (create_vbo) {
 		vb->has_vbo = true;
-		//glGenVertexArrays_ptr(1, &vb->vao);
-		//PRINT_GL_ERROR("glGenVertexArrays\n");
 		glGenBuffers_ptr(1, &vb->vbo);
 		PRINT_GL_ERROR("glGenBuffers\n");
-		//glBindVertexArray_ptr(vb->vao);
-		//PRINT_GL_ERROR("glBindVertexArray\n");
 		glBindBuffer_ptr(GL_ARRAY_BUFFER, vb->vbo);
 		PRINT_GL_ERROR("glBindBuffer\n");
 		glBufferData_ptr(GL_ARRAY_BUFFER, (GLsizei *)(sizeof(float) * count), vb->v, GL_STATIC_DRAW);
 		PRINT_GL_ERROR("glBufferData\n");
-		//glBindVertexArray_ptr(0);
-		//PRINT_GL_ERROR("glBindVertexArray\n");
 		glBindBuffer_ptr(GL_ARRAY_BUFFER, 0);
 		PRINT_GL_ERROR("glBindBuffer\n");
+
+		delete[] vb->v;
+		vb->v = nullptr;
 	}
 	else {
 		vb->has_vbo = false;
@@ -3937,8 +3933,6 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 	gfx::enable_depth_test(true);
 
 	if (vb->has_vbo) {
-		//glBindVertexArray_ptr(vb->vao);
-		//PRINT_GL_ERROR("glBindVertexArray\n");
 		glBindBuffer_ptr(GL_ARRAY_BUFFER, vb->vbo);
 		PRINT_GL_ERROR("glBindBuffer\n");
 	}
@@ -3948,8 +3942,6 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 	gfx::Vertex_Cache::instance()->end();
 
 	if (vb->has_vbo) {
-		//glBindVertexArray_ptr(0);
-		//PRINT_GL_ERROR("glBindVertexArray\n");
 		glBindBuffer_ptr(GL_ARRAY_BUFFER, 0);
 		PRINT_GL_ERROR("glBindBuffer\n");
 	}
@@ -3985,8 +3977,6 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 	PRINT_GL_ERROR("glTexParameteri\n");
 	
 	if (vb->has_vbo) {
-		//glBindVertexArray_ptr(vb->vao);
-		//PRINT_GL_ERROR("glBindVertexArray\n");
 		glBindBuffer_ptr(GL_ARRAY_BUFFER, vb->vbo);
 		PRINT_GL_ERROR("glBindBuffer\n");
 	}
@@ -3996,8 +3986,6 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 	gfx::Vertex_Cache::instance()->end();
 
 	if (vb->has_vbo) {
-		//glBindVertexArray_ptr(0);
-		//PRINT_GL_ERROR("glBindVertexArray\n");
 		glBindBuffer_ptr(GL_ARRAY_BUFFER, 0);
 		PRINT_GL_ERROR("glBindBuffer\n");
 	}
@@ -5474,6 +5462,7 @@ void game_lib_destroy_program(Program *prg)
 	}
 	Vertex_Buffer_Info *vertex_buffer_i = vertex_buffer_info(prg);
 	for (std::map<int, Vertex_Buffer *>::iterator i = vertex_buffer_i->vertex_buffers.begin(); i != vertex_buffer_i->vertex_buffers.end(); i++) {
+		glDeleteBuffers_ptr(1, &vertex_buffer_i->vertex_buffers[(*i).first]->vbo);
 		delete vertex_buffer_i->vertex_buffers[(*i).first]->v;
 		delete vertex_buffer_i->vertex_buffers[(*i).first];
 	}
