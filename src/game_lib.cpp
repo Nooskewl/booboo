@@ -77,6 +77,9 @@ struct JSON_Info {
 struct Vertex_Buffer {
 	float *v;
 	int num_triangles;
+	bool has_vbo;
+	GLuint vbo;
+	GLuint vao;
 };
 
 struct Vertex_Buffer_Info {
@@ -3809,7 +3812,7 @@ static Variable exprfunc_model_size(Program *prg, const std::vector<Token> &v)
 
 static Variable exprfunc_model_create_vertex_buffer(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(6)
+	MIN_ARGS(6)
 
 	Variable *verts = as_variable(prg, v[0]).p;
 	Variable *faces = as_variable(prg, v[1]).p;
@@ -3817,6 +3820,11 @@ static Variable exprfunc_model_create_vertex_buffer(Program *prg, const std::vec
 	Variable *normals = as_variable(prg, v[3]).p;
 	Variable *texcoords = as_variable(prg, v[4]).p;
 	int num_triangles = as_number(prg, v[5]);
+
+	bool create_vbo = false;
+	if (v.size() > 6) {
+		create_vbo = (bool)as_number(prg, v[6]);
+	}
 
 	Vertex_Buffer_Info *info = vertex_buffer_info(prg);
 
@@ -3877,6 +3885,27 @@ static Variable exprfunc_model_create_vertex_buffer(Program *prg, const std::vec
 		}
 	}
 
+	if (create_vbo) {
+		vb->has_vbo = true;
+		//glGenVertexArrays_ptr(1, &vb->vao);
+		//PRINT_GL_ERROR("glGenVertexArrays\n");
+		glGenBuffers_ptr(1, &vb->vbo);
+		PRINT_GL_ERROR("glGenBuffers\n");
+		//glBindVertexArray_ptr(vb->vao);
+		//PRINT_GL_ERROR("glBindVertexArray\n");
+		glBindBuffer_ptr(GL_ARRAY_BUFFER, vb->vbo);
+		PRINT_GL_ERROR("glBindBuffer\n");
+		glBufferData_ptr(GL_ARRAY_BUFFER, (GLsizei *)(sizeof(float) * count), vb->v, GL_STATIC_DRAW);
+		PRINT_GL_ERROR("glBufferData\n");
+		//glBindVertexArray_ptr(0);
+		//PRINT_GL_ERROR("glBindVertexArray\n");
+		glBindBuffer_ptr(GL_ARRAY_BUFFER, 0);
+		PRINT_GL_ERROR("glBindBuffer\n");
+	}
+	else {
+		vb->has_vbo = false;
+	}
+
 	return v1;
 }
 
@@ -3907,9 +3936,23 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 	gfx::enable_depth_write(true);
 	gfx::enable_depth_test(true);
 
+	if (vb->has_vbo) {
+		//glBindVertexArray_ptr(vb->vao);
+		//PRINT_GL_ERROR("glBindVertexArray\n");
+		glBindBuffer_ptr(GL_ARRAY_BUFFER, vb->vbo);
+		PRINT_GL_ERROR("glBindBuffer\n");
+	}
+
 	gfx::Vertex_Cache::instance()->start();
 	gfx::Vertex_Cache::instance()->cache_3d_immediate(vb->v, vb->num_triangles);
 	gfx::Vertex_Cache::instance()->end();
+
+	if (vb->has_vbo) {
+		//glBindVertexArray_ptr(0);
+		//PRINT_GL_ERROR("glBindVertexArray\n");
+		glBindBuffer_ptr(GL_ARRAY_BUFFER, 0);
+		PRINT_GL_ERROR("glBindBuffer\n");
+	}
 
 	gfx::enable_depth_test(false);
 	gfx::enable_depth_write(false);
@@ -3941,9 +3984,23 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 	glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	PRINT_GL_ERROR("glTexParameteri\n");
 	
+	if (vb->has_vbo) {
+		//glBindVertexArray_ptr(vb->vao);
+		//PRINT_GL_ERROR("glBindVertexArray\n");
+		glBindBuffer_ptr(GL_ARRAY_BUFFER, vb->vbo);
+		PRINT_GL_ERROR("glBindBuffer\n");
+	}
+
 	gfx::Vertex_Cache::instance()->start(image);
 	gfx::Vertex_Cache::instance()->cache_3d_immediate(vb->v, vb->num_triangles);
 	gfx::Vertex_Cache::instance()->end();
+
+	if (vb->has_vbo) {
+		//glBindVertexArray_ptr(0);
+		//PRINT_GL_ERROR("glBindVertexArray\n");
+		glBindBuffer_ptr(GL_ARRAY_BUFFER, 0);
+		PRINT_GL_ERROR("glBindBuffer\n");
+	}
 
 	gfx::enable_depth_test(false);
 	gfx::enable_depth_write(false);
