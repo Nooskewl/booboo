@@ -13,12 +13,11 @@ a, a:visited {
 }
 h1, h2, h3 {
 	padding: 10px;
-	margin-top: 10px;
-	margin-bottom: 10px;
-	background-color: #400036;
-	border: 5px solid #ff00d8;
-	color: #ff00d8;
-	border-radius: 5px;
+	margin-top: 15px;
+	margin-bottom: 15px;
+	background-color: black;
+	color: #ffd800;
+	border: 2px solid #ff00d8;
 }
 ::selection {
 	color: white;
@@ -33,6 +32,9 @@ h1, h2, h3 {
 	width: 1200px;
 	margin-left: auto;
 	margin-right: auto;
+}
+.center {
+	text-align: center;
 }
 #nooskewl {
 	height: 128px;
