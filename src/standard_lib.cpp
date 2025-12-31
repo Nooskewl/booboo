@@ -1273,6 +1273,7 @@ static bool vectorfunc_clear(Program *prg, const std::vector<Token> &v)
 	id.type = Variable::VECTOR;
 
 	id.v.clear();
+	id.v = std::vector<Variable>(); // set capacity to 0 (free memory)
 
 	return true;
 }
