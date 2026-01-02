@@ -3486,13 +3486,7 @@ static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
 	gfx::set_matrices(t, save_p);
 	gfx::update_projection();
 
-	gfx::enable_depth_write(true);
-	gfx::enable_depth_test(true);
-
 	model->model->draw_tinted_textured(c);
-
-	gfx::enable_depth_test(false);
-	gfx::enable_depth_write(false);
 
 	gfx::set_matrices(save_mv, save_p);
 	gfx::update_projection();
@@ -4204,15 +4198,9 @@ static bool billboardfunc_draw(Program *prg, const std::vector<Token> &v)
 	gfx::set_matrices(t, proj);
 	gfx::update_projection();
 	
-	gfx::enable_depth_write(true);
-	gfx::enable_depth_test(true);
-
 	gfx::Vertex_Cache::instance()->start(img);
 	gfx::Vertex_Cache::instance()->cache_3d_immediate(vec, 2);
 	gfx::Vertex_Cache::instance()->end();
-
-	gfx::enable_depth_test(false);
-	gfx::enable_depth_write(false);
 	
 	gfx::set_matrices(mv, proj);
 	gfx::update_projection();
