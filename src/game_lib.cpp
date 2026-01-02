@@ -14,8 +14,8 @@ using namespace booboo;
 static GUI_Transition_Type transition_in_type = TRANSITION_ENLARGE;
 static GUI_Transition_Type transition_out_type = TRANSITION_SHRINK;
 static bool custom_projection_set = false;
-static glm::mat4 custom_mv;
-static glm::mat4 custom_proj;
+static glm::mat4 custom_mv = glm::mat4(1.0f);
+static glm::mat4 custom_proj = glm::mat4(1.0f);
 static int my_scissor[4];
 static bool custom_scissor_set;
 static int my_viewport[4];
@@ -795,15 +795,15 @@ static bool gfxfunc_set_projection(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &mv = as_variable(prg, v[0]);
-	Variable &proj = as_variable(prg, v[1]);
+	Variable mv = as_variable_resolve(prg, v[0]);
+	Variable proj = as_variable_resolve(prg, v[1]);
 
 	CHECK_VECTOR(mv)
 	CHECK_VECTOR(proj)
 
 	glm::mat4 glm_mv = to_glm_mat4(mv);
 	glm::mat4 glm_proj = to_glm_mat4(proj);
-
+	
 	gfx::set_matrices(glm_mv, glm_proj);
 	gfx::update_projection();
 
@@ -3400,7 +3400,7 @@ void set_2d()
 	gfx::apply_screen_shake();
 
 	is_3d = false;
-
+	
 	custom_projection_set = false;
 }
 
@@ -3813,11 +3813,11 @@ static Variable exprfunc_model_create_vertex_buffer(Program *prg, const std::vec
 {
 	MIN_ARGS(6)
 
-	Variable *verts = as_variable(prg, v[0]).p;
-	Variable *faces = as_variable(prg, v[1]).p;
-	Variable *colours = as_variable(prg, v[2]).p;
-	Variable *normals = as_variable(prg, v[3]).p;
-	Variable *texcoords = as_variable(prg, v[4]).p;
+	Variable *verts = as_pointer(prg, v[0]).p;
+	Variable *faces = as_pointer(prg, v[1]).p;
+	Variable *colours = as_pointer(prg, v[2]).p;
+	Variable *normals = as_pointer(prg, v[3]).p;
+	Variable *texcoords = as_pointer(prg, v[4]).p;
 	int num_triangles = as_number(prg, v[5]);
 
 	bool create_vbo = false;
@@ -3919,7 +3919,7 @@ static bool modelfunc_destroy_vertex_buffer(Program *prg, const std::vector<Toke
 	return true;
 }
 
-static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
+static bool modelfunc_draw_vertex_buffer(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
@@ -3928,9 +3928,6 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 	Vertex_Buffer_Info *info = vertex_buffer_info(prg);
 	INFO_EXISTS(info->vertex_buffers, id)
 	Vertex_Buffer *vb = info->vertex_buffers[id];
-
-	gfx::enable_depth_write(true);
-	gfx::enable_depth_test(true);
 
 	if (vb->has_vbo) {
 		glBindBuffer_ptr(GL_ARRAY_BUFFER, vb->vbo);
@@ -3946,13 +3943,10 @@ static bool modelfunc_draw_3d(Program *prg, const std::vector<Token> &v)
 		PRINT_GL_ERROR("glBindBuffer\n");
 	}
 
-	gfx::enable_depth_test(false);
-	gfx::enable_depth_write(false);
-
 	return true;
 }
 
-static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v)
+static bool modelfunc_draw_vertex_buffer_textured(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -3961,9 +3955,6 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 
 	Vertex_Buffer_Info *info = vertex_buffer_info(prg);
 	Vertex_Buffer *vb = info->vertex_buffers[id];
-
-	gfx::enable_depth_write(true);
-	gfx::enable_depth_test(true);
 
 	Image_Info *iinfo = image_info(prg);
 	INFO_EXISTS(iinfo->images, tex)
@@ -3989,9 +3980,6 @@ static bool modelfunc_draw_3d_textured(Program *prg, const std::vector<Token> &v
 		glBindBuffer_ptr(GL_ARRAY_BUFFER, 0);
 		PRINT_GL_ERROR("glBindBuffer\n");
 	}
-
-	gfx::enable_depth_test(false);
-	gfx::enable_depth_write(false);
 
 	glTexParameteri_ptr(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	PRINT_GL_ERROR("glTexParameteri\n");
@@ -5375,8 +5363,8 @@ void start_lib_game()
 	add_expression_handler("model_size", exprfunc_model_size);
 	add_expression_handler("create_vertex_buffer", exprfunc_model_create_vertex_buffer);
 	add_instruction("destroy_vertex_buffer", modelfunc_destroy_vertex_buffer);
-	add_instruction("draw_3d", modelfunc_draw_3d);
-	add_instruction("draw_3d_textured", modelfunc_draw_3d_textured);
+	add_instruction("draw_vertex_buffer", modelfunc_draw_vertex_buffer);
+	add_instruction("draw_vertex_buffer_textured", modelfunc_draw_vertex_buffer_textured);
 	add_expression_handler("model_clone", exprfunc_model_clone);
 	add_expression_handler("billboard_create", exprfunc_billboard_create);
 	add_expression_handler("billboard_from_sprite", exprfunc_billboard_from_sprite);

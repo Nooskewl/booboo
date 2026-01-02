@@ -1,4 +1,4 @@
-Copyright 2022-2025 Nooskewl
+Copyright 2022-2026 Nooskewl
 
 BooBoo is a mini language with a simple, but powerful game API.
 

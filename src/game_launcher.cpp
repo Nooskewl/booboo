@@ -405,8 +405,6 @@ void draw_all()
 {
 	gfx::clear_buffers();
 
-	//gfx::set_cull_mode(gfx::NO_FACE);
-	
 	std::vector<Token> tmp;
 	call_void_function(prg, "draw", tmp);
 

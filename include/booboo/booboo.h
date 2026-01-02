@@ -207,6 +207,7 @@ double as_number(Program *prg, const Token &t);
 std::string as_string(Program *prg, const Token &t);
 int as_label(Program *prg, const Token &t);
 int as_function(Program *prg, const Token &t);
+Variable as_pointer(Program *prg, const Token &t);
 
 // The black box allows you to store anything you want
 void *get_black_box(Program *prg, std::string id);

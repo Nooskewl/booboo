@@ -3636,7 +3636,7 @@ static Variable exprfunc_mul(Program *prg, const std::vector<Token> &v)
 
 glm::mat4 to_glm_mat4(Variable &v)
 {
-	glm::mat4 m;
+	glm::mat4 m = glm::mat4(1.0f);
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			m[i][j] = (float)v.v[i].v[j].n;
@@ -3665,27 +3665,7 @@ Variable from_glm_mat4(glm::mat4 m)
 
 static Variable identity(int sz)
 {
-	Variable var;
-	var.type = Variable::VECTOR;
-
-	for (int c = 0; c < sz; c++) {
-		Variable col;
-		col.type = Variable::VECTOR;
-		for (int r = 0; r < sz; r++) {
-			Variable num;
-			num.type = Variable::NUMBER;
-			if (c == r) {
-				num.n = 1;
-			}
-			else {
-				num.n = 0;
-			}
-			col.v.push_back(num);
-		}
-		var.v.push_back(col);
-	}
-
-	return var;
+	return from_glm_mat4(glm::mat4(1.0f));
 }
 
 static Variable exprfunc_frustum(Program *prg, const std::vector<Token> &v)
@@ -4401,11 +4381,6 @@ Variable &as_variable(Program *prg, const Token &t)
 	if (prg->variables[t.i].type == Variable::FISH) {
 		return go_fish(prg, prg->variables[t.i].f);
 	}
-	else if (prg->variables[t.i].type == Variable::EXPRESSION) {
-		static Variable var;
-		var = evaluate_expression(prg, prg->variables[t.i].e);
-		return var;
-	}
 	return prg->variables[t.i];
 }
 
@@ -4626,6 +4601,22 @@ int as_function(Program *prg, const Token &t)
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 	return v->n;
+}
+
+Variable as_pointer(Program *prg, const Token &t)
+{
+	if (t.type != Token::SYMBOL) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+	}
+	if (prg->variables[t.i].type == Variable::FISH) {
+		return go_fish(prg, prg->variables[t.i].f);
+	}
+	else if (prg->variables[t.i].type == Variable::EXPRESSION) {
+		return evaluate_expression(prg, prg->variables[t.i].e);
+	}
+	else {
+		return prg->variables[t.i];
+	}
 }
 
 // Error class
