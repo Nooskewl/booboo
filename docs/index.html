@@ -646,13 +646,27 @@ Sections:
 <h3>(file_read)</h3>
 <pre>
 	Read a word from a file
+	Returns empty string on eof
 	e.g. = s (file_read f)
 </pre>
 
 <h3>(file_read_line)</h3>
 <pre>
 	Read a line from a file
+	Returns empty string (no newline) on eof
 	e.g. = s (file_read_line f)
+</pre>
+
+<h3>(file_read_byte)</h3>
+<pre>
+	Read a byte from a file. Returns a negative number on eof
+	e.g. = n (file_read_byte f)
+</pre>
+
+<h3>file_write_byte</h3>
+<pre>
+	Write a byte to a file
+	e.g. file_write_byte f 255
 </pre>
 
 <h3>file_write</h3>
