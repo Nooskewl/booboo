@@ -702,6 +702,27 @@ static Variable exprfunc_string_char_at(Program *prg, const std::vector<Token> &
 	return v1;
 }
 
+static bool stringfunc_set_char_at(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	Variable &s = as_variable(prg, v[0]);
+	int index = as_number(prg, v[1]);
+	int value = as_number(prg, v[2]);
+
+	Variable *p;
+	if (v[0].dereference) {
+		p = s.p;
+	}
+	else {
+		p = &s;
+	}
+
+	p->s[index] = value;
+
+	return true;
+}
+
 static Variable exprfunc_string_length(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -1920,6 +1941,7 @@ void start_lib_standard()
 
 	add_expression_handler("string_format", exprfunc_string_format);
 	add_expression_handler("string_char_at", exprfunc_string_char_at);
+	add_instruction("string_set_char_at", stringfunc_set_char_at);
 	add_expression_handler("string_length", exprfunc_string_length);
 	add_expression_handler("string_from_number", exprfunc_string_from_number);
 	add_expression_handler("string_substr", exprfunc_string_substr);
