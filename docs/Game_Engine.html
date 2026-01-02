@@ -207,6 +207,28 @@ The following sections describe the API:
 	e.g. = vec (file_list)
 </pre>
 
+<h3>screenshot</h3>
+<pre>
+	Save a screenshot of the backbuffer. TGA and PNG are supported.
+	The optional boolean toggles whether or not the letterbox is saved
+	(default TRUE)
+	e.g. screenshot "screenshot.png" FALSE
+</pre>
+
+<h3>add_notification</h3>
+<pre>
+	Add a popup notification in the top right of the screen that goes
+	away after a few seconds. This uses the default font named font.ttf.
+	e.g. add_notification "You won!"
+</pre>
+
+<h3>screen_shake</h3>
+<pre>
+	Apply a screen shake effect
+	Currently only works with 2d projection, not after set_3d
+	e.g. screen_shake amount_in_pixels duration_in_millis
+</pre>
+
 <a id="Graphics"></a>
 <h2>Graphics Functions</h2>
 
@@ -268,13 +290,6 @@ The following sections describe the API:
 	e.g. = s (get_scale)
 </pre>
 
-<h3>screen_shake</h3>
-<pre>
-	Apply a screen shake effect
-	Currently only works with 2d projection, not after set_3d
-	e.g. screen_shake amount_in_pixels duration_in_millis
-</pre>
-
 <h3>(is_fullscreen)</h3>
 <pre>
 	Find out if the screen is currently fullscreen
@@ -286,13 +301,6 @@ The following sections describe the API:
 	Change from fullscreen to windowed or vice versa depending on the
 	current windowed/fullscreen state.
 	e.g. toggle_fullscreen
-</pre>
-
-<h3>add_notification</h3>
-<pre>
-	Add a popup notification in the top right of the screen that goes
-	away after a few seconds. This uses the default font named font.ttf.
-	e.g. add_notification "You won!"
 </pre>
 
 <h3>(get_refresh_rate)</h3>
@@ -535,13 +543,6 @@ The following sections describe the API:
 <a id="Image"></a>
 <h2>Image Functions</h2>
 
-<h3>(image_create)</h3>
-<pre>
-	create a render target
-	e.g. = dest (image_create w h)
-	Returns -1 on fail
-</pre>
-
 <h3>set_target</h3>
 <pre>
 	Set the render target. This only works with images created with
@@ -553,6 +554,13 @@ The following sections describe the API:
 <pre>
 	Set the render target to the backbuffer
 	e.g. set_target_backbuffer
+</pre>
+
+<h3>(image_create)</h3>
+<pre>
+	create a render target
+	e.g. = dest (image_create w h)
+	Returns -1 on fail
 </pre>
 
 <h3>(image_load)</h3>
@@ -591,14 +599,6 @@ The following sections describe the API:
 	new one. It's faster.
 	e.g. image_update img v /* v is in the same format as
 	image_read_texture describes */
-</pre>
-
-<h3>screenshot</h3>
-<pre>
-	Save a screenshot of the backbuffer. TGA and PNG are supported.
-	The optional boolean toggles whether or not the letterbox is saved
-	(default TRUE)
-	e.g. screenshot "screenshot.png" FALSE
 </pre>
 
 <h3>image_draw</h3>
