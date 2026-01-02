@@ -4614,6 +4614,9 @@ Variable as_pointer(Program *prg, const Token &t)
 	else if (prg->variables[t.i].type == Variable::EXPRESSION) {
 		return evaluate_expression(prg, prg->variables[t.i].e);
 	}
+	else if (t.dereference) {
+		return *prg->variables[t.i].p;
+	}
 	else {
 		return prg->variables[t.i];
 	}
