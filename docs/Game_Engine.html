@@ -34,6 +34,9 @@ There are 3 optional functions taking/returning no parameters called from the ap
 <li><b>end</b> - called when the program is exiting</li>
 </ul>
 
+<p>Before draw, the backbuffer is cleared to black, the depth buffer is cleared to 1.0
+and the stencil buffer is cleared to 0.</p>
+
 <p>
 There are also GUI callbacks for events and drawing, and a callback for
 generic input events, which are described in the <a href="#GUI">GUI</a> and
