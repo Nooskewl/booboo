@@ -429,6 +429,37 @@ The following sections describe the API:
 	e.g. resize_vertex_cache (* 1024 256)
 </pre>
 
+<h3>create_vertex_buffer</h3>
+<pre>
+	Draw arbitrary 3d geometry
+	All vectors are vectors of numbers
+	e.g., one vertex is 3 numbers, one face is 3 numbers, one colour is 4
+	faces are vertex indices
+	colours are per-face-vertex
+	empty colour vector = white
+	empty normal vector = 0.0
+	Pass vectors as pointers to avoid array copies
+	e.g. = vb (create_vertex_buffer (@ vert_vec) (@ face_vec) (@ colour_vec) (@ normal_vec) (@ texcoord_vec) num_triangles ^ create_fbo)
+</pre>
+
+<h3>destroy_vertex_buffer</h3>
+<pre>
+	Destroy a vertex buffer
+	e.g. destroy_vertex_buffer vb
+</pre>
+
+<h3>draw_vertex_buffer</h3>
+<pre>
+	Draw arbitrary geometry
+	e.g. draw_vertex_buffer vertex_buf
+</pre>
+
+<h3>draw_vertex_buffer_textured</h3>
+<pre>
+	Draw arbitrary textured geometry
+	e.g. draw_vertex_buffer_textured tex vertex_buf texture
+</pre>
+
 <a id="Primitives"></a>
 <h2>Primitive Functions</h2>
 
@@ -1079,37 +1110,6 @@ The following sections describe the API:
 <pre>
 	Translate the modelview matrix
 	e.g. translate_3d x y z
-</pre>
-
-<h3>create_vertex_buffer</h3>
-<pre>
-	Draw arbitrary 3d geometry
-	All vectors are vectors of numbers
-	e.g., one vertex is 3 numbers, one face is 3 numbers, one colour is 4
-	faces are vertex indices
-	colours are per-face-vertex
-	empty colour vector = white
-	empty normal vector = 0.0
-	Pass vectors as pointers to avoid array copies
-	e.g. = vb (create_vertex_buffer (@ vert_vec) (@ face_vec) (@ colour_vec) (@ normal_vec) (@ texcoord_vec) num_triangles ^ create_fbo)
-</pre>
-
-<h3>destroy_vertex_buffer</h3>
-<pre>
-	Destroy a vertex buffer
-	e.g. destroy_vertex_buffer vb
-</pre>
-
-<h3>draw_vertex_buffer</h3>
-<pre>
-	Draw arbitrary geometry
-	e.g. draw_vertex_buffer vertex_buf
-</pre>
-
-<h3>draw_vertex_buffer_textured</h3>
-<pre>
-	Draw arbitrary textured geometry
-	e.g. draw_vertex_buffer_textured tex vertex_buf texture
 </pre>
 
 <h3>(billboard_create)</h3>
