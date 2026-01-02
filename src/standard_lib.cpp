@@ -1350,17 +1350,19 @@ static bool vectorfunc_reserve(Program *prg, const std::vector<Token> &v)
 
 static bool mapfunc_clear(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	MIN_ARGS(1)
 
-	Variable &id = as_variable(prg, v[0]);
+	for (size_t i = 0; i < v.size(); i++) {
+		Variable &id = as_variable(prg, v[i]);
 
-	if (id.constant) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant map at " + get_error_info(prg));
+		if (id.constant) {
+			throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant map at " + get_error_info(prg));
+		}
+
+		id.type = Variable::MAP;
+
+		id.m.clear();
 	}
-
-	id.type = Variable::MAP;
-
-	id.m.clear();
 
 	return true;
 }
