@@ -6,6 +6,8 @@ var shader
 = shader (shader_load "lit_3d_vertex" "lit_3d_fragment")
 
 set_3d
+enable_depth_test TRUE
+enable_depth_write TRUE
 
 var start_light_pos light_pos
 vector_init start_light_pos 0 0 0 1

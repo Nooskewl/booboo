@@ -18,6 +18,8 @@ for i 0 (< i num_billboards) 1 loop
 :loop
 	
 set_3d
+enable_depth_test TRUE
+enable_depth_write TRUE
 
 var angle
 = angle 0

@@ -5,6 +5,8 @@ var model
 = model (model_load "nooskewl.x")
 
 set_3d
+enable_depth_test TRUE
+enable_depth_write TRUE
 
 var rx rz count
 = rx 0

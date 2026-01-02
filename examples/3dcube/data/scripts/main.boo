@@ -189,12 +189,14 @@ var rx ry
 = ry 0
 
 set_3d
+enable_depth_test TRUE
+enable_depth_write TRUE
 
 function draw
 {
 	clear 100 100 255
 
-	draw_3d vertex_buffer
+	draw_vertex_buffer vertex_buffer
 }
 
 function run

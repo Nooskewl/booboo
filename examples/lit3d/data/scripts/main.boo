@@ -96,6 +96,8 @@ var vertex_buffer
 = vertex_buffer (create_vertex_buffer (@ verts) (@ faces) (@ colours) (@ normals) (@ texcoords) 12)
 
 set_3d
+enable_depth_test TRUE
+enable_depth_write TRUE
 
 var light_pos
 vector_init light_pos 0 100 0
@@ -108,7 +110,7 @@ function draw
 	shader_set_float_vector shader "light_pos" light_pos
 	shader_set_colour shader "ground_colour" 255 255 255 255
 
-	draw_3d_textured vertex_buffer tex
+	draw_vertex_buffer_textured vertex_buffer tex
 }
 
 function run
