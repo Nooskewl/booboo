@@ -3564,37 +3564,6 @@ static bool modelfunc_translate(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static Variable exprfunc_model_get_position(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-
-	int model_id = as_number(prg, v[0]);
-
-	Variable x;
-	x.type = Variable::NUMBER;
-	Variable y;
-	y.type = Variable::NUMBER;
-	Variable z;
-	z.type = Variable::NUMBER;
-
-	Model_Info *info = model_info(prg);
-	INFO_EXISTS(info->models, model_id)
-	Model *model = info->models[model_id];
-
-	glm::vec3 pos = glm::vec3(model->mat[3]);
-	x.n = pos.x;
-	y.n = pos.y;
-	z.n = pos.z;
-
-	Variable vec;
-	vec.type = Variable::VECTOR;
-	vec.v.push_back(x);
-	vec.v.push_back(y);
-	vec.v.push_back(z);
-
-	return vec;
-}
-
 static bool modelfunc_identity_3d(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -5340,7 +5309,6 @@ void start_lib_game()
 	add_instruction("model_scale", modelfunc_scale);
 	add_instruction("model_rotate", modelfunc_rotate);
 	add_instruction("model_translate", modelfunc_translate);
-	add_expression_handler("model_get_position", exprfunc_model_get_position);
 	add_instruction("identity_3d", modelfunc_identity_3d);
 	add_instruction("scale_3d", modelfunc_scale_3d);
 	add_instruction("rotate_3d", modelfunc_rotate_3d);
