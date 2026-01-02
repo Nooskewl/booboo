@@ -1446,9 +1446,40 @@ static Variable exprfunc_file_read_line(Program *prg, const std::vector<Token> &
 	}
 	else {
 		std::getline(*info->files[id], var.s);
+		var.s += "\n";
 	}
 
 	return var;
+}
+
+static Variable exprfunc_file_read_byte(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number(prg, v[0]);
+
+	Variable var;
+	var.type = Variable::NUMBER;
+
+	File_Info *info = file_info(prg);
+
+	var.n = info->files[id]->get();
+
+	return var;
+}
+
+static bool filefunc_write_byte(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	int b = as_number(prg, v[1]);
+
+	File_Info *info = file_info(prg);
+
+	info->files[id]->put(b);
+
+	return true;
 }
 
 static bool filefunc_write(Program *prg, const std::vector<Token> &v)
@@ -1938,6 +1969,8 @@ void start_lib_standard()
 	add_instruction("file_close", filefunc_close);
 	add_expression_handler("file_read", exprfunc_file_read);
 	add_expression_handler("file_read_line", exprfunc_file_read_line);
+	add_expression_handler("file_read_byte", exprfunc_file_read_byte);
+	add_instruction("file_write_byte", filefunc_write_byte);
 	add_instruction("file_write", filefunc_write);
 	add_instruction("file_print", filefunc_print);
 	
