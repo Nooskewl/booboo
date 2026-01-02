@@ -814,6 +814,34 @@ static Variable exprfunc_string_trim(Program *prg, const std::vector<Token> &v)
 	return v1;
 }
 
+static Variable exprfunc_string_ltrim(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable v1;
+	v1.type = Variable::STRING;
+
+	std::string str = as_string(prg, v[0]);
+
+	v1.s = util::ltrim(str);
+
+	return v1;
+}
+
+static Variable exprfunc_string_rtrim(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable v1;
+	v1.type = Variable::STRING;
+
+	std::string str = as_string(prg, v[0]);
+
+	v1.s = util::rtrim(str);
+
+	return v1;
+}
+
 static Variable exprfunc_string_replace(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
@@ -1283,18 +1311,20 @@ static bool vectorfunc_erase(Program *prg, const std::vector<Token> &v)
 
 static bool vectorfunc_clear(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	MIN_ARGS(1)
 
-	Variable &id = as_variable(prg, v[0]);
+	for (size_t i = 0; i < v.size(); i++) {
+		Variable &id = as_variable(prg, v[i]);
 
-	if (id.constant) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
+		if (id.constant) {
+			throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
+		}
+
+		id.type = Variable::VECTOR;
+
+		id.v.clear();
+		id.v = std::vector<Variable>(); // set capacity to 0 (free memory)
 	}
-
-	id.type = Variable::VECTOR;
-
-	id.v.clear();
-	id.v = std::vector<Variable>(); // set capacity to 0 (free memory)
 
 	return true;
 }
@@ -1948,6 +1978,8 @@ void start_lib_standard()
 	add_expression_handler("string_uppercase", exprfunc_string_uppercase);
 	add_expression_handler("string_lowercase", exprfunc_string_lowercase);
 	add_expression_handler("string_trim", exprfunc_string_trim);
+	add_expression_handler("string_ltrim", exprfunc_string_ltrim);
+	add_expression_handler("string_rtrim", exprfunc_string_rtrim);
 	add_expression_handler("string_replace", exprfunc_string_replace);
 	add_expression_handler("string_match", exprfunc_string_match);
 	add_expression_handler("string_matches", exprfunc_string_matches);
