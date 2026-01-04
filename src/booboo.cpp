@@ -24,6 +24,10 @@ static std::vector<std::string> special_functions;
 
 int num_ops = 0;
 
+#ifdef CLI
+extern std::vector<std::string> cli_args;
+#endif
+
 // First off maybe 10 utility functions taken from Nooskewl Shim
 
 static void skip_whitespace(booboo::Program *prg)
@@ -3013,6 +3017,25 @@ static bool corefunc_explode(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+#ifdef CLI
+static Variable exprfunc_get_args(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	Variable vec;
+	vec.type = Variable::VECTOR;
+
+	for (int i = 0; i < cli_args.size(); i++) {
+		Variable v1;
+		v1.type = Variable::STRING;
+		v1.s = cli_args[i];
+		vec.v.push_back(v1);
+	}
+
+	return vec;
+}
+#endif
+
 static Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 {
 	Variable ret;
@@ -4154,6 +4177,10 @@ void start()
 	add_instruction("srand", corefunc_srand);
 	add_expression_handler("rand", exprfunc_rand);
 	add_instruction("explode", corefunc_explode);
+	
+#ifdef CLI
+	add_expression_handler("get_args", exprfunc_get_args);
+#endif
 	
 	return_code = 0;
 }

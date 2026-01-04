@@ -16,6 +16,8 @@ using namespace noo;
 
 booboo::Program *prg;
 
+std::vector<std::string> cli_args;
+
 static std::string load_text_from_filesystem(std::string filename)
 {
 	int _sz;
@@ -53,6 +55,10 @@ static std::string load_text_from_filesystem(std::string filename)
 
 int main(int argc, char **argv)
 {
+	for (int i = 0 ; i < argc; i++) {
+		cli_args.push_back(argv[i]);
+	}
+
 	shim::organisation_name = "Nooskewl";
 	shim::game_name = "BooBoo";
 
