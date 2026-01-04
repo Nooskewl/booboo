@@ -1738,16 +1738,26 @@ static bool filefunc_print(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool twinklefunc_colour(Program *prg, const std::vector<Token> &v)
+static bool twinklefunc_text_fore(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(4)
+	COUNT_ARGS(2)
 
-	int fore = as_number(prg, v[0]);
-	int fore_b = as_number(prg, v[1]);
-	int back = as_number(prg, v[2]);
-	int back_b = as_number(prg, v[3]);
+	int c = as_number(prg, v[0]);
+	int c_b = as_number(prg, v[1]);
 
-	twinkle::set((twinkle::TWINKLE_COLOR)fore, fore_b, (twinkle::TWINKLE_COLOR)back, back_b);
+	twinkle::set_fore((twinkle::TWINKLE_COLOR)c, c_b);
+
+	return true;
+}
+
+static bool twinklefunc_text_back(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int c = as_number(prg, v[0]);
+	int c_b = as_number(prg, v[1]);
+
+	twinkle::set_back((twinkle::TWINKLE_COLOR)c, c_b);
 
 	return true;
 }
@@ -2030,7 +2040,8 @@ void start_lib_standard()
 	add_instruction("file_write", filefunc_write);
 	add_instruction("file_print", filefunc_print);
 	
-	add_instruction("text_colour", twinklefunc_colour);
+	add_instruction("text_fore", twinklefunc_text_fore);
+	add_instruction("text_back", twinklefunc_text_back);
 	add_instruction("text_reset", twinklefunc_reset);
 	add_expression_handler("getch", exprfunc_twinkle_getch);
 	add_instruction("text_clear", twinklefunc_clear);

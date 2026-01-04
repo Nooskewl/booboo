@@ -833,19 +833,18 @@ Sections:
 	e.g. = v (get_args)
 </pre>
 
-<h3>text_colour</h3>
+<h3>text_fore</h3>
 <pre>
-	Change the text colour. Colour constants are:
-		BLACK
-		BLUE
-		GREEN
-		CYAN
-		RED
-		PURPLE
-		YELLOW
-		WHITE
+	Change the text foreground colour. See constants for colours.
 	Each colour has a bright version toggleable by a boolean.
-	e.g. text_colour BLACK 0 WHITE 1 ; fore fore_bright back back_bright
+	e.g. text_fore RED TRUE
+</pre>
+
+<h3>text_back</h3>
+<pre>
+	Change the text background colour. See constants for colours.
+	Each colour has a bright version toggleable by a boolean.
+	e.g. text_back WHITE FALSE
 </pre>
 
 <h3>text_reset</h3>
