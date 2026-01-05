@@ -406,6 +406,29 @@ static bool gfxfunc_unset_scissor(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static Variable exprfunc_gfx_get_scissor(Program *prg, const std::vector<Token> &v)
+{
+	Variable vec;
+	vec.type = Variable::VECTOR;
+
+	int x, y, w, h;
+	gfx::get_scissor(x, y, w, h);
+
+	Variable var;
+	var.type = Variable::NUMBER;
+	
+	var.n = x;
+	vec.v.push_back(var);
+	var.n = y;
+	vec.v.push_back(var);
+	var.n = w;
+	vec.v.push_back(var);
+	var.n = h;
+	vec.v.push_back(var);
+
+	return vec;
+}
+
 static bool gfxfunc_set_viewport(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(4)
@@ -427,6 +450,29 @@ static bool gfxfunc_unset_viewport(Program *prg, const std::vector<Token> &v)
 	gfx::unset_viewport();
 
 	return true;
+}
+
+static Variable exprfunc_gfx_get_viewport(Program *prg, const std::vector<Token> &v)
+{
+	Variable vec;
+	vec.type = Variable::VECTOR;
+
+	int x, y, w, h;
+	gfx::get_viewport(x, y, w, h);
+
+	Variable var;
+	var.type = Variable::NUMBER;
+	
+	var.n = x;
+	vec.v.push_back(var);
+	var.n = y;
+	vec.v.push_back(var);
+	var.n = w;
+	vec.v.push_back(var);
+	var.n = h;
+	vec.v.push_back(var);
+
+	return vec;
 }
 
 static bool gfxfunc_clear(Program *prg, const std::vector<Token> &v)
@@ -5266,8 +5312,10 @@ void start_lib_game()
 	add_expression_handler("get_refresh_rate", exprfunc_gfx_get_refresh_rate);
 	add_instruction("set_scissor", gfxfunc_set_scissor);
 	add_instruction("unset_scissor", gfxfunc_unset_scissor);
+	add_expression_handler("get_scissor", exprfunc_gfx_get_scissor);
 	add_instruction("set_viewport", gfxfunc_set_viewport);
 	add_instruction("unset_viewport", gfxfunc_unset_viewport);
+	add_expression_handler("get_viewport", exprfunc_gfx_get_viewport);
 	add_instruction("set_blend_mode", gfxfunc_set_blend_mode);
 	add_instruction("clear_depth_buffer", gfxfunc_clear_depth_buffer);
 	add_instruction("clear_stencil_buffer", gfxfunc_clear_stencil_buffer);
