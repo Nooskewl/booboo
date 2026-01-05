@@ -1486,10 +1486,10 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "TRANSITION_SLIDE", TRANSITION_SLIDE, pass, var_i);
 	insert_constant(prg, "TRANSITION_SLIDE_VERTICAL", TRANSITION_SLIDE_VERTICAL, pass, var_i);
 	insert_constant(prg, "TRANSITION_FADE", TRANSITION_FADE, pass, var_i);
-	insert_constant(prg, "BAR_TOP", gfx::BAR_TOP, pass, var_i);
-	insert_constant(prg, "BAR_BOTTOM", gfx::BAR_BOTTOM, pass, var_i);
-	insert_constant(prg, "BAR_LEFT", gfx::BAR_LEFT, pass, var_i);
-	insert_constant(prg, "BAR_RIGHT", gfx::BAR_RIGHT, pass, var_i);
+	insert_constant(prg, "LETTERBOX_TOP", gfx::LETTERBOX_TOP, pass, var_i);
+	insert_constant(prg, "LETTERBOX_BOTTOM", gfx::LETTERBOX_BOTTOM, pass, var_i);
+	insert_constant(prg, "LETTERBOX_LEFT", gfx::LETTERBOX_LEFT, pass, var_i);
+	insert_constant(prg, "LETTERBOX_RIGHT", gfx::LETTERBOX_RIGHT, pass, var_i);
 	insert_constant(prg, "BLEND_ZERO", gfx::BLEND_ZERO, pass, var_i);
 	insert_constant(prg, "BLEND_ONE", gfx::BLEND_ONE, pass, var_i);
 	insert_constant(prg, "BLEND_SRCCOLOR", gfx::BLEND_SRCCOLOR, pass, var_i);

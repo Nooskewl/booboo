@@ -50,7 +50,7 @@ There is another global callback you can define, draw_letterbox
 	function draw_letterbox type x y w h
 </pre>
 <p>x, y are the top left coordinate of where to draw, w/h are the width and
-height in pixels. See BAR_* in constants for the bar types. This is used to
+height in pixels. See LETTERBOX_* in constants for the bar types. This is used to
 draw a custom letterbox when the window size and aspect ratio you requested don't
 match. A default letterbox will be drawn in case you don't draw anything.
 </p>
@@ -1992,13 +1992,13 @@ GUI constants:
 	<li>TRANSITION_FADE</li>
 </ul>
 
-<p>For drawing custom black bars:</p>
+<p>For drawing custom letterbox:</p>
 
 <ul>
-	<li>BAR_TOP</li>
-	<li>BAR_BOTTOM</li>
-	<li>BAR_LEFT</li>
-	<li>BAR_RIGHT</li>
+	<li>LETTERBOX_TOP</li>
+	<li>LETTERBOX_BOTTOM</li>
+	<li>LETTERBOX_LEFT</li>
+	<li>LETTERBOX_RIGHT</li>
 </ul>
 
 <p>For set_blend_mode:</p>

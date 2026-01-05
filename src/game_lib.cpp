@@ -5307,7 +5307,7 @@ static void letterbox_callback(gfx::Letterbox_Type type, int x, int y, int w, in
 
 	// draw a default
 	switch (type) {
-		case gfx::BAR_TOP:
+		case gfx::LETTERBOX_TOP:
 			c[0].r = 255;
 			c[0].g = 0;
 			c[0].b = 216;
@@ -5325,7 +5325,7 @@ static void letterbox_callback(gfx::Letterbox_Type type, int x, int y, int w, in
 			c[3].b = 0;
 			c[3].a = 255;
 			break;
-		case gfx::BAR_BOTTOM:
+		case gfx::LETTERBOX_BOTTOM:
 			c[0].r = 0;
 			c[0].g = 0;
 			c[0].b = 0;
@@ -5343,7 +5343,7 @@ static void letterbox_callback(gfx::Letterbox_Type type, int x, int y, int w, in
 			c[3].b = 216;
 			c[3].a = 255;
 			break;
-		case gfx::BAR_LEFT:
+		case gfx::LETTERBOX_LEFT:
 			c[0].r = 255;
 			c[0].g = 0;
 			c[0].b = 216;
@@ -5361,7 +5361,7 @@ static void letterbox_callback(gfx::Letterbox_Type type, int x, int y, int w, in
 			c[3].b =  216;
 			c[3].a = 255;
 			break;
-		case gfx::BAR_RIGHT:
+		case gfx::LETTERBOX_RIGHT:
 			c[0].r = 0;
 			c[0].g = 0;
 			c[0].b = 0;
