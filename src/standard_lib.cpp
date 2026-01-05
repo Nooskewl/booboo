@@ -496,6 +496,68 @@ static Variable exprfunc_list_directory(Program *prg, const std::vector<Token> &
 	return vec;
 }
 
+static void quicksort(Program *prg, int func, Variable *vec, int start, int pivot)
+{
+	if (start >= pivot) {
+		return;
+	}
+	int save = pivot;
+	for (int i = start; i < pivot; i++) {
+		int i1 = prg->variables_map["__tmp0"];
+		int i2 = prg->variables_map["__tmp1"];
+		Variable &v1 = get_variable(prg, i1);
+		Variable &v2 = get_variable(prg, i2);
+		v1 = vec->v[i];
+		v2 = vec->v[pivot];
+		std::vector<Token> params;
+		Token t;
+		t.type = Token::SYMBOL;
+		t.i = i1;
+		params.push_back(t);
+		t.i = i2;
+		params.push_back(t);
+		Variable result;
+		call_function(prg, func, params, result, 0);
+		if (result.n == false) {
+			Variable v = vec->v[i];
+			vec->v.erase(vec->v.begin()+i);
+			vec->v.insert(vec->v.begin()+pivot, v);
+			pivot--;
+			i--;
+		}
+	}
+	quicksort(prg, func, vec, start, pivot-1);
+	quicksort(prg, func, vec, pivot+1, save);
+}
+
+static bool corefunc_sort(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable *vec = as_pointer(prg, v[0]).p;
+	int func = as_function(prg, v[1]);
+
+	if (vec->v.size() <= 1) {
+		return true;
+	}
+
+	quicksort(prg, func, vec, 0, vec->v.size()-1);
+
+	return true;
+}
+
+static bool corefunc_unique(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	Variable *vec = as_pointer(prg, v[0]).p;
+
+	auto last = std::unique(vec->v.begin(), vec->v.end());
+	vec->v.erase(last, vec->v.end());
+
+	return true;
+}
+
 static Variable exprfunc_string_format(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
@@ -1980,6 +2042,8 @@ void start_lib_standard()
 	add_expression_handler("get_system_language", exprfunc_get_system_language);
 	add_expression_handler("get_full_path", exprfunc_get_full_path);
 	add_expression_handler("list_drives", exprfunc_list_drives);
+	add_instruction("sort", corefunc_sort);
+	add_instruction("unique", corefunc_unique);
 
 	add_expression_handler("string_format", exprfunc_string_format);
 	add_expression_handler("string_char_at", exprfunc_string_char_at);

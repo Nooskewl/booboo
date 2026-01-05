@@ -1519,6 +1519,22 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "FACE_CCW", gfx::FACE_CCW, pass, var_i);
 #endif
 
+	for (int i = 0; i < 100; i++) {
+		std::string name = "__tmp" + util::itos(i);
+		int var_index = var_i;
+		var_i++;
+		if (pass == PASS2) {
+			prg->variables_map[name] = var_index;
+		}
+		Variable v;
+		v.name = name;
+		v.type = Variable::UNTYPED;
+		v.obfuscated = name;
+		if (pass == PASS1) {
+			prg->variables.push_back(v);
+		}
+	}
+
 	bool _is_deref = false;
 
 	while ((tok = token(prg, tt)) != "") {

@@ -103,6 +103,32 @@ struct Variable
 
 	bool constant;
 
+	bool operator==(const Variable &var) const
+	{
+		if (type != var.type) {
+			return false;
+		}
+
+		switch (type) {
+			case NUMBER:
+			case FUNCTION:
+			case LABEL:
+				return n == var.n;
+			case STRING:
+				return s == var.s;
+			case VECTOR:
+				return v == var.v;
+			case MAP:
+				return m == var.m;
+			case POINTER:
+				return p == var.p;
+			default:
+				return false;
+		}
+
+		return false;
+	}
+
 	Variable(const Variable &var)
 	{
 		type = var.type;
