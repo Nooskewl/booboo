@@ -856,6 +856,20 @@ static bool gfxfunc_set_default_projection(Program *prg, const std::vector<Token
 	return true;
 }
 
+static Variable exprfunc_gfx_get_projection(Program *prg, const std::vector<Token> &v)
+{
+	Variable vec;
+	vec.type = Variable::VECTOR;
+
+	glm::mat4 mv, proj;
+	gfx::get_matrices(mv, proj);
+
+	vec.v.push_back(from_glm_mat4(mv));
+	vec.v.push_back(from_glm_mat4(proj));
+
+	return vec;
+}
+
 static bool gfxfunc_resize_vertex_cache(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -5331,6 +5345,7 @@ void start_lib_game()
 	add_instruction("enable_colour_write", gfxfunc_enable_colour_write);
 	add_instruction("set_projection", gfxfunc_set_projection);
 	add_instruction("set_default_projection", gfxfunc_set_default_projection);
+	add_expression_handler("get_projection", exprfunc_gfx_get_projection);
 	add_instruction("resize_vertex_cache", gfxfunc_resize_vertex_cache);
 	add_expression_handler("is_colour_write_enabled", exprfunc_gfx_is_colour_write_enabled);
 	add_expression_handler("is_stencil_enabled", exprfunc_gfx_is_stencil_enabled);
