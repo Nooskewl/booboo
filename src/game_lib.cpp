@@ -821,6 +821,46 @@ static bool gfxfunc_resize_vertex_cache(Program *prg, const std::vector<Token> &
 	return true;
 }
 
+static Variable exprfunc_gfx_is_colour_write_enabled(Program *prg, const std::vector<Token> &v)
+{
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = gfx::is_colour_write_enabled();
+	return var;
+}
+
+static Variable exprfunc_gfx_is_stencil_enabled(Program *prg, const std::vector<Token> &v)
+{
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = gfx::is_stencil_enabled();
+	return var;
+}
+
+static Variable exprfunc_gfx_is_two_sided_stencil_enabled(Program *prg, const std::vector<Token> &v)
+{
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = gfx::is_two_sided_stencil_enabled();
+	return var;
+}
+
+static Variable exprfunc_gfx_is_depth_test_enabled(Program *prg, const std::vector<Token> &v)
+{
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = gfx::is_depth_test_enabled();
+	return var;
+}
+
+static Variable exprfunc_gfx_is_depth_write_enabled(Program *prg, const std::vector<Token> &v)
+{
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = gfx::is_depth_write_enabled();
+	return var;
+}
+
 static bool primfunc_start_primitives(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -5244,6 +5284,11 @@ void start_lib_game()
 	add_instruction("set_projection", gfxfunc_set_projection);
 	add_instruction("set_default_projection", gfxfunc_set_default_projection);
 	add_instruction("resize_vertex_cache", gfxfunc_resize_vertex_cache);
+	add_expression_handler("is_colour_write_enabled", exprfunc_gfx_is_colour_write_enabled);
+	add_expression_handler("is_stencil_enabled", exprfunc_gfx_is_stencil_enabled);
+	add_expression_handler("is_two_sided_stencil_enabled", exprfunc_gfx_is_two_sided_stencil_enabled);
+	add_expression_handler("is_depth_test_enabled", exprfunc_gfx_is_depth_test_enabled);
+	add_expression_handler("is_depth_write_enabled", exprfunc_gfx_is_depth_write_enabled);
 	add_instruction("start_primitives", primfunc_start_primitives);
 	add_instruction("end_primitives", primfunc_end_primitives);
 	add_instruction("line", primfunc_line);
