@@ -20,7 +20,7 @@ function draw_letterbox type x y w h
 	
 	var xx yy
 
-	if (== type BAR_TOP) top (== type BAR_BOTTOM) bottom (== type BAR_LEFT) left right
+	if (== type LETTERBOX_TOP) top (== type LETTERBOX_BOTTOM) bottom (== type LETTERBOX_LEFT) left right
 		= xx (neg (/ (- (* (+ (floor (/ w (* h_w scale))) 1) (* h_w scale)) 2)))
 		= yy (- (+ y h) (* h_h scale))
 		image_start ih
