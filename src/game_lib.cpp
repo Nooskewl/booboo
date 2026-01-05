@@ -929,6 +929,130 @@ static Variable exprfunc_gfx_is_depth_write_enabled(Program *prg, const std::vec
 	return var;
 }
 
+static Variable exprfunc_gfx_get_blend_mode(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	Variable vec;
+	vec.type = Variable::VECTOR;
+
+	gfx::Blend_Mode src, dst;
+	gfx::get_blend_mode(src, dst);
+
+	Variable var;
+	var.type = Variable::NUMBER;
+
+	var.n = src;
+	vec.v.push_back(var);
+	var.n = dst;
+	vec.v.push_back(var);
+
+	return vec;
+}
+
+static Variable exprfunc_gfx_get_depth_mode(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	gfx::Compare_Func f = gfx::get_depth_mode();
+
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = f;
+
+	return var;
+}
+
+static Variable exprfunc_gfx_get_stencil_mode(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	Variable vec;
+	vec.type = Variable::VECTOR;
+
+	gfx::Compare_Func f;
+	gfx::Stencil_Op fail, zfail, pass;
+	int ref, mask;
+
+	gfx::get_stencil_mode(f, fail, zfail, pass, ref, mask);
+
+	Variable var;
+	var.type = Variable::NUMBER;
+
+	var.n = f;
+	vec.v.push_back(var);
+	var.n = fail;
+	vec.v.push_back(var);
+	var.n = zfail;
+	vec.v.push_back(var);
+	var.n = pass;
+	vec.v.push_back(var);
+	var.n = ref;
+	vec.v.push_back(var);
+	var.n = mask;
+	vec.v.push_back(var);
+
+	return vec;
+}
+
+static Variable exprfunc_gfx_get_stencil_mode_backfaces(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	Variable vec;
+	vec.type = Variable::VECTOR;
+
+	gfx::Compare_Func f;
+	gfx::Stencil_Op fail, zfail, pass;
+	int ref, mask;
+
+	gfx::get_stencil_mode_backfaces(f, fail, zfail, pass, ref, mask);
+
+	Variable var;
+	var.type = Variable::NUMBER;
+
+	var.n = f;
+	vec.v.push_back(var);
+	var.n = fail;
+	vec.v.push_back(var);
+	var.n = zfail;
+	vec.v.push_back(var);
+	var.n = pass;
+	vec.v.push_back(var);
+	var.n = ref;
+	vec.v.push_back(var);
+	var.n = mask;
+	vec.v.push_back(var);
+
+	return vec;
+}
+
+static Variable exprfunc_gfx_get_front_face(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	gfx::Front_Face f = gfx::get_front_face();
+
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = f;
+
+	return var;
+}
+
+static Variable exprfunc_gfx_get_cull_mode(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	gfx::Faces f = gfx::get_cull_mode();
+
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = f;
+
+	return var;
+}
+
 static bool primfunc_start_primitives(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -5360,6 +5484,12 @@ void start_lib_game()
 	add_expression_handler("is_two_sided_stencil_enabled", exprfunc_gfx_is_two_sided_stencil_enabled);
 	add_expression_handler("is_depth_test_enabled", exprfunc_gfx_is_depth_test_enabled);
 	add_expression_handler("is_depth_write_enabled", exprfunc_gfx_is_depth_write_enabled);
+	add_expression_handler("get_blend_mode", exprfunc_gfx_get_blend_mode);
+	add_expression_handler("get_depth_mode", exprfunc_gfx_get_depth_mode);
+	add_expression_handler("get_stencil_mode", exprfunc_gfx_get_stencil_mode);
+	add_expression_handler("get_stencil_mode_backfaces", exprfunc_gfx_get_stencil_mode_backfaces);
+	add_expression_handler("get_front_face", exprfunc_gfx_get_front_face);
+	add_expression_handler("get_cull_mode", exprfunc_gfx_get_cull_mode);
 	add_instruction("start_primitives", primfunc_start_primitives);
 	add_instruction("end_primitives", primfunc_end_primitives);
 	add_instruction("line", primfunc_line);
