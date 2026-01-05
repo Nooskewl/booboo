@@ -9,6 +9,9 @@ play_mml is an MML music/SFX player.
 
 prune_sprite_json keeps only the required info in Aseprite sprite exports
 
+convert_model converts ascii .x models to binary .nsm models which are faster to
+load and smaller
+
 io_scene_goobliata_x - Blender 2.78 model import/exporter
 
 Some of these tools need SDL3.dll and SDL3_ttf.dll, located in the root of the

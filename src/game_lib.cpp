@@ -16,10 +16,6 @@ static GUI_Transition_Type transition_out_type = TRANSITION_SHRINK;
 static bool custom_projection_set = false;
 static glm::mat4 custom_mv = glm::mat4(1.0f);
 static glm::mat4 custom_proj = glm::mat4(1.0f);
-static int my_scissor[4];
-static bool custom_scissor_set;
-static int my_viewport[4];
-static bool custom_viewport_set;
 
 extern bool quit;
 extern Program *prg;
@@ -398,12 +394,6 @@ static bool gfxfunc_set_scissor(Program *prg, const std::vector<Token> &v)
 
 	gfx::set_scissor(x, y, w, h);
 
-	custom_scissor_set = true;
-	my_scissor[0] = x;
-	my_scissor[1] = y;
-	my_scissor[2] = w;
-	my_scissor[3] = h;
-
 	return true;
 }
 
@@ -413,8 +403,6 @@ static bool gfxfunc_unset_scissor(Program *prg, const std::vector<Token> &v)
 
 	gfx::unset_scissor();
 	
-	custom_scissor_set = false;
-
 	return true;
 }
 
@@ -429,12 +417,6 @@ static bool gfxfunc_set_viewport(Program *prg, const std::vector<Token> &v)
 
 	gfx::set_viewport(x, y, w, h);
 
-	custom_viewport_set = true;
-	my_viewport[0] = x;
-	my_viewport[1] = y;
-	my_viewport[2] = w;
-	my_viewport[3] = h;
-
 	return true;
 }
 
@@ -443,8 +425,6 @@ static bool gfxfunc_unset_viewport(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(0)
 
 	gfx::unset_viewport();
-
-	custom_viewport_set = false;
 
 	return true;
 }
@@ -5138,12 +5118,6 @@ static void found_device_callback()
 		else {
 			set_2d();
 		}
-	}
-	if (custom_scissor_set) {
-		gfx::set_scissor(my_scissor[0], my_scissor[1], my_scissor[2], my_scissor[3]);
-	}
-	if (custom_viewport_set) {
-		gfx::set_viewport(my_viewport[0], my_viewport[1], my_viewport[2], my_viewport[3]);
 	}
 }
 
