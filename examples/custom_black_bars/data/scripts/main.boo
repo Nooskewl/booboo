@@ -10,7 +10,7 @@ explode (image_size iv) v_w v_h
 explode (image_size ih) h_w h_h
 explode (image_size it) t_w t_h
 
-function draw_black_bar type x y w h
+function draw_letterbox type x y w h
 {
 	var scale
 	= scale 3

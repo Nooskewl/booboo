@@ -1682,12 +1682,12 @@ static bool imagefunc_screenshot(Program *prg, const std::vector<Token> &v)
 
 	util::Size<int> size;
 
-	bool include_black_bars = true;
+	bool include_letterbox = true;
 	if (v.size() > 1) {
-		include_black_bars = as_number(prg, v[1]);
+		include_letterbox = as_number(prg, v[1]);
 	}
 
-	unsigned char *buf = gfx::Image::read_backbuffer(include_black_bars, &size.w, &size.h);
+	unsigned char *buf = gfx::Image::read_backbuffer(include_letterbox, &size.w, &size.h);
 
 	if (buf != nullptr) {
 		if (filename.find(".tga") != std::string::npos) {
@@ -5297,7 +5297,7 @@ static bool widgetfunc_gui_set_transition_types(Program *prg, const std::vector<
 	return true;
 }
 
-static void black_bars_callback(gfx::Black_Bar_Type type, int x, int y, int w, int h)
+static void letterbox_callback(gfx::Letterbox_Type type, int x, int y, int w, int h)
 {
 	if (prg == nullptr) {
 		return;
@@ -5398,7 +5398,7 @@ static void black_bars_callback(gfx::Black_Bar_Type type, int x, int y, int w, i
 	v.push_back(t);
 	t.n = h;
 	v.push_back(t);
-	call_void_function(prg, "draw_black_bar", v, 0);
+	call_void_function(prg, "draw_letterbox", v, 0);
 }
 
 static void lost_device_callback()
@@ -5424,13 +5424,13 @@ static void found_device_callback()
 void register_game_callbacks()
 {
 	gfx::register_lost_device_callbacks(lost_device_callback, found_device_callback);
-	gfx::register_black_bars_callback(black_bars_callback);
+	gfx::register_letterbox_callback(letterbox_callback);
 }
  
 void unregister_game_callbacks()
 {
 	gfx::register_lost_device_callbacks(nullptr, nullptr);
-	gfx::register_black_bars_callback(nullptr);
+	gfx::register_letterbox_callback(nullptr);
 }
 
 void start_lib_game()
@@ -5654,7 +5654,7 @@ void start_lib_game()
 	add_special_function("event");
 	add_special_function("gui_event");
 	add_special_function("gui_draw");
-	add_special_function("draw_black_bar");
+	add_special_function("draw_letterbox");
 }
 
 void end_lib_game()
