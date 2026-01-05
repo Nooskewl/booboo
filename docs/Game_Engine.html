@@ -283,17 +283,17 @@ The following sections describe the API:
 	e.g. = s (get_scale)
 </pre>
 
-<h3>(is_fullscreen)</h3>
-<pre>
-	Find out if the screen is currently fullscreen
-	e.g. = onoff (is_fullscreen)
-</pre>
-
 <h3>toggle_fullscreen</h3>
 <pre>
 	Change from fullscreen to windowed or vice versa depending on the
 	current windowed/fullscreen state.
 	e.g. toggle_fullscreen
+</pre>
+
+<h3>(is_fullscreen)</h3>
+<pre>
+	Find out if the screen is currently fullscreen
+	e.g. = onoff (is_fullscreen)
 </pre>
 
 <h3>(get_refresh_rate)</h3>
@@ -348,6 +348,12 @@ The following sections describe the API:
 	e.g. set_blend_mode BLEND_ONE BLEND_ONE ; additive blending
 </pre>
 
+<h3>get_blend_mode</h3>
+<pre>
+	Returns the blend mode
+	e.g. explode (get_blend_mode) src dst
+</pre>
+
 <h3>clear_depth_buffer</h3>
 <pre>
 	Clear the depth buffer. Expects a double
@@ -366,10 +372,22 @@ The following sections describe the API:
 	e.g. enable_depth_test onoff
 </pre>
 
+<h3>is_depth_test_enabled</h3>
+<pre>
+	Returns whether or not depth test is enabled
+	e.g. = onoff (is_depth_test_enabled)
+</pre>
+
 <h3>enable_depth_write</h3>
 <pre>
 	Enable/disable writing into the depth buffer
 	e.g. enable_depth_write onoff
+</pre>
+
+<h3>is_depth_write_enabled</h3>
+<pre>
+	Returns whether or not depth write is enabled
+	e.g. = onoff (is_depth_write_enabled)
 </pre>
 
 <h3>set_depth_mode</h3>
@@ -378,10 +396,22 @@ The following sections describe the API:
 	e.g. set_depth_mode COMPARE_LESSEQUAL
 </pre>
 
+<h3>get_depth_mode</h3>
+<pre>
+	Returns the depth mode
+	e.g. = mode (get_depth_mode)
+</pre>
+
 <h3>enable_stencil</h3>
 <pre>
 	Enable/disable stencil buffer
 	e.g. enable_stencil onoff
+</pre>
+
+<h3>is_stencil_enabled</h3>
+<pre>
+	Returns whether or not stencil is enabled
+	e.g. = onoff (is_stencil_enabled)
 </pre>
 
 <h3>enable_two_sided_stencil</h3>
@@ -390,10 +420,22 @@ The following sections describe the API:
 	e.g. enable_two_sided_stencil onoff
 </pre>
 
+<h3>is_two_sided_stencil_enabled</h3>
+<pre>
+	Returns whether or not two sided stencil is enabled
+	e.g. = onoff (is_two_sided_stencil_enabled)
+</pre>
+
 <h3>set_stencil_mode</h3>
 <pre>
 	Set the stencil mode for frontfaces
 	e.g. set_stencil_mode COMPARE_LESS STENCILOP_REPALCE STENCILOP_REPLACE STENCILOP_KEEP #FF #00
+</pre>
+
+<h3>get_stencil_mode</h3>
+<pre>
+	Returns the stencil mode (front faces)
+	e.g. explode (get_stencil_mode) func fail zfail pass ref mask
 </pre>
 
 <h3>set_stencil_mode_backfaces</h3>
@@ -402,10 +444,22 @@ The following sections describe the API:
 	e.g. set_stencil_mode_backfaces COMPARE_LESS STENCILOP_REPALCE STENCILOP_REPLACE STENCILOP_KEEP #FF #00
 </pre>
 
+<h3>get_stencil_mode_backfaces</h3>
+<pre>
+	Returns the stencil mode (back faces)
+	e.g. explode (get_stencil_mode_backfaces) func fail zfail pass ref mask
+</pre>
+
 <h3>set_front_face</h3>
 <pre>
 	Set the winding order for front faces (see constants)
 	e.g. set_front_face FACE_CCW
+</pre>
+
+<h3>get_front_face</h3>
+<pre>
+	Returns the front face
+	e.g. = f (get_front_face)
 </pre>
 
 <h3>set_cull_mode</h3>
@@ -414,10 +468,22 @@ The following sections describe the API:
 	e.g. set_cull_mode FRONT_FACE
 </pre>
 
+<h3>get_cull_mode</h3>
+<pre>
+	Returns the cull mode
+	e.g. = mode (get_cull_mode)
+</pre>
+
 <h3>enable_colour_write</h3>
 <pre>
 	Enable/disable writing into the colour buffer
 	e.g. enable_colour_write onoff
+</pre>
+
+<h3>is_colour_write_enabled</h3>
+<pre>
+	Returns whether or not colour write is enabled
+	e.g. = onoff (is_colour_write_enabled)
 </pre>
 
 <h3>set_projection</h3>
@@ -477,72 +543,6 @@ The following sections describe the API:
 <pre>
 	Draw arbitrary textured geometry
 	e.g. draw_vertex_buffer_textured tex vertex_buf texture
-</pre>
-
-<h3>is_colour_write_enabled</h3>
-<pre>
-	Returns whether or not colour write is enabled
-	e.g. = onoff (is_colour_write_enabled)
-</pre>
-
-<h3>is_stencil_enabled</h3>
-<pre>
-	Returns whether or not stencil is enabled
-	e.g. = onoff (is_stencil_enabled)
-</pre>
-
-<h3>is_two_sided_stencil_enabled</h3>
-<pre>
-	Returns whether or not two sided stencil is enabled
-	e.g. = onoff (is_two_sided_stencil_enabled)
-</pre>
-
-<h3>is_depth_test_enabled</h3>
-<pre>
-	Returns whether or not depth test is enabled
-	e.g. = onoff (is_depth_test_enabled)
-</pre>
-
-<h3>is_depth_write_enabled</h3>
-<pre>
-	Returns whether or not depth write is enabled
-	e.g. = onoff (is_depth_write_enabled)
-</pre>
-
-<h3>get_blend_mode</h3>
-<pre>
-	Returns the blend mode
-	e.g. explode (get_blend_mode) src dst
-</pre>
-
-<h3>get_depth_mode</h3>
-<pre>
-	Returns the depth mode
-	e.g. = mode (get_depth_mode)
-</pre>
-
-<h3>get_stencil_mode</h3>
-<pre>
-	Returns the stencil mode (front faces)
-	e.g. explode (get_stencil_mode) func fail zfail pass ref mask
-</pre>
-
-<h3>get_stencil_mode_backfaces</h3>
-<pre>
-	Returns the stencil mode (back faces)
-	e.g. explode (get_stencil_mode_backfaces) func fail zfail pass ref mask
-</pre>
-
-<h3>get_front_face</h3>
-<pre>
-	Returns the front face
-	e.g. = f (get_front_face)
-</pre>
-
-<h3>get_cull_mode</h3>
-<pre>
-	Returns the cull mode
-	e.g. = mode (get_cull_mode)
 </pre>
 
 <a id="Primitives"></a>
