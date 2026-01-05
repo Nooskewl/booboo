@@ -408,6 +408,7 @@ static bool gfxfunc_unset_scissor(Program *prg, const std::vector<Token> &v)
 
 static Variable exprfunc_gfx_get_scissor(Program *prg, const std::vector<Token> &v)
 {
+	COUNT_ARGS(0)
 	Variable vec;
 	vec.type = Variable::VECTOR;
 
@@ -454,6 +455,7 @@ static bool gfxfunc_unset_viewport(Program *prg, const std::vector<Token> &v)
 
 static Variable exprfunc_gfx_get_viewport(Program *prg, const std::vector<Token> &v)
 {
+	COUNT_ARGS(0)
 	Variable vec;
 	vec.type = Variable::VECTOR;
 
@@ -858,6 +860,7 @@ static bool gfxfunc_set_default_projection(Program *prg, const std::vector<Token
 
 static Variable exprfunc_gfx_get_projection(Program *prg, const std::vector<Token> &v)
 {
+	COUNT_ARGS(0)
 	Variable vec;
 	vec.type = Variable::VECTOR;
 
@@ -883,6 +886,7 @@ static bool gfxfunc_resize_vertex_cache(Program *prg, const std::vector<Token> &
 
 static Variable exprfunc_gfx_is_colour_write_enabled(Program *prg, const std::vector<Token> &v)
 {
+	COUNT_ARGS(0)
 	Variable var;
 	var.type = Variable::NUMBER;
 	var.n = gfx::is_colour_write_enabled();
@@ -891,6 +895,7 @@ static Variable exprfunc_gfx_is_colour_write_enabled(Program *prg, const std::ve
 
 static Variable exprfunc_gfx_is_stencil_enabled(Program *prg, const std::vector<Token> &v)
 {
+	COUNT_ARGS(0)
 	Variable var;
 	var.type = Variable::NUMBER;
 	var.n = gfx::is_stencil_enabled();
@@ -899,6 +904,7 @@ static Variable exprfunc_gfx_is_stencil_enabled(Program *prg, const std::vector<
 
 static Variable exprfunc_gfx_is_two_sided_stencil_enabled(Program *prg, const std::vector<Token> &v)
 {
+	COUNT_ARGS(0)
 	Variable var;
 	var.type = Variable::NUMBER;
 	var.n = gfx::is_two_sided_stencil_enabled();
@@ -907,6 +913,7 @@ static Variable exprfunc_gfx_is_two_sided_stencil_enabled(Program *prg, const st
 
 static Variable exprfunc_gfx_is_depth_test_enabled(Program *prg, const std::vector<Token> &v)
 {
+	COUNT_ARGS(0)
 	Variable var;
 	var.type = Variable::NUMBER;
 	var.n = gfx::is_depth_test_enabled();
@@ -915,6 +922,7 @@ static Variable exprfunc_gfx_is_depth_test_enabled(Program *prg, const std::vect
 
 static Variable exprfunc_gfx_is_depth_write_enabled(Program *prg, const std::vector<Token> &v)
 {
+	COUNT_ARGS(0)
 	Variable var;
 	var.type = Variable::NUMBER;
 	var.n = gfx::is_depth_write_enabled();

@@ -316,6 +316,12 @@ The following sections describe the API:
 	e.g. unset_scissor
 </pre>
 
+<h3>get_scissor</h3>
+<pre>
+	Get the scissor rectangle
+	e.g. explode (get_scissor) x y w h
+</pre>
+
 <h3>set_viewport</h3>
 <pre>
 	Set a custom viewport
@@ -328,6 +334,12 @@ The following sections describe the API:
 <pre>
 	Reset the viewport after custom setting
 	e.g. unset_viewport
+</pre>
+
+<h3>get_viewport</h3>
+<pre>
+	Get the viewport
+	e.g. explode (get_viewport) x y w h
 </pre>
 
 <h3>set_blend_mode</h3>
@@ -420,6 +432,12 @@ The following sections describe the API:
 	e.g. set_default_projection
 </pre>
 
+<h3>get_projection</h3>
+<pre>
+	Get the current projection matices
+	e.g. explode (get_projection) mv proj
+</pre>
+
 <h3>resize_vertex_cache</h3>
 <pre>
 	Normally not needed, but if you draw a tonne of geometry between
@@ -459,6 +477,36 @@ The following sections describe the API:
 <pre>
 	Draw arbitrary textured geometry
 	e.g. draw_vertex_buffer_textured tex vertex_buf texture
+</pre>
+
+<h3>is_colour_write_enabled</h3>
+<pre>
+	Returns whether or not colour write is enabled
+	e.g. = onoff (is_colour_write_enabled)
+</pre>
+
+<h3>is_stencil_enabled</h3>
+<pre>
+	Returns whether or not stencil is enabled
+	e.g. = onoff (is_stencil_enabled)
+</pre>
+
+<h3>is_two_sided_stencil_enabled</h3>
+<pre>
+	Returns whether or not two sided stencil is enabled
+	e.g. = onoff (is_two_sided_stencil_enabled)
+</pre>
+
+<h3>is_depth_test_enabled</h3>
+<pre>
+	Returns whether or not depth test is enabled
+	e.g. = onoff (is_depth_test_enabled)
+</pre>
+
+<h3>is_depth_write_enabled</h3>
+<pre>
+	Returns whether or not depth write is enabled
+	e.g. = onoff (is_depth_write_enabled)
 </pre>
 
 <a id="Primitives"></a>
