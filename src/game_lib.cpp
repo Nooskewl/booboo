@@ -4607,6 +4607,74 @@ static bool widgetfunc_set_down_widget(Program *prg, const std::vector<Token> &v
 	return true;
 }
 
+static Variable exprfunc_widget_get_padding_left(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	unsigned int widget = as_number(prg, v[0]);
+
+	Widget_Info *info = widget_info(prg);
+	
+	INFO_EXISTS(info->widgets, widget)
+
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = info->widgets[widget]->widget->get_padding_left();
+
+	return var;
+}
+
+static Variable exprfunc_widget_get_padding_right(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	unsigned int widget = as_number(prg, v[0]);
+
+	Widget_Info *info = widget_info(prg);
+	
+	INFO_EXISTS(info->widgets, widget)
+
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = info->widgets[widget]->widget->get_padding_right();
+
+	return var;
+}
+
+static Variable exprfunc_widget_get_padding_top(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	unsigned int widget = as_number(prg, v[0]);
+
+	Widget_Info *info = widget_info(prg);
+	
+	INFO_EXISTS(info->widgets, widget)
+
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = info->widgets[widget]->widget->get_padding_top();
+
+	return var;
+}
+
+static Variable exprfunc_widget_get_padding_bottom(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	unsigned int widget = as_number(prg, v[0]);
+
+	Widget_Info *info = widget_info(prg);
+	
+	INFO_EXISTS(info->widgets, widget)
+
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = info->widgets[widget]->widget->get_padding_bottom();
+
+	return var;
+}
+
 static bool widgetfunc_set_float_left(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -5325,6 +5393,10 @@ void start_lib_game()
 	add_instruction("widget_set_right_widget", widgetfunc_set_right_widget);
 	add_instruction("widget_set_up_widget", widgetfunc_set_up_widget);
 	add_instruction("widget_set_down_widget", widgetfunc_set_down_widget);
+	add_expression_handler("widget_get_padding_left", exprfunc_widget_get_padding_left);
+	add_expression_handler("widget_get_padding_right", exprfunc_widget_get_padding_right);
+	add_expression_handler("widget_get_padding_top", exprfunc_widget_get_padding_top);
+	add_expression_handler("widget_get_padding_bottom", exprfunc_widget_get_padding_bottom);
 	add_instruction("gui_start", widgetfunc_gui_start);
 	add_instruction("gui_exit", widgetfunc_gui_exit);
 	add_instruction("gui_set_focus", widgetfunc_gui_set_focus);
