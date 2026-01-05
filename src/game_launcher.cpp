@@ -403,7 +403,11 @@ void handle_event(TGUI_Event *event)
 
 void draw_all()
 {
+	glDisable_ptr(GL_SCISSOR_TEST);
+	PRINT_GL_ERROR("glDisable(GL_SCISSOR_TEST)\n");
 	gfx::clear_buffers();
+	glEnable_ptr(GL_SCISSOR_TEST);
+	PRINT_GL_ERROR("glEnable(GL_SCISSOR_TEST)\n");
 
 	std::vector<Token> tmp;
 	call_void_function(prg, "draw", tmp);
