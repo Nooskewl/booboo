@@ -316,7 +316,7 @@ The following sections describe the API:
 	e.g. unset_scissor
 </pre>
 
-<h3>get_scissor</h3>
+<h3>(get_scissor)</h3>
 <pre>
 	Get the scissor rectangle
 	e.g. explode (get_scissor) x y w h
@@ -336,7 +336,7 @@ The following sections describe the API:
 	e.g. unset_viewport
 </pre>
 
-<h3>get_viewport</h3>
+<h3>(get_viewport)</h3>
 <pre>
 	Get the viewport
 	e.g. explode (get_viewport) x y w h
@@ -348,7 +348,7 @@ The following sections describe the API:
 	e.g. set_blend_mode BLEND_ONE BLEND_ONE ; additive blending
 </pre>
 
-<h3>get_blend_mode</h3>
+<h3>(get_blend_mode)</h3>
 <pre>
 	Returns the blend mode
 	e.g. explode (get_blend_mode) src dst
@@ -372,7 +372,7 @@ The following sections describe the API:
 	e.g. enable_depth_test onoff
 </pre>
 
-<h3>is_depth_test_enabled</h3>
+<h3>(is_depth_test_enabled)</h3>
 <pre>
 	Returns whether or not depth test is enabled
 	e.g. = onoff (is_depth_test_enabled)
@@ -384,7 +384,7 @@ The following sections describe the API:
 	e.g. enable_depth_write onoff
 </pre>
 
-<h3>is_depth_write_enabled</h3>
+<h3>(is_depth_write_enabled)</h3>
 <pre>
 	Returns whether or not depth write is enabled
 	e.g. = onoff (is_depth_write_enabled)
@@ -396,7 +396,7 @@ The following sections describe the API:
 	e.g. set_depth_mode COMPARE_LESSEQUAL
 </pre>
 
-<h3>get_depth_mode</h3>
+<h3>(get_depth_mode)</h3>
 <pre>
 	Returns the depth mode
 	e.g. = mode (get_depth_mode)
@@ -408,7 +408,7 @@ The following sections describe the API:
 	e.g. enable_stencil onoff
 </pre>
 
-<h3>is_stencil_enabled</h3>
+<h3>(is_stencil_enabled)</h3>
 <pre>
 	Returns whether or not stencil is enabled
 	e.g. = onoff (is_stencil_enabled)
@@ -420,7 +420,7 @@ The following sections describe the API:
 	e.g. enable_two_sided_stencil onoff
 </pre>
 
-<h3>is_two_sided_stencil_enabled</h3>
+<h3>(is_two_sided_stencil_enabled)</h3>
 <pre>
 	Returns whether or not two sided stencil is enabled
 	e.g. = onoff (is_two_sided_stencil_enabled)
@@ -432,7 +432,7 @@ The following sections describe the API:
 	e.g. set_stencil_mode COMPARE_LESS STENCILOP_REPALCE STENCILOP_REPLACE STENCILOP_KEEP #FF #00
 </pre>
 
-<h3>get_stencil_mode</h3>
+<h3>(get_stencil_mode)</h3>
 <pre>
 	Returns the stencil mode (front faces)
 	e.g. explode (get_stencil_mode) func fail zfail pass ref mask
@@ -444,7 +444,7 @@ The following sections describe the API:
 	e.g. set_stencil_mode_backfaces COMPARE_LESS STENCILOP_REPALCE STENCILOP_REPLACE STENCILOP_KEEP #FF #00
 </pre>
 
-<h3>get_stencil_mode_backfaces</h3>
+<h3>(get_stencil_mode_backfaces)</h3>
 <pre>
 	Returns the stencil mode (back faces)
 	e.g. explode (get_stencil_mode_backfaces) func fail zfail pass ref mask
@@ -456,7 +456,7 @@ The following sections describe the API:
 	e.g. set_front_face FACE_CCW
 </pre>
 
-<h3>get_front_face</h3>
+<h3>(get_front_face)</h3>
 <pre>
 	Returns the front face
 	e.g. = f (get_front_face)
@@ -468,7 +468,7 @@ The following sections describe the API:
 	e.g. set_cull_mode FRONT_FACE
 </pre>
 
-<h3>get_cull_mode</h3>
+<h3>(get_cull_mode)</h3>
 <pre>
 	Returns the cull mode
 	e.g. = mode (get_cull_mode)
@@ -480,7 +480,7 @@ The following sections describe the API:
 	e.g. enable_colour_write onoff
 </pre>
 
-<h3>is_colour_write_enabled</h3>
+<h3>(is_colour_write_enabled)</h3>
 <pre>
 	Returns whether or not colour write is enabled
 	e.g. = onoff (is_colour_write_enabled)
@@ -498,7 +498,7 @@ The following sections describe the API:
 	e.g. set_default_projection
 </pre>
 
-<h3>get_projection</h3>
+<h3>(get_projection)</h3>
 <pre>
 	Get the current projection matices
 	e.g. explode (get_projection) mv proj
@@ -514,7 +514,7 @@ The following sections describe the API:
 	e.g. resize_vertex_cache (* 1024 256)
 </pre>
 
-<h3>create_vertex_buffer</h3>
+<h3>(create_vertex_buffer)</h3>
 <pre>
 	Draw arbitrary 3d geometry
 	All vectors are vectors of numbers
@@ -1094,6 +1094,7 @@ The following sections describe the API:
 <h3>(model_load)</h3>
 <pre>
 	Load a model with an optional armature an animations from .x file
+	Each model has its own transform set with model_* transform functions
 	e.g. = model (model_load "filename.x" ^ lffs)
 	Returns -1 on fail
 </pre>
@@ -1101,6 +1102,8 @@ The following sections describe the API:
 <h3>(model_clone)</h3>
 <pre>
 	Clone a model
+	This is a clone of an existing model with its own transform. Any
+	animations will repeat over clones
 	e.g. = clone (model_clone model)
 </pre>
 
@@ -1545,7 +1548,7 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. = result (joy_get_button joy_num JOY_A)
 </pre>
 
-<h3>joy_get_axis</h3>
+<h3>(joy_get_axis)</h3>
 <pre>
 	Get the state of a joystick axis listed in constants
 	Results or -1 to 1 except for triggers which are 0 to 1
