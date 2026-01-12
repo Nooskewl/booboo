@@ -1592,6 +1592,9 @@ and h are the calculated position and size of the widget in pixels.
 <a id="JSON"></a>
 <h2>JSON Functions</h2>
 
+<p>You can dig down into the file by separating keys with "&gt;"</p>
+<p>"[0]" "[1]" etc can be used to access arrays.</p>
+
 <h3>(json_load)</h3>
 <pre>
 	Load a JSON file
@@ -1610,92 +1613,72 @@ and h are the calculated position and size of the widget in pixels.
 <h3>(json_exists)</h3>
 <pre>
 	Check if a key exists in a JSON object
-	You can dig down into the file by separating keys with "&gt;"
-	"[0]" "[1]" etc can be used to access arrays.
 	e.g. = yesno (json_exists json "foo&gt;bar&gt;baz")
 </pre>
 
 <h3>(json_typeof)</h3>
 <pre>
 	Return a string representation of JSON key type
-	e.g. = val (json_typeof json "foo&gt;bar&gt;baz"
+	e.g. = val (json_typeof json "foo&gt;bar&gt;baz")
 </pre>
 
 <h3>(json_size)</h3>
 <pre>
 	Return the number of children of a JSON key
-	e.g. = n (json_size json "foo&gt;bar&gt;baz"
+	e.g. = n (json_size json "foo&gt;bar&gt;baz")
 </pre>
 
 <h3>(json_get_string)</h3>
 <pre>
 	Read a string from JSON
-	You can dig down into the file by separating keys with "&gt;"
-	"[0]" "[1]" etc can be used to access arrays.
 	e.g. = s (json_get_string json "settings&gt;profile&gt;name")
 </pre>
 
 <h3>(json_get_number)</h3>
 <pre>
 	Read a number from JSON
-	You can dig down into the file by separating keys with "&gt;"
-	"[0]" "[1]" etc can be used to access arrays.
 	e.g. = n (json_get_number json "settings&gt;mouse&gt;sensitivity")
 </pre>
 
 <h3>(json_get_bool)</h3>
 <pre>
 	Read a boolean from JSON
-	You can dig down into the file by separating keys with "&gt;"
-	"[0]" "[1]" etc can be used to access arrays.
 	e.g. = n (json_get_boolean json "settings&gt;gfx&gt;crt_filter")
 </pre>
 
 <h3>json_set_string</h3>
 <pre>
 	Set a string in a JSON object
-	You can dig down into the file by separating keys with "&gt;"
-	"[0]" "[1]" etc can be used to access arrays.
 	e.g. json_set_string json "foo&gt;bar&gt;baz" "TURNIPS"
 </pre>
 
 <h3>json_set_number</h3>
 <pre>
 	Set a number in a JSON object
-	You can dig down into the file by separating keys with "&gt;"
-	"[0]" "[1]" etc can be used to access arrays.
 	e.g. json_set_number json "foo&gt;bar&gt;baz" 762.4
 </pre>
 
 <h3>json_set_bool</h3>
 <pre>
 	Set a boolean in a JSON object
-	You can dig down into the file by separating keys with "&gt;"
-	"[0]" "[1]" etc can be used to access arrays.
 	e.g. json_set_bool json "foo&gt;bar&gt;baz" TRUE
 </pre>
 
 <h3>json_add_array</h3>
 <pre>
 	Add an array element to a json object.
-	You can dig down into the file by separating keys with "&gt;"
-	"[0]" "[1]" etc can be used to access arrays.
 	e.g. json_add_array json "foo&gt;bar&gt;baz"
 </pre>
 
 <h3>json_add_hash</h3>
 <pre>
 	Add a hash element to a json object.
-	You can dig down into the file by separating keys with "&gt;"
-	"[0]" "[1]" etc can be used to access arrays.
 	e.g. json_add_array json "foo&gt;bar&gt;baz"
 </pre>
 
 <h3>json_remove</h3>
 <pre>
 	Remove a child from JSON tree
-	You can dig down into the file by separating keys with "&gt;"
-	"[0]" "[1]" etc can be used to access arrays.
 	e.g. json_remove json "foo&gt;bar&gt;baz"
 </pre>
 
