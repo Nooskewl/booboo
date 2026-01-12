@@ -3033,6 +3033,17 @@ static bool corefunc_explode(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static Variable exprfunc_core_get_savedgames_path(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	Variable var;
+	var.type = Variable::STRING;
+	var.s = util::get_savegames_dir();
+
+	return var;
+}
+
 #ifdef CLI
 static Variable exprfunc_get_args(Program *prg, const std::vector<Token> &v)
 {
@@ -4193,6 +4204,7 @@ void start()
 	add_instruction("srand", corefunc_srand);
 	add_expression_handler("rand", exprfunc_rand);
 	add_instruction("explode", corefunc_explode);
+	add_expression_handler("get_savedgames_path", exprfunc_core_get_savedgames_path);
 	
 #ifdef CLI
 	add_expression_handler("get_args", exprfunc_get_args);
