@@ -1607,6 +1607,26 @@ and h are the calculated position and size of the widget in pixels.
 	Returns -1 on fail
 </pre>
 
+<h3>(json_exists)</h3>
+<pre>
+	Check if a key exists in a JSON object
+	You can dig down into the file by separating keys with "&gt;"
+	"[0]" "[1]" etc can be used to access arrays.
+	e.g. = yesno (json_exists json "foo&gt;bar&gt;baz")
+</pre>
+
+<h3>(json_typeof)</h3>
+<pre>
+	Return a string representation of JSON key type
+	e.g. = val (json_typeof json "foo&gt;bar&gt;baz"
+</pre>
+
+<h3>(json_size)</h3>
+<pre>
+	Return the number of children of a JSON key
+	e.g. = n (json_size json "foo&gt;bar&gt;baz"
+</pre>
+
 <h3>(json_get_string)</h3>
 <pre>
 	Read a string from JSON

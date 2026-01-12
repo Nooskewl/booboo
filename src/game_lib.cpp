@@ -3452,6 +3452,83 @@ static bool jsonfunc_destroy(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static Variable exprfunc_json_exists(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	JSON_Info *info = json_info(prg);
+	INFO_EXISTS(info->jsons, id)
+	util::JSON *json = info->jsons[id];
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	util::JSON::Node *n = json->get_root()->find(name);
+	v1.n = n != nullptr;
+
+	return v1;
+}
+
+static Variable exprfunc_json_typeof(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	JSON_Info *info = json_info(prg);
+	INFO_EXISTS(info->jsons, id)
+	util::JSON *json = info->jsons[id];
+
+	Variable v1;
+	v1.type = Variable::STRING;
+
+	util::JSON::Node *n = json->get_root()->find(name);
+	util::JSON::Node::Type t = n->get_type();
+
+	switch (t) {
+		case util::JSON::Node::STRING:
+			v1.s = "string";
+		case util::JSON::Node::BOOL:
+			v1.s = "bool";
+		case util::JSON::Node::DOUBLE:
+			v1.s = "number";
+		default:
+			std::string val = n->get_value();
+			if (val == "[array]") {
+				v1.s = "array";
+			}
+			else {
+				v1.s = "hash";
+			}
+	}
+
+	return v1;
+}
+
+static Variable exprfunc_json_size(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	JSON_Info *info = json_info(prg);
+	INFO_EXISTS(info->jsons, id)
+	util::JSON *json = info->jsons[id];
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	util::JSON::Node *n = json->get_root()->find(name);
+	v1.n = n->size();
+
+	return v1;
+}
+
 static Variable exprfunc_json_get_string(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -5640,6 +5717,9 @@ void start_lib_game()
 	add_expression_handler("json_load", exprfunc_json_load);
 	add_expression_handler("json_create", exprfunc_json_create);
 	add_instruction("json_destroy", jsonfunc_destroy);
+	add_expression_handler("json_exists", exprfunc_json_exists);
+	add_expression_handler("json_typeof", exprfunc_json_typeof);
+	add_expression_handler("json_size", exprfunc_json_size);
 	add_expression_handler("json_get_string", exprfunc_json_get_string);
 	add_expression_handler("json_get_number", exprfunc_json_get_number);
 	add_expression_handler("json_get_bool", exprfunc_json_get_bool);
