@@ -3414,6 +3414,31 @@ static Variable exprfunc_json_load(Program *prg, const std::vector<Token> &v)
 	return v1;
 }
 
+static Variable exprfunc_json_create(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	bool array = as_number(prg, v[0]);
+
+	JSON_Info *info = json_info(prg);
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	v1.n = info->json_id;
+
+	try {
+		util::JSON *json = new util::JSON(array);
+
+		info->jsons[info->json_id++] = json;
+	}
+	catch (util::Error &e) {
+		v1.n = -1;
+	}
+
+	return v1;
+}
+
 static bool jsonfunc_destroy(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -3537,6 +3562,40 @@ static bool jsonfunc_set_bool(Program *prg, const std::vector<Token> &v)
 
 	util::JSON::Node *n = json->get_root();
 	n->add_nested_bool(name, nullptr, val, NULL, true);
+
+	return true;
+}
+
+static bool jsonfunc_add_array(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	JSON_Info *info = json_info(prg);
+	INFO_EXISTS(info->jsons, id)
+	util::JSON *json = info->jsons[id];
+
+	util::JSON::Node *n = json->get_root();
+	n->add_nested_array(name);
+
+	return true;
+}
+
+static bool jsonfunc_add_hash(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	JSON_Info *info = json_info(prg);
+	INFO_EXISTS(info->jsons, id)
+	util::JSON *json = info->jsons[id];
+
+	util::JSON::Node *n = json->get_root();
+	n->add_nested_hash(name);
 
 	return true;
 }
@@ -5579,6 +5638,7 @@ void start_lib_game()
 	add_instruction("shader_set_matrix", shaderfunc_set_matrix);
 	add_instruction("shader_set_matrix_array", shaderfunc_set_matrix_array);
 	add_expression_handler("json_load", exprfunc_json_load);
+	add_expression_handler("json_create", exprfunc_json_create);
 	add_instruction("json_destroy", jsonfunc_destroy);
 	add_expression_handler("json_get_string", exprfunc_json_get_string);
 	add_expression_handler("json_get_number", exprfunc_json_get_number);
@@ -5586,6 +5646,8 @@ void start_lib_game()
 	add_instruction("json_set_string", jsonfunc_set_string);
 	add_instruction("json_set_number", jsonfunc_set_number);
 	add_instruction("json_set_bool", jsonfunc_set_bool);
+	add_instruction("json_add_array", jsonfunc_add_array);
+	add_instruction("json_add_hash", jsonfunc_add_hash);
 	add_instruction("json_remove", jsonfunc_remove);
 	add_expression_handler("json_save", exprfunc_json_save);
 	add_expression_handler("model_load", exprfunc_model_load);

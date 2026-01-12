@@ -1599,6 +1599,14 @@ and h are the calculated position and size of the widget in pixels.
 	Returns -1 on fail
 </pre>
 
+<h3>(json_create)</h3>
+<pre>
+	Create a blank JSON file. Takes a boolean that creates the root
+	as either an array (TRUE) or hash (FALSE)
+	e.g. = j (json_create FALSE)
+	Returns -1 on fail
+</pre>
+
 <h3>(json_get_string)</h3>
 <pre>
 	Read a string from JSON
@@ -1645,6 +1653,22 @@ and h are the calculated position and size of the widget in pixels.
 	You can dig down into the file by separating keys with "&gt;"
 	"[0]" "[1]" etc can be used to access arrays.
 	e.g. json_set_bool json "foo&gt;bar&gt;baz" TRUE
+</pre>
+
+<h3>json_add_array</h3>
+<pre>
+	Add an array element to a json object.
+	You can dig down into the file by separating keys with "&gt;"
+	"[0]" "[1]" etc can be used to access arrays.
+	e.g. json_add_array json "foo&gt;bar&gt;baz"
+</pre>
+
+<h3>json_add_hash</h3>
+<pre>
+	Add a hash element to a json object.
+	You can dig down into the file by separating keys with "&gt;"
+	"[0]" "[1]" etc can be used to access arrays.
+	e.g. json_add_array json "foo&gt;bar&gt;baz"
 </pre>
 
 <h3>json_remove</h3>
