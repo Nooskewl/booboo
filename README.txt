@@ -36,6 +36,9 @@ You can obfuscate code with the +obfuscate switch. Examples:
 > ./BooBooCLI dragonslayer.boo +obfuscate
 > ./BooBoo town +obfuscate > foo.boo
 
+You can put a list of function names not to obfuscate in a text file
+and add +no-obfuscate <filename> to your command line arguments.
+
 --
 
 The portrait example uses a screenshot from the game Broken Pearl

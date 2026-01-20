@@ -5,6 +5,8 @@
 #endif
 
 #include <climits>
+#include <iostream>
+#include <fstream>
 
 #include <sys/stat.h>
 
@@ -96,6 +98,21 @@ int main(int argc, char **argv)
 
 	booboo::start();
 	start_lib_standard();
+	
+	int obfuscate_index = util::check_args(argc, argv, "+no-obfuscate");
+	if (obfuscate_index > 0) {
+		std::string filename = std::string(argv[obfuscate_index+1]);
+		std::fstream *f = new std::fstream;
+		f->open(filename, std::fstream::in);
+		std::string s;
+		while (!f->eof()) {
+			(*f) >> s;
+			if (s != "") {
+				booboo::add_special_function(s);
+			}
+		}
+		f->close();
+	}
 
 again:
 	booboo::quit = false;

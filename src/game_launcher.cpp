@@ -1,5 +1,8 @@
 #include <unistd.h>
 #include <climits>
+#include <iostream>
+#include <fstream>
+
 #include <sys/stat.h>
 
 #ifdef _WIN32
@@ -841,6 +844,21 @@ int main(int argc, char **argv)
 	booboo::start();
 	start_lib_standard();
 	start_lib_game();
+
+	int obfuscate_index = util::check_args(argc, argv, "+no-obfuscate");
+	if (obfuscate_index > 0) {
+		std::string filename = std::string(argv[obfuscate_index+1]);
+		std::fstream *f = new std::fstream;
+		f->open(filename, std::fstream::in);
+		std::string s;
+		while (!f->eof()) {
+			(*f) >> s;
+			if (s != "") {
+				booboo::add_special_function(s);
+			}
+		}
+		f->close();
+	}
 
 	add_instruction("mouse_set_relative", mousefunc_set_relative);
 	add_expression_handler("mouse_get_delta", exprfunc_mouse_get_delta);
