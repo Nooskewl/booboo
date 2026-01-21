@@ -770,7 +770,7 @@ static bool stringfunc_set_char_at(Program *prg, const std::vector<Token> &v)
 
 	Variable &s = as_variable(prg, v[0]);
 	int index = as_number(prg, v[1]);
-	int value = as_number(prg, v[2]);
+	uint32_t value = as_number(prg, v[2]);
 
 	Variable *p;
 	if (v[0].dereference) {
@@ -780,7 +780,7 @@ static bool stringfunc_set_char_at(Program *prg, const std::vector<Token> &v)
 		p = &s;
 	}
 
-	p->s[index] = value;
+	p->s = util::utf8_substr(p->s, 0, index) + util::utf8_char_to_string(value) + util::utf8_substr(p->s, index+1);
 
 	return true;
 }
