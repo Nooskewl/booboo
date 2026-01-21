@@ -45,4 +45,5 @@ The portrait example uses a screenshot from the game Broken Pearl
 
 --
 
-Please visit https://nooskewl.com for updates!
+Please do not redistribute BooBoo without a license, available from
+https://nooskewl.com!
