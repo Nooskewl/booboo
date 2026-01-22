@@ -620,6 +620,8 @@ The following sections describe the API:
 <a id="Image"></a>
 <h2>Image Functions</h2>
 
+<p>Supported formats are png and tga.</p>
+
 <h3>set_target</h3>
 <pre>
 	Set the render target. This only works with images created with
@@ -729,6 +731,11 @@ The following sections describe the API:
 
 <a id="Sprite"></a>
 <h2>Sprite Functions</h2>
+
+<p>Sprites are exported as a sprite sheet from Aseprite with a JSON file
+(matching names) for each animation. Then a file called sprite.json is
+put in a directory with all the animations, and in that file is an array
+of animation names.</p>
 
 <h3>(sprite_load)</h3>
 <pre>
@@ -851,6 +858,8 @@ The following sections describe the API:
 <a id="Font"></a>
 <h2>Font Functions</h2>
 
+<p>Currently only TTF are supported.</p>
+
 <h3>(font_load)</h3>
 <pre>
 	load a TTF font
@@ -898,6 +907,9 @@ The following sections describe the API:
 
 <a id="Tilemap"></a>
 <h2>Tilemap Functions</h2>
+
+<p>Tilemaps are exported from AshEdit. Tile sheets are named tiles0.png,
+tiles1.png, etc (or tga.)</p>
 
 <h3>set_tile_size</h3>
 <pre>
@@ -1078,6 +1090,9 @@ The following sections describe the API:
 
 <a id="3D"></a>
 <h2>3D Functions</h2>
+
+<p>Models can be in either ascii .x (DirectX model) or .nsm (binary Nooskewl
+model) using convert_model in tools to convert.</p>
 
 <h3>set_2d</h3>
 <pre>
@@ -1467,6 +1482,8 @@ and h are the calculated position and size of the widget in pixels.
 
 <a id="Audio"></a>
 <h2>Audio Functions</h2>
+
+<p>Supported sample types are wav, ogg and flac.</p>
 
 <h3>(mml_create)</h3>
 <pre>
