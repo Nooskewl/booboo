@@ -345,6 +345,21 @@ static std::string tokenfunc_deref(Program *prg)
 	return "*";
 }
 
+static std::string tokenfunc_char(Program *prg)
+{
+	prg->s->p++;
+
+	int n = prg->s->code[prg->s->p];
+
+	prg->s->p++;
+	prg->s->p++;
+
+	char buf[1000];
+	snprintf(buf, 1000, "%d", n);
+
+	return buf;
+}
+
 static std::string token(Program *prg, Token::Token_Type &ret_type)
 {
 	skip_whitespace(prg);
@@ -379,7 +394,7 @@ static std::string token(Program *prg, Token::Token_Type &ret_type)
 	if (c == '(' || c == '[') {
 		ret_type = Token::SYMBOL;
 	}
-	else if (c == '#') {
+	else if (c == '#' || c == '\'') {
 		ret_type = Token::NUMBER;
 	}
 	else {
@@ -4116,6 +4131,7 @@ static void init_token_map()
 	add_token_handler('#', tokenfunc_hex);
 	add_token_handler('~', tokenfunc_ref);
 	add_token_handler('*', tokenfunc_deref);
+	add_token_handler('\'', tokenfunc_char);
 }
 
 void start()

@@ -212,14 +212,19 @@ static bool corefunc_print(Program *prg, const std::vector<Token> &v)
 		result += fmt.substr(start, c-start);
 
 		c += fmt_len;
-		prev = fmt[c];
+		prev = fmt[c > 0 ? c-1 : c];
 
 		std::string val;
 
 		if (v[_tok].type == Token::NUMBER) {
 			format = (format == "") ? "g" : format;
 			char buf[1000];
-			snprintf(buf, 1000, ("%" + format).c_str(), v[_tok].n);
+			if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
+				snprintf(buf, 1000, ("%" + format).c_str(), (int)v[_tok].n);
+			}
+			else {
+				snprintf(buf, 1000, ("%" + format).c_str(), v[_tok].n);
+			}
 			val = buf;
 		}
 		else if (v[_tok].type == Token::STRING) {
@@ -239,7 +244,12 @@ static bool corefunc_print(Program *prg, const std::vector<Token> &v)
 			if (IS_NUMBER(*v1)) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
-				snprintf(buf, 1000, ("%" + format).c_str(), v1->n);
+				if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
+					snprintf(buf, 1000, ("%" + format).c_str(), (int)v1->n);
+				}
+				else {
+					snprintf(buf, 1000, ("%" + format).c_str(), v1->n);
+				}
 				val = buf;
 			}
 			else if (IS_STRING(*v1)) {
@@ -253,7 +263,12 @@ static bool corefunc_print(Program *prg, const std::vector<Token> &v)
 				if (IS_NUMBER(var)) {
 					format = (format == "") ? "g" : format;
 					char buf[1000];
-					snprintf(buf, 1000, ("%" + format).c_str(), var.n);
+					if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
+						snprintf(buf, 1000, ("%" + format).c_str(), (int)var.n);
+					}
+					else {
+						snprintf(buf, 1000, ("%" + format).c_str(), var.n);
+					}
 					val = buf;
 				}
 				else {
@@ -286,7 +301,12 @@ static bool corefunc_print(Program *prg, const std::vector<Token> &v)
 				if (IS_NUMBER(var)) {
 					format = (format == "") ? "g" : format;
 					char buf[1000];
-					snprintf(buf, 1000, ("%" + format).c_str(), var.n);
+					if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
+						snprintf(buf, 1000, ("%" + format).c_str(), (int)var.n);
+					}
+					else {
+						snprintf(buf, 1000, ("%" + format).c_str(), var.n);
+					}
 					val = buf;
 				}
 				else {
@@ -613,14 +633,19 @@ static Variable exprfunc_string_format(Program *prg, const std::vector<Token> &v
 		result += fmt.substr(start, c-start);
 
 		c += fmt_len;
-		prev = fmt[c];
+		prev = fmt[c > 0 ? c-1 : c];
 
 		std::string val;
 
 		if (v[_tok].type == Token::NUMBER) {
 			format = (format == "") ? "g" : format;
 			char buf[1000];
-			snprintf(buf, 1000, ("%" + format).c_str(), v[_tok].n);
+			if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
+				snprintf(buf, 1000, ("%" + format).c_str(), (int)v[_tok].n);
+			}
+			else {
+				snprintf(buf, 1000, ("%" + format).c_str(), v[_tok].n);
+			}
 			val = buf;
 		}
 		else if (v[_tok].type == Token::STRING) {
@@ -634,7 +659,12 @@ static Variable exprfunc_string_format(Program *prg, const std::vector<Token> &v
 			if (IS_NUMBER(v1)) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
-				snprintf(buf, 1000, ("%" + format).c_str(), v1.n);
+				if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
+					snprintf(buf, 1000, ("%" + format).c_str(), (int)v1.n);
+				}
+				else {
+					snprintf(buf, 1000, ("%" + format).c_str(), v1.n);
+				}
 				val = buf;
 			}
 			else if (IS_STRING(v1)) {
@@ -648,7 +678,12 @@ static Variable exprfunc_string_format(Program *prg, const std::vector<Token> &v
 				if (IS_NUMBER(var)) {
 					format = (format == "") ? "g" : format;
 					char buf[1000];
-					snprintf(buf, 1000, ("%" + format).c_str(), var.n);
+					if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
+						snprintf(buf, 1000, ("%" + format).c_str(), (int)var.n);
+					}
+					else {
+						snprintf(buf, 1000, ("%" + format).c_str(), var.n);
+					}
 					val = buf;
 				}
 				else {
@@ -681,7 +716,12 @@ static Variable exprfunc_string_format(Program *prg, const std::vector<Token> &v
 				if (IS_NUMBER(var)) {
 					format = (format == "") ? "g" : format;
 					char buf[1000];
-					snprintf(buf, 1000, ("%" + format).c_str(), var.n);
+					if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
+						snprintf(buf, 1000, ("%" + format).c_str(), (int)var.n);
+					}
+					else {
+						snprintf(buf, 1000, ("%" + format).c_str(), var.n);
+					}
 					val = buf;
 				}
 				else {
@@ -1665,14 +1705,19 @@ static bool filefunc_print(Program *prg, const std::vector<Token> &v)
 		result += fmt.substr(start, c-start);
 
 		c += fmt_len;
-		prev = fmt[c];
+		prev = fmt[c > 0 ? c-1 : c];
 
 		std::string val;
 
 		if (v[_tok].type == Token::NUMBER) {
 			format = (format == "") ? "g" : format;
 			char buf[1000];
-			snprintf(buf, 1000, ("%" + format).c_str(), v[_tok].n);
+			if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
+				snprintf(buf, 1000, ("%" + format).c_str(), (int)v[_tok].n);
+			}
+			else {
+				snprintf(buf, 1000, ("%" + format).c_str(), v[_tok].n);
+			}
 			val = buf;
 		}
 		else if (v[_tok].type == Token::STRING) {
@@ -1686,7 +1731,12 @@ static bool filefunc_print(Program *prg, const std::vector<Token> &v)
 			if (IS_NUMBER(v1)) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
-				snprintf(buf, 1000, ("%" + format).c_str(), v1.n);
+				if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
+					snprintf(buf, 1000, ("%" + format).c_str(), (int)v1.n);
+				}
+				else {
+					snprintf(buf, 1000, ("%" + format).c_str(), v1.n);
+				}
 				val = buf;
 			}
 			else if (IS_STRING(v1)) {
@@ -1700,7 +1750,12 @@ static bool filefunc_print(Program *prg, const std::vector<Token> &v)
 				if (IS_NUMBER(var)) {
 					format = (format == "") ? "g" : format;
 					char buf[1000];
-					snprintf(buf, 1000, ("%" + format).c_str(), var.n);
+					if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
+						snprintf(buf, 1000, ("%" + format).c_str(), (int)var.n);
+					}
+					else {
+						snprintf(buf, 1000, ("%" + format).c_str(), var.n);
+					}
 					val = buf;
 				}
 				else {
@@ -1733,7 +1788,12 @@ static bool filefunc_print(Program *prg, const std::vector<Token> &v)
 				if (IS_NUMBER(var)) {
 					format = (format == "") ? "g" : format;
 					char buf[1000];
-					snprintf(buf, 1000, ("%" + format).c_str(), var.n);
+					if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
+						snprintf(buf, 1000, ("%" + format).c_str(), (int)var.n);
+					}
+					else {
+						snprintf(buf, 1000, ("%" + format).c_str(), var.n);
+					}
 					val = buf;
 				}
 				else {
