@@ -783,6 +783,59 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			tok.n = atof(str.c_str());
 			tok.dereference = false;
 		}
+		else if (c == '#') {
+			tok.type = Token::NUMBER;
+			std::string str = "";
+			p++;
+			int prev = -1;
+			int prev_prev = -1;
+			while (p < (int)expr.length()) {
+				char buf[2];
+				buf[0] = expr[p];
+				buf[1] = 0;
+				str += buf;
+				if (!((buf[0] >= 'A' && buf[0] <= 'F') || (buf[0] >= 'a' && buf[0] <= 'f') || (buf[0] >= '0' && buf[0] <= '9'))) {
+					break;
+				}
+				prev_prev = prev;
+				prev = buf[0];
+				p++;
+			}
+			str = util::remove_quotes(util::unescape_string(str));
+			int n;
+			std::stringstream ss;
+			ss << std::hex << str;
+			ss >> n;
+			char buf[1000];
+			snprintf(buf, 1000, "%d", n);
+			tok.token = buf;
+			tok.n = n;
+			tok.dereference = false;
+		}
+		else if (c == '\'') {
+			tok.type = Token::NUMBER;
+			std::string str = "";
+			p++;
+			int prev = -1;
+			int prev_prev = -1;
+			while (p < (int)expr.length()) {
+				char buf[2];
+				buf[0] = expr[p];
+				buf[1] = 0;
+				str += buf;
+				if (buf[0] == '\'' && (prev != '\\' || prev_prev == '\\')) {
+					p++;
+					break;
+				}
+				prev_prev = prev;
+				prev = buf[0];
+				p++;
+			}
+			str = util::remove_quotes(util::unescape_string(str));
+			tok.token = str[0];
+			tok.n = str[0];
+			tok.dereference = false;
+		}
 		else if (c == '"') {
 			tok.type = Token::STRING;
 			std::string str = "";
@@ -1076,6 +1129,59 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			}
 			tok.token = str;
 			tok.n = atof(str.c_str());
+			tok.dereference = false;
+		}
+		else if (c == '#') {
+			tok.type = Token::NUMBER;
+			std::string str = "";
+			p++;
+			int prev = -1;
+			int prev_prev = -1;
+			while (p < (int)expr.length()) {
+				char buf[2];
+				buf[0] = expr[p];
+				buf[1] = 0;
+				str += buf;
+				if (!((buf[0] >= 'A' && buf[0] <= 'F') || (buf[0] >= 'a' && buf[0] <= 'f') || (buf[0] >= '0' && buf[0] <= '9'))) {
+					break;
+				}
+				prev_prev = prev;
+				prev = buf[0];
+				p++;
+			}
+			str = util::remove_quotes(util::unescape_string(str));
+			int n;
+			std::stringstream ss;
+			ss << std::hex << str;
+			ss >> n;
+			char buf[1000];
+			snprintf(buf, 1000, "%d", n);
+			tok.token = buf;
+			tok.n = n;
+			tok.dereference = false;
+		}
+		else if (c == '\'') {
+			tok.type = Token::NUMBER;
+			std::string str = "";
+			p++;
+			int prev = -1;
+			int prev_prev = -1;
+			while (p < (int)expr.length()) {
+				char buf[2];
+				buf[0] = expr[p];
+				buf[1] = 0;
+				str += buf;
+				if (buf[0] == '\'' && (prev != '\\' || prev_prev == '\\')) {
+					p++;
+					break;
+				}
+				prev_prev = prev;
+				prev = buf[0];
+				p++;
+			}
+			str = util::remove_quotes(util::unescape_string(str));
+			tok.token = str[0];
+			tok.n = str[0];
 			tok.dereference = false;
 		}
 		else if (c == '"') {
