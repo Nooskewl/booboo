@@ -874,7 +874,7 @@ int main(int argc, char **argv)
 		while ((line = t.next()) != "") {
 			util::Tokenizer t2(line, '=');
 			std::string key = t2.next();
-			std::string value = t2.next();
+			std::string value = t2.remaining();
 			if (key == "fullscreen") {
 				toggle_fullscreen = atoi(value.c_str());
 			}
@@ -1024,7 +1024,7 @@ again:
 
 		util::Tokenizer t(text, '=');
 		std::string key = t.next();
-		dir = t.next();
+		dir = t.remaining();
 		dir = util::trim(dir);
 		dir = util::remove_quotes(dir);
 		if (key == "launch") {

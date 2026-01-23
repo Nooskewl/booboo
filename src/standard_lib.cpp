@@ -93,7 +93,7 @@ static std::map<std::string, Config_Value> load_cfg(Program *prg, std::string cf
 	while ((line = t.next()) != "") {
 		util::Tokenizer t2(line, '=');
 		std::string name = t2.next();
-		std::string value = t2.next();
+		std::string value = t2.remaining();
 		util::trim(value);
 
 		if (name == "") {
