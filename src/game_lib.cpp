@@ -3723,6 +3723,34 @@ static Variable exprfunc_json_save(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
+static bool jsonfunc_register_number(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	Variable &var = prg->variables[v[0].i];
+	std::string name = as_string(prg, v[1]);
+	bool readonly = (bool)as_number(prg, v[2]);
+	
+	util::JSON::Node *root = shim::shim_json->get_root();
+	root->get_nested_double("game>" + name, &var.n, var.n, true, readonly);
+
+	return true;
+}
+
+static bool jsonfunc_register_string(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	Variable &var = prg->variables[v[0].i];
+	std::string name = as_string(prg, v[1]);
+	bool readonly = (bool)as_number(prg, v[2]);
+	
+	util::JSON::Node *root = shim::shim_json->get_root();
+	root->get_nested_string("game>" + name, &var.s, var.s, true, readonly);
+
+	return true;
+}
+
 bool is_3d = false;
 
 void set_3d()
@@ -5815,6 +5843,8 @@ void start_lib_game()
 	add_instruction("json_remove", jsonfunc_remove);
 	add_expression_handler("json_save", exprfunc_json_save);
 	add_expression_handler("model_load", exprfunc_model_load);
+	add_instruction("json_register_number", jsonfunc_register_number);
+	add_instruction("json_register_string", jsonfunc_register_string);
 	add_instruction("model_destroy", modelfunc_destroy);
 	add_instruction("model_draw", modelfunc_draw);
 	add_instruction("set_2d", modelfunc_set_2d);

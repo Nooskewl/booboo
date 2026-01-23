@@ -1480,6 +1480,26 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. = onoff (cd_sphere_sphere x y z r x2 y2 z2 r2)
 </pre>
 
+<h3>(cd_box_box)</h3>
+<pre>
+	Bounding box collision detection
+	e.g. = onoff (cd_box_box x1 y1 w1 h1 x2 y2 w2 h2)
+</pre>
+
+<h3>(cd_line_line)</h3>
+<pre>
+	Line/line collision detection. A vector with result and possible intersection point
+	is returned
+	e.g. = vec (cd_line_line x1 y1 x2 y2 x3 y3 x4 y4)
+	e.g. explode vec collided collision_x collision_y
+</pre>
+
+<h3>(dist_point_line)</h3>
+<pre>
+	Returns the distance between a point and a line segment
+	e.g. = dist (dist_point_line px py lx1 ly1 lx2 ly2)
+</pre>
+
 <a id="Audio"></a>
 <h2>Audio Functions</h2>
 
@@ -1709,6 +1729,22 @@ and h are the calculated position and size of the widget in pixels.
 <pre>
 	Free a JSON object
 	e.g. json_destroy json
+</pre>
+
+<h3>json_register_number</h3>
+<pre>
+	Register a number with DevSettings
+	You can access devsettings by running with +debug and pressing F9
+	A "game&gt;" prefix is added automatically.
+	e.g. json_register_number n "foo&gt;baz" readonly
+</pre>
+
+<h3>json_register_string</h3>
+<pre>
+	Register a string with DevSettings
+	You can access devsettings by running with +debug and pressing F9
+	A "game&gt;" prefix is added automatically.
+	e.g. json_register_string s "foo&gt;baz" readonly
 </pre>
 
 <a id="Constants"></a>
