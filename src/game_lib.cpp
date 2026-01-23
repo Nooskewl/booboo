@@ -3688,30 +3688,79 @@ static Variable exprfunc_json_save(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
+class BooBoo_Trigger : public util::Trigger
+{
+public:
+	BooBoo_Trigger(Program *prg, std::string name, int func) :
+		prg(prg),
+		name(name),
+		func(func)
+	{
+	}
+
+	virtual void run()
+	{
+		std::vector<Token> v;
+		Token t;
+		t.type = Token::STRING;
+		t.s = t.token = name;
+		t.dereference = false;
+		v.push_back(t);
+		call_void_function(prg, func, v, 0);
+	}
+
+	virtual ~BooBoo_Trigger()
+	{
+	}
+
+private:
+	Program *prg;
+	std::string name;
+	int func;
+};
+
 static bool jsonfunc_register_number(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	MIN_ARGS(3)
 
 	Variable &var = prg->variables[v[0].i];
 	std::string name = as_string(prg, v[1]);
 	bool readonly = (bool)as_number(prg, v[2]);
+
+	BooBoo_Trigger *trigger;
+	
+	if (v.size() > 3) {
+		trigger = new BooBoo_Trigger(prg, name, as_function(prg, v[3]));
+	}
+	else {
+		trigger = nullptr;
+	}
 	
 	util::JSON::Node *root = shim::shim_json->get_root();
-	root->get_nested_double("game>" + name, &var.n, var.n, true, readonly);
+	root->add_nested_double("game>" + name, &var.n, var.n, trigger, readonly);
 
 	return true;
 }
 
 static bool jsonfunc_register_string(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	MIN_ARGS(3)
 
 	Variable &var = prg->variables[v[0].i];
 	std::string name = as_string(prg, v[1]);
 	bool readonly = (bool)as_number(prg, v[2]);
 	
+	BooBoo_Trigger *trigger;
+	
+	if (v.size() > 3) {
+		trigger = new BooBoo_Trigger(prg, name, as_function(prg, v[3]));
+	}
+	else {
+		trigger = nullptr;
+	}
+	
 	util::JSON::Node *root = shim::shim_json->get_root();
-	root->get_nested_string("game>" + name, &var.s, var.s, true, readonly);
+	root->add_nested_string("game>" + name, &var.s, var.s, trigger, readonly);
 
 	return true;
 }

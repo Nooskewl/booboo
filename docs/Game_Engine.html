@@ -1736,16 +1736,18 @@ and h are the calculated position and size of the widget in pixels.
 <pre>
 	Register a number with DevSettings
 	You can access devsettings by running with +debug and pressing F9
-	A "game&gt;" prefix is added automatically.
-	e.g. json_register_number n "foo&gt;baz" readonly
+	A "game&gt;" prefix is added automatically. The optional callback is
+	called with the key's name when the value is changed in devsettings
+	e.g. json_register_number n "foo&gt;baz" readonly ^ callback
 </pre>
 
 <h3>json_register_string</h3>
 <pre>
 	Register a string with DevSettings
 	You can access devsettings by running with +debug and pressing F9
-	A "game&gt;" prefix is added automatically.
-	e.g. json_register_string s "foo&gt;baz" readonly
+	A "game&gt;" prefix is added automatically. The optional callback is
+	called with the key's name when the value is changed in devsettings
+	e.g. json_register_string s "foo&gt;baz" readonly ^ callback
 </pre>
 
 <a id="Constants"></a>
