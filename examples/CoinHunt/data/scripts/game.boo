@@ -337,7 +337,7 @@ function calc_real_a
 	= real_a (+ (/ (* PI 3) 2) ship_a)
 }
 
-function bullet_collide bx by
+function bullet_collide oldx oldy newx newy
 {
 	; Check coins
 
@@ -353,14 +353,9 @@ function bullet_collide bx by
 	explode coin cx cy exists
 	? exists 0
 	je skip_it
-	var dx
-	var dy
-	= dx (- bx cx)
-	= dy (- by cy)
-	= dx (* dx dx)
-	= dy (* dy dy)
-	= dx (sqrt (+ dx dy))
-	? dx 18
+	var dist
+	= dist (dist_point_line cx cy oldx oldy newx newy)
+	? dist 18
 	jge skip_it
 	= [coin 2] 0
 	= [coins i] coin
@@ -394,14 +389,9 @@ function bullet_collide bx by
 	explode e ex ey exists
 	? exists 0
 	je not_a_hit2
-	var dx
-	var dy
-	= dx (- bx ex)
-	= dy (- by ey)
-	= dx (* dx dx)
-	= dy (* dy dy)
-	= dx (sqrt (+ dx dy))
-	? dx 14
+	var dist
+	= dist (dist_point_line ex ey oldx oldy newx newy)
+	? dist 14
 	jge not_a_hit2
 	= [e 2] 0
 	= [enemies i] e
@@ -928,7 +918,7 @@ function run
 	jne do_fire
 	goto do_thrust
 :do_fire
-	? next_fire_ticks 7
+	? next_fire_ticks 5
 	jl do_thrust
 	= next_fire_ticks 0
 	
@@ -951,7 +941,7 @@ function run
 	vector_add bullets b
 	mml_play shoot_sfx 1 0
 
-	if (>= (vector_size bullets) 7) erase_one
+	if (>= (vector_size bullets) 16) erase_one
 		vector_erase bullets 0
 	:erase_one
 
@@ -1163,20 +1153,16 @@ function run
 	= s (sin ba)
 	var speed
 	= speed 16
-	var step
-	= step 1
-:next_step
-	= bx (+ bx (* c step))
-	= by (+ by (* s step))
+	var newx newy
+	= newx (+ bx (* c speed))
+	= newy (+ by (* s speed))
 	var hit_something
-	call_result hit_something bullet_collide bx by
+	call_result hit_something bullet_collide bx by newx newy
+	= bx newx
+	= by newy
 	? hit_something 0
-	je hit_nothing
+	je done_steps
 	goto erase_it
-:hit_nothing
-	= speed (- speed step)
-	? speed 0
-	jg next_step
 :done_steps
 	? bx 0
 	jl erase_it

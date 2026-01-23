@@ -4644,6 +4644,90 @@ static Variable exprfunc_cd_sphere_sphere(Program *prg, const std::vector<Token>
 	return result;
 }
 
+static Variable exprfunc_cd_box_box(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(8)
+
+	Variable result;
+	result.type = Variable::NUMBER;
+
+	double x1 = as_number(prg, v[0]);
+	double y1 = as_number(prg, v[1]);
+	double w1 = as_number(prg, v[2]);
+	double h1 = as_number(prg, v[3]);
+	double x2 = as_number(prg, v[4]);
+	double y2 = as_number(prg, v[5]);
+	double w2 = as_number(prg, v[6]);
+	double h2 = as_number(prg, v[7]);
+
+	result.n = cd::box_box(util::Point<float>(x1, y1), util::Point<float>(x1+w1, y1+h1), util::Point<float>(x2, y2), util::Point<float>(x2+w2, y2+h2));
+
+	return result;
+}
+
+static Variable exprfunc_cd_line_line(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(8)
+
+	Variable result;
+	result.type = Variable::VECTOR;
+
+	util::Point<float> a, b;
+	util::Point<float> c, d;
+	util::Point<float> res;
+
+	a.x = as_number(prg, v[0]);
+	a.y = as_number(prg, v[1]);
+	b.x = as_number(prg, v[2]);
+	b.y = as_number(prg, v[3]);
+	c.x = as_number(prg, v[4]);
+	c.y = as_number(prg, v[5]);
+	d.x = as_number(prg, v[6]);
+	d.y = as_number(prg, v[7]);
+
+	Variable num;
+	num.type = Variable::NUMBER;
+
+	num.n = cd::line_line(&a, &b, &c, &d, &res);
+
+	result.v.push_back(num);
+
+	if (num.n) {
+		num.n = res.x;
+		result.v.push_back(num);
+		num.n = res.y;
+		result.v.push_back(num);
+	}
+	else {
+		num.n = -1;
+		result.v.push_back(num);
+		result.v.push_back(num);
+	}
+
+	return result;
+}
+
+static Variable exprfunc_dist_point_line(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(6)
+
+	Variable result;
+	result.type = Variable::NUMBER;
+
+	util::Point<float> pt, a, b;
+
+	pt.x = as_number(prg, v[0]);
+	pt.y = as_number(prg, v[1]);
+	a.x = as_number(prg, v[2]);
+	a.y = as_number(prg, v[3]);
+	b.x = as_number(prg, v[4]);
+	b.y = as_number(prg, v[5]);
+
+	result.n = cd::dist_point_line(pt, a, b);
+
+	return result;
+}
+
 class BooBoo_Widget : public TGUI_Widget {
 public:
 	BooBoo_Widget(Program *prg, int id, int w, int h);
@@ -5761,6 +5845,9 @@ void start_lib_game()
 	add_expression_handler("cd_model_point", exprfunc_cd_model_point);
 	add_expression_handler("cd_model_line_segment", exprfunc_cd_model_line_segment);
 	add_expression_handler("cd_sphere_sphere", exprfunc_cd_sphere_sphere);
+	add_expression_handler("cd_box_box", exprfunc_cd_box_box);
+	add_expression_handler("cd_line_line", exprfunc_cd_line_line);
+	add_expression_handler("dist_point_line", exprfunc_dist_point_line);
 	add_expression_handler("widget_create", exprfunc_widget_create);
 	add_instruction("widget_set_parent", widgetfunc_set_parent);
 	add_instruction("widget_set_float_left", widgetfunc_set_float_left);
