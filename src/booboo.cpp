@@ -3045,6 +3045,105 @@ static bool corefunc_for(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool corefunc_while(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &expr = prg->variables[v[0].i];
+	unsigned int end_label = as_label(prg, v[1]);
+
+	CHECK_EXPRESSION(expr)
+
+	Variable er = evaluate_expression(prg, expr.e);
+
+	if (er.n == 0) {
+		prg->s->pc = end_label;
+		return true;
+	}
+
+	prg->s->pc++;
+
+	prg->break_flag = false;
+	prg->continue_flag = false;
+
+	unsigned int start = prg->s->pc;
+
+	while (true) {
+		if (interpret(prg) == false) {
+			return false;
+		}
+		if (prg->break_flag) {
+			prg->break_flag = false;
+			prg->s->pc = end_label;
+			return true;
+		}
+		else if (prg->s->pc < start || prg->s->pc > end_label) {
+			break;
+		}
+		if (prg->continue_flag) {
+			prg->continue_flag = false;
+			prg->s->pc = end_label;
+		}
+		if (prg->s->pc == end_label) {
+			er = evaluate_expression(prg, expr.e);
+			if (er.n == 0) {
+				prg->s->pc++;
+				break;
+			}
+			prg->s->pc = start;
+		}
+	}
+
+	return true;
+}
+
+static bool corefunc_do_while(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &expr = prg->variables[v[0].i];
+	unsigned int end_label = as_label(prg, v[1]);
+
+	CHECK_EXPRESSION(expr)
+
+	Variable er;
+
+	prg->s->pc++;
+
+	prg->break_flag = false;
+	prg->continue_flag = false;
+
+	unsigned int start = prg->s->pc;
+
+	while (true) {
+		if (interpret(prg) == false) {
+			return false;
+		}
+		if (prg->break_flag) {
+			prg->break_flag = false;
+			prg->s->pc = end_label;
+			return true;
+		}
+		else if (prg->s->pc < start || prg->s->pc > end_label) {
+			break;
+		}
+		if (prg->continue_flag) {
+			prg->continue_flag = false;
+			prg->s->pc = end_label;
+		}
+		if (prg->s->pc == end_label) {
+			er = evaluate_expression(prg, expr.e);
+			if (er.n == 0) {
+				prg->s->pc++;
+				break;
+			}
+			prg->s->pc = start;
+		}
+	}
+
+	return true;
+}
+
 static bool corefunc_if(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
@@ -4320,6 +4419,8 @@ void start()
 	add_expression_handler("pointer", exprfunc_pointer);
 
 	add_instruction("for", corefunc_for);
+	add_instruction("while", corefunc_while);
+	add_instruction("do_while", corefunc_do_while);
 	add_instruction("if", corefunc_if);
 	
 	add_expression_handler("time", exprfunc_time);
