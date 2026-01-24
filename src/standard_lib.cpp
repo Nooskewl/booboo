@@ -507,7 +507,7 @@ static Variable exprfunc_list_directory(Program *prg, const std::vector<Token> &
 		}
 #else
 		struct stat s;
-		if (stat((path_part + "/" + fn).c_str(), &s) == 0) {
+		if (stat(fn.c_str(), &s) == 0) {
 			if (S_ISDIR(s.st_mode)) {
 				_is_dir = true;
 			}
