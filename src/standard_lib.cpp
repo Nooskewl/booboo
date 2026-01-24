@@ -483,7 +483,7 @@ static Variable exprfunc_list_directory(Program *prg, const std::vector<Token> &
 			p--;
 		}
 		if (p > 0) {
-			path_part = glob.substr(0, p+1);
+			path_part = glob.substr(0, p);
 		}
 	}
 
@@ -491,27 +491,39 @@ static Variable exprfunc_list_directory(Program *prg, const std::vector<Token> &
 
 	std::string fn;
 
+	Variable filenames;
+	filenames.type = Variable::VECTOR;
+	Variable is_dir;
+	is_dir.type = Variable::VECTOR;
+
 	while ((fn = l.next()) != "") {
 		if (fn == "." || fn == "..") {
 			continue;
 		}
+		bool _is_dir = false;
 #ifdef _WIN32
-		if (PathIsDirectory((path_part + fn).c_str())) {
-			fn += "/";
+		if (PathIsDirectory((path_part + "/" + fn).c_str())) {
+			_is_dir = true;
 		}
 #else
 		struct stat s;
-		if (stat(fn.c_str(), &s) == 0) {
+		if (stat((path_part + "/" + fn).c_str(), &s) == 0) {
 			if (S_ISDIR(s.st_mode)) {
-				fn += "/";
+				_is_dir = true;
 			}
 		}
 #endif
 		Variable v;
 		v.type = Variable::STRING;
 		v.s = fn;
-		vec.v.push_back(v);
+		filenames.v.push_back(v);
+		v.type = Variable::NUMBER;
+		v.n = _is_dir;
+		is_dir.v.push_back(v);
 	}
+
+	vec.v.push_back(filenames);
+	vec.v.push_back(is_dir);
 
 	return vec;
 }

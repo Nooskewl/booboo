@@ -47,6 +47,7 @@ var old_home old_end
 var selected
 var top
 var filenames
+var is_dir
 var dir
 
 var argv
@@ -95,7 +96,7 @@ function chop_dir s
 {
 	var p
 	= p (string_length s)
-	= p (- p 2)
+	= p (- p 1)
 	if (< p 0) none
 		return s
 	:none
@@ -130,11 +131,11 @@ function list_dir name
 	var len
 	= len (string_length name)
 	var sub
-	= sub (string_substr name (- len 3))
-	if (&& (== sub "../") (>= len 6)) check_collapse
+	= sub (string_substr name (- len 2))
+	if (&& (== sub "..") (>= len 5)) check_collapse
 		var sub
-		= sub (string_substr name (- len 6))
-		if (&& (!= sub "../../") (!= sub "..\\../")) collapse
+		= sub (string_substr name (- len 5))
+		if (&& (!= sub "../..") (!= sub "..\\..")) collapse
 			var count
 			= count 0
 			var p
@@ -145,9 +146,9 @@ function list_dir name
 				= ch (string_from_number c)
 				if (|| (== ch "/") (== ch "\\")) found_slash
 					= count (+ count 1)
-					if (== count 3) really_collapse
+					if (== count 2) really_collapse
 						var sub
-						= sub (string_substr name 0 (+ p 1))
+						= sub (string_substr name 0 p)
 						= name sub
 						goto done_collapse
 					:really_collapse
@@ -158,8 +159,8 @@ function list_dir name
 	:done_collapse
 
 	= dir name
-	= name (+ name "*")
-	= filenames (list_directory name)
+	= name (+ name "/*")
+	explode (list_directory name) filenames is_dir
 
 	if (|| (matches dir "^.:[/\\\\]$") (matches dir "^/$")) no_up has_up
 		var drives
@@ -172,18 +173,20 @@ function list_dir name
 		for i 0 (< i sz) 1 add_drive
 			var drive
 			= drive [drives i]
-			= drive (+ drive ":/")
+			= drive (+ drive ":")
 			var sub
 			= sub (string_substr dir 0 1)
 			var tmp
 			= tmp [drives i]
 			if (!= sub [drives i]) really_add_drive
 				vector_insert filenames place drive
+				vector_insert is_dir place TRUE
 				= place (+ place 1)
 			:really_add_drive
 		:add_drive
 	:no_up
-		vector_insert filenames 0 "../"
+		vector_insert filenames 0 ".."
+		vector_insert is_dir 0 TRUE
 	:has_up
 
 	= selected 0
@@ -200,9 +203,9 @@ function list_dir name
 			= go_ok 1
 			goto done_list
 		:is_cpa
-		if (== s "data/") is_data_dir
+		if (== s "data") is_data_dir
 			var orig
-			= orig (+ [filenames i] "scripts/main.boo")
+			= orig (+ [filenames i] "/scripts/main.boo")
 			var f
 			= f (file_open orig "r")
 			if (!= -1 f) is_booboo_app
@@ -268,6 +271,9 @@ function draw
 		var s
 		= s [filenames i]
 		call_result s chop_dir s
+		if (== [is_dir i] TRUE) add_slash
+			= s (+ s "/")
+		:add_slash
 		var c
 		= c 128
 		if (== i selected) draw_bg
@@ -333,18 +339,12 @@ function navigate
 	var s
 	= s [filenames selected]
 	call_result s chop_dir s
-	var len
-	= len (string_length s)
-	var c
-	= c (string_char_at s (- len 1))
-	var cs
-	= cs (string_from_number c)
-	if (|| (== cs "/") (== cs "\\\\")) go_dir
+	if (== TRUE [is_dir selected]) go_dir
 		var d
 		if (matches s "^.:[/\\\\]$") is_root_windows not_root
 			= d s
 		:is_root_windows
-			= d (+ dir s)
+			= d (+ dir "/" s)
 		:not_root
 		call list_dir d
 	:go_dir
