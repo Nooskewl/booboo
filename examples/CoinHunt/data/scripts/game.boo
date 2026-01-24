@@ -941,7 +941,7 @@ function run
 	vector_add bullets b
 	mml_play shoot_sfx 1 0
 
-	if (>= (vector_size bullets) 16) erase_one
+	if (>= (vector_size bullets) 20) erase_one
 		vector_erase bullets 0
 	:erase_one
 
