@@ -290,7 +290,7 @@ Sections:
 	e.g. jle my_label
 </pre>
 
-<h3>jg</h3>
+<h3 style="page-break-before: always;">jg</h3>
 <pre>
 	Jump if greater
 	e.g. jg my_label
@@ -332,7 +332,7 @@ Sections:
 	order of appearance in the if statement or behaviour is undefined.
 </pre>
 
-<h3>for</h3>
+<h3 style="page-break-before: always;">for</h3>
 <pre>
 	A for loop
 	e.g. for i start (expression) increment end_label
@@ -396,7 +396,7 @@ Sections:
 	e.g. = str (string_from_number 97) ; creates "a"
 </pre>
 
-<h3>(string_substr)</h3>
+<h3 style="page-break-before: always;">(string_substr)</h3>
 <pre>
 	Create a substring of a string
 	e.g. = s (string_substr s start end)
@@ -540,7 +540,7 @@ Sections:
 	e.g. = n (ceil x)
 </pre>
 
-<h3>(neg)</h3>
+<h3 style="page-break-before: always;">(neg)</h3>
 <pre>
 	Invert the sign of a number
 	e.g. = n (neg x)
@@ -582,7 +582,7 @@ Sections:
 	e.g. = n (max a b)
 </pre>
 
-<h3>Vector and matrix math</h3>
+<h3 style="page-break-before: always;">Vector and matrix math</h3>
 <pre>
 	Some vector and matrix math is available through expression
 	operators. Supported are: mul, identity, scale, rotate,
@@ -633,7 +633,7 @@ Sections:
 	e.g. vector_reserve v n
 </pre>
 
-<h3>sort</h3>
+<h3 style="page-break-before: always;">sort</h3>
 <pre>
 	Sort a vector
 	Takes a pointer to a vector and a comparator function.
@@ -655,12 +655,6 @@ Sections:
 	e.g. vector_init v 1 2 3 4 5
 	e.g. var a b c
 	e.g. explode v a b c ; 1 2 3 in a b c
-</pre>
-
-<h3>(get_savedgames_path)</h3>
-<pre>
-	Returns the path to the Saved Games folder
-	e.g. = s (get_savedgames_path)
 </pre>
 
 <a id="Map"></a>
@@ -783,7 +777,7 @@ Sections:
 	e.g. cfg_set_string cfg "name" "Trent"
 </pre>
 
-<h3>(cfg_exists)</h3>
+<h3 style="page-break-before: always;">(cfg_exists)</h3>
 <pre>
 	check if a value exists in a config file
 	e.g. = exists (cfg_exists cfg "x")
@@ -843,7 +837,7 @@ Sections:
 	e.g. = dest (getenv "HOME")
 </pre>
 
-<h3>mkdir</h3>
+<h3 style="page-break-before: always;">mkdir</h3>
 <pre>
 	Create a directory
 	e.g. mkdir my_string_path
@@ -855,7 +849,7 @@ Sections:
 	e.g. explode (list_directory "/home/Pelvis/*") filenames is_dir_flags
 </pre>
 
-<h3>(get_system_language)</h3>
+<h3 style="page-break-before: always;">(get_system_language)</h3>
 <pre>
 	Returns the user interface language of the system
 	e.g. = lang (get_system_language)
@@ -911,6 +905,12 @@ Sections:
 	e.g. = v (get_args)
 </pre>
 
+<h3>(get_savedgames_path)</h3>
+<pre>
+	Returns the path to the Saved Games folder
+	e.g. = s (get_savedgames_path)
+</pre>
+
 <h3>text_fore</h3>
 <pre>
 	Change the text foreground colour. See constants for colours.
@@ -937,7 +937,7 @@ Sections:
 	e.g. text_clear
 </pre>
 
-<h3>(getch)</h3>
+<h3 style="page-break-before: always;">(getch)</h3>
 <pre>
 	Input a single character from the terminal, not waiting for newline
 	e.g. = input_number (getch)

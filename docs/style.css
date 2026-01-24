@@ -16,6 +16,9 @@ h1, h2, h3 {
 	color: white;
 	border: 2px solid black;
 }
+h2 {
+	page-break-before: always;
+}
 ::selection {
 	color: white;
 	background-color: blue;
