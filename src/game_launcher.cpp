@@ -836,6 +836,34 @@ int main(int argc, char **argv)
 
 	::start();
 
+	try {
+		std::string path = save_dir();
+		std::string cfg_text = util::load_text_from_filesystem(path + "/com.nooskewl.booboo.launcher.txt");
+		util::Tokenizer t(cfg_text, '\n');
+		std::string line;
+		while ((line = t.next()) != "") {
+			util::Tokenizer t2(line, '=');
+			std::string key = t2.next();
+			std::string value = t2.remaining();
+			if (key == "fullscreen") {
+				toggle_fullscreen = atoi(value.c_str());
+			}
+			else if (key == "invert_mouse_wheel") {
+				invert_mouse_wheel = atoi(value.c_str());
+			}
+			else if (key == "volume") {
+				shim::music_volume = atoi(value.c_str())/255.0f;
+			}
+		}
+	}
+	catch (util::Error &e) {
+	}
+
+	if (toggle_fullscreen) {
+		gfx::internal::gfx_context.fullscreen_window = true;
+		SDL_SetWindowFullscreen(gfx::internal::gfx_context.window, gfx::internal::gfx_context.fullscreen_window ? true : false);
+	}
+
 	if (shim::font != nullptr) {
 		shim::devsettings_num_rows = (shim::screen_size.h-16)/shim::font->get_height();
 		shim::devsettings_max_width = shim::screen_size.w-10;
@@ -866,37 +894,10 @@ int main(int argc, char **argv)
 	add_expression_handler("mouse_get_buttons", exprfunc_mouse_get_buttons);
 	add_expression_handler("key_get", exprfunc_key_get);
 
-	try {
-		std::string path = save_dir();
-		std::string cfg_text = util::load_text_from_filesystem(path + "/com.nooskewl.booboo.launcher.txt");
-		util::Tokenizer t(cfg_text, '\n');
-		std::string line;
-		while ((line = t.next()) != "") {
-			util::Tokenizer t2(line, '=');
-			std::string key = t2.next();
-			std::string value = t2.remaining();
-			if (key == "fullscreen") {
-				toggle_fullscreen = atoi(value.c_str());
-			}
-			else if (key == "invert_mouse_wheel") {
-				invert_mouse_wheel = atoi(value.c_str());
-			}
-			else if (key == "volume") {
-				shim::music_volume = atoi(value.c_str())/255.0f;
-			}
-		}
-	}
-	catch (util::Error &e) {
-	}
-
 	for (int i = 1; i < argc; i++) {
 		if (std::string(argv[i]) == "+volume" && i < (argc-1)) {
 			shim::music_volume = atoi(argv[i+1])/255.0f;
 		}
-	}
-
-	if (toggle_fullscreen) {
-		gen_f11();
 	}
 
 again:
