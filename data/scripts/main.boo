@@ -162,7 +162,7 @@ function list_dir name
 	= name (+ name "/*")
 	explode (list_directory name) filenames is_dir
 
-	if (|| (matches dir "^.:[/\\\\]$") (matches dir "^/$")) no_up has_up
+	if (|| (matches dir "^[A-Z]:/$") (matches dir "^/$")) no_up has_up
 		var drives
 		= drives (list_drives)
 		var sz
@@ -281,7 +281,7 @@ function draw
 			filled_rectangle 0 0 0 255 0 0 0 255 0 216 255 255 0 216 255 255 0 y W (/ fh 2)
 			filled_rectangle 0 216 255 255 0 216 255 255 0 0 0 255 0 0 0 255 0 (+ y (/ fh 2)) W (/ fh 2)
 		:draw_bg
-		font_draw font c c c 255 s 25 y
+		font_draw font c c c 255 s 25 y FALSE
 		= y (+ y fh)
 	:loop
 
@@ -341,8 +341,8 @@ function navigate
 	call_result s chop_dir s
 	if (== TRUE [is_dir selected]) go_dir
 		var d
-		if (matches s "^.:[/\\\\]$") is_root_windows not_root
-			= d s
+		if (matches s "^[A-Z]:$") is_root_windows not_root
+			= d (+ s "/")
 		:is_root_windows
 			= d (+ dir "/" s)
 		:not_root

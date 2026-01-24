@@ -2159,10 +2159,18 @@ static bool fontfunc_draw(Program *prg, const std::vector<Token> &v)
 	std::string text = as_string(prg, v[5]);
 	double x = as_number(prg, v[6]);
 	double y = as_number(prg, v[7]);
+	bool interpret_codes;
 	bool rtl;
 
 	if (v.size() > 8) {
-		rtl = as_number(prg, v[8]);
+		interpret_codes = as_number(prg, v[8]);
+	}
+	else {
+		interpret_codes = false;
+	}
+
+	if (v.size() > 9) {
+		rtl = as_number(prg, v[9]);
 	}
 	else {
 		rtl = false;
@@ -2180,7 +2188,7 @@ static bool fontfunc_draw(Program *prg, const std::vector<Token> &v)
 	c.b = b;
 	c.a = a;
 
-	font->draw(c, text, util::Point<float>(x, y), true, false, true, rtl);
+	font->draw(c, text, util::Point<float>(x, y), interpret_codes, false, interpret_codes, rtl);
 
 	return true;
 }
