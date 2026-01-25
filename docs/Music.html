@@ -39,9 +39,7 @@ elements in the envelope. If you have 2 elements in the envelope, each
 value applies to half the note, for 3 it's a third and so on.
 </p>
 
-<p>
-The definitions and effects you can use are:
-</p>
+<h2>Effects</h2>
 
 <h3>@S</h3>
 <pre>
@@ -94,7 +92,7 @@ The definitions and effects you can use are:
 	Absolute pitch shift. The values are in Hz.
 </pre>
 
-<h3>@R</h3>
+<h3 style="page-break-before: always;">@R</h3>
 <pre>
 	Reverb
 	@R0 = { 5 0 1000 255 32 }
@@ -102,7 +100,7 @@ The definitions and effects you can use are:
 	falloff time in MS, start volume of reverb, end volume of reverb
 </pre>
 
-<hr>
+<h2>Notes and Other</h2>
 
 <p>
 Within a channel, there are many symbols you can use. This is an attempt to document all of them, hopefully
@@ -218,7 +216,7 @@ I don't forget any this time...
 	Same as @CV but for pitch
 </pre>
 
-<h3>@CD</h3>
+<h3 style="page-break-before: always;">@CD</h3>
 <pre>
 	Same as @CV but for dutycycle
 </pre>
@@ -231,8 +229,6 @@ I don't forget any this time...
 	crackle. If you set it to @RT4 (maybe with @CP1) it will play through
 	it smoothly without resetting the phase. If you set @RT2 it will reset it halfway through.
 </pre>
-
-<h2>Buzz</h2>
 
 <p>Each generator can have buzz added to the waveform it generates. It's basically a hack at this point...
 If you had a pulse wave in a channel then added sine wave buzz you can imagine the wave being square
@@ -280,7 +276,7 @@ with a slight (or big) sine at each level.
 	toggle sample stretching or not. By default (s0) samples are played back without stretching to note length
 </pre>
 
-<hr>
+<h2>PetiteMM</h2>
 
 <p>
 PetiteMM is a great tool which can convert MIDI to MML. You will need to hand
