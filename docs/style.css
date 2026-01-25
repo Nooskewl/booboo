@@ -21,7 +21,7 @@ h2 {
 }
 ::selection {
 	color: white;
-	background-color: blue;
+	background-color: red;
 }
 #footer {
 	margin-top: 50px;
