@@ -36,8 +36,6 @@ struct Sample_Info {
 
 struct Image {
 	gfx::Image *image;
-	util::Size<int> size;
-	bool created;
 };
 
 struct Image_Info {
@@ -1601,8 +1599,6 @@ static Variable exprfunc_image_create(Program *prg, const std::vector<Token> &v)
 
 		Image *i = new Image;
 		i->image = img;
-		i->created = true;
-		i->size = util::Size<int>(w, h);
 
 		info->images[info->image_id++] = i;
 	}
@@ -1636,7 +1632,6 @@ static Variable exprfunc_image_load(Program *prg, const std::vector<Token> &v)
 
 		Image *i = new Image;
 		i->image = img;
-		i->created = false;
 
 		info->images[info->image_id++] = i;
 	}
@@ -2060,8 +2055,6 @@ static Variable exprfunc_image_to_texture(Program *prg, const std::vector<Token>
 
 	Image *i = new Image;
 	i->image = img;
-	i->created = true;
-	i->size = util::Size<int>(w, h);
 
 	info->images[info->image_id++] = i;
 
