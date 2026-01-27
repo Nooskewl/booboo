@@ -1974,6 +1974,33 @@ static Variable exprfunc_cfg_save(Program *prg, const std::vector<Token> &v)
 	return v1;
 }
 
+static Variable exprfunc_cfg_typeof(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+
+	CFG_Info *info = cfg_info(prg);
+	
+	INFO_EXISTS(info->cfgs, id)
+
+	Variable v1;
+	v1.type = Variable::STRING;
+
+	if (info->cfgs[id].find(name) == info->cfgs[id].end()) {
+		v1.s = "unknown";
+	}
+	else if (info->cfgs[id][name].type == Variable::NUMBER) {
+		v1.s = "number";
+	}
+	else {
+		v1.s = "string";
+	}
+
+	return v1;
+}
+
 static Variable exprfunc_cfg_get_number(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -2185,6 +2212,7 @@ void start_lib_standard()
 	add_expression_handler("cfg_load", exprfunc_cfg_load);
 	add_instruction("cfg_destroy", cfgfunc_destroy);
 	add_expression_handler("cfg_save", exprfunc_cfg_save);
+	add_expression_handler("cfg_typeof", exprfunc_cfg_typeof);
 	add_expression_handler("cfg_get_number", exprfunc_cfg_get_number);
 	add_expression_handler("cfg_get_string", exprfunc_cfg_get_string);
 	add_instruction("cfg_set_number", cfgfunc_set_number);
