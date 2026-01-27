@@ -393,7 +393,7 @@ void handle_event(TGUI_Event *event)
 	}
 	else if (event->type == TGUI_MOUSE_WHEEL) {
 		args[1].n = event->mouse.x;
-		args[2].n = event->mouse.y;
+		args[2].n = event->mouse.y * (invert_mouse_wheel ? -1 : 1);
 	}
 	else {
 		go = false;
