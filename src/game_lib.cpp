@@ -125,6 +125,16 @@ struct Widget_Info
 	std::map<int, Widget *> widgets;
 };
 
+struct CPA {
+	util::CPA *cpa;
+};
+
+struct CPA_Info
+{
+	int cpa_id;
+	std::map<int, CPA *> cpas;
+};
+
 static MML_Info *mml_info(Program *prg)
 {
 	MML_Info *info = (MML_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.mml");
@@ -253,6 +263,17 @@ static Widget_Info *widget_info(Program *prg)
 		info = new Widget_Info;
 		info->widget_id = 0;
 		booboo::set_black_box(prg, "com.nooskewl.booboo.widget", info);
+	}
+	return info;
+}
+
+static CPA_Info *cpa_info(Program *prg)
+{
+	CPA_Info *info = (CPA_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.cpa");
+	if (info == nullptr) {
+		info = new CPA_Info;
+		info->cpa_id = 0;
+		booboo::set_black_box(prg, "com.nooskewl.booboo.cpa", info);
 	}
 	return info;
 }
@@ -5620,6 +5641,74 @@ static bool widgetfunc_gui_set_transition_types(Program *prg, const std::vector<
 	return true;
 }
 
+static Variable exprfunc_load_cpa(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(1)
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	std::string name = as_string(prg, v[0]);
+
+	CPA_Info *info = cpa_info(prg);
+
+	v1.n = info->cpa_id;
+
+	bool load_from_filesystem = false;
+	if (v.size() > 1) {
+		load_from_filesystem = as_number(prg, v[1]);
+	}
+
+	try {
+		util::CPA *cpa;
+		if (load_from_filesystem) {
+			cpa = new util::CPA(name);
+		}
+		else {
+			int sz;
+			char *data = util::slurp_file(name, &sz);
+			cpa = new util::CPA((Uint8 *)data, sz);
+			delete[] data;
+		}
+
+		CPA *c = new CPA;
+		c->cpa = cpa;
+
+		info->cpas[info->cpa_id++] = c;
+	}
+	catch (util::Error &e) {
+		v1.n = -1;
+	}
+
+	return v1;
+}
+
+static bool cpafunc_set_cpa(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number(prg, v[0]);
+	
+	CPA_Info *info = cpa_info(prg);
+
+	INFO_EXISTS(info->cpas, id)
+
+	util::CPA *cpa = info->cpas[id]->cpa;
+
+	shim::cpa = cpa;
+
+	return true;
+}
+
+static bool cpafunc_set_default_cpa(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	shim::cpa = shim::default_cpa;
+
+	return true;
+}
+
 static void letterbox_callback(gfx::Letterbox_Type type, int x, int y, int w, int h)
 {
 	if (prg == nullptr) {
@@ -5981,6 +6070,9 @@ void start_lib_game()
 	add_instruction("gui_exit", widgetfunc_gui_exit);
 	add_instruction("gui_set_focus", widgetfunc_gui_set_focus);
 	add_instruction("gui_set_transition_types", widgetfunc_gui_set_transition_types);
+	add_expression_handler("cpa_load", exprfunc_load_cpa);
+	add_instruction("cpa_set", cpafunc_set_cpa);
+	add_instruction("cpa_set_default", cpafunc_set_default_cpa);
 
 	add_special_function("end");
 	add_special_function("run");

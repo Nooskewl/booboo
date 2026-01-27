@@ -156,6 +156,7 @@ The following sections describe the API:
 <li><a href="#Audio">Audio Functions</a></li>
 <li><a href="#Input">Input Functions</a></li>
 <li><a href="#JSON">JSON Functions</a></li>
+<li><a href="#CPA">CPA Functions</a></li>
 <li><a href="#Constants">Constants</a></li>
 <li><a href="#Events">Events</a></li>
 </ul>
@@ -1748,6 +1749,31 @@ and h are the calculated position and size of the widget in pixels.
 	A "game&gt;" prefix is added automatically. The optional callback is
 	called with the key's name when the value is changed in devsettings
 	e.g. json_register_string s "foo&gt;baz" readonly ^ callback
+</pre>
+
+<a id="CPA"></a>
+<h2>CPA Functions</h2>
+
+<p>CPAs are extra datafiles with the same structure as data.cpa.</p>
+
+<h3>(cpa_load)</h3>
+<pre>
+	Load a CPA datafile.
+	e.g. = cpa (cpa_load "file.cpa" ^ lffs)
+	Returns -1 on fail
+</pre>
+
+<h3>cpa_set</h3>
+<pre>
+	Change the default CPA file. All functions that load from data/data.cpa will
+	now load from this CPA, until cpa_set_default is called.
+	e.g. cpa_set cpa
+</pre>
+
+<h3>cpa_set_default</h3>
+<pre>
+	Restore the default CPA datafile
+	e.g. cpa_set_default
 </pre>
 
 <a id="Constants"></a>
