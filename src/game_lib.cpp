@@ -2654,7 +2654,7 @@ static Variable exprfunc_sprite_load(Program *prg, const std::vector<Token> &v)
 	}
 
 	try {
-		gfx::Sprite *sprite = new gfx::Sprite(name, name, load_from_filesystem);
+		gfx::Sprite *sprite = new gfx::Sprite(name);
 		info->sprites[info->sprite_id++] = sprite;
 	}
 	catch (util::Error &e) {
@@ -5668,7 +5668,6 @@ static Variable exprfunc_load_cpa(Program *prg, const std::vector<Token> &v)
 			int sz;
 			char *data = util::slurp_file(name, &sz);
 			cpa = new util::CPA((Uint8 *)data, sz);
-			delete[] data;
 		}
 
 		CPA *c = new CPA;
