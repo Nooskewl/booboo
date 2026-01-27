@@ -93,7 +93,7 @@ var rx ry
 = ry 0
 
 var vertex_buffer
-= vertex_buffer (create_vertex_buffer (@ verts) (@ faces) (@ colours) (@ normals) (@ texcoords) 12)
+= vertex_buffer (create_vertex_buffer verts faces colours normals texcoords 12)
 
 set_3d
 enable_depth_test TRUE

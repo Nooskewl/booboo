@@ -85,7 +85,7 @@ var colours
 var normals
 
 var vertex_buffer
-= vertex_buffer (create_vertex_buffer (@ positions) (@ faces) (@ colours) (@ normals) (@ texcoords) 2)
+= vertex_buffer (create_vertex_buffer positions faces colours normals texcoords 2)
 	
 var angle
 = angle 0

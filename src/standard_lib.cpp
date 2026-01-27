@@ -566,7 +566,19 @@ static bool corefunc_sort(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable *vec = as_pointer(prg, v[0]).p;
+	Variable *vec;
+       	if (v[0].type == Token::SYMBOL) {
+		if (prg->variables[v[0].i].type == Variable::EXPRESSION) {
+			static Variable var = evaluate_expression(prg, prg->variables[v[0].i].e);
+			vec = &var;
+		}
+		else {
+			vec = &as_variable(prg, v[0]);
+		}
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg));
+	}
 	int func = as_function(prg, v[1]);
 
 	if (vec->v.size() <= 1) {
@@ -582,7 +594,19 @@ static bool corefunc_unique(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable *vec = as_pointer(prg, v[0]).p;
+	Variable *vec;
+       	if (v[0].type == Token::SYMBOL) {
+		if (prg->variables[v[0].i].type == Variable::EXPRESSION) {
+			static Variable var = evaluate_expression(prg, prg->variables[v[0].i].e);
+			vec = &var;
+		}
+		else {
+			vec = &as_variable(prg, v[0]);
+		}
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg));
+	}
 
 	auto last = std::unique(vec->v.begin(), vec->v.end());
 	vec->v.erase(last, vec->v.end());

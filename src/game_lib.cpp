@@ -4167,11 +4167,71 @@ static Variable exprfunc_model_create_vertex_buffer(Program *prg, const std::vec
 {
 	MIN_ARGS(6)
 
-	Variable *verts = as_pointer(prg, v[0]).p;
-	Variable *faces = as_pointer(prg, v[1]).p;
-	Variable *colours = as_pointer(prg, v[2]).p;
-	Variable *normals = as_pointer(prg, v[3]).p;
-	Variable *texcoords = as_pointer(prg, v[4]).p;
+	Variable *verts;
+       	if (v[0].type == Token::SYMBOL) {
+		if (prg->variables[v[0].i].type == Variable::EXPRESSION) {
+			static Variable var = evaluate_expression(prg, prg->variables[v[0].i].e);
+			verts = &var;
+		}
+		else {
+			verts = &as_variable(prg, v[0]);
+		}
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg));
+	}
+	Variable *faces;
+       	if (v[1].type == Token::SYMBOL) {
+		if (prg->variables[v[1].i].type == Variable::EXPRESSION) {
+			static Variable var = evaluate_expression(prg, prg->variables[v[1].i].e);
+			faces = &var;
+		}
+		else {
+			faces = &as_variable(prg, v[1]);
+		}
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg));
+	}
+	Variable *colours;
+       	if (v[2].type == Token::SYMBOL) {
+		if (prg->variables[v[2].i].type == Variable::EXPRESSION) {
+			static Variable var = evaluate_expression(prg, prg->variables[v[2].i].e);
+			colours = &var;
+		}
+		else {
+			colours = &as_variable(prg, v[2]);
+		}
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg));
+	}
+	Variable *normals;
+       	if (v[3].type == Token::SYMBOL) {
+		if (prg->variables[v[3].i].type == Variable::EXPRESSION) {
+			static Variable var = evaluate_expression(prg, prg->variables[v[3].i].e);
+			normals = &var;
+		}
+		else {
+			normals = &as_variable(prg, v[3]);
+		}
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg));
+	}
+	Variable *texcoords;
+       	if (v[4].type == Token::SYMBOL) {
+		if (prg->variables[v[4].i].type == Variable::EXPRESSION) {
+			static Variable var = evaluate_expression(prg, prg->variables[v[4].i].e);
+			texcoords = &var;
+		}
+		else {
+			texcoords = &as_variable(prg, v[4]);
+		}
+	}
+	else {
+		throw Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg));
+	}
 	int num_triangles = as_number(prg, v[5]);
 
 	bool create_vbo = false;

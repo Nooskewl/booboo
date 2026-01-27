@@ -182,7 +182,7 @@ vector_add colours 255
 vector_add colours 255
 
 var vertex_buffer
-= vertex_buffer (create_vertex_buffer (@ verts) (@ faces) (@ colours) (@ normals) (@ texcoords) (/ (vector_size faces) 3))
+= vertex_buffer (create_vertex_buffer verts faces colours normals texcoords (/ (vector_size faces) 3))
 
 var rx ry
 = rx 0
