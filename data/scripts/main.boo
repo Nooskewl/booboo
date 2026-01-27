@@ -1,7 +1,8 @@
-var scanline_skip scanline_alpha
-= scanline_skip 2
-;= scanline_alpha 128
-= scanline_alpha 0 ; disable the effect
+var scanline_skip scanline_alpha scanline_h
+= scanline_h 2
+= scanline_skip 4
+= scanline_alpha 32
+;= scanline_alpha 0 ; disable the effect
 
 var TOP
 = TOP 20
@@ -84,8 +85,8 @@ function rsz destroy_fonts
 	explode (get_screen_size) W H
 	resize W H
 
-	= font (font_load "font.ttf" (/ H 25) 1)
-	= small_font (font_load "font.ttf" (/ H 35) 1)
+	= font (font_load "astron-boy.ttf" (/ H 15) 1)
+	= small_font (font_load "astron-boy.ttf" (/ H 25) 1)
 
 	= fh (font_height font)
 
@@ -258,14 +259,14 @@ function draw
 	font_draw font 255 255 255 255 "Enter Directory: A/Return/LMB" 25 (+ 5 (- H (* fh 3.5)))
 	var w
 	= w (font_width font found_text)
-	font_draw font found_r found_g found_b 255 found_text (- (- W w) 26) (+ 5 (- H (* fh 3.5)))
+	font_draw font found_r found_g found_b 255 found_text (- (- W w) 26) (+ 5 (- H (* fh 2.5)))
 
 	var w
 	= w (/ (font_width small_font dir) 2)
 	var sfh
 	= sfh (font_height small_font)
-	filled_rectangle 255 0 216 255 255 0 216 255 255 0 216 255 255 0 216 255 (- (/ W 2) w 5) (+ 10 fh (- H (* fh 3.5))) (+ 10 (* w 2)) (+ sfh 4)
-	font_draw small_font 0 0 0 255 dir (- (/ W 2) w) (+ 12 fh (- H (* fh 3.5)))
+	filled_rectangle 255 0 216 255 255 0 216 255 255 0 216 255 255 0 216 255 (- (/ W 2) w 5) (+ 10 fh (- H (* fh 2.5))) (+ 10 (* w 2)) (+ sfh 4)
+	font_draw small_font 0 0 0 255 dir (- (/ W 2) w) (+ 12 fh (- H (* fh 2.5)))
 
 	for i top (&& (< i sz) (< i (+ top num))) 1 loop
 		var s
@@ -297,7 +298,7 @@ function draw
 
 	var i
 	for i 0 (< i H) scanline_skip do_scanline
-		line 0 0 0 scanline_alpha 0 (+ i 0.5) W (+ i 0.5) 1
+		line 0 0 0 scanline_alpha 0 (+ i 0.5) W (+ i 0.5) scanline_h
 	:do_scanline
 
 	end_primitives
