@@ -15,7 +15,7 @@ function zero_padded_string_from_number n
 clear 0 0 0
 
 var font
-= font (font_load "font.ttf" 96 1)
+= font (font_load "skateblade.ttf" 92 1)
 var small_font
 = small_font (font_load "font.ttf" 32 1)
 
