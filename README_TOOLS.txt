@@ -1,3 +1,5 @@
+Note: Some of these need SDL3.dll!
+
 compress_dir can compress a data/ directory into a data.cpa file. Just enter the
 data/ directory and run it, it will create ../data.cpa. BooBoo can launch a
 data.cpa in a directory by pointing BooBoo to the directory of the data.cpa
