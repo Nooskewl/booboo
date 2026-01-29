@@ -2101,7 +2101,7 @@ static Variable exprfunc_font_load(Program *prg, const std::vector<Token> &v)
 	}
 
 	try {
-		gfx::TTF *font = new gfx::TTF(name, size, 1024, load_from_filesystem);
+		gfx::TTF *font = new gfx::TTF(name, size, 4096, load_from_filesystem);
 		font->set_smooth(smooth);
 		info->fonts[info->font_id++] = font;
 	}
