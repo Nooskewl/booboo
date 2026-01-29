@@ -1,5 +1,5 @@
 var font
-= font (font_load "font.ttf" 96 1)
+= font (font_load "Horror.ttf" 88 1)
 var small_font
 = small_font (font_load "font.ttf" 48 1)
 

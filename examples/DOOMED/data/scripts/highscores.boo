@@ -1,7 +1,7 @@
 clear 0 0 0
 
 var font
-= font (font_load "font.ttf" 96 1)
+= font (font_load "Horror.ttf" 88 1)
 var small_font
 = small_font (font_load "font.ttf" 40 1)
 
