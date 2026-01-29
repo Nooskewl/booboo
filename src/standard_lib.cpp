@@ -30,7 +30,7 @@ template <typename T> T sign(T v) { return (T(0) < v) - (v < T(0)); }
 
 struct File_Info {
 	int file_id;
-	std::map<int, std::fstream *> files;
+	std::map<int, SDL_IOStream *> files;
 };
 
 struct Config_Value
@@ -182,27 +182,10 @@ static bool save_cfg(Program *prg, int id, std::string cfg_name)
 	return true;
 }
 
-static Variable exprfunc_getenv(Program *prg, const std::vector<Token> &v)
+static std::string sformat(Program *prg, const std::vector<Token> &v, int skip)
 {
-	COUNT_ARGS(1)
-
-	std::string get = as_string(prg, v[0]);
-
-	char *ptr = getenv(get.c_str());
-
-	Variable var;
-	var.type = Variable::STRING;
-	var.s = ptr == nullptr ? "" : ptr;
-
-	return var;
-}
-
-static bool corefunc_print(Program *prg, const std::vector<Token> &v)
-{
-	MIN_ARGS(1)
-
-	std::string fmt = as_string(prg, v[0]);
-	int _tok = 1;
+	std::string fmt = as_string(prg, v[skip]);
+	int _tok = skip+1;
 	
 	int prev = 0;
 	int arg_count = 0;
@@ -272,32 +255,26 @@ static bool corefunc_print(Program *prg, const std::vector<Token> &v)
 			val = buf;
 		}
 		else {
-			Variable *v1;
-			if (v[_tok].dereference) {
-				v1 = as_variable(prg, v[_tok]).p;
-			}
-			else {
-				v1 = &as_variable(prg, v[_tok]);
-			}
-			if (IS_NUMBER(*v1)) {
+			Variable &v1 = as_variable(prg, v[_tok]);
+			if (IS_NUMBER(v1)) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
 				if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
-					snprintf(buf, 1000, ("%" + format).c_str(), (int)v1->n);
+					snprintf(buf, 1000, ("%" + format).c_str(), (int)v1.n);
 				}
 				else {
-					snprintf(buf, 1000, ("%" + format).c_str(), v1->n);
+					snprintf(buf, 1000, ("%" + format).c_str(), v1.n);
 				}
 				val = buf;
 			}
-			else if (IS_STRING(*v1)) {
+			else if (IS_STRING(v1)) {
 				format = (format == "") ? "s" : format;
 				char buf[1000];
-				snprintf(buf, 1000, ("%" + format).c_str(), v1->s.c_str());
+				snprintf(buf, 1000, ("%" + format).c_str(), v1.s.c_str());
 				val = buf;
 			}
-			else if (IS_EXPRESSION(*v1)) {
-				Variable var = evaluate_expression(prg, v1->e);
+			else if (IS_EXPRESSION(v1)) {
+				Variable var = evaluate_expression(prg, v1.e);
 				if (IS_NUMBER(var)) {
 					format = (format == "") ? "g" : format;
 					char buf[1000];
@@ -334,8 +311,8 @@ static bool corefunc_print(Program *prg, const std::vector<Token> &v)
 					val = buf;
 				}
 			}
-			else if (IS_FISH(*v1)) {
-				Variable &var = go_fish(prg, v1->f);
+			else if (IS_FISH(v1)) {
+				Variable &var = go_fish(prg, v1.f);
 				if (IS_NUMBER(var)) {
 					format = (format == "") ? "g" : format;
 					char buf[1000];
@@ -373,20 +350,17 @@ static bool corefunc_print(Program *prg, const std::vector<Token> &v)
 				}
 			}
 			else {
-				if (IS_VECTOR(*v1)) {
+				if (IS_VECTOR(v1)) {
 					val = "-vector-";
 				}
-				else if (IS_MAP(*v1)) {
+				else if (IS_MAP(v1)) {
 					val = "-map-";
 				}
-				else if (IS_FUNCTION(*v1)) {
+				else if (IS_FUNCTION(v1)) {
 					val = "-function-";
 				}
-				else if (IS_LABEL(*v1)) {
+				else if (IS_LABEL(v1)) {
 					val = "-label-";
-				}
-				else if (IS_POINTER(*v1)) {
-					val = "-pointer-";
 				}
 				else {
 					val = "-unknown-";
@@ -407,7 +381,31 @@ static bool corefunc_print(Program *prg, const std::vector<Token> &v)
 		result += fmt.substr(c);
 	}
 
-	printf("%s", result.c_str());
+	return result;
+}
+
+static Variable exprfunc_getenv(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	std::string get = as_string(prg, v[0]);
+
+	char *ptr = getenv(get.c_str());
+
+	Variable var;
+	var.type = Variable::STRING;
+	var.s = ptr == nullptr ? "" : ptr;
+
+	return var;
+}
+
+static bool corefunc_print(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(1)
+
+	std::string result = sformat(prg, v, 0);
+
+	printf(result.c_str());
 
 	return true;
 }
@@ -658,202 +656,7 @@ static Variable exprfunc_string_format(Program *prg, const std::vector<Token> &v
 
 	Variable v1;
 
-	std::string fmt = as_string(prg, v[0]);
-	int _tok = 1;
-	
-	int prev = 0;
-	int arg_count = 0;
-
-	for (size_t i = 0; i < fmt.length(); i++) {
-		if (fmt[i] == '%' && prev != '%') {
-			arg_count++;
-		}
-		prev = fmt[i];
-	}
-
-	std::string result;
-	int c = 0;
-	prev = 0;
-
-	for (int arg = 0; arg < arg_count; arg++) {
-		int start = c;
-		std::string format;
-		int fmt_len = 1;
-		while (c < (int)fmt.length()) {
-			if (fmt[c] == '%' && prev != '%') {
-				if (c < (int)fmt.length()-1) {
-					if (fmt[c+1] == '(') {
-						int l = 2;
-						int st = c+l;
-						if (c+l >= (int)fmt.length()) {
-							throw Error(std::string(__FUNCTION__) + ": " + "Invalid format specifier at " + get_error_info(prg));
-						}
-						while (fmt[c+l] != ')' && c+l < (int)fmt.length()) {
-							l++;
-						}
-						if (c+l >= (int)fmt.length()) {
-							throw Error(std::string(__FUNCTION__) + ": " + "Invalid format specifier at " + get_error_info(prg));
-						}
-						format = fmt.substr(st, l-2);
-						fmt_len = l + 1;
-					}
-				}
-				break;
-			}
-			prev = fmt[c];
-			c++;
-		}
-
-		result += fmt.substr(start, c-start);
-
-		c += fmt_len;
-		prev = fmt[c > 0 ? c-1 : c];
-
-		std::string val;
-
-		if (v[_tok].type == Token::NUMBER) {
-			format = (format == "") ? "g" : format;
-			char buf[1000];
-			if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
-				snprintf(buf, 1000, ("%" + format).c_str(), (int)v[_tok].n);
-			}
-			else {
-				snprintf(buf, 1000, ("%" + format).c_str(), v[_tok].n);
-			}
-			val = buf;
-		}
-		else if (v[_tok].type == Token::STRING) {
-			format = (format == "") ? "s" : format;
-			char buf[1000];
-			snprintf(buf, 1000, ("%" + format).c_str(), v[_tok].s.c_str());
-			val = buf;
-		}
-		else {
-			Variable &v1 = as_variable(prg, v[_tok]);
-			if (IS_NUMBER(v1)) {
-				format = (format == "") ? "g" : format;
-				char buf[1000];
-				if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
-					snprintf(buf, 1000, ("%" + format).c_str(), (int)v1.n);
-				}
-				else {
-					snprintf(buf, 1000, ("%" + format).c_str(), v1.n);
-				}
-				val = buf;
-			}
-			else if (IS_STRING(v1)) {
-				format = (format == "") ? "s" : format;
-				char buf[1000];
-				snprintf(buf, 1000, ("%" + format).c_str(), v1.s.c_str());
-				val = buf;
-			}
-			else if (IS_EXPRESSION(v1)) {
-				Variable var = evaluate_expression(prg, v1.e);
-				if (IS_NUMBER(var)) {
-					format = (format == "") ? "g" : format;
-					char buf[1000];
-					if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
-						snprintf(buf, 1000, ("%" + format).c_str(), (int)var.n);
-					}
-					else {
-						snprintf(buf, 1000, ("%" + format).c_str(), var.n);
-					}
-					val = buf;
-				}
-				else {
-					if (IS_STRING(var)) {
-						val = var.s;
-					}
-					else if (IS_VECTOR(var)) {
-						val = "-vector-";
-					}
-					else if (IS_MAP(var)) {
-						val = "-map-";
-					}
-					else if (IS_FUNCTION(var)) {
-						val = "-function-";
-					}
-					else if (IS_LABEL(var)) {
-						val = "-label-";
-					}
-					else {
-						val = "-unknown-";
-					}
-					format = (format == "") ? "s" : format;
-					char buf[1000];
-					snprintf(buf, 1000, ("%" + format).c_str(), val.c_str());
-					val = buf;
-				}
-			}
-			else if (IS_FISH(v1)) {
-				Variable &var = go_fish(prg, v1.f);
-				if (IS_NUMBER(var)) {
-					format = (format == "") ? "g" : format;
-					char buf[1000];
-					if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
-						snprintf(buf, 1000, ("%" + format).c_str(), (int)var.n);
-					}
-					else {
-						snprintf(buf, 1000, ("%" + format).c_str(), var.n);
-					}
-					val = buf;
-				}
-				else {
-					if (IS_STRING(var)) {
-						val = var.s;
-					}
-					else if (IS_VECTOR(var)) {
-						val = "-vector-";
-					}
-					else if (IS_MAP(var)) {
-						val = "-map-";
-					}
-					else if (IS_FUNCTION(var)) {
-						val = "-function-";
-					}
-					else if (IS_LABEL(var)) {
-						val = "-label-";
-					}
-					else {
-						val = "-unknown-";
-					}
-					format = (format == "") ? "s" : format;
-					char buf[1000];
-					snprintf(buf, 1000, ("%" + format).c_str(), val.c_str());
-					val = buf;
-				}
-			}
-			else {
-				if (IS_VECTOR(v1)) {
-					val = "-vector-";
-				}
-				else if (IS_MAP(v1)) {
-					val = "-map-";
-				}
-				else if (IS_FUNCTION(v1)) {
-					val = "-function-";
-				}
-				else if (IS_LABEL(v1)) {
-					val = "-label-";
-				}
-				else {
-					val = "-unknown-";
-				}
-				format = (format == "") ? "s" : format;
-				char buf[1000];
-				snprintf(buf, 1000, ("%" + format).c_str(), val.c_str());
-				val = buf;
-			}
-		}
-
-		_tok++;
-
-		result += val;
-	}
-
-	if (c < (int)fmt.length()) {
-		result += fmt.substr(c);
-	}
+	std::string result = sformat(prg, v, 0);
 
 	v1.type = Variable::STRING;
 	v1.s = result;
@@ -1605,22 +1408,35 @@ static Variable exprfunc_file_open(Program *prg, const std::vector<Token> &v)
 	v1.type = Variable::NUMBER;
 	v1.n = info->file_id;
 
-	std::fstream *f = new std::fstream;
+	SDL_IOStream *f = SDL_IOFromFile(filename.c_str(), mode.c_str());
 
-	if (mode == "r") {
-		f->open(filename, std::fstream::in);
-	}
-	else if (mode == "w") {
-		f->open(filename, std::fstream::out);
-	}
-	else if (mode == "a") {
-		f->open(filename, std::fstream::out | std::fstream::app);
-	}
-	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid file open mode at " + get_error_info(prg));
+	if (f == nullptr) {
+		v1.n = -1;
+		return v1;
 	}
 
-	if (f->fail()) {
+	info->files[info->file_id++] = f;
+
+	return v1;
+}
+
+static Variable exprfunc_file_open_cpa(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	std::string filename = as_string(prg, v[0]);
+	
+	File_Info *info = file_info(prg);
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+	v1.n = info->file_id;
+
+	int sz;
+
+	SDL_IOStream *f = util::open_file(filename.c_str(), &sz);
+
+	if (f == nullptr) {
 		v1.n = -1;
 		return v1;
 	}
@@ -1637,8 +1453,10 @@ static bool filefunc_close(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v[0]);
 	
 	File_Info *info = file_info(prg);
+	INFO_EXISTS(info->files, id)
 
-	info->files[id]->close();
+	SDL_CloseIO(info->files[id]);
+	info->files.erase(info->files.find(id));
 
 	return true;
 }
@@ -1653,8 +1471,32 @@ static Variable exprfunc_file_read(Program *prg, const std::vector<Token> &v)
 	var.type = Variable::STRING;
 
 	File_Info *info = file_info(prg);
+	INFO_EXISTS(info->files, id)
 
-	(*info->files[id]) >> var.s;
+	SDL_IOStream *f = info->files[id];
+
+	bool skipped = false;
+
+	while (true) {
+		Uint8 c;
+		SDL_ReadU8(f, &c);
+		if (SDL_GetIOStatus(f) == SDL_IO_STATUS_EOF) {
+			break;
+		}
+		bool space = isspace(c);
+		if (skipped == false && !space) {
+			skipped = true;
+		}
+		if (!space && skipped == true) {
+			char buf[2];
+			buf[0] = c;
+			buf[1] = 0;
+			var.s += buf;
+		}
+		else if (space) {
+			break;
+		}
+	}
 
 	return var;
 }
@@ -1669,13 +1511,23 @@ static Variable exprfunc_file_read_line(Program *prg, const std::vector<Token> &
 	var.type = Variable::STRING;
 
 	File_Info *info = file_info(prg);
+	INFO_EXISTS(info->files, id)
 
-	if ((*info->files[id]).eof()) {
-		var.s = "";
-	}
-	else {
-		std::getline(*info->files[id], var.s);
-		var.s += "\n";
+	SDL_IOStream *f = info->files[id];
+
+	while (true) {
+		Uint8 c;
+		SDL_ReadU8(f, &c);
+		if (SDL_GetIOStatus(f) == SDL_IO_STATUS_EOF) {
+			break;
+		}
+		char buf[2];
+		buf[0] = c;
+		buf[1] = 0;
+		var.s += buf;
+		if (c == '\n') {
+			break;
+		}
 	}
 
 	return var;
@@ -1691,8 +1543,12 @@ static Variable exprfunc_file_read_byte(Program *prg, const std::vector<Token> &
 	var.type = Variable::NUMBER;
 
 	File_Info *info = file_info(prg);
+	INFO_EXISTS(info->files, id)
 
-	var.n = info->files[id]->get();
+	Uint8 c;
+	SDL_ReadU8(info->files[id], &c);
+
+	var.n = c;
 
 	return var;
 }
@@ -1705,8 +1561,11 @@ static bool filefunc_write_byte(Program *prg, const std::vector<Token> &v)
 	int b = as_number(prg, v[1]);
 
 	File_Info *info = file_info(prg);
+	INFO_EXISTS(info->files, id)
 
-	info->files[id]->put(b);
+	SDL_IOStream *f = info->files[id];
+
+	SDL_WriteU8(f, (Uint8)b);
 
 	return true;
 }
@@ -1719,8 +1578,9 @@ static bool filefunc_write(Program *prg, const std::vector<Token> &v)
 	std::string val = as_string(prg, v[1]);
 
 	File_Info *info = file_info(prg);
+	INFO_EXISTS(info->files, id)
 
-	(*info->files[id]) << val;
+	SDL_WriteIO(info->files[id], val.c_str(), val.length());
 
 	return true;
 }
@@ -1730,208 +1590,32 @@ static bool filefunc_print(Program *prg, const std::vector<Token> &v)
 	MIN_ARGS(2)
 
 	int id = as_number(prg, v[0]);
-	std::string fmt = as_string(prg, v[1]);
-	int _tok = 2;
-	
-	int prev = 0;
-	int arg_count = 0;
 
-	for (size_t i = 0; i < fmt.length(); i++) {
-		if (fmt[i] == '%' && prev != '%') {
-			arg_count++;
-		}
-		prev = fmt[i];
-	}
+	std::string val = sformat(prg, v, 1);
 
-	std::string result;
-	int c = 0;
-	prev = 0;
-
-	for (int arg = 0; arg < arg_count; arg++) {
-		int start = c;
-		std::string format;
-		int fmt_len = 1;
-		while (c < (int)fmt.length()) {
-			if (fmt[c] == '%' && prev != '%') {
-				if (c < (int)fmt.length()-1) {
-					if (fmt[c+1] == '(') {
-						int l = 2;
-						int st = c+l;
-						if (c+l >= (int)fmt.length()) {
-							throw Error(std::string(__FUNCTION__) + ": " + "Invalid format specifier at " + get_error_info(prg));
-						}
-						while (fmt[c+l] != ')' && c+l < (int)fmt.length()) {
-							l++;
-						}
-						if (c+l >= (int)fmt.length()) {
-							throw Error(std::string(__FUNCTION__) + ": " + "Invalid format specifier at " + get_error_info(prg));
-						}
-						format = fmt.substr(st, l-2);
-						fmt_len = l + 1;
-					}
-				}
-				break;
-			}
-			prev = fmt[c];
-			c++;
-		}
-
-		result += fmt.substr(start, c-start);
-
-		c += fmt_len;
-		prev = fmt[c > 0 ? c-1 : c];
-
-		std::string val;
-
-		if (v[_tok].type == Token::NUMBER) {
-			format = (format == "") ? "g" : format;
-			char buf[1000];
-			if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
-				snprintf(buf, 1000, ("%" + format).c_str(), (int)v[_tok].n);
-			}
-			else {
-				snprintf(buf, 1000, ("%" + format).c_str(), v[_tok].n);
-			}
-			val = buf;
-		}
-		else if (v[_tok].type == Token::STRING) {
-			format = (format == "") ? "s" : format;
-			char buf[1000];
-			snprintf(buf, 1000, ("%" + format).c_str(), v[_tok].s.c_str());
-			val = buf;
-		}
-		else {
-			Variable &v1 = as_variable(prg, v[_tok]);
-			if (IS_NUMBER(v1)) {
-				format = (format == "") ? "g" : format;
-				char buf[1000];
-				if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
-					snprintf(buf, 1000, ("%" + format).c_str(), (int)v1.n);
-				}
-				else {
-					snprintf(buf, 1000, ("%" + format).c_str(), v1.n);
-				}
-				val = buf;
-			}
-			else if (IS_STRING(v1)) {
-				format = (format == "") ? "s" : format;
-				char buf[1000];
-				snprintf(buf, 1000, ("%" + format).c_str(), v1.s.c_str());
-				val = buf;
-			}
-			else if (IS_EXPRESSION(v1)) {
-				Variable var = evaluate_expression(prg, v1.e);
-				if (IS_NUMBER(var)) {
-					format = (format == "") ? "g" : format;
-					char buf[1000];
-					if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
-						snprintf(buf, 1000, ("%" + format).c_str(), (int)var.n);
-					}
-					else {
-						snprintf(buf, 1000, ("%" + format).c_str(), var.n);
-					}
-					val = buf;
-				}
-				else {
-					if (IS_STRING(var)) {
-						val = var.s;
-					}
-					else if (IS_VECTOR(var)) {
-						val = "-vector-";
-					}
-					else if (IS_MAP(var)) {
-						val = "-map-";
-					}
-					else if (IS_FUNCTION(var)) {
-						val = "-function-";
-					}
-					else if (IS_LABEL(var)) {
-						val = "-label-";
-					}
-					else {
-						val = "-unknown-";
-					}
-					format = (format == "") ? "s" : format;
-					char buf[1000];
-					snprintf(buf, 1000, ("%" + format).c_str(), val.c_str());
-					val = buf;
-				}
-			}
-			else if (IS_FISH(v1)) {
-				Variable &var = go_fish(prg, v1.f);
-				if (IS_NUMBER(var)) {
-					format = (format == "") ? "g" : format;
-					char buf[1000];
-					if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
-						snprintf(buf, 1000, ("%" + format).c_str(), (int)var.n);
-					}
-					else {
-						snprintf(buf, 1000, ("%" + format).c_str(), var.n);
-					}
-					val = buf;
-				}
-				else {
-					if (IS_STRING(var)) {
-						val = var.s;
-					}
-					else if (IS_VECTOR(var)) {
-						val = "-vector-";
-					}
-					else if (IS_MAP(var)) {
-						val = "-map-";
-					}
-					else if (IS_FUNCTION(var)) {
-						val = "-function-";
-					}
-					else if (IS_LABEL(var)) {
-						val = "-label-";
-					}
-					else {
-						val = "-unknown-";
-					}
-					format = (format == "") ? "s" : format;
-					char buf[1000];
-					snprintf(buf, 1000, ("%" + format).c_str(), val.c_str());
-					val = buf;
-				}
-			}
-			else {
-				if (IS_VECTOR(v1)) {
-					val = "-vector-";
-				}
-				else if (IS_MAP(v1)) {
-					val = "-map-";
-				}
-				else if (IS_FUNCTION(v1)) {
-					val = "-function-";
-				}
-				else if (IS_LABEL(v1)) {
-					val = "-label-";
-				}
-				else {
-					val = "-unknown-";
-				}
-				format = (format == "") ? "s" : format;
-				char buf[1000];
-				snprintf(buf, 1000, ("%" + format).c_str(), val.c_str());
-				val = buf;
-			}
-		}
-
-		_tok++;
-
-		result += val;
-	}
-
-	if (c < (int)fmt.length()) {
-		result += fmt.substr(c);
-	}
-	
 	File_Info *info = file_info(prg);
+	INFO_EXISTS(info->files, id)
 
-	(*info->files[id]) << result;
+	SDL_WriteIO(info->files[id], val.c_str(), val.length());
 
 	return true;
+}
+
+static Variable exprfunc_file_eof(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number(prg, v[0]);
+
+	File_Info *info = file_info(prg);
+	INFO_EXISTS(info->files, id)
+
+	Variable var;
+	var.type = Variable::NUMBER;
+
+	var.n = SDL_GetIOStatus(info->files[id]) == SDL_IO_STATUS_EOF;
+
+	return var;
 }
 
 static bool twinklefunc_text_fore(Program *prg, const std::vector<Token> &v)
@@ -2718,6 +2402,7 @@ void start_lib_standard()
 	add_expression_handler("map_keys", exprfunc_map_keys);
 
 	add_expression_handler("file_open", exprfunc_file_open);
+	add_expression_handler("file_open_cpa", exprfunc_file_open_cpa);
 	add_instruction("file_close", filefunc_close);
 	add_expression_handler("file_read", exprfunc_file_read);
 	add_expression_handler("file_read_line", exprfunc_file_read_line);
@@ -2725,6 +2410,7 @@ void start_lib_standard()
 	add_instruction("file_write_byte", filefunc_write_byte);
 	add_instruction("file_write", filefunc_write);
 	add_instruction("file_print", filefunc_print);
+	add_expression_handler("file_eof", exprfunc_file_eof);
 	
 	add_instruction("text_fore", twinklefunc_text_fore);
 	add_instruction("text_back", twinklefunc_text_back);
@@ -2774,8 +2460,7 @@ void standard_lib_destroy_program(Program *prg)
 {
 	File_Info *file_i = file_info(prg);
 	for (size_t i = 0; i < file_i->files.size(); i++) {
-		file_i->files[i]->close();
-		delete file_i->files[i];
+		SDL_CloseIO(file_i->files[i]);
 	}
 	JSON_Info *json_i = json_info(prg);
 	for (std::map<int, util::JSON *>::iterator i = json_i->jsons.begin(); i != json_i->jsons.end(); i++) {
