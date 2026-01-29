@@ -745,6 +745,18 @@ Sections:
 	e.g. file_print f "%(20s)%(20s)%(20s)" x y z
 </pre>
 
+<h3>(file_tell)</h3>
+<pre>
+	Return the current file offset
+	e.g. = o (file_tell f)
+</pre>
+
+<h3>file_seek</h3>
+<pre>
+	Seek within file. Uses SEEK_* constants.
+	e.g. file_seek f 0 SEEK_END
+</pre>
+
 <a id="CFG"></a>
 <h2>Configuration Functions</h2>
 
@@ -1132,6 +1144,14 @@ These are used with text_fore/text_back:
 	<li>PURPLE</li>
 	<li>YELLOW</li>
 	<li>WHITE</li>
+</ul>
+
+<p>Used with file_seek:</p>
+
+<ul>
+	<li>SEEK_SET</li>
+	<li>SEEK_CUR</li>
+	<li>SEEK_END</li>
 </ul>
 
 </div>

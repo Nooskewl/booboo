@@ -1601,6 +1601,39 @@ static bool filefunc_print(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static Variable exprfunc_file_tell(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number(prg, v[0]);
+
+	File_Info *info = file_info(prg);
+	INFO_EXISTS(info->files, id)
+
+	Variable var;
+	var.type = Variable::NUMBER;
+
+	var.n = SDL_TellIO(info->files[id]);
+
+	return var;
+}
+
+static bool filefunc_seek(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	int id = as_number(prg, v[0]);
+	Sint64 o = as_number(prg, v[1]);
+	int whence = as_number(prg, v[2]);
+
+	File_Info *info = file_info(prg);
+	INFO_EXISTS(info->files, id)
+
+	SDL_SeekIO(info->files[id], o, (SDL_IOWhence)whence);
+
+	return true;
+}
+
 static Variable exprfunc_file_eof(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -2411,6 +2444,8 @@ void start_lib_standard()
 	add_instruction("file_write", filefunc_write);
 	add_instruction("file_print", filefunc_print);
 	add_expression_handler("file_eof", exprfunc_file_eof);
+	add_expression_handler("file_tell", exprfunc_file_tell);
+	add_instruction("file_seek", filefunc_seek);
 	
 	add_instruction("text_fore", twinklefunc_text_fore);
 	add_instruction("text_back", twinklefunc_text_back);
