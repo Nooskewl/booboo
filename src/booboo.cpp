@@ -1580,6 +1580,7 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "EVENT_MOUSE_UP", TGUI_MOUSE_UP, pass, var_i);
 	insert_constant(prg, "EVENT_MOUSE_AXIS", TGUI_MOUSE_AXIS, pass, var_i);
 	insert_constant(prg, "EVENT_MOUSE_WHEEL", TGUI_MOUSE_WHEEL, pass, var_i);
+	insert_constant(prg, "EVENT_TEXT", TGUI_TEXT, pass, var_i);
 	insert_constant(prg, "JOY_A", TGUI_B_A, pass, var_i);
 	insert_constant(prg, "JOY_B", TGUI_B_B, pass, var_i);
 	insert_constant(prg, "JOY_X", TGUI_B_X, pass, var_i);
@@ -3313,7 +3314,21 @@ static Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 			return ret;
 		}
 		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+			Variable var2 = as_variable_resolve(prg, v[1]);
+			if (IS_STRING(var2)) {
+				std::string s;
+
+				for (size_t i = 1; i < v.size(); i++) {
+					s += as_string(prg, v[i]);
+				}
+
+				ret.type = Variable::STRING;
+				ret.s = s;
+				return ret;
+			}
+			else {
+				throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+			}
 		}
 	}
 	else if (v[0].type == Token::NUMBER) {

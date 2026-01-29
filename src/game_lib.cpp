@@ -1,6 +1,7 @@
 #include <shim5/shim5.h>
 #include <shim5/shaders/glsl/default_vertex.h>
 #include <shim5/shaders/glsl/default_textured_fragment.h>
+#include <shim5/internal/gfx.h>
 
 #include <libutil/libutil.h>
 using namespace noo;
@@ -5708,6 +5709,24 @@ static bool cpafunc_set_default_cpa(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool miscfunc_start_text_input(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	SDL_StartTextInput(gfx::internal::gfx_context.window);
+
+	return true;
+}
+
+static bool miscfunc_stop_text_input(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	SDL_StopTextInput(gfx::internal::gfx_context.window);
+
+	return true;
+}
+
 static void letterbox_callback(gfx::Letterbox_Type type, int x, int y, int w, int h)
 {
 	if (prg == nullptr) {
@@ -6072,6 +6091,8 @@ void start_lib_game()
 	add_expression_handler("cpa_load", exprfunc_load_cpa);
 	add_instruction("cpa_set", cpafunc_set_cpa);
 	add_instruction("cpa_set_default", cpafunc_set_default_cpa);
+	add_instruction("start_text_input", miscfunc_start_text_input);
+	add_instruction("stop_text_input", miscfunc_stop_text_input);
 
 	add_special_function("end");
 	add_special_function("run");

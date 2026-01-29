@@ -395,6 +395,10 @@ void handle_event(TGUI_Event *event)
 		args[1].n = event->mouse.x;
 		args[2].n = event->mouse.y * (invert_mouse_wheel ? -1 : 1);
 	}
+	else if (event->type == TGUI_TEXT) {
+		args[1].type = Token::STRING;
+		args[1].s = event->text.text;
+	}
 	else {
 		go = false;
 	}
