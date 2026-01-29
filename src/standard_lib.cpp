@@ -2641,6 +2641,19 @@ static bool cpafunc_set_default_cpa(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool cpafunc_destroy(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number(prg, v[0]);
+	CPA_Info *info = cpa_info(prg);
+	INFO_EXISTS(info->cpas, id)
+	delete info->cpas[id]->cpa;
+	info->cpas.erase(info->cpas.find(id));
+
+	return true;
+}
+
 void start_lib_standard()
 {
 	add_expression_handler("getenv", exprfunc_getenv);
@@ -2750,6 +2763,7 @@ void start_lib_standard()
 	add_expression_handler("cpa_load", exprfunc_load_cpa);
 	add_instruction("cpa_set", cpafunc_set_cpa);
 	add_instruction("cpa_set_default", cpafunc_set_default_cpa);
+	add_instruction("cpa_destroy", cpafunc_destroy);
 }
 
 void end_lib_standard()
