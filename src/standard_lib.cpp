@@ -12,6 +12,7 @@
 
 #include <sys/stat.h>
 
+#include <shim5/shim5.h>
 #include <libutil/libutil.h>
 using namespace noo;
 
@@ -45,6 +46,21 @@ struct CFG_Info {
 	std::map<int, std::map<std::string, Config_Value> > cfgs;
 };
 
+struct JSON_Info {
+	unsigned int json_id;
+	std::map<int, util::JSON *> jsons;
+};
+
+struct CPA {
+	util::CPA *cpa;
+};
+
+struct CPA_Info
+{
+	int cpa_id;
+	std::map<int, CPA *> cpas;
+};
+
 File_Info *file_info(Program *prg)
 {
 	File_Info *info = (File_Info *)get_black_box(prg, "com.nooskewl.booboo.files");
@@ -63,6 +79,28 @@ static CFG_Info *cfg_info(Program *prg)
 		info = new CFG_Info;
 		info->cfg_id = 0;
 		booboo::set_black_box(prg, "com.nooskewl.booboo.cfg", info);
+	}
+	return info;
+}
+
+static JSON_Info *json_info(Program *prg)
+{
+	JSON_Info *info = (JSON_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.json");
+	if (info == nullptr) {
+		info = new JSON_Info;
+		info->json_id = 0;
+		booboo::set_black_box(prg, "com.nooskewl.booboo.json", info);
+	}
+	return info;
+}
+
+static CPA_Info *cpa_info(Program *prg)
+{
+	CPA_Info *info = (CPA_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.cpa");
+	if (info == nullptr) {
+		info = new CPA_Info;
+		info->cpa_id = 0;
+		booboo::set_black_box(prg, "com.nooskewl.booboo.cpa", info);
 	}
 	return info;
 }
@@ -2155,6 +2193,454 @@ static bool cfgfunc_erase(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static util::JSON *json_from_arg(Program *prg, const Token &t)
+{
+	if (t.type == Token::SYMBOL) {
+		Variable &var = as_variable(prg, t);
+		if (var.type == Variable::POINTER) {
+			return shim::shim_json;
+		}
+		else {
+			int id = as_number(prg, t);
+			JSON_Info *info = json_info(prg);
+			INFO_EXISTS(info->jsons, id)
+			return info->jsons[id];
+		}
+	}
+	return shim::shim_json;
+}
+
+static Variable exprfunc_json_load(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(1)
+
+	std::string name = as_string(prg, v[0]);
+
+	JSON_Info *info = json_info(prg);
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	v1.n = info->json_id;
+
+	bool load_from_filesystem = false;
+	if (v.size() > 1) {
+		load_from_filesystem = as_number(prg, v[1]);
+	}
+
+	try {
+		util::JSON *json = new util::JSON(name, load_from_filesystem);
+
+		info->jsons[info->json_id++] = json;
+	}
+	catch (util::Error &e) {
+		v1.n = -1;
+	}
+
+	return v1;
+}
+
+static Variable exprfunc_json_create(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	bool array = as_number(prg, v[0]);
+
+	JSON_Info *info = json_info(prg);
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	v1.n = info->json_id;
+
+	try {
+		util::JSON *json = new util::JSON(array);
+
+		info->jsons[info->json_id++] = json;
+	}
+	catch (util::Error &e) {
+		v1.n = -1;
+	}
+
+	return v1;
+}
+
+static bool jsonfunc_destroy(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number(prg, v[0]);
+	JSON_Info *info = json_info(prg);
+	INFO_EXISTS(info->jsons, id)
+	delete info->jsons[id];
+	info->jsons.erase(info->jsons.find(id));
+
+	return true;
+}
+
+static Variable exprfunc_json_exists(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	util::JSON *json = json_from_arg(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	util::JSON::Node *n = json->get_root()->find(name);
+	v1.n = n != nullptr;
+
+	return v1;
+}
+
+static Variable exprfunc_json_typeof(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	util::JSON *json = json_from_arg(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	Variable v1;
+	v1.type = Variable::STRING;
+
+	util::JSON::Node *n = json->get_root()->find(name);
+	util::JSON::Node::Type t = n->get_type();
+
+	switch (t) {
+		case util::JSON::Node::STRING:
+			v1.s = "string";
+		case util::JSON::Node::BOOL:
+			v1.s = "bool";
+		case util::JSON::Node::DOUBLE:
+			v1.s = "number";
+		default:
+			std::string val = n->get_value();
+			if (val == "[array]") {
+				v1.s = "array";
+			}
+			else {
+				v1.s = "hash";
+			}
+	}
+
+	return v1;
+}
+
+static Variable exprfunc_json_size(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	util::JSON *json = json_from_arg(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	util::JSON::Node *n = json->get_root()->find(name);
+	v1.n = n->size();
+
+	return v1;
+}
+
+static Variable exprfunc_json_get_string(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	util::JSON *json = json_from_arg(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	Variable v1;
+	v1.type = Variable::STRING;
+
+	util::JSON::Node *n = json->get_root()->find(name);
+	v1.s = n->as_string();
+
+	return v1;
+}
+
+static Variable exprfunc_json_get_number(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	util::JSON *json = json_from_arg(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	util::JSON::Node *n = json->get_root()->find(name);
+	v1.n = n->as_double();
+
+	return v1;
+}
+
+static Variable exprfunc_json_get_bool(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	util::JSON *json = json_from_arg(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	util::JSON::Node *n = json->get_root()->find(name);
+	v1.n = n->as_bool();
+
+	return v1;
+}
+
+static bool jsonfunc_set_string(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	util::JSON *json = json_from_arg(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	std::string val = as_string(prg, v[2]);
+	
+	util::JSON::Node *n = json->get_root();
+	n->add_nested_string(name, nullptr, val, NULL, true);
+
+	return true;
+}
+
+static bool jsonfunc_set_number(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	util::JSON *json = json_from_arg(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	double val = as_number(prg, v[2]);
+	
+	util::JSON::Node *n = json->get_root();
+	n->add_nested_double(name, nullptr, val, NULL, true);
+
+	return true;
+}
+
+static bool jsonfunc_set_bool(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	util::JSON *json = json_from_arg(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	bool val = (bool)as_number(prg, v[2]);
+	
+	util::JSON::Node *n = json->get_root();
+	n->add_nested_bool(name, nullptr, val, NULL, true);
+
+	return true;
+}
+
+static bool jsonfunc_add_array(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	util::JSON *json = json_from_arg(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	util::JSON::Node *n = json->get_root();
+	n->add_nested_array(name);
+
+	return true;
+}
+
+static bool jsonfunc_add_hash(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	util::JSON *json = json_from_arg(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	util::JSON::Node *n = json->get_root();
+	n->add_nested_hash(name);
+
+	return true;
+}
+
+static bool jsonfunc_remove(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	util::JSON *json = json_from_arg(prg, v[0]);
+	std::string name = as_string(prg, v[1]);
+	
+	json->remove(name);
+
+	return true;
+}
+
+static Variable exprfunc_json_save(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	util::JSON *json = json_from_arg(prg, v[0]);
+	std::string fn = as_string(prg, v[1]);
+
+	Variable var;
+	var.type = Variable::NUMBER;
+
+	util::JSON::Node *n = json->get_root();
+	std::string s = n->to_json();
+
+	FILE *f = fopen(fn.c_str(), "w");
+	if (f == nullptr) {
+		var.n = 0;
+	}
+	else {
+		fprintf(f, "%s", s.c_str());
+		fclose(f);
+		var.n = 1;
+	}
+
+	return var;
+}
+
+class BooBoo_Trigger : public util::Trigger
+{
+public:
+	BooBoo_Trigger(Program *prg, std::string name, int func) :
+		prg(prg),
+		name(name),
+		func(func)
+	{
+	}
+
+	virtual void run()
+	{
+		std::vector<Token> v;
+		Token t;
+		t.type = Token::STRING;
+		t.s = t.token = name;
+		t.dereference = false;
+		v.push_back(t);
+		call_void_function(prg, func, v, 0);
+	}
+
+	virtual ~BooBoo_Trigger()
+	{
+	}
+
+private:
+	Program *prg;
+	std::string name;
+	int func;
+};
+
+static bool jsonfunc_register_number(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(3)
+
+	Variable &var = prg->variables[v[0].i];
+	std::string name = as_string(prg, v[1]);
+	bool readonly = (bool)as_number(prg, v[2]);
+
+	BooBoo_Trigger *trigger;
+	
+	if (v.size() > 3) {
+		trigger = new BooBoo_Trigger(prg, name, as_function(prg, v[3]));
+	}
+	else {
+		trigger = nullptr;
+	}
+	
+	util::JSON::Node *root = shim::shim_json->get_root();
+	root->add_nested_double("game>" + name, &var.n, var.n, trigger, readonly);
+
+	return true;
+}
+
+static bool jsonfunc_register_string(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(3)
+
+	Variable &var = prg->variables[v[0].i];
+	std::string name = as_string(prg, v[1]);
+	bool readonly = (bool)as_number(prg, v[2]);
+	
+	BooBoo_Trigger *trigger;
+	
+	if (v.size() > 3) {
+		trigger = new BooBoo_Trigger(prg, name, as_function(prg, v[3]));
+	}
+	else {
+		trigger = nullptr;
+	}
+	
+	util::JSON::Node *root = shim::shim_json->get_root();
+	root->add_nested_string("game>" + name, &var.s, var.s, trigger, readonly);
+
+	return true;
+}
+
+static Variable exprfunc_load_cpa(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(1)
+
+	Variable v1;
+	v1.type = Variable::NUMBER;
+
+	std::string name = as_string(prg, v[0]);
+
+	CPA_Info *info = cpa_info(prg);
+
+	v1.n = info->cpa_id;
+
+	bool load_from_filesystem = false;
+	if (v.size() > 1) {
+		load_from_filesystem = as_number(prg, v[1]);
+	}
+
+	try {
+		util::CPA *cpa;
+		if (load_from_filesystem) {
+			cpa = new util::CPA(name);
+		}
+		else {
+			int sz;
+			char *data = util::slurp_file(name, &sz);
+			cpa = new util::CPA((Uint8 *)data, sz);
+		}
+
+		CPA *c = new CPA;
+		c->cpa = cpa;
+
+		info->cpas[info->cpa_id++] = c;
+	}
+	catch (util::Error &e) {
+		v1.n = -1;
+	}
+
+	return v1;
+}
+
+static bool cpafunc_set_cpa(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number(prg, v[0]);
+	
+	CPA_Info *info = cpa_info(prg);
+
+	INFO_EXISTS(info->cpas, id)
+
+	util::CPA *cpa = info->cpas[id]->cpa;
+
+	shim::cpa = cpa;
+
+	return true;
+}
+
+static bool cpafunc_set_default_cpa(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	shim::cpa = shim::default_cpa;
+
+	return true;
+}
+
 void start_lib_standard()
 {
 	add_expression_handler("getenv", exprfunc_getenv);
@@ -2243,6 +2729,27 @@ void start_lib_standard()
 	add_instruction("cfg_set_string", cfgfunc_set_string);
 	add_expression_handler("cfg_exists", exprfunc_cfg_exists);
 	add_instruction("cfg_erase", cfgfunc_erase);
+	add_expression_handler("json_load", exprfunc_json_load);
+	add_expression_handler("json_create", exprfunc_json_create);
+	add_instruction("json_destroy", jsonfunc_destroy);
+	add_expression_handler("json_exists", exprfunc_json_exists);
+	add_expression_handler("json_typeof", exprfunc_json_typeof);
+	add_expression_handler("json_size", exprfunc_json_size);
+	add_expression_handler("json_get_string", exprfunc_json_get_string);
+	add_expression_handler("json_get_number", exprfunc_json_get_number);
+	add_expression_handler("json_get_bool", exprfunc_json_get_bool);
+	add_instruction("json_set_string", jsonfunc_set_string);
+	add_instruction("json_set_number", jsonfunc_set_number);
+	add_instruction("json_set_bool", jsonfunc_set_bool);
+	add_instruction("json_add_array", jsonfunc_add_array);
+	add_instruction("json_add_hash", jsonfunc_add_hash);
+	add_instruction("json_remove", jsonfunc_remove);
+	add_expression_handler("json_save", exprfunc_json_save);
+	add_instruction("json_register_number", jsonfunc_register_number);
+	add_instruction("json_register_string", jsonfunc_register_string);
+	add_expression_handler("cpa_load", exprfunc_load_cpa);
+	add_instruction("cpa_set", cpafunc_set_cpa);
+	add_instruction("cpa_set_default", cpafunc_set_default_cpa);
 }
 
 void end_lib_standard()
@@ -2256,11 +2763,24 @@ void standard_lib_destroy_program(Program *prg)
 		file_i->files[i]->close();
 		delete file_i->files[i];
 	}
+	JSON_Info *json_i = json_info(prg);
+	for (std::map<int, util::JSON *>::iterator i = json_i->jsons.begin(); i != json_i->jsons.end(); i++) {
+		delete json_i->jsons[(*i).first];
+	}
+	CPA_Info *cpa_i = cpa_info(prg);
+	for (std::map<int, CPA *>::iterator i = cpa_i->cpas.begin(); i != cpa_i->cpas.end(); i++) {
+		delete ((*i).second)->cpa;
+		delete (*i).second;
+	}
 	delete file_i;
+	delete json_i;
+	delete cpa_i;
 
 	CFG_Info *cfg_i = cfg_info(prg);
 	delete cfg_i;
 
 	set_black_box(prg, "com.nooskewl.booboo.files", nullptr);
 	set_black_box(prg, "com.nooskewl.booboo.cfg", nullptr);
+	set_black_box(prg, "com.nooskewl.booboo.json", nullptr);
+	set_black_box(prg, "com.nooskewl.booboo.cpa", nullptr);
 }
