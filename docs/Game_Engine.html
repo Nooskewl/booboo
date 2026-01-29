@@ -766,6 +766,18 @@ of animation names.</p>
 	e.g. sprite_draw sprite tint_r g b a dx dy ^ flip_h flip_v
 </pre>
 
+<h3>sprite_stretch_region</h3>
+<pre>
+	draw a region of an sprite and maybe stretch it
+	e.g. sprite_stretch_region sprite r g b a source_x source_y source_w source_h dest_x dest_y dest_w dest_h ^ flip_h flip_v
+</pre>
+
+<h3>sprite_draw_rotated_scaled</h3>
+<pre>
+	draw an sprite with rotation and scale
+	e.g. sprite_draw_rotated_scaled img tint_r tint_g tint_b tint_a pivot_x pivot_y x y angle scale_x scale_y ^ flip_h flip_v
+</pre>
+
 <h3>sprite_set_animation</h3>
 <pre>
 	Set the current animation. You can optionally add a callback which

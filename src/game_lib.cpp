@@ -2883,6 +2883,129 @@ static bool spritefunc_draw(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool spritefunc_stretch_region(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(13)
+
+	int id = as_number(prg, v[0]);
+	double r = as_number(prg, v[1]);
+	double g = as_number(prg, v[2]);
+	double b = as_number(prg, v[3]);
+	double a = as_number(prg, v[4]);
+	double sx = as_number(prg, v[5]);
+	double sy = as_number(prg, v[6]);
+	double sw = as_number(prg, v[7]);
+	double sh = as_number(prg, v[8]);
+	double dx = as_number(prg, v[9]);
+	double dy = as_number(prg, v[10]);
+	double dw = as_number(prg, v[11]);
+	double dh = as_number(prg, v[12]);
+
+	double flip_h;
+	double flip_v;
+
+	if (v.size() > 13) {
+		flip_h = as_number(prg, v[13]);
+	}
+	else {
+		flip_h = false;
+	}
+
+	if (v.size() > 14) {
+		flip_v = as_number(prg, v[14]);
+	}
+	else {
+		flip_v = false;
+	}
+	
+	Sprite_Info *info = sprite_info(prg);
+
+	INFO_EXISTS(info->sprites, id)
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	gfx::Image *img = sprite->get_current_image();
+
+	SDL_Color c;
+	c.r = r;
+	c.g = g;
+	c.b = b;
+	c.a = a;
+
+	int flags = 0;
+	if (flip_h != 0.0) {
+		flags |= gfx::Image::FLIP_H;
+	}
+	if (flip_v != 0.0) {
+		flags |= gfx::Image::FLIP_V;
+	}
+
+	img->stretch_region_tinted(c, util::Point<float>(sx, sy), util::Size<float>(sw, sh), util::Point<float>(dx, dy), util::Size<float>(dw, dh), flags);
+
+	return true;
+}
+
+static bool spritefunc_draw_rotated_scaled(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(12)
+
+	int id = as_number(prg, v[0]);
+	double r = as_number(prg, v[1]);
+	double g = as_number(prg, v[2]);
+	double b = as_number(prg, v[3]);
+	double a = as_number(prg, v[4]);
+	double cx = as_number(prg, v[5]);
+	double cy = as_number(prg, v[6]);
+	double x = as_number(prg, v[7]);
+	double y = as_number(prg, v[8]);
+	double angle = as_number(prg, v[9]);
+	double scale_x = as_number(prg, v[10]);
+	double scale_y = as_number(prg, v[11]);
+
+	double flip_h;
+	double flip_v;
+
+	if (v.size() > 12) {
+		flip_h = as_number(prg, v[12]);
+	}
+	else {
+		flip_h = false;
+	}
+
+	if (v.size() > 13) {
+		flip_v = as_number(prg, v[13]);
+	}
+	else {
+		flip_v = false;
+	}
+
+	Sprite_Info *info = sprite_info(prg);
+
+	INFO_EXISTS(info->sprites, id)
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	gfx::Image *img = sprite->get_current_image();
+
+	SDL_Color c;
+	c.r = r;
+	c.g = g;
+	c.b = b;
+	c.a = a;
+
+	int flags = 0;
+	if (flip_h != 0.0) {
+		flags |= gfx::Image::FLIP_H;
+	}
+	if (flip_v != 0.0) {
+		flags |= gfx::Image::FLIP_V;
+	}
+
+	img->draw_tinted_rotated_scaledxy(c, util::Point<float>(cx, cy), util::Point<float>(x, y), angle, scale_x, scale_y, flags);
+
+	return true;
+}
+
 static bool spritefunc_start(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -5491,6 +5614,8 @@ void start_lib_game()
 	add_expression_handler("sprite_num_frames", exprfunc_sprite_num_frames);
 	add_expression_handler("sprite_current_frame_size", exprfunc_sprite_current_frame_size);
 	add_instruction("sprite_draw", spritefunc_draw);
+	add_instruction("sprite_stretch_region", spritefunc_stretch_region);
+	add_instruction("sprite_draw_rotated_scaled", spritefunc_draw_rotated_scaled);
 	add_instruction("sprite_start", spritefunc_start);
 	add_instruction("sprite_stop", spritefunc_stop);
 	add_instruction("sprite_reset", spritefunc_reset);
