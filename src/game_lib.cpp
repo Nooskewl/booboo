@@ -1649,7 +1649,7 @@ static Variable exprfunc_image_load(Program *prg, const std::vector<Token> &v)
 	}
 
 	try {
-		gfx::Image *img = new gfx::Image(name, false, load_from_filesystem);
+		gfx::Image *img = new gfx::Image(name, load_from_filesystem, load_from_filesystem);
 
 		Image *i = new Image;
 		i->image = img;
@@ -2654,7 +2654,7 @@ static Variable exprfunc_sprite_load(Program *prg, const std::vector<Token> &v)
 	}
 
 	try {
-		gfx::Sprite *sprite = new gfx::Sprite(name);
+		gfx::Sprite *sprite = new gfx::Sprite(name, load_from_filesystem, load_from_filesystem);
 		info->sprites[info->sprite_id++] = sprite;
 	}
 	catch (util::Error &e) {
