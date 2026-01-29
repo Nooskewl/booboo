@@ -377,7 +377,7 @@ The following sections describe the API:
 	e.g. clear_stencil_buffer #FFFFFFFF
 </pre>
 
-<h3 style="page-break-before: always;">enable_depth_test</h3>
+<h3>enable_depth_test</h3>
 <pre>
 	Enable/disable depth test
 	e.g. enable_depth_test onoff
@@ -419,7 +419,7 @@ The following sections describe the API:
 	e.g. enable_stencil onoff
 </pre>
 
-<h3>(is_stencil_enabled)</h3>
+<h3 style="page-break-before: always;">(is_stencil_enabled)</h3>
 <pre>
 	Returns whether or not stencil is enabled
 	e.g. = onoff (is_stencil_enabled)
@@ -437,7 +437,7 @@ The following sections describe the API:
 	e.g. = onoff (is_two_sided_stencil_enabled)
 </pre>
 
-<h3 style="page-break-before: always;">set_stencil_mode</h3>
+<h3>set_stencil_mode</h3>
 <pre>
 	Set the stencil mode for frontfaces
 	e.g. set_stencil_mode COMPARE_LESS STENCILOP_REPALCE STENCILOP_REPLACE STENCILOP_KEEP #FF #00
@@ -479,7 +479,7 @@ The following sections describe the API:
 	e.g. set_cull_mode FRONT_FACE
 </pre>
 
-<h3>(get_cull_mode)</h3>
+<h3 style="page-break-before: always;">(get_cull_mode)</h3>
 <pre>
 	Returns the cull mode
 	e.g. = mode (get_cull_mode)
@@ -503,7 +503,7 @@ The following sections describe the API:
 	e.g. set_projection mv proj
 </pre>
 
-<h3 style="page-break-before: always;">set_default_projection</h3>
+<h3>set_default_projection</h3>
 <pre>
 	Restore the default projection
 	e.g. set_default_projection
@@ -525,7 +525,7 @@ The following sections describe the API:
 	e.g. resize_vertex_cache (* 1024 256)
 </pre>
 
-<h3>(create_vertex_buffer)</h3>
+<h3 style="page-break-before: always;">(create_vertex_buffer)</h3>
 <pre>
 	Draw arbitrary 3d geometry
 	All vectors are vectors of numbers
@@ -691,13 +691,13 @@ The following sections describe the API:
 	image_read_texture describes */
 </pre>
 
-<h3>image_draw</h3>
+<h3 style="page-break-before: always;">image_draw</h3>
 <pre>
 	draw an image
 	e.g. image_draw img tint_r tint_g tint_b tint_a x y ^ flip_h flip_v
 </pre>
 
-<h3 style="page-break-before: always;">image_stretch_region</h3>
+<h3>image_stretch_region</h3>
 <pre>
 	draw a region of an image and maybe stretch it
 	e.g. image_stretch_region image r g b a source_x source_y source_w source_h dest_x dest_y dest_w dest_h ^ flip_h flip_v
@@ -866,7 +866,7 @@ of animation names.</p>
 	e.g. = v (sprite_frame_times sprite)
 </pre>
 
-<h3>(sprite_is_started)</h3>
+<h3 style="page-break-before: always;">(sprite_is_started)</h3>
 <pre>
 	Check if a sprite is started or not
 	e.g. = onoff (sprite_is_started sprite)
@@ -987,7 +987,7 @@ tiles1.png, etc (or tga.)</p>
 	with number 74 to be a question block in your platformer.
 </pre>
 
-<h3>tilemap_set_animated_tiles</h3>
+<h3 style="page-break-before: always;">tilemap_set_animated_tiles</h3>
 <pre>
 	Tiles can be animated. The delay is in milliseconds. Width
 	and height are the width and height of the area to animate. Then
@@ -997,7 +997,7 @@ tiles1.png, etc (or tga.)</p>
 	e.g. tilemap_set_animated_tiles tilemap delay w h anim_data
 </pre>
 
-<h3 style="page-break-before: always;">(tilemap_find_path)</h3>
+<h3>(tilemap_find_path)</h3>
 <pre>
 	A* pathfinding using the tilemap solids and your own supplied points.
 	The path returned is a vector of vectors of x/y values
@@ -1394,7 +1394,7 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. widget_set_padding_bottom widget px
 </pre>
 
-<h3>(widget_get_padding_left)</h3>
+<h3 style="page-break-before: always;">(widget_get_padding_left)</h3>
 <pre>
 	Get left padding of a widget
 	e.g. = pad (widget_get_padding_left widget)
@@ -1418,7 +1418,7 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. = pad (widget_get_padding_bottom widget)
 </pre>
 
-<h3 style="page-break-before: always;">widget_set_left_widget</h3>
+<h3>widget_set_left_widget</h3>
 <pre>
 	Hint at the widget to the left of this one for focus changes
 	with keyboard/gamepad
@@ -1454,7 +1454,7 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. widget_set_down_widget widget down_widget
 </pre>
 
-<h3>gui_start</h3>
+<h3 style="page-break-before: always;">gui_start</h3>
 <pre>
 	Start executing a gui
 	e.g. gui_start root_widget
