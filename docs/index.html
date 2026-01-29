@@ -42,6 +42,8 @@ Sections:
 <li><a href="#Map">Maps</a></li>
 <li><a href="#Files">Files</a></li>
 <li><a href="#CFG">Configuration Functions</a></li>
+<li><a href="#JSON">JSON Functions</a></li>
+<li><a href="#CPA">CPA Functions</a></li>
 <li><a href="#Other">Other</a></li>
 <li><a href="#Constants">Constants</a></li>
 </ul>
@@ -795,6 +797,155 @@ Sections:
 <pre>
 	Free a configuration object
 	e.g. cfg_destroy cfg
+</pre>
+
+<a id="JSON"></a>
+<h2>JSON Functions</h2>
+
+<p>You can dig down into the file by separating keys with "&gt;"</p>
+<p>"[0]" "[1]" etc can be used to access arrays.</p>
+<p>You can use NULL to access the shim5.json object.</p>
+
+<h3>(json_load)</h3>
+<pre>
+	Load a JSON file
+	e.g. = j (json_load "file.json" ^ lffs)
+	Returns -1 on fail
+</pre>
+
+<h3>(json_create)</h3>
+<pre>
+	Create a blank JSON file. Takes a boolean that creates the root
+	as either an array (TRUE) or hash (FALSE)
+	e.g. = j (json_create FALSE)
+	Returns -1 on fail
+</pre>
+
+<h3>(json_exists)</h3>
+<pre>
+	Check if a key exists in a JSON object
+	e.g. = yesno (json_exists json "foo&gt;bar&gt;baz")
+</pre>
+
+<h3>(json_typeof)</h3>
+<pre>
+	Return a string representation of JSON key type
+	e.g. = val (json_typeof json "foo&gt;bar&gt;baz")
+</pre>
+
+<h3>(json_size)</h3>
+<pre>
+	Return the number of children of a JSON key
+	e.g. = n (json_size json "foo&gt;bar&gt;baz")
+</pre>
+
+<h3>(json_get_string)</h3>
+<pre>
+	Read a string from JSON
+	e.g. = s (json_get_string json "settings&gt;profile&gt;name")
+</pre>
+
+<h3>(json_get_number)</h3>
+<pre>
+	Read a number from JSON
+	e.g. = n (json_get_number json "settings&gt;mouse&gt;sensitivity")
+</pre>
+
+<h3>(json_get_bool)</h3>
+<pre>
+	Read a boolean from JSON
+	e.g. = n (json_get_boolean json "settings&gt;gfx&gt;crt_filter")
+</pre>
+
+<h3 style="page-break-before: always;">json_set_string</h3>
+<pre>
+	Set a string in a JSON object
+	e.g. json_set_string json "foo&gt;bar&gt;baz" "TURNIPS"
+</pre>
+
+<h3>json_set_number</h3>
+<pre>
+	Set a number in a JSON object
+	e.g. json_set_number json "foo&gt;bar&gt;baz" 762.4
+</pre>
+
+<h3>json_set_bool</h3>
+<pre>
+	Set a boolean in a JSON object
+	e.g. json_set_bool json "foo&gt;bar&gt;baz" TRUE
+</pre>
+
+<h3>json_add_array</h3>
+<pre>
+	Add an array element to a json object.
+	e.g. json_add_array json "foo&gt;bar&gt;baz"
+</pre>
+
+<h3>json_add_hash</h3>
+<pre>
+	Add a hash element to a json object.
+	e.g. json_add_array json "foo&gt;bar&gt;baz"
+</pre>
+
+<h3>json_remove</h3>
+<pre>
+	Remove a child from JSON tree
+	e.g. json_remove json "foo&gt;bar&gt;baz"
+</pre>
+
+<h3>(json_save)</h3>
+<pre>
+	Save a json object to json file
+	e.g. = succeeded (json_save json "foo.json")
+</pre>
+
+<h3>json_destroy</h3>
+<pre>
+	Free a JSON object
+	e.g. json_destroy json
+</pre>
+
+<h3>json_register_number</h3>
+<pre>
+	Register a number with DevSettings
+	You can access devsettings by running with +debug and pressing F9
+	A "game&gt;" prefix is added automatically. The optional callback is
+	called with the key's name when the value is changed in devsettings
+	e.g. json_register_number n "foo&gt;baz" readonly ^ callback
+</pre>
+
+<h3>json_register_string</h3>
+<pre>
+	Register a string with DevSettings
+	You can access devsettings by running with +debug and pressing F9
+	A "game&gt;" prefix is added automatically. The optional callback is
+	called with the key's name when the value is changed in devsettings
+	e.g. json_register_string s "foo&gt;baz" readonly ^ callback
+</pre>
+
+<a id="CPA"></a>
+<h2>CPA Functions</h2>
+
+<p>CPAs are extra datafiles with the same structure as data.cpa.</p>
+
+<h3>(cpa_load)</h3>
+<pre>
+	Load a CPA datafile.
+	e.g. = cpa (cpa_load "file.cpa" ^ lffs)
+	Returns -1 on fail
+</pre>
+
+<h3>cpa_set</h3>
+<pre>
+	Change the default CPA file. All functions that load from data/data.cpa will
+	now load from this CPA, until cpa_set_default is called.
+	e.g. cpa_set cpa
+</pre>
+
+<h3>cpa_set_default</h3>
+<pre>
+	Restore the default CPA datafile
+	e.g. cpa_set_default
 </pre>
 
 <a id="Other"></a>
