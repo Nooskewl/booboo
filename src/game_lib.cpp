@@ -5718,7 +5718,7 @@ static bool miscfunc_start_text_input(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool miscfunc_stop_text_input(Program *prg, const std::vector<Token> &v)
+static bool miscfunc_end_text_input(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
@@ -6092,7 +6092,7 @@ void start_lib_game()
 	add_instruction("cpa_set", cpafunc_set_cpa);
 	add_instruction("cpa_set_default", cpafunc_set_default_cpa);
 	add_instruction("start_text_input", miscfunc_start_text_input);
-	add_instruction("stop_text_input", miscfunc_stop_text_input);
+	add_instruction("end_text_input", miscfunc_end_text_input);
 
 	add_special_function("end");
 	add_special_function("run");
