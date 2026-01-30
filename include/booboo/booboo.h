@@ -20,7 +20,11 @@
 #endif
 #endif
 #else
+#ifdef BOOBOO_LIB_BUILD
+#define BOOBOO_EXPORT __attribute__((visibility("default")))
+#else
 #define BOOBOO_EXPORT
+#endif
 #endif
 
 namespace booboo {

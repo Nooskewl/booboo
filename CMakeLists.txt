@@ -15,8 +15,8 @@ include_directories("include")
 include_directories(${USER_INCLUDE_PATH})
 link_directories(${USER_LIBRARY_PATH})
 
-set(SHIM5_LIB shim5.dll)
-set(TGUI6_LIB tgui6.dll)
+set(SHIM5_LIB shim5)
+set(TGUI6_LIB tgui6)
 
 # Inputs
 
@@ -122,7 +122,7 @@ else() # Linux
 	if (RASPBERRYPI)
 		SET(FLAGS "${FLAGS} -DRASPBERRYPI")
 	endif()
-	set(LFLAGS "-Wl,-rpath,\$ORIGIN")
+	#set(LFLAGS "-Wl,-rpath,\$ORIGIN")
 	if(DEBUG)
 		#set(FLAGS "${FLAGS} -DDEBUG=1 -fsanitize=address -fsanitize=leak")
 		#set(LFLAGS "${LFLAGS} -fsanitize=address -fsanitize=leak")
@@ -152,12 +152,12 @@ else() # Linux
 endif()
 
 target_link_libraries("corelibrary" ${LIBS})
-target_link_libraries("gamelibrary" corelibrary)
+target_link_libraries("gamelibrary" corelibrary ${LIBS})
 
-target_link_libraries("corelauncher" corelibrary)
+target_link_libraries("corelauncher" corelibrary ${LIBS})
 
 if(GAME_LAUNCHER)
-	target_link_libraries("gamelauncher" gamelibrary corelibrary)
+	target_link_libraries("gamelauncher" gamelibrary corelibrary ${LIBS})
 endif()
 
-target_link_libraries("seventeen" corelibrary ${DLL_EXAMPLE_LIBS})
+target_link_libraries("seventeen" corelibrary ${LIBS})

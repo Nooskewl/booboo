@@ -117,6 +117,7 @@ int main(int argc, char **argv)
 	std::string dll;
 	while ((dll = tok.next()) != "") {
 		dll = util::trim(dll);
+#ifdef _WIN32
 		dll += ".dll";
 		HMODULE m = LoadLibrary(dll.c_str());
 		if (m != NULL) {
@@ -125,6 +126,16 @@ int main(int argc, char **argv)
 				(*func)();
 			}
 		}
+#else
+		dll = "lib" + dll + ".so";
+		void *handle = dlopen(dll.c_str(), RTLD_LAZY);
+		if (handle != nullptr) {
+			BOOBOO_DLL_START_FUNC func = (BOOBOO_DLL_START_FUNC)dlsym(handle, "booboo_start");
+			if (func != nullptr) {
+				(*func)();
+			}
+		}
+#endif
 	}
 
 again:
