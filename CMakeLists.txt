@@ -42,6 +42,7 @@ set(DLL_EXAMPLE_SOURCES
 )
 
 if (MINGW)
+	LIST(APPEND CORE_LAUNCHER_SOURCES misc/versioninfo_cli.rc misc/windows_icons.rc)
 	LIST(APPEND GAME_LAUNCHER_SOURCES misc/versioninfo.rc misc/booboo.manifest misc/windows_icons.rc)
 endif()
 
@@ -86,7 +87,7 @@ if(MINGW)
 		set_target_properties("gamelauncher" PROPERTIES OUTPUT_NAME "BooBoo")
 	endif()
 	set(LIBS twinkle ${SHIM5_LIB} ${TGUI6_LIB} mingw32 SDL3 SDL3_ttf png16 vorbis FLAC ogg freetype zlibstatic winmm dbghelp shcore msvcrt imm32 setupapi shlwapi version)
-	set(DLL_EXAMPLE_LIBS mingw32 twinkle SDL3 zlibstatic)
+	set(DLL_EXAMPLE_LIBS)
 elseif(WIN32)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /IGNORE:4075 /IGNORE:4099")
 	SET(FLAGS "${FLAGS} /D_CRT_SECURE_NO_WARNINGS /D_USE_MATH_DEFINES /EHsc /MP /W3 /wd4244 /wd4800 /wd4101 /MT")
@@ -151,12 +152,12 @@ else() # Linux
 endif()
 
 target_link_libraries("corelibrary" ${LIBS})
-target_link_libraries("gamelibrary" corelibrary ${LIBS})
+target_link_libraries("gamelibrary" corelibrary)
 
-target_link_libraries("corelauncher" corelibrary ${LIBS})
+target_link_libraries("corelauncher" corelibrary)
 
 if(GAME_LAUNCHER)
-	target_link_libraries("gamelauncher" gamelibrary corelibrary ${LIBS})
+	target_link_libraries("gamelauncher" gamelibrary corelibrary)
 endif()
 
 target_link_libraries("seventeen" corelibrary ${DLL_EXAMPLE_LIBS})
