@@ -58,6 +58,7 @@ struct Variable
 		int i;
 		std::string name;
 		std::vector<Token> v;
+		bool dereference;
 
 		Expression() {
 		}
@@ -76,6 +77,7 @@ struct Variable
 	{
 		int c_i;
 		std::vector<Token> v;
+		bool dereference;
 
 		Fish() {
 		}

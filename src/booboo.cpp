@@ -557,6 +557,8 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 {
 	int p = 0;
 
+	Variable::Expression e;
+	
 	while (isspace(expr[p]) && p < (int)expr.length()) {
 		p++;
 	}
@@ -573,6 +575,20 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 	buf[1] = 0;
 	name += buf;
 	p++;
+	if (name == "*") {
+		name = "";
+		e.dereference = true;
+		while (isspace(expr[p]) && p < (int)expr.length()) {
+			p++;
+		}
+		buf[0] = expr[p];
+		buf[1] = 0;
+		name += buf;
+		p++;
+	}
+	else {
+		e.dereference = false;
+	}
 	int first = name[0];
 	int open_count = name[0] == '[' || name[0] == '(';
 	while (p < (int)expr.length()) {
@@ -598,8 +614,6 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 		p++;
 	}
 
-	Variable::Expression e;
-	
 	e.name = name;
 
 	if (name.length() > 0 && name[0] == '(') {
@@ -913,6 +927,16 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 	p++; // skip [
 	while (isspace(expr[p]) && p < (int)expr.length()) {
 		p++;
+	}
+	if (expr[p] == '*') {
+		e.dereference = true;
+		p++;
+		while (isspace(expr[p]) && p < (int)expr.length()) {
+			p++;
+		}
+	}
+	else {
+		e.dereference = false;
 	}
 	if (expr[p] == '[') {
 		int start = p;
@@ -4959,7 +4983,7 @@ Variable evaluate_expression(Program *prg, const Variable::Expression &e)
 
 		Variable result;
 
-		call_function(prg, var.n, e.v, result);
+		call_function(prg, e.dereference ? var.p->n : var.n, e.v, result);
 
 		return result;
 	}
@@ -4979,6 +5003,9 @@ Variable evaluate_expression(Program *prg, const Variable::Expression &e)
 Variable &go_fish(Program *prg, const Variable::Fish &f)
 {
 	Variable *v = &prg->variables[f.c_i];
+	if (v->type == Variable::POINTER) {
+		v = v->p;
+	}
 	int type = v->type;
 	bool constant = v->constant;
 	static Variable tmp;
