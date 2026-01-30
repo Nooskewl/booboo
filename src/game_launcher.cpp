@@ -900,7 +900,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	std::string dlls = util::load_text_from_filesystem("DLL.txt");
+	std::string dlls = util::load_text_from_filesystem("dll.txt");
 	util::Tokenizer tok(dlls, '\n');
 	std::string dll;
 	while ((dll = tok.next()) != "") {
