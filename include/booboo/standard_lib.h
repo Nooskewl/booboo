@@ -3,8 +3,8 @@
 
 #include "booboo.h"
 
-void start_lib_standard();
-void end_lib_standard();
-void standard_lib_destroy_program(booboo::Program *prg);
+void BOOBOO_EXPORT start_lib_standard();
+void BOOBOO_EXPORT end_lib_standard();
+void BOOBOO_EXPORT standard_lib_destroy_program(booboo::Program *prg);
 
 #endif // BOOBOO_CORE_LIB_H

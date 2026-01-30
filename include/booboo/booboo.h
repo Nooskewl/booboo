@@ -5,15 +5,33 @@
 #include <vector>
 #include <map>
 
+#ifdef _WIN32
+#pragma warning(disable : 4251)
+#endif
+
+#ifdef _WIN32
+#ifdef BOOBOO_STATIC
+#define BOOBOO_EXPORT
+#else
+#ifdef BOOBOO_LIB_BUILD
+#define BOOBOO_EXPORT __declspec(dllexport)
+#else
+#define BOOBOO_EXPORT __declspec(dllimport)
+#endif
+#endif
+#else
+#define BOOBOO_EXPORT
+#endif
+
 namespace booboo {
 
 class Program;
 
-class Error {
+class BOOBOO_EXPORT Error {
 public:
-	Error();
-	Error(std::string error_message);
-	virtual ~Error();
+	BOOBOO_EXPORT Error();
+	BOOBOO_EXPORT Error(std::string error_message);
+	BOOBOO_EXPORT virtual ~Error();
 	
 	std::string error_message;
 };
@@ -105,84 +123,13 @@ struct Variable
 
 	bool constant;
 
-	bool operator==(const Variable &var) const
-	{
-		if (type != var.type) {
-			return false;
-		}
+	BOOBOO_EXPORT bool operator==(const Variable &var) const;
 
-		switch (type) {
-			case NUMBER:
-			case FUNCTION:
-			case LABEL:
-				return n == var.n;
-			case STRING:
-				return s == var.s;
-			case VECTOR:
-				return v == var.v;
-			case MAP:
-				return m == var.m;
-			case POINTER:
-				return p == var.p;
-			default:
-				return false;
-		}
+	BOOBOO_EXPORT Variable(const Variable &var);
 
-		return false;
-	}
+	BOOBOO_EXPORT Variable();
 
-	Variable(const Variable &var)
-	{
-		type = var.type;
-		name = var.name;
-		obfuscated = var.obfuscated;
-		constant = var.constant;
-
-		switch (type) {
-			case NUMBER:
-			case FUNCTION:
-			case LABEL:
-				n = var.n;
-				break;
-			case STRING:
-				s = var.s;
-				break;
-			case VECTOR:
-				v = var.v;
-				break;
-			case MAP:
-				m = var.m;
-				break;
-			case EXPRESSION:
-				e = var.e;
-				break;
-			case FISH:
-				f = var.f;
-				break;
-			case POINTER:
-				p = var.p;
-				break;
-			default:
-				n = var.n;
-				s = var.s;
-				v = var.v;
-				m = var.m;
-				e = var.e;
-				f = var.f;
-				p = var.p;
-				break;
-		}
-	}
-
-	Variable() :
-		type(UNTYPED),
-		constant(false)
-	{
-	}
-
-	~Variable()
-	{
-	}
+	BOOBOO_EXPORT ~Variable();
 };
 
 typedef bool (*library_func)(Program *prg, const std::vector<Token> &v);
@@ -190,71 +137,72 @@ typedef std::string (*token_func)(Program *);
 typedef Variable (*expression_func)(Program *prg, const std::vector<Token> &v);
 
 // Call these before/after using BooBoo
-void start();
-void end();
+void BOOBOO_EXPORT start();
+void BOOBOO_EXPORT end();
 
 // These are the how you create, destroy and run programs
-Program *create_program(std::string code);
-void destroy_program(Program *prg);
-bool interpret(Program *prg);
+Program BOOBOO_EXPORT *create_program(std::string code);
+void BOOBOO_EXPORT destroy_program(Program *prg);
+bool BOOBOO_EXPORT interpret(Program *prg);
 
 // Special functions are left unobfuscated
-void add_special_function(std::string name);
+void BOOBOO_EXPORT add_special_function(std::string name);
 
 // Functions calling
-void call_function(Program *prg, int function, const std::vector<Token> &params, Variable &result, int ignore_params = 0);
-void call_function(Program *prg, std::string function, const std::vector<Token> &params, Variable &result, int ignore_params = 0);
-void call_void_function(Program *prg, int function, const std::vector<Token> &params, int ignore_params = 0);
-void call_void_function(Program *prg, std::string function, const std::vector<Token> &params, int ignore_params = 0);
+void BOOBOO_EXPORT call_function(Program *prg, int function, const std::vector<Token> &params, Variable &result, int ignore_params = 0);
+void BOOBOO_EXPORT call_function(Program *prg, std::string function, const std::vector<Token> &params, Variable &result, int ignore_params = 0);
+void BOOBOO_EXPORT call_void_function(Program *prg, int function, const std::vector<Token> &params, int ignore_params = 0);
+void BOOBOO_EXPORT call_void_function(Program *prg, std::string function, const std::vector<Token> &params, int ignore_params = 0);
 
 // To create token vectors for calling functions
-Token token_number(std::string token, double n);
-Token token_string(std::string token, std::string s);
+Token BOOBOO_EXPORT token_number(std::string token, double n);
+Token BOOBOO_EXPORT token_string(std::string token, std::string s);
 
 // For dealing with results
-double get_number(Variable &v);
-std::string get_string(Variable &v);
-std::vector<Variable> get_vector(Variable &v);
+double BOOBOO_EXPORT get_number(Variable &v);
+std::string BOOBOO_EXPORT get_string(Variable &v);
+std::vector<Variable> BOOBOO_EXPORT get_vector(Variable &v);
 
 // Add a library function
-void add_instruction(std::string name, library_func func);
+void BOOBOO_EXPORT add_instruction(std::string name, library_func func);
 // Add a token handler
-void add_token_handler(char token, token_func func);
+void BOOBOO_EXPORT add_token_handler(char token, token_func func);
 // Handler for things within an expression (parenthesis)
-void add_expression_handler(std::string name, expression_func func);
+void BOOBOO_EXPORT add_expression_handler(std::string name, expression_func func);
 
 // For error handling
-int get_line_num(Program *prg);
-std::string get_file_name(Program *prg);
-std::string get_error_info(Program *prg);
+int BOOBOO_EXPORT get_line_num(Program *prg);
+std::string BOOBOO_EXPORT get_file_name(Program *prg);
+std::string BOOBOO_EXPORT get_error_info(Program *prg);
 
 // These are helpful within your own library functions
-Variable &as_variable(Program *prg, const Token &t);
-Variable as_variable_resolve(Program *prg, const Token &t);
-double as_number(Program *prg, const Token &t);
-std::string as_string(Program *prg, const Token &t);
-int as_label(Program *prg, const Token &t);
-int as_function(Program *prg, const Token &t);
-Variable as_pointer(Program *prg, const Token &t);
+Variable BOOBOO_EXPORT &as_variable(Program *prg, const Token &t);
+Variable BOOBOO_EXPORT as_variable_resolve(Program *prg, const Token &t);
+double BOOBOO_EXPORT as_number(Program *prg, const Token &t);
+std::string BOOBOO_EXPORT as_string(Program *prg, const Token &t);
+int BOOBOO_EXPORT as_label(Program *prg, const Token &t);
+int BOOBOO_EXPORT as_function(Program *prg, const Token &t);
+Variable BOOBOO_EXPORT as_pointer(Program *prg, const Token &t);
 
 // The black box allows you to store anything you want
-void *get_black_box(Program *prg, std::string id);
-void set_black_box(Program *prg, std::string id, void *data);
+void BOOBOO_EXPORT *get_black_box(Program *prg, std::string id);
+void BOOBOO_EXPORT set_black_box(Program *prg, std::string id, void *data);
 
-void obfuscate(Program *prg);
+void BOOBOO_EXPORT obfuscate(Program *prg);
 
 // If you have a variable of type SYMBOL then 'i' is the index you pass here to retrive the variable
-Variable &get_variable(Program *prg, int index);
+Variable BOOBOO_EXPORT &get_variable(Program *prg, int index);
 
-Variable evaluate_expression(Program *prg, const Variable::Expression &e);
-Variable &go_fish(Program *prg, const Variable::Fish &f);
+Variable BOOBOO_EXPORT evaluate_expression(Program *prg, const Variable::Expression &e);
+Variable BOOBOO_EXPORT &go_fish(Program *prg, const Variable::Fish &f);
 
 // This stuff can be used but it's used by the BooBoo interpreter
-extern std::string reset_game_name;
-extern std::string main_program_name;
-extern int return_code;
-extern bool quit;
-extern std::string (*load_text)(std::string filename); // must be set
+extern BOOBOO_EXPORT std::string reset_game_name;
+extern BOOBOO_EXPORT std::string main_program_name;
+extern BOOBOO_EXPORT int return_code;
+extern BOOBOO_EXPORT bool quit;
+extern BOOBOO_EXPORT std::string (*load_text)(std::string filename); // must be set
+extern BOOBOO_EXPORT Program *prg;
 
 } // End namespace booboo
 
@@ -319,5 +267,9 @@ extern std::string (*load_text)(std::string filename); // must be set
 #define CHECK_EXPRESSION(v)
 #define CHECK_FISH(v)
 #endif
+
+extern "C" {
+	typedef void (*BOOBOO_DLL_START_FUNC)(void);
+}
 
 #endif // BOOBOO_H

@@ -12,14 +12,15 @@ enum GUI_Transition_Type {
 	TRANSITION_FADE
 };
 
-void start_lib_game();
-void end_lib_game();
-void game_lib_destroy_program(booboo::Program *prg);
-void register_game_callbacks();
-void unregister_game_callbacks();
+void BOOBOO_EXPORT start_lib_game();
+void BOOBOO_EXPORT end_lib_game();
+void BOOBOO_EXPORT game_lib_destroy_program(booboo::Program *prg);
 
 extern bool is_3d;
 void set_2d();
 void set_3d();
+
+void BOOBOO_EXPORT register_game_callbacks();
+void BOOBOO_EXPORT unregister_game_callbacks();
 
 #endif // BOOBOO_GAME_LIB_H

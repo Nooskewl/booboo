@@ -5,7 +5,7 @@ project("BooBoo")
 
 option(GAME_LAUNCHER "Build the game launcher" ON)
 option(DEBUG "Debug build" OFF)
-option(USE_STATIC_LIBS "Link with static libraries" ON)
+option(USE_STATIC_LIBS "Link with static libraries" OFF)
 option(RASPBERRYPI "Build for Raspberry Pi" OFF)
 
 set(USER_INCLUDE_PATH "" CACHE FILEPATH "Any extra include directories you want")
@@ -14,10 +14,9 @@ set(USER_LIBRARY_PATH "" CACHE FILEPATH "Any extra library directories you want"
 include_directories("include")
 include_directories(${USER_INCLUDE_PATH})
 link_directories(${USER_LIBRARY_PATH})
-link_directories(${CMAKE_BINARY_DIR})
 
-set(SHIM5_LIB shim5)
-set(TGUI6_LIB tgui6)
+set(SHIM5_LIB shim5.dll)
+set(TGUI6_LIB tgui6.dll)
 
 # Inputs
 
@@ -26,13 +25,20 @@ set(LIB_SOURCES
 	src/standard_lib.cpp
 )
 
-set(GAME_LAUNCHER_SOURCES
-	src/game_launcher.cpp
+set(GAME_LIB_SOURCES
 	src/game_lib.cpp
 )
 
 set(CORE_LAUNCHER_SOURCES
 	src/launcher.cpp
+)
+
+set(GAME_LAUNCHER_SOURCES
+	src/game_launcher.cpp
+)
+
+set(DLL_EXAMPLE_SOURCES
+	src/dll_example.cpp
 )
 
 if (MINGW)
@@ -41,13 +47,15 @@ endif()
 
 # Outputs
 
-add_library("corelibrary" STATIC ${LIB_SOURCES})
+add_library("corelibrary" SHARED ${LIB_SOURCES})
 add_executable("corelauncher" ${CORE_LAUNCHER_SOURCES})
 
 if(GAME_LAUNCHER)
-	add_library("gamelibrary" STATIC ${LIB_SOURCES})
+	add_library("gamelibrary" SHARED ${GAME_LIB_SOURCES})
 	add_executable("gamelauncher" ${GAME_LAUNCHER_SOURCES})
 endif()
+
+add_library("seventeen" SHARED ${DLL_EXAMPLE_SOURCES})
 
 # Platform specifics
 
@@ -64,21 +72,21 @@ if(MINGW)
 	if(USE_STATIC_LIBS AND GAME_LAUNCHER)
 		set(FLAGS "${FLAGS} -DTGUI6_STATIC -DSHIM5_STATIC")
 	endif()
-	set_target_properties("corelibrary" PROPERTIES COMPILE_FLAGS "${FLAGS} -DCLI")
+	set_target_properties("corelibrary" PROPERTIES COMPILE_FLAGS "${FLAGS} -DBOOBOO_LIB_BUILD")
 	set_target_properties("corelibrary" PROPERTIES OUTPUT_NAME "BooBooCore")
-	set_target_properties("corelauncher" PROPERTIES COMPILE_FLAGS "${FLAGS} -DCLI")
+	set_target_properties("corelauncher" PROPERTIES COMPILE_FLAGS "${FLAGS}")
 	set_target_properties("corelauncher" PROPERTIES LINK_FLAGS "${LFLAGS}")
 	set_target_properties("corelauncher" PROPERTIES OUTPUT_NAME "BooBooCLI")
 
 	if(GAME_LAUNCHER)
-		set_target_properties("gamelibrary" PROPERTIES COMPILE_FLAGS "${FLAGS}")
+		set_target_properties("gamelibrary" PROPERTIES COMPILE_FLAGS "${FLAGS} -DBOOBOO_LIB_BUILD")
 		set_target_properties("gamelibrary" PROPERTIES OUTPUT_NAME "BooBooGame")
 		set_target_properties("gamelauncher" PROPERTIES COMPILE_FLAGS "${FLAGS}")
 		set_target_properties("gamelauncher" PROPERTIES LINK_FLAGS "${LFLAGS_WIN32}")
 		set_target_properties("gamelauncher" PROPERTIES OUTPUT_NAME "BooBoo")
 	endif()
-	set(CORE_LAUNCHER_LIBS mingw32 "corelibrary" twinkle util SDL3 zlibstatic shlwapi)
-	set(GAME_LAUNCHER_LIBS "gamelibrary" twinkle ${SHIM5_LIB} util ${TGUI6_LIB} mingw32 SDL3 SDL3_ttf png16 vorbis FLAC ogg freetype zlibstatic winmm dbghelp shcore msvcrt imm32 setupapi shlwapi version)
+	set(LIBS twinkle ${SHIM5_LIB} ${TGUI6_LIB} mingw32 SDL3 SDL3_ttf png16 vorbis FLAC ogg freetype zlibstatic winmm dbghelp shcore msvcrt imm32 setupapi shlwapi version)
+	set(DLL_EXAMPLE_LIBS mingw32 twinkle SDL3 zlibstatic)
 elseif(WIN32)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /IGNORE:4075 /IGNORE:4099")
 	SET(FLAGS "${FLAGS} /D_CRT_SECURE_NO_WARNINGS /D_USE_MATH_DEFINES /EHsc /MP /W3 /wd4244 /wd4800 /wd4101 /MT")
@@ -93,7 +101,7 @@ elseif(WIN32)
 	#set(FLAGS "${FLAGS} /DUSE_TTF")
 	set_target_properties("gamelauncher" PROPERTIES COMPILE_FLAGS "${FLAGS}")
 	set_target_properties("gamelauncher" PROPERTIES OUTPUT_NAME "BooBoo")
-	set(LIBS ${LIBS} twinkle ${SHIM5_LIB} util ${TGUI6_LIB} SDL3 SDL3_ttf libpng16_static ogg libvorbis_static FLAC freetype zlibstatic winmm dbghelp shcore msvcrt)
+	set(LIBS ${LIBS} twinkle ${SHIM5_LIB} ${TGUI6_LIB} SDL3 SDL3_ttf libpng16_static ogg libvorbis_static FLAC freetype zlibstatic winmm dbghelp shcore msvcrt)
 
 elseif(APPLE)
 	SET(FLAGS "-Wall -Wno-extern-c-compat -Wno-c++11-narrowing -Wno-overloaded-virtual -DTGUI6_STATIC -DSHIM5_STATIC")
@@ -106,7 +114,7 @@ elseif(APPLE)
 	set_target_properties("gamelauncher" PROPERTIES COMPILE_FLAGS "${FLAGS}")
 	set_target_properties("gamelauncher" PROPERTIES LINK_FLAGS "-framework Cocoa -framework IOKit -framework OpenGL -framework CoreAudio -framework AudioUnit -framework ForceFeedback -framework Carbon")
 	set_target_properties("gamelauncher" PROPERTIES OUTPUT_NAME "BooBoo")
-	set(LIBS ${LIBS} twinkle ${SHIM5_LIB} util ${TGUI6_LIB} SDL3 SDL3_ttf z)
+	set(LIBS ${LIBS} twinkle ${SHIM5_LIB} ${TGUI6_LIB} SDL3 SDL3_ttf z)
 else() # Linux
 	SET(FLAGS "-Wall -Wno-comment -Wno-strict-aliasing -std=c++0x")
 	SET(FLAGS "${FLAGS} -DUSE_TTF -DUSE_PNG")
@@ -127,9 +135,9 @@ else() # Linux
 	endif()
 	set(CMAKE_C_FLAGS_RELEASE "-O3")
 	set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-	set_target_properties("corelibrary" PROPERTIES COMPILE_FLAGS "${FLAGS} -DCLID")
+	set_target_properties("corelibrary" PROPERTIES COMPILE_FLAGS "${FLAGS}")
 	set_target_properties("corelibrary" PROPERTIES OUTPUT_NAME "BooBooCore")
-	set_target_properties("corelauncher" PROPERTIES COMPILE_FLAGS "${FLAGS} -DCLI")
+	set_target_properties("corelauncher" PROPERTIES COMPILE_FLAGS "${FLAGS}")
 	set_target_properties("corelauncher" PROPERTIES LINK_FLAGS "${LFLAGS}")
 	set_target_properties("corelauncher" PROPERTIES OUTPUT_NAME "BooBooCLI")
 	if(GAME_LAUNCHER)
@@ -139,16 +147,16 @@ else() # Linux
 		set_target_properties("gamelauncher" PROPERTIES LINK_FLAGS "${LFLAGS}")
 		set_target_properties("gamelauncher" PROPERTIES OUTPUT_NAME "BooBoo")
 	endif()
-	set(CORE_LAUNCHER_LIBS "corelibrary" twinkle ${SHIM5_LIB} util ${TGUI6_LIB} SDL3 SDL3_ttf GL Xcursor X11 FLAC vorbis ogg freetype png z)
-	set(GAME_LAUNCHER_LIBS "gamelibrary" twinkle ${SHIM5_LIB} util ${TGUI6_LIB} SDL3 SDL3_ttf GL Xcursor X11 FLAC vorbis ogg freetype png z)
+	set(LIBS twinkle ${SHIM5_LIB} ${TGUI6_LIB} SDL3 SDL3_ttf GL Xcursor X11 FLAC vorbis ogg freetype png z)
 endif()
 
-target_link_libraries("corelauncher" ${CORE_LAUNCHER_LIBS})
+target_link_libraries("corelibrary" ${LIBS})
+target_link_libraries("gamelibrary" corelibrary ${LIBS})
+
+target_link_libraries("corelauncher" corelibrary ${LIBS})
 
 if(GAME_LAUNCHER)
-	if(MINGW)
-		target_link_libraries("gamelauncher" ${GAME_LAUNCHER_LIBS})
-	else()
-		target_link_libraries("gamelauncher" ${GAME_LAUNCHER_LIBS})
-	endif()
+	target_link_libraries("gamelauncher" gamelibrary corelibrary ${LIBS})
 endif()
+
+target_link_libraries("seventeen" corelibrary ${DLL_EXAMPLE_LIBS})

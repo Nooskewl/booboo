@@ -10,15 +10,13 @@
 
 #include <sys/stat.h>
 
-#include <libutil/libutil.h>
+#include <shim5/shim5.h>
+
 using namespace noo;
 
 #include "booboo/booboo.h"
 #include "booboo/standard_lib.h"
-
-booboo::Program *prg;
-
-std::vector<std::string> cli_args;
+#include "booboo/internal.h"
 
 static std::string load_text_from_filesystem(std::string filename)
 {
@@ -58,13 +56,13 @@ static std::string load_text_from_filesystem(std::string filename)
 int main(int argc, char **argv)
 {
 	for (int i = 0 ; i < argc; i++) {
-		cli_args.push_back(argv[i]);
+		booboo::cli_args.push_back(argv[i]);
 	}
 
 	shim::organisation_name = "Nooskewl";
 	shim::game_name = "BooBoo";
 
-	booboo::load_text = util::load_text_from_filesystem;
+	booboo::load_text = load_text_from_filesystem;
 
 	std::string fn = argc >= 2 ? argv[1] : "";
 
@@ -162,7 +160,7 @@ again:
 		}
 	}
 
-	prg = booboo::create_program(code);
+	booboo::prg = booboo::create_program(code);
 
 	bool ob = false;
 	for (int i = 1; i < argc; i++) {
@@ -173,15 +171,15 @@ again:
 	}
 
 	if (ob) {
-		booboo::obfuscate(prg);
+		booboo::obfuscate(booboo::prg);
 	}
 	else {
-		while (booboo::interpret(prg)) {
+		while (booboo::interpret(booboo::prg)) {
 		}
 	}
 
-	standard_lib_destroy_program(prg);
-	booboo::destroy_program(prg);
+	standard_lib_destroy_program(booboo::prg);
+	booboo::destroy_program(booboo::prg);
 
 	if (booboo::reset_game_name != "") {
 		fn = "";

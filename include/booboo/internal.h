@@ -62,10 +62,14 @@ struct Program {
 	std::map<std::string, void *> black_box;
 };
 
-glm::mat4 to_glm_mat4(Variable &v);
-Variable from_glm_mat4(glm::mat4 m);
+glm::mat4 BOOBOO_EXPORT to_glm_mat4(Variable &v);
+Variable BOOBOO_EXPORT from_glm_mat4(glm::mat4 m);
 
 extern std::vector<booboo::library_func> library;
+
+extern BOOBOO_EXPORT std::vector<std::string> cli_args;
+
+extern BOOBOO_EXPORT int num_ops;
 
 } // End namespace booboo
 

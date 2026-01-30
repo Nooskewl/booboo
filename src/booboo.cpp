@@ -7,7 +7,6 @@
 
 #include <shim5/shim5.h>
 
-#include <libutil/libutil.h>
 using namespace noo;
 
 #include <twinkle.h>
@@ -21,12 +20,6 @@ static std::map<char, booboo::token_func> token_map;
 static std::map<std::string, int> expression_map;
 static std::vector<booboo::expression_func> expression_handlers;
 static std::vector<std::string> special_functions;
-
-int num_ops = 0;
-
-#ifdef CLI
-extern std::vector<std::string> cli_args;
-#endif
 
 // First off maybe 10 utility functions taken from Nooskewl Shim
 
@@ -42,14 +35,97 @@ static void skip_whitespace(booboo::Program *prg)
 
 namespace booboo {
 
+Program *prg;
 std::string reset_game_name;
 std::string main_program_name;
 int return_code;
 bool quit;
 std::string (*load_text)(std::string filename);
 std::vector<booboo::library_func> library;
+int num_ops = 0;
+
+std::vector<std::string> cli_args;
 
 // And this all makes BooBoo work
+
+bool Variable::operator==(const Variable &var) const
+{
+	if (type != var.type) {
+		return false;
+	}
+
+	switch (type) {
+		case NUMBER:
+		case FUNCTION:
+		case LABEL:
+			return n == var.n;
+		case STRING:
+			return s == var.s;
+		case VECTOR:
+			return v == var.v;
+		case MAP:
+			return m == var.m;
+		case POINTER:
+			return p == var.p;
+		default:
+			return false;
+	}
+
+	return false;
+}
+
+Variable::Variable(const Variable &var)
+{
+	type = var.type;
+	name = var.name;
+	obfuscated = var.obfuscated;
+	constant = var.constant;
+
+	switch (type) {
+		case NUMBER:
+		case FUNCTION:
+		case LABEL:
+			n = var.n;
+			break;
+		case STRING:
+			s = var.s;
+			break;
+		case VECTOR:
+			v = var.v;
+			break;
+		case MAP:
+			m = var.m;
+			break;
+		case EXPRESSION:
+			e = var.e;
+			break;
+		case FISH:
+			f = var.f;
+			break;
+		case POINTER:
+			p = var.p;
+			break;
+		default:
+			n = var.n;
+			s = var.s;
+			v = var.v;
+			m = var.m;
+			e = var.e;
+			f = var.f;
+			p = var.p;
+			break;
+	}
+}
+
+Variable::Variable() :
+	type(UNTYPED),
+	constant(false)
+{
+}
+
+Variable::~Variable()
+{
+}
 
 static bool is_special(std::string func)
 {
@@ -575,20 +651,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 	buf[1] = 0;
 	name += buf;
 	p++;
-	if (name == "*") {
-		name = "";
-		e.dereference = true;
-		while (isspace(expr[p]) && p < (int)expr.length()) {
-			p++;
-		}
-		buf[0] = expr[p];
-		buf[1] = 0;
-		name += buf;
-		p++;
-	}
-	else {
-		e.dereference = false;
-	}
+	e.dereference = false;
 	int first = name[0];
 	int open_count = name[0] == '[' || name[0] == '(';
 	while (p < (int)expr.length()) {
@@ -1338,7 +1401,6 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "PURPLE", 5, pass, var_i);
 	insert_constant(prg, "YELLOW", 6, pass, var_i);
 	insert_constant(prg, "WHITE", 7, pass, var_i);
-#ifndef CLI
 	insert_constant(prg, "KEY_UNKNOWN", TGUIK_UNKNOWN, pass, var_i);
 	insert_constant(prg, "KEY_RETURN", TGUIK_RETURN, pass, var_i);
 	insert_constant(prg, "KEY_ESCAPE", TGUIK_ESCAPE, pass, var_i);
@@ -1663,7 +1725,6 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "BACK_FACE", gfx::BACK_FACE, pass, var_i);
 	insert_constant(prg, "FACE_CW", gfx::FACE_CW, pass, var_i);
 	insert_constant(prg, "FACE_CCW", gfx::FACE_CCW, pass, var_i);
-#endif
 	insert_constant(prg, "SEEK_SET", SDL_IO_SEEK_SET, pass, var_i);
 	insert_constant(prg, "SEEK_CUR", SDL_IO_SEEK_CUR, pass, var_i);
 	insert_constant(prg, "SEEK_END", SDL_IO_SEEK_END, pass, var_i);
@@ -2565,6 +2626,7 @@ void add_expression_handler(std::string name, expression_func func)
 {
 	expression_map[name] = expression_handlers.size();
 	expression_handlers.push_back(func);
+	printf("size=%d\n", expression_handlers.size());
 }
 
 static bool breaker_reset(Program *prg, const std::vector<Token> &v)
@@ -3291,25 +3353,6 @@ static Variable exprfunc_core_get_savedgames_path(Program *prg, const std::vecto
 
 	return var;
 }
-
-#ifdef CLI
-static Variable exprfunc_get_args(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(0)
-
-	Variable vec;
-	vec.type = Variable::VECTOR;
-
-	for (int i = 0; i < cli_args.size(); i++) {
-		Variable v1;
-		v1.type = Variable::STRING;
-		v1.s = cli_args[i];
-		vec.v.push_back(v1);
-	}
-
-	return vec;
-}
-#endif
 
 static Variable exprfunc_add(Program *prg, const std::vector<Token> &v)
 {
@@ -4362,6 +4405,23 @@ static Variable exprfunc_toptr(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
+static Variable exprfunc_get_args(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	Variable v1;
+	v1.type = Variable::VECTOR;
+
+	for (int i = 0; i < shim::argc; i++) {
+		Variable var;
+		var.type = Variable::STRING;
+		var.s = shim::argv[i];
+		v1.v.push_back(var);
+	}
+
+	return v1;
+}
+
 static void init_token_map()
 {
 	add_token_handler(':', tokenfunc_label);
@@ -4470,10 +4530,7 @@ void start()
 	add_expression_handler("rand", exprfunc_rand);
 	add_instruction("explode", corefunc_explode);
 	add_expression_handler("get_savedgames_path", exprfunc_core_get_savedgames_path);
-	
-#ifdef CLI
 	add_expression_handler("get_args", exprfunc_get_args);
-#endif
 	
 	return_code = 0;
 }

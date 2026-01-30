@@ -12,7 +12,6 @@
 #include <shim5/shim5.h>
 #include <shim5/internal/gfx.h>
 
-#include <libutil/libutil.h>
 using namespace noo;
 
 #include "booboo/booboo.h"
@@ -20,8 +19,6 @@ using namespace noo;
 #include "booboo/game_lib.h"
 #include "booboo/internal.h"
 using namespace booboo;
-
-Program *prg;
 
 int orig_argc;
 char **orig_argv;
@@ -43,7 +40,6 @@ static bool delta_got;
 
 static int exit_key = TGUIK_F12;
 
-extern int num_ops;
 Uint64 op_time = 0;
 double ops_sec = 0;
 bool show_ops;
@@ -901,6 +897,21 @@ int main(int argc, char **argv)
 	for (int i = 1; i < argc; i++) {
 		if (std::string(argv[i]) == "+volume" && i < (argc-1)) {
 			shim::music_volume = atoi(argv[i+1])/255.0f;
+		}
+	}
+
+	std::string dlls = util::load_text_from_filesystem("DLL.txt");
+	util::Tokenizer tok(dlls, '\n');
+	std::string dll;
+	while ((dll = tok.next()) != "") {
+		dll = util::trim(dll);
+		dll += ".dll";
+		HMODULE m = LoadLibrary(dll.c_str());
+		if (m != NULL) {
+			BOOBOO_DLL_START_FUNC func = (BOOBOO_DLL_START_FUNC)GetProcAddress(m, "booboo_start");
+			if (func != NULL) {
+				(*func)();
+			}
 		}
 	}
 

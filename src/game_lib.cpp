@@ -3,14 +3,13 @@
 #include <shim5/shaders/glsl/default_textured_fragment.h>
 #include <shim5/internal/gfx.h>
 
-#include <libutil/libutil.h>
 using namespace noo;
 
 #include "booboo/booboo.h"
-#include "booboo/internal.h"
-using namespace booboo;
-
 #include "booboo/game_lib.h"
+#include "booboo/internal.h"
+
+using namespace booboo;
 
 static GUI_Transition_Type transition_in_type = TRANSITION_ENLARGE;
 static GUI_Transition_Type transition_out_type = TRANSITION_SHRINK;
@@ -19,7 +18,10 @@ static glm::mat4 custom_mv = glm::mat4(1.0f);
 static glm::mat4 custom_proj = glm::mat4(1.0f);
 
 extern bool quit;
-extern Program *prg;
+
+namespace booboo {
+
+} // End namespace booboo
 
 #define INFO_EXISTS(m, i) if (m.find(i) == m.end()) { \
 	throw Error(std::string(__FUNCTION__) + ": " + "Invalid handle at " + get_error_info(prg)); \
@@ -300,23 +302,6 @@ static Variable exprfunc_misc_get_ticks(Program *prg, const std::vector<Token> &
 	Variable v1;
 	v1.type = Variable::NUMBER;
 	v1.n = SDL_GetTicks();
-
-	return v1;
-}
-
-static Variable exprfunc_misc_get_args(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(0)
-
-	Variable v1;
-	v1.type = Variable::VECTOR;
-
-	for (int i = 0; i < shim::argc; i++) {
-		Variable var;
-		var.type = Variable::STRING;
-		var.s = shim::argv[i];
-		v1.v.push_back(var);
-	}
 
 	return v1;
 }
@@ -5506,7 +5491,6 @@ void start_lib_game()
 	add_instruction("inspect", miscfunc_inspect);
 	add_instruction("delay", miscfunc_delay);
 	add_expression_handler("get_ticks", exprfunc_misc_get_ticks);
-	add_expression_handler("get_args", exprfunc_misc_get_args);
 	add_expression_handler("get_logic_rate", exprfunc_misc_get_logic_rate);
 	add_instruction("set_logic_rate", miscfunc_set_logic_rate);
 	add_expression_handler("file_list", exprfunc_misc_file_list);
