@@ -1,0 +1,4 @@
+Specify which DLLs you want to load in app/dll.txt (without extension or "lib" on Linux.)
+
+DLLs should have an extern "C" { void booboo_start(void) } that adds
+instructions/expression handlers.
