@@ -2626,7 +2626,6 @@ void add_expression_handler(std::string name, expression_func func)
 {
 	expression_map[name] = expression_handlers.size();
 	expression_handlers.push_back(func);
-	printf("size=%d\n", expression_handlers.size());
 }
 
 static bool breaker_reset(Program *prg, const std::vector<Token> &v)
