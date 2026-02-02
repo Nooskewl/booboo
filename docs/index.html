@@ -176,12 +176,12 @@ Sections:
 	call foo (@ bar) ; where foo is expecting a pointer
 </pre>
 
-<h3>*</h3>
+<h3>`</h3>
 <pre>
 	Dereference operator. This is used to get/set the value pointed
 	to by a pointer
 	e.g. = p (@ some_num)
-	e.g. = *p 10 ; some_num is now 10
+	e.g. = `p 10 ; some_num is now 10
 </pre>
 
 <h3>(toptr)</h3>
@@ -192,7 +192,7 @@ Sections:
 	e.g. = number 10
 	e.g. var bar
 	e.g. = bar "foo"
-	e.g. = *(toptr bar) 1000 ; foo is now 1000
+	e.g. = `(toptr bar) 1000 ; foo is now 1000
 	You can use this to script BooBoo with function names/etc in a text file.
 	Returns NULL if the variable isn't found
 </pre>

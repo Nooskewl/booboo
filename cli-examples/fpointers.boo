@@ -5,7 +5,7 @@ function foo
 
 var p
 = p (@ foo)
-call *p
+call `p
 
 call bar foo
 

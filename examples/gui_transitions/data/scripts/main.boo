@@ -174,7 +174,7 @@ function draw_radio x y w h focussed data
 
 	circle 255 255 255 255 (+ xx 10) cy 7 1 -1
 
-	if (== *[data "group"] [data "index"]) check
+	if (== `[data "group"] [data "index"]) check
 		filled_circle 255 255 255 255 (+ xx 10) cy 5 -1
 	:check
 	
@@ -221,11 +221,11 @@ function radio_event type a b c d x y w h focussed ~data
 		var on_button
 		call_result on_button owned x y w h c d
 		if (== on_button TRUE) really_down
-			= *[data "group"] [data "index"]
+			= `[data "group"] [data "index"]
 		:really_down
 	:down
 	if (&& (== TRUE focussed) (== FALSE b) (|| (&& (== type EVENT_KEY_DOWN) (== KEY_RETURN a)) (&& (== type EVENT_JOY_DOWN) (== b JOY_A)))) down2
-		= *[data "group"] [data "index"]
+		= `[data "group"] [data "index"]
 	:down2
 }
 

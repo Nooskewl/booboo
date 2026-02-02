@@ -10,7 +10,7 @@ if (== -1 f) default read
 var p
 = p (toptr s)
 if (!= p NULL) go nope
-	call *p
+	call `p
 :go
 	print "NOPE!\n"
 :nope
