@@ -43,6 +43,12 @@ and add +no-obfuscate <filename> to your command line arguments.
 
 --
 
+DLLs can extend BooBoo. Use the BooBoo SDK and create an
+app/dll.txt (or dll.txt for BooBooCLI) with the names of DLLs to
+load separated by a newline.
+
+--
+
 The portrait example uses a screenshot from the game Broken Pearl
 
 --
