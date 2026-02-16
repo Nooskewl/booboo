@@ -255,26 +255,32 @@ static std::string sformat(Program *prg, const std::vector<Token> &v, int skip)
 			val = buf;
 		}
 		else {
-			Variable &v1 = as_variable(prg, v[_tok]);
-			if (IS_NUMBER(v1)) {
+			Variable *v1;
+			if (v[_tok].dereference > 0) {
+				v1 = dereference(prg, v[_tok]);
+			}
+			else {
+				v1 = &as_variable(prg, v[_tok]);
+			}
+			if (IS_NUMBER(*v1)) {
 				format = (format == "") ? "g" : format;
 				char buf[1000];
 				if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
-					snprintf(buf, 1000, ("%" + format).c_str(), (int)v1.n);
+					snprintf(buf, 1000, ("%" + format).c_str(), (int)v1->n);
 				}
 				else {
-					snprintf(buf, 1000, ("%" + format).c_str(), v1.n);
+					snprintf(buf, 1000, ("%" + format).c_str(), v1->n);
 				}
 				val = buf;
 			}
-			else if (IS_STRING(v1)) {
+			else if (IS_STRING(*v1)) {
 				format = (format == "") ? "s" : format;
 				char buf[1000];
-				snprintf(buf, 1000, ("%" + format).c_str(), v1.s.c_str());
+				snprintf(buf, 1000, ("%" + format).c_str(), v1->s.c_str());
 				val = buf;
 			}
-			else if (IS_EXPRESSION(v1)) {
-				Variable var = evaluate_expression(prg, v1.e);
+			else if (IS_EXPRESSION(*v1)) {
+				Variable var = evaluate_expression(prg, v1->e);
 				if (IS_NUMBER(var)) {
 					format = (format == "") ? "g" : format;
 					char buf[1000];
@@ -311,8 +317,8 @@ static std::string sformat(Program *prg, const std::vector<Token> &v, int skip)
 					val = buf;
 				}
 			}
-			else if (IS_FISH(v1)) {
-				Variable &var = go_fish(prg, v1.f);
+			else if (IS_FISH(*v1)) {
+				Variable &var = go_fish(prg, v1->f);
 				if (IS_NUMBER(var)) {
 					format = (format == "") ? "g" : format;
 					char buf[1000];
@@ -350,16 +356,16 @@ static std::string sformat(Program *prg, const std::vector<Token> &v, int skip)
 				}
 			}
 			else {
-				if (IS_VECTOR(v1)) {
+				if (IS_VECTOR(*v1)) {
 					val = "-vector-";
 				}
-				else if (IS_MAP(v1)) {
+				else if (IS_MAP(*v1)) {
 					val = "-map-";
 				}
-				else if (IS_FUNCTION(v1)) {
+				else if (IS_FUNCTION(*v1)) {
 					val = "-function-";
 				}
-				else if (IS_LABEL(v1)) {
+				else if (IS_LABEL(*v1)) {
 					val = "-label-";
 				}
 				else {
@@ -691,7 +697,7 @@ static bool stringfunc_set_char_at(Program *prg, const std::vector<Token> &v)
 
 	Variable *p;
 	if (v[0].dereference) {
-		p = s.p;
+		p = dereference(prg, v[0]);
 	}
 	else {
 		p = &s;
@@ -2230,7 +2236,7 @@ public:
 		Token t;
 		t.type = Token::STRING;
 		t.s = t.token = name;
-		t.dereference = false;
+		t.dereference = 0;
 		v.push_back(t);
 		call_void_function(prg, func, v, 0);
 	}

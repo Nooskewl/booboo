@@ -657,7 +657,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 	buf[1] = 0;
 	name += buf;
 	p++;
-	e.dereference = false;
+	e.dereference = 0;
 	int first = name[0];
 	int open_count = name[0] == '[' || name[0] == '(';
 	while (p < (int)expr.length()) {
@@ -740,7 +740,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 
 	bool done = false;
 
-	bool deref = false;
+	int deref = 0;
 
 	while (!done) {
 		while (isspace(expr[p]) && p < (int)expr.length()) {
@@ -792,7 +792,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			tok.i = var_i++;
 			tok.token = new_expr;
 			tok.dereference = deref;
-			deref = false;
+			deref = 0;
 
 			Variable v1;
 			v1.name = "__e" + util::itos(expression_i++);
@@ -810,7 +810,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 		}
 		else if (c == ')') {
 			done = true;
-			deref = false;
+			deref = 0;
 			break;
 		}
 		else if (c == '[') {
@@ -836,7 +836,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			tok.i = var_i++;
 			tok.token = new_expr;
 			tok.dereference = deref;
-			deref = false;
+			deref = 0;
 
 			Variable v1;
 			v1.name = "__f" + util::itos(fish_i++);
@@ -864,7 +864,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			}
 			tok.token = str;
 			tok.n = atof(str.c_str());
-			tok.dereference = false;
+			tok.dereference = 0;
 		}
 		else if (c == '#') {
 			tok.type = Token::NUMBER;
@@ -893,7 +893,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			snprintf(buf, 1000, "%d", n);
 			tok.token = buf;
 			tok.n = n;
-			tok.dereference = false;
+			tok.dereference = 0;
 		}
 		else if (c == '\'') {
 			tok.type = Token::NUMBER;
@@ -917,7 +917,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			str = util::remove_quotes(util::unescape_string(str));
 			tok.token = str[0];
 			tok.n = str[0];
-			tok.dereference = false;
+			tok.dereference = 0;
 		}
 		else if (c == '"') {
 			tok.type = Token::STRING;
@@ -941,7 +941,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			str = util::remove_quotes(util::unescape_string(str));
 			tok.token = str;
 			tok.s = str;
-			tok.dereference = false;
+			tok.dereference = 0;
 		}
 		else if (isalpha(c) || c == '_') {
 			tok.type = Token::SYMBOL;
@@ -958,7 +958,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			}
 			tok.token = sym;
 			tok.dereference = deref;
-			deref = false;
+			deref = 0;
 
 			if (pass == PASS2) {
 				if (prg->variables_map.find(sym) == prg->variables_map.end()) {
@@ -968,7 +968,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			}
 		}
 		else if (c == '`') {
-			deref = true;
+			deref++;
 			p++;
 			continue;
 		}
@@ -998,14 +998,16 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 		p++;
 	}
 	if (expr[p] == '`') {
-		e.dereference = true;
-		p++;
-		while (isspace(expr[p]) && p < (int)expr.length()) {
+		while (expr[p] == '`') {
+			e.dereference++;
 			p++;
+			while (isspace(expr[p]) && p < (int)expr.length()) {
+				p++;
+			}
 		}
 	}
 	else {
-		e.dereference = false;
+		e.dereference = 0;
 	}
 	if (expr[p] == '[') {
 		int start = p;
@@ -1098,7 +1100,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 
 	bool done = false;
 
-	bool deref = false;
+	int deref = 0;
 
 	while (!done) {
 		while (isspace(expr[p]) && p < (int)expr.length()) {
@@ -1150,7 +1152,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			tok.i = var_i++;
 			tok.token = new_expr;
 			tok.dereference = deref;
-			deref = false;
+			deref = 0;
 
 			Variable v1;
 			v1.name = "__e" + util::itos(expression_i++);
@@ -1189,7 +1191,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			tok.i = var_i++;
 			tok.token = new_expr;
 			tok.dereference = deref;
-			deref = false;
+			deref = 0;
 
 			Variable v1;
 			v1.name = "__f" + util::itos(fish_i++);
@@ -1207,7 +1209,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 		}
 		else if (c == ']') {
 			done = true;
-			deref = false;
+			deref = 0;
 			break;
 		}
 		else if (isdigit(c) || c == '-' || c == '.') {
@@ -1222,7 +1224,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			}
 			tok.token = str;
 			tok.n = atof(str.c_str());
-			tok.dereference = false;
+			tok.dereference = 0;
 		}
 		else if (c == '#') {
 			tok.type = Token::NUMBER;
@@ -1251,7 +1253,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			snprintf(buf, 1000, "%d", n);
 			tok.token = buf;
 			tok.n = n;
-			tok.dereference = false;
+			tok.dereference = 0;
 		}
 		else if (c == '\'') {
 			tok.type = Token::NUMBER;
@@ -1275,7 +1277,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			str = util::remove_quotes(util::unescape_string(str));
 			tok.token = str[0];
 			tok.n = str[0];
-			tok.dereference = false;
+			tok.dereference = 0;
 		}
 		else if (c == '"') {
 			tok.type = Token::STRING;
@@ -1299,7 +1301,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			str = util::remove_quotes(util::unescape_string(str));
 			tok.token = str;
 			tok.s = str;
-			tok.dereference = false;
+			tok.dereference = 0;
 		}
 		else if (isalpha(c) || c == '_') {
 			tok.type = Token::SYMBOL;
@@ -1316,7 +1318,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			}
 			tok.token = sym;
 			tok.dereference = deref;
-			deref = false;
+			deref = 0;
 
 			if (pass == PASS2) {
 				if (prg->variables_map.find(sym) == prg->variables_map.end()) {
@@ -1326,7 +1328,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			}
 		}
 		else if (c == '`') {
-			deref = true;
+			deref++;
 			p++;
 			continue;
 		}
@@ -1751,12 +1753,12 @@ static void compile(Program *prg, Pass pass)
 		}
 	}
 
-	bool _is_deref = false;
+	int _is_deref = 0;
 
 	while ((tok = token(prg, tt)) != "") {
 top:
 		if (tok == "`") {
-			_is_deref = true;
+			_is_deref++;
 		}
 		else if (tok == "function") {
 			std::string func_name = token(prg, tt);
@@ -1797,12 +1799,12 @@ top:
 			bool is_param = true;
 			bool finished = false;
 			bool param_is_ref = false;
-			bool is_deref = false;
+			int is_deref = 0;
 			while ((tok = token(prg, tt)) != "") {
 func_top:
 				func.s->line = prg->s->line;
 				if (tok == "`") {
-					is_deref = true;
+					is_deref++;
 				}
 				else if (tok == "{") {
 					is_param = false;
@@ -1832,8 +1834,8 @@ func_top:
 					t.i = var_i;
 					t.s = tok2;
 					t.token = tok2;
-					t.dereference = false;
-					is_deref = false;
+					t.dereference = 0;
+					is_deref = 0;
 					func.s->program[func.s->program.size()-1].data.push_back(t);
 
 					if (pass == PASS1) {
@@ -1895,8 +1897,8 @@ func_top:
 						}
 						t.s = tok2;
 						t.token = tok2;
-						t.dereference = false;
-						is_deref = false;
+						t.dereference = 0;
+						is_deref = 0;
 						func.s->program[func.s->program.size()-1].data.push_back(t);
 						std::string valtok = token(prg, tt);
 						if (valtok[0] == '(') {
@@ -1926,7 +1928,7 @@ func_top:
 								t.i = prg->variables_map[v.name];
 							}
 							t.dereference = is_deref;
-							is_deref = false;
+							is_deref = 0;
 
 							func.s->program[func.s->program.size()-1].data.push_back(t);
 						}
@@ -1957,7 +1959,7 @@ func_top:
 								t.i = prg->variables_map[v.name];
 							}
 							t.dereference = is_deref;
-							is_deref = false;
+							is_deref = 0;
 
 							func.s->program[func.s->program.size()-1].data.push_back(t);
 						}
@@ -1976,8 +1978,8 @@ func_top:
 							t2.s = valtok;
 							t2.n = atof(valtok.c_str());
 							t2.token = valtok;
-							t2.dereference = false;
-							is_deref = false;
+							t2.dereference = 0;
+							is_deref = 0;
 							func.s->program[func.s->program.size()-1].data.push_back(t2);
 						}
 					}
@@ -2028,8 +2030,8 @@ func_top:
 						}
 						t.s = tok2;
 						t.token = tok2;
-						t.dereference = false;
-						is_deref = false;
+						t.dereference = 0;
+						is_deref = 0;
 						func.s->program[func.s->program.size()-1].data.push_back(t);
 					}
 				}
@@ -2060,7 +2062,7 @@ func_top:
 						t.i = prg->variables_map[v.name];
 					}
 					t.dereference = is_deref;
-					is_deref = false;
+					is_deref = 0;
 
 					func.s->program[func.s->program.size()-1].data.push_back(t);
 				}
@@ -2091,7 +2093,7 @@ func_top:
 						t.i = prg->variables_map[v.name];
 					}
 					t.dereference = is_deref;
-					is_deref = false;
+					is_deref = 0;
 
 					func.s->program[func.s->program.size()-1].data.push_back(t);
 				}
@@ -2101,7 +2103,7 @@ func_top:
 					s.name = tok;
 					func.s->program.push_back(s);
 					func.s->line_numbers.push_back(prg->s->line);
-					is_deref = false;
+					is_deref = 0;
 				}
 				else if (is_param) {
 					if (tok == "~") {
@@ -2126,7 +2128,7 @@ func_top:
 						func.param_names.push_back(tok);
 						func.ref.push_back(param_is_ref);
 						param_is_ref = false;
-						is_deref = false;
+						is_deref = 0;
 					}
 				}
 				else {
@@ -2154,7 +2156,7 @@ func_top:
 							break;
 					}
 					t.dereference = is_deref;
-					is_deref = false;
+					is_deref = 0;
 					func.s->program[func.s->program.size()-1].data.push_back(t);
 				}
 			}
@@ -2200,8 +2202,8 @@ func_top:
 			t.i = var_i;
 			t.s = tok2;
 			t.token = tok2;
-			t.dereference = false;
-			_is_deref = false;
+			t.dereference = 0;
+			_is_deref = 0;
 			prg->s->program[prg->s->program.size()-1].data.push_back(t);
 
 			if (pass == PASS1 && prg->variables_map.find(tok2) != prg->variables_map.end()) {
@@ -2250,8 +2252,8 @@ func_top:
 				}
 				t.s = tok2;
 				t.token = tok2;
-				t.dereference = false;
-				_is_deref = false;
+				t.dereference = 0;
+				_is_deref = 0;
 				prg->s->program[prg->s->program.size()-1].data.push_back(t);
 				std::string valtok = token(prg, tt);
 				if (valtok[0] == '(') {
@@ -2279,7 +2281,7 @@ func_top:
 						t.i = prg->variables_map[v.name];
 					}
 					t.dereference = _is_deref;
-					_is_deref = false;
+					_is_deref = 0;
 
 					prg->s->program[prg->s->program.size()-1].data.push_back(t);
 				}
@@ -2308,7 +2310,7 @@ func_top:
 						t.i = prg->variables_map[v.name];
 					}
 					t.dereference = _is_deref;
-					_is_deref = false;
+					_is_deref = 0;
 
 					prg->s->program[prg->s->program.size()-1].data.push_back(t);
 				}
@@ -2325,7 +2327,7 @@ func_top:
 						t2.n = atof(valtok.c_str());
 					}
 					t2.token = valtok;
-					t2.dereference = false;
+					t2.dereference = 0;
 					prg->s->program[prg->s->program.size()-1].data.push_back(t2);
 				}
 			}
@@ -2366,8 +2368,8 @@ func_top:
 				}
 				t.s = tok2;
 				t.token = tok2;
-				t.dereference = false;
-				_is_deref = false;
+				t.dereference = 0;
+				_is_deref = 0;
 				prg->s->program[prg->s->program.size()-1].data.push_back(t);
 			}
 		}
@@ -2396,7 +2398,7 @@ func_top:
 				t.i = prg->variables_map[v.name];
 			}
 			t.dereference = _is_deref;
-			_is_deref = false;
+			_is_deref = 0;
 
 			prg->s->program[prg->s->program.size()-1].data.push_back(t);
 		}
@@ -2425,7 +2427,7 @@ func_top:
 				t.i = prg->variables_map[v.name];
 			}
 			t.dereference = _is_deref;
-			_is_deref = false;
+			_is_deref = 0;
 
 			prg->s->program[prg->s->program.size()-1].data.push_back(t);
 		}
@@ -2435,7 +2437,7 @@ func_top:
 			s.name = tok;
 			prg->s->program.push_back(s);
 			prg->s->line_numbers.push_back(prg->s->line);
-			_is_deref = false;
+			_is_deref = 0;
 		}
 		else if (prg->s->program.size() == 0) {
 			throw Error("Expected keyword at " + get_error_info(prg));
@@ -2462,7 +2464,7 @@ func_top:
 					break;
 			}
 			t.dereference = _is_deref;
-			_is_deref = false;
+			_is_deref = 0;
 			prg->s->program[prg->s->program.size()-1].data.push_back(t);
 		}
 	}
@@ -2688,7 +2690,7 @@ static bool do_set(Program *prg, const std::vector<Token> &v, bool const_ok)
 			v1 = tmp.p;
 		}
 		else {
-			v1 = as_variable(prg, v[0]).p;
+			v1 = dereference(prg, v[0]);
 		}
 	}
 	else {
@@ -3670,7 +3672,7 @@ static Variable exprfunc_equal(Program *prg, const std::vector<Token> &v)
 				v1 = tmp.p;
 			}
 			else {
-				v1 = as_variable(prg, v[0]).p;
+				v1 = dereference(prg, v[0]);
 			}
 		}
 		else {
@@ -4632,7 +4634,7 @@ Token token_number(std::string token, double n)
 	t.type = Token::NUMBER;
 	t.token = token;
 	t.n = n;
-	t.dereference = false;
+	t.dereference = 0;
 	return t;
 }
 
@@ -4642,7 +4644,7 @@ Token token_string(std::string token, std::string s)
 	t.type = Token::STRING;
 	t.token = token;
 	t.s = s;
-	t.dereference = false;
+	t.dereference = 0;
 	return t;
 }
 
@@ -4786,6 +4788,9 @@ Variable as_variable_resolve(Program *prg, const Token &t)
 	}
 	else if (prg->variables[t.i].type == Variable::EXPRESSION) {
 		return evaluate_expression(prg, prg->variables[t.i].e);
+	}
+	else if (t.dereference > 0) {
+		return *dereference(prg, t);
 	}
 	else {
 		return prg->variables[t.i];
@@ -5157,6 +5162,24 @@ Variable &go_fish(Program *prg, const Variable::Fish &f)
 		v->m[key].constant = constant;
 		return v->m[key];
 	}
+}
+
+Variable *dereference(Program *prg, const Token &t)
+{
+	Variable *v = &prg->variables[t.i];
+	static Variable tmp;
+	if (v->type == Variable::EXPRESSION) {
+		tmp = evaluate_expression(prg, prg->variables[t.i].e);
+		v = &tmp;
+	}
+	else if (v->type == Variable::FISH) {
+		tmp = go_fish(prg, prg->variables[t.i].f);
+		v = &tmp;
+	}
+	for (int i = 0; i < t.dereference; i++) {
+		v = v->p;
+	}
+	return v;
 }
 
 } // end namespace booboo

@@ -2658,7 +2658,7 @@ static void sprite_callback(void *data)
 	Token t;
 	t.type = Token::NUMBER;
 	t.n = d->id;
-	t.dereference = false;
+	t.dereference = 0;
 	v.push_back(t);
 	call_void_function(d->prg, d->function, v, 0);
 	delete d;
@@ -3764,7 +3764,7 @@ static void model_callback(void *data)
 	Token t;
 	t.type = Token::NUMBER;
 	t.n = d->id;
-	t.dereference = false;
+	t.dereference = 0;
 	v.push_back(t);
 	call_void_function(d->prg, d->function, v, 0);
 	delete d;
@@ -4641,7 +4641,7 @@ void BooBoo_Widget::draw()
 
 	t.type = Token::NUMBER;
 	t.n = id;
-	t.dereference = false;
+	t.dereference = 0;
 	tmp.push_back(t);
 
 	t.type = Token::NUMBER;
@@ -4677,7 +4677,7 @@ void BooBoo_Widget::handle_event(TGUI_Event *event)
 
 	t.type = Token::NUMBER;
 	t.n = id;
-	t.dereference = false;
+	t.dereference = 0;
 	tmp.push_back(t);
 
 	t.type = Token::NUMBER;
@@ -5440,7 +5440,7 @@ static void letterbox_callback(gfx::Letterbox_Type type, int x, int y, int w, in
 	std::vector<Token> v;
 	Token t;
 	t.type = Token::NUMBER;
-	t.dereference = false;
+	t.dereference = 0;
 	t.n = (int)type;
 	v.push_back(t);
 	t.n = x;

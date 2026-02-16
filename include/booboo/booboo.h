@@ -57,7 +57,7 @@ struct Token {
 
 	std::string token;
 
-	bool dereference;
+	int dereference;
 };
 
 struct Variable
@@ -80,7 +80,7 @@ struct Variable
 		int i;
 		std::string name;
 		std::vector<Token> v;
-		bool dereference;
+		int dereference;
 
 		Expression() {
 		}
@@ -99,7 +99,7 @@ struct Variable
 	{
 		int c_i;
 		std::vector<Token> v;
-		bool dereference;
+		int dereference;
 
 		Fish() {
 		}
@@ -199,6 +199,8 @@ Variable BOOBOO_EXPORT &get_variable(Program *prg, int index);
 
 Variable BOOBOO_EXPORT evaluate_expression(Program *prg, const Variable::Expression &e);
 Variable BOOBOO_EXPORT &go_fish(Program *prg, const Variable::Fish &f);
+
+extern BOOBOO_EXPORT Variable *dereference(Program *prg, const Token &t);
 
 // This stuff can be used but it's used by the BooBoo interpreter
 extern BOOBOO_EXPORT std::string reset_game_name;
