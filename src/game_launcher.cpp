@@ -916,6 +916,9 @@ int main(int argc, char **argv)
 		}
 #else
 		dll = "lib" + dll + ".so";
+		char buf[4096];
+		getcwd(buf, 4096);
+		dll = std::string(buf) + "/" + dll;
 		void *handle = dlopen(dll.c_str(), RTLD_LAZY);
 		if (handle != nullptr) {
 			BOOBOO_DLL_START_FUNC func = (BOOBOO_DLL_START_FUNC)dlsym(handle, "booboo_start");
