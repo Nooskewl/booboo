@@ -917,10 +917,14 @@ int main(int argc, char **argv)
 #else
 		dll = "lib" + dll + ".so";
 		void *handle = dlopen(dll.c_str(), RTLD_LAZY);
+		printf("dll='%s'\n", dll.c_str());
 		if (handle != nullptr) {
+			printf("opened dll\n");
 			BOOBOO_DLL_START_FUNC func = (BOOBOO_DLL_START_FUNC)dlsym(handle, "booboo_start");
 			if (func != nullptr) {
+				printf("found func\n");
 				(*func)();
+				printf("CALLED!\n");
 			}
 		}
 #endif
