@@ -1627,12 +1627,7 @@ static bool imagefunc_save(Program *prg, const std::vector<Token> &v)
 
 	unsigned char *buf = gfx::Image::read_texture(img);
 
-	if (filename.find(".tga") != std::string::npos) {
-		gfx::Image::save_tga(filename, buf, img->size);
-	}
-	else {
-		gfx::Image::save_png(filename, buf, img->size);
-	}
+	gfx::Image::save_image(filename, buf, img->size);
 
 	delete[] buf;
 
@@ -1655,12 +1650,7 @@ static bool imagefunc_screenshot(Program *prg, const std::vector<Token> &v)
 	unsigned char *buf = gfx::Image::read_backbuffer(include_letterbox, &size.w, &size.h);
 
 	if (buf != nullptr) {
-		if (filename.find(".tga") != std::string::npos) {
-			gfx::Image::save_tga(filename, buf, size);
-		}
-		else {
-			gfx::Image::save_png(filename, buf, size);
-		}
+		gfx::Image::save_image(filename, buf, size);
 
 		delete[] buf;
 	}
