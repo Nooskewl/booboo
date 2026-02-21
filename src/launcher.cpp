@@ -18,41 +18,6 @@ using namespace noo;
 #include "booboo/standard_lib.h"
 #include "booboo/internal.h"
 
-static std::string load_text_from_filesystem(std::string filename)
-{
-	int _sz;
-	struct stat st;
-	int r = stat(filename.c_str(), &st);
-	if (r == 0) {
-		_sz = st.st_size;
-	}
-	else {
-		throw booboo::Error("Error getting file size: " + filename);
-	}
-
-	FILE *file = fopen(filename.c_str(), "rb");
-
-	if (file == nullptr) {
-		throw booboo::Error("File not found: " + filename);
-	}
-
-	char *buf = new char[_sz+1];
-
-	if (fread(buf, _sz, 1, file) != 1) {
-		throw booboo::Error("File load error: " + filename);
-	}
-
-	fclose(file);
-
-	buf[_sz] = 0;
-
-	std::string text = buf;
-
-	delete[] buf;
-
-	return text;
-}
-
 int main(int argc, char **argv)
 {
 	for (int i = 0 ; i < argc; i++) {
@@ -62,7 +27,7 @@ int main(int argc, char **argv)
 	shim::organisation_name = "Nooskewl";
 	shim::game_name = "BooBoo";
 
-	booboo::load_text = load_text_from_filesystem;
+	booboo::load_text = util::load_text_from_filesystem;
 
 	std::string fn = argc >= 2 ? argv[1] : "";
 
@@ -128,6 +93,9 @@ int main(int argc, char **argv)
 		}
 #else
 		dll = "lib" + dll + ".so";
+		char buf[4096];
+		getcwd(buf, 4096);
+		dll = std::string(buf) + "/" + dll;
 		void *handle = dlopen(dll.c_str(), RTLD_LAZY);
 		if (handle != nullptr) {
 			BOOBOO_DLL_START_FUNC func = (BOOBOO_DLL_START_FUNC)dlsym(handle, "booboo_start");
@@ -152,7 +120,7 @@ again:
 
 	if (was_reset) {
 		try {
-			code = load_text_from_filesystem(fn);
+			code = util::load_text_from_filesystem(fn);
 		}
 		catch (booboo::Error &e) {
 			printf("Program is missing or corrupt!\n");
@@ -164,7 +132,7 @@ again:
 	else {
 		if (fn != "") {
 			try {
-				code = load_text_from_filesystem(fn);
+				code = util::load_text_from_filesystem(fn);
 			}
 			catch (booboo::Error &e) {
 				printf("Program is missing or corrupt!\n");
@@ -175,7 +143,7 @@ again:
 		}
 		else {
 			try {
-				code = load_text_from_filesystem("main.boo");
+				code = util::load_text_from_filesystem("main.boo");
 			}
 			catch (booboo::Error &e) {
 				printf("Program is missing or corrupt!\n");
