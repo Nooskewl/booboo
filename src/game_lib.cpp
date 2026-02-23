@@ -27,103 +27,7 @@ namespace booboo {
 	throw Error(std::string(__FUNCTION__) + ": " + "Invalid handle at " + get_error_info(prg)); \
 }
 
-struct MML_Info {
-	unsigned int mml_id;
-	std::map<int, audio::MML *> mmls;
-};
-
-struct Sample_Info {
-	unsigned int sample_id;
-	std::map<int, audio::Sample *> samples;
-};
-
-struct Image {
-	gfx::Image *image;
-};
-
-struct Image_Info {
-	unsigned int image_id;
-	std::map<int, Image *> images;
-};
-
-struct Font_Info {
-	unsigned int font_id;
-	std::map<int, gfx::TTF *> fonts;
-};
-
-struct Tilemap_Info {
-	unsigned int tilemap_id;
-	std::map<int, gfx::Tilemap *> tilemaps;
-};
-
-struct Sprite_Info {
-	unsigned int sprite_id;
-	std::map<int, gfx::Sprite *> sprites;
-};
-
-struct Shader_Info {
-	unsigned int shader_id;
-	std::map<int, gfx::Shader *> shaders;
-};
-
-struct Vertex_Buffer {
-	float *v;
-	int num_triangles;
-	bool has_vbo;
-	GLuint vbo;
-};
-
-struct Vertex_Buffer_Info {
-	unsigned int vertex_buffer_id;
-	std::map<int, Vertex_Buffer *> vertex_buffers;
-};
-
-struct Model {
-	glm::mat4 mat;
-	gfx::Model *model;
-	bool is_clone;
-};
-
-struct Model_Info {
-	unsigned int model_id;
-	std::map<int, Model *> models;
-};
-
-struct Billboard {
-	double x;
-	double y;
-	double z;
-	double w;
-	double h;
-	double tx;
-	double ty;
-	double tz;
-	double sx;
-	double sy;
-	double unit;
-	gfx::Image *image;
-	gfx::Sprite *sprite;
-};
-
-struct Billboard_Info {
-	unsigned int billboard_id;
-	std::map<int, Billboard *> billboards;
-};
-
-class BooBoo_Widget;
-
-struct Widget {
-	BooBoo_Widget *widget;
-	Variable *data;
-};
-
-struct Widget_Info
-{
-	int widget_id;
-	std::map<int, Widget *> widgets;
-};
-
-static MML_Info *mml_info(Program *prg)
+MML_Info *mml_info(Program *prg)
 {
 	MML_Info *info = (MML_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.mml");
 	if (info == nullptr) {
@@ -134,7 +38,7 @@ static MML_Info *mml_info(Program *prg)
 	return info;
 }
 
-static Sample_Info *sample_info(Program *prg)
+Sample_Info *sample_info(Program *prg)
 {
 	Sample_Info *info = (Sample_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.sample");
 	if (info == nullptr) {
@@ -145,7 +49,7 @@ static Sample_Info *sample_info(Program *prg)
 	return info;
 }
 
-static Image_Info *image_info(Program *prg)
+Image_Info *image_info(Program *prg)
 {
 	Image_Info *info = (Image_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.image");
 	if (info == nullptr) {
@@ -156,7 +60,7 @@ static Image_Info *image_info(Program *prg)
 	return info;
 }
 
-static Font_Info *font_info(Program *prg)
+Font_Info *font_info(Program *prg)
 {
 	Font_Info *info = (Font_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.font");
 	if (info == nullptr) {
@@ -167,7 +71,7 @@ static Font_Info *font_info(Program *prg)
 	return info;
 }
 
-static Tilemap_Info *tilemap_info(Program *prg)
+Tilemap_Info *tilemap_info(Program *prg)
 {
 	Tilemap_Info *info = (Tilemap_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.tilemap");
 	if (info == nullptr) {
@@ -178,7 +82,7 @@ static Tilemap_Info *tilemap_info(Program *prg)
 	return info;
 }
 
-static Sprite_Info *sprite_info(Program *prg)
+Sprite_Info *sprite_info(Program *prg)
 {
 	Sprite_Info *info = (Sprite_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.sprite");
 	if (info == nullptr) {
@@ -189,7 +93,7 @@ static Sprite_Info *sprite_info(Program *prg)
 	return info;
 }
 
-static Shader_Info *shader_info(Program *prg)
+Shader_Info *shader_info(Program *prg)
 {
 	Shader_Info *info = (Shader_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.shader");
 	if (info == nullptr) {
@@ -200,7 +104,7 @@ static Shader_Info *shader_info(Program *prg)
 	return info;
 }
 
-static Vertex_Buffer_Info *vertex_buffer_info(Program *prg)
+Vertex_Buffer_Info *vertex_buffer_info(Program *prg)
 {
 	Vertex_Buffer_Info *info = (Vertex_Buffer_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.vertex_buffer");
 	if (info == nullptr) {
@@ -211,7 +115,7 @@ static Vertex_Buffer_Info *vertex_buffer_info(Program *prg)
 	return info;
 }
 
-static Model_Info *model_info(Program *prg)
+Model_Info *model_info(Program *prg)
 {
 	Model_Info *info = (Model_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.model");
 	if (info == nullptr) {
@@ -222,7 +126,7 @@ static Model_Info *model_info(Program *prg)
 	return info;
 }
 
-static Billboard_Info *billboard_info(Program *prg)
+Billboard_Info *billboard_info(Program *prg)
 {
 	Billboard_Info *info = (Billboard_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.billboard");
 	if (info == nullptr) {
@@ -233,7 +137,7 @@ static Billboard_Info *billboard_info(Program *prg)
 	return info;
 }
 
-static Widget_Info *widget_info(Program *prg)
+Widget_Info *widget_info(Program *prg)
 {
 	Widget_Info *info = (Widget_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.widget");
 	if (info == nullptr) {

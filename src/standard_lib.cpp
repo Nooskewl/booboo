@@ -28,39 +28,6 @@ using namespace booboo;
 
 template <typename T> T sign(T v) { return (T(0) < v) - (v < T(0)); }
 
-struct File_Info {
-	int file_id;
-	std::map<int, SDL_IOStream *> files;
-};
-
-struct Config_Value
-{
-	Variable::Variable_Type type;
-
-	double n;
-	std::string s;
-};
-
-struct CFG_Info {
-	unsigned int cfg_id;
-	std::map<int, std::map<std::string, Config_Value> > cfgs;
-};
-
-struct JSON_Info {
-	unsigned int json_id;
-	std::map<int, util::JSON *> jsons;
-};
-
-struct CPA {
-	util::CPA *cpa;
-};
-
-struct CPA_Info
-{
-	int cpa_id;
-	std::map<int, CPA *> cpas;
-};
-
 File_Info *file_info(Program *prg)
 {
 	File_Info *info = (File_Info *)get_black_box(prg, "com.nooskewl.booboo.files");
@@ -72,7 +39,7 @@ File_Info *file_info(Program *prg)
 	return info;
 }
 
-static CFG_Info *cfg_info(Program *prg)
+CFG_Info *cfg_info(Program *prg)
 {
 	CFG_Info *info = (CFG_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.cfg");
 	if (info == nullptr) {
@@ -83,7 +50,7 @@ static CFG_Info *cfg_info(Program *prg)
 	return info;
 }
 
-static JSON_Info *json_info(Program *prg)
+JSON_Info *json_info(Program *prg)
 {
 	JSON_Info *info = (JSON_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.json");
 	if (info == nullptr) {
@@ -94,7 +61,7 @@ static JSON_Info *json_info(Program *prg)
 	return info;
 }
 
-static CPA_Info *cpa_info(Program *prg)
+CPA_Info *cpa_info(Program *prg)
 {
 	CPA_Info *info = (CPA_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.cpa");
 	if (info == nullptr) {
