@@ -23,6 +23,8 @@ void set_3d();
 void BOOBOO_EXPORT register_game_callbacks();
 void BOOBOO_EXPORT unregister_game_callbacks();
 
+/* These are for accessing assets in the black box */
+
 struct MML_Info {
 	unsigned int mml_id;
 	std::map<int, audio::MML *> mmls;

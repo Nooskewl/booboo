@@ -7,6 +7,8 @@ void BOOBOO_EXPORT start_lib_standard();
 void BOOBOO_EXPORT end_lib_standard();
 void BOOBOO_EXPORT standard_lib_destroy_program(booboo::Program *prg);
 
+/* These are for accessing assets in the black box */
+
 struct File_Info {
 	int file_id;
 	std::map<int, SDL_IOStream *> files;
