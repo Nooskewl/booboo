@@ -467,9 +467,6 @@ static void loop()
 	bool can_draw = true;
 	bool can_logic = true;
 	std::string old_music_name = "";
-#if defined IOS || defined ANDROID
-	float old_volume = 1.0f;
-#endif
 	int curr_logic_rate = shim::logic_rate;
 
 	while (quit == false) {
@@ -851,9 +848,6 @@ int main(int argc, char **argv)
 			else if (key == "invert_mouse_wheel") {
 				invert_mouse_wheel = atoi(value.c_str());
 			}
-			else if (key == "volume") {
-				shim::music_volume = atoi(value.c_str())/255.0f;
-			}
 		}
 	}
 	catch (util::Error &e) {
@@ -893,12 +887,6 @@ int main(int argc, char **argv)
 	add_expression_handler("mouse_get_position", exprfunc_mouse_get_position);
 	add_expression_handler("mouse_get_buttons", exprfunc_mouse_get_buttons);
 	add_expression_handler("key_get", exprfunc_key_get);
-
-	for (int i = 1; i < argc; i++) {
-		if (std::string(argv[i]) == "+volume" && i < (argc-1)) {
-			shim::music_volume = atoi(argv[i+1])/255.0f;
-		}
-	}
 
 	std::string dlls = util::load_text_from_filesystem("dll.txt");
 	util::Tokenizer tok(dlls, '\n');
@@ -1011,7 +999,6 @@ again:
 	FILE *f = fopen(out_path.c_str(), "w");
 	fprintf(f, "fullscreen=%d\n", gfx::is_fullscreen_window());
 	fprintf(f, "invert_mouse_wheel=%d\n", invert_mouse_wheel);
-	fprintf(f, "volume=%d\n", int(shim::music_volume*255));
 	fclose(f);
 
 	Program *tmp_prg = prg;

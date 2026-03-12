@@ -1339,7 +1339,7 @@ static bool mmlfunc_play(Program *prg, const std::vector<Token> &v)
 
 	audio::MML *mml = info->mmls[id];
 
-	mml->play(shim::music_volume*volume, loop);
+	mml->play(volume, loop);
 
 	return true;
 }
@@ -1432,7 +1432,7 @@ static bool samplefunc_play(Program *prg, const std::vector<Token> &v)
 
 	audio::Sample *sample = info->samples[id];
 
-	sample->play(shim::music_volume * volume, loop);
+	sample->play(volume, loop);
 
 	return true;
 }
