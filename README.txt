@@ -50,8 +50,3 @@ load separated by a newline.
 --
 
 The portrait example uses a screenshot from the game Broken Pearl
-
---
-
-Please do not redistribute BooBoo without a license, available from
-https://nooskewl.com!
