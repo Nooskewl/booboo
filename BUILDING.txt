@@ -4,9 +4,6 @@ you will not use twinkle and will usually use wedge too.
 
 1) sudo apt install g++ libsdl3-dev libsdl3-ttf-dev libfreetype-dev libglm-dev cmake git libflac-dev libogg-dev libvorbis-dev libpng-dev
 
-*1.1*) Most distros don't ship with SDL3 yet, so compile and install SDL3
-and SDL3_ttf from source
-
 2) git clone https://codeberg.org/nooskewl/tgui6.git
    git clone https://codeberg.org/nooskewl/shim5.git
    git clone https://codeberg.org/nooskewl/booboo.git
