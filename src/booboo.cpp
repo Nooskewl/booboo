@@ -1382,6 +1382,21 @@ static void insert_pointer(Program *prg, std::string name, Variable *value, Pass
 	}
 }
 
+static void insert_var(Program *prg, std::string name, Pass pass, int &var_i)
+{
+	int var_index = var_i;
+	var_i++;
+	if (pass == PASS2) {
+		prg->variables_map[name] = var_index;
+	}
+	Variable v;
+	v.name = name;
+	v.constant = false;
+	if (pass == PASS1) {
+		prg->variables.push_back(v);
+	}
+}
+
 static void compile(Program *prg, Pass pass)
 {
 	int p_bak = prg->s->p;
@@ -1396,6 +1411,7 @@ static void compile(Program *prg, Pass pass)
 	int fish_i = 0;
 
 	// Constants
+	insert_var(prg, "VOID", pass, var_i);
 	insert_constant(prg, "TRUE", 1, pass, var_i);
 	insert_constant(prg, "FALSE", 0, pass, var_i);
 	insert_constant(prg, "PI", M_PI, pass, var_i);
