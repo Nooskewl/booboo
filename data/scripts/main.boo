@@ -75,6 +75,8 @@ if (== found 0) list_current
 	call list_dir "./"
 :list_current
 
+var inst
+
 function rsz destroy_fonts
 {
 	if (== destroy_fonts TRUE) destroy
@@ -307,7 +309,7 @@ function draw
 function sel_up sound
 {
 	if (== sound 1) play
-		mml_play widget 1 0
+		= inst (mml_play widget 1 0)
 	:play
 	= selected (- selected 1)
 	if (< selected 0) zero
@@ -321,7 +323,7 @@ function sel_up sound
 function sel_down sound
 {
 	if (== sound 1) play
-		mml_play widget 1 0
+		= inst (mml_play widget 1 0)
 	:play
 	var sz
 	= sz (vector_size filenames)
@@ -336,7 +338,7 @@ function sel_down sound
 
 function navigate
 {
-	mml_play button 1 0
+	= inst (mml_play button 1 0)
 	var s
 	= s [filenames selected]
 	call_result s chop_dir s
@@ -353,7 +355,7 @@ function navigate
 
 function launch
 {
-	mml_play button 1 0
+	= inst (mml_play button 1 0)
 	if (== go_ok 0) cant
 		return
 	:cant
@@ -378,7 +380,7 @@ function run
 			var sz
 			= sz (vector_size filenames)
 			if (&& (>= sel 0) (< sel sz)) check_click2
-				mml_play button 1 0
+				= inst (mml_play button 1 0)
 				if (== sel selected) nav select
 					call navigate
 				:nav
@@ -423,12 +425,12 @@ function run
 	var i
 
 	if (&& (== home 1) (== old_home 0)) do_home (&& (== _end 1) (== old_end 0)) do_end
-		mml_play widget 1 0
+		= inst (mml_play widget 1 0)
 		for i 0 (< i sz) 1 home_slowly
 			call sel_up 0
 		:home_slowly
 	:do_home
-		mml_play widget 1 0
+		= inst (mml_play widget 1 0)
 		for i 0 (< i sz) 1 end_slowly
 			call sel_down 0
 		:end_slowly
@@ -523,13 +525,13 @@ function event type a b c d
 
 	if (== 1 _do_pgup) pgup (== 1 _do_pgdn) pgdn
 		var i
-		mml_play widget 1 0
+		= inst (mml_play widget 1 0)
 		for i 0 (< i num) 1 pgup_slowly
 			call sel_up 0
 		:pgup_slowly
 	:pgup
 		var i
-		mml_play widget 1 0
+		= inst (mml_play widget 1 0)
 		for i 0 (< i num) 1 pgdn_slowly
 			call sel_down 0
 		:pgdn_slowly

@@ -17,6 +17,8 @@ var old_joy_u
 var old_joy_d
 = old_joy_d joy_d
 
+var inst
+
 function draw
 {
 	var text
@@ -86,7 +88,7 @@ function run
 	je move_bar
 	goto no_move_bar
 :move_bar
-	mml_play drip_sfx 1 0
+	= inst (mml_play drip_sfx 1 0)
 	? selected 0
 	je make_1
 	= selected 0

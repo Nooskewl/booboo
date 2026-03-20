@@ -5,7 +5,7 @@ var buf last lastop
 var peq
 = peq 1
 
-var button_sfx
+var button_sfx inst
 = button_sfx (mml_create "@PO0 = { 0 1000 }\nA @PO0 g32 @PO0")
 
 var font
@@ -184,7 +184,7 @@ function button_event type a b c d x y w h focussed ~data
 
 	if (== pressed 1) press
 		call [ops [data "text"]] data
-		mml_play button_sfx 1 0
+		= inst (mml_play button_sfx 1 0)
 	:press
 }
 
