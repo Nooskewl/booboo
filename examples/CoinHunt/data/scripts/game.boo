@@ -1,6 +1,6 @@
-var music
+var music inst
 = music (mml_load "music/game.mml")
-mml_play music 0.5 1
+= inst (mml_play music 0.5 1)
 
 var ship_img
 = ship_img (image_load "misc/ship.png")
@@ -359,8 +359,8 @@ function bullet_collide oldx oldy newx newy
 	jge skip_it
 	= [coin 2] 0
 	= [coins i] coin
-	mml_play hit_sfx 1 0
-	mml_play shot_coin_sfx 1 0
+	= inst (mml_play hit_sfx 1 0)
+	= inst (mml_play shot_coin_sfx 1 0)
 	call do_explode cx cy 64 251 242 54
 	? dead 1
 	jne die
@@ -395,7 +395,7 @@ function bullet_collide oldx oldy newx newy
 	jge not_a_hit2
 	= [e 2] 0
 	= [enemies i] e
-	mml_play hit_sfx 1 0
+	= inst (mml_play hit_sfx 1 0)
 	call do_explode ex ey 48 223 113 38
 	return 1
 :not_a_hit2
@@ -841,7 +841,7 @@ function run
 	jle dont_count_score
 	= total_time (+ total_time 1)
 	= total_ticks (- total_ticks 1)
-	mml_play count_sfx 1 0
+	= inst (mml_play count_sfx 1 0)
 	= i (+ i 1)
 	? i 20
 	jl next_score_count
@@ -939,7 +939,7 @@ function run
 	vector_add b by
 	vector_add b ba
 	vector_add bullets b
-	mml_play shoot_sfx 1 0
+	= inst (mml_play shoot_sfx 1 0)
 
 	if (>= (vector_size bullets) 20) erase_one
 		vector_erase bullets 0
@@ -1026,7 +1026,7 @@ function run
 	jge not_a_hit
 	= [tmp 2] 0
 	= [coins i] tmp
-	mml_play coin_sfx 1 0
+	= inst (mml_play coin_sfx 1 0)
 	= collected (+ collected 1)
 	? collected NUM_COINS
 	jl not_a_hit
@@ -1063,7 +1063,7 @@ function run
 	= dead 1
 	call do_explode ex ey 48 223 113 38
 	call do_explode pos_x pos_y 64 255 255 255
-	mml_play hit_sfx 1 0
+	= inst (mml_play hit_sfx 1 0)
 	= [e 2] 0
 	= [enemies i] e
 :player_didnt_hit_enemy

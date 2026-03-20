@@ -1,6 +1,7 @@
 #include <shim5/shim5.h>
 #include <shim5/shaders/glsl/default_vertex.h>
 #include <shim5/shaders/glsl/default_textured_fragment.h>
+#include <shim5/internal/audio.h>
 #include <shim5/internal/gfx.h>
 
 using namespace noo;
@@ -38,6 +39,17 @@ MML_Info *mml_info(Program *prg)
 	return info;
 }
 
+MML_Instance_Info *mml_instance_info(Program *prg)
+{
+	MML_Instance_Info *info = (MML_Instance_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.mml_instance");
+	if (info == nullptr) {
+		info = new MML_Instance_Info;
+		info->instance_id = 0;
+		booboo::set_black_box(prg, "com.nooskewl.booboo.mml_instance", info);
+	}
+	return info;
+}
+
 Sample_Info *sample_info(Program *prg)
 {
 	Sample_Info *info = (Sample_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.sample");
@@ -45,6 +57,17 @@ Sample_Info *sample_info(Program *prg)
 		info = new Sample_Info;
 		info->sample_id = 0;
 		booboo::set_black_box(prg, "com.nooskewl.booboo.sample", info);
+	}
+	return info;
+}
+
+Sample_Instance_Info *sample_instance_info(Program *prg)
+{
+	Sample_Instance_Info *info = (Sample_Instance_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.sample_instance");
+	if (info == nullptr) {
+		info = new Sample_Instance_Info;
+		info->instance_id = 0;
+		booboo::set_black_box(prg, "com.nooskewl.booboo.sample_instance", info);
 	}
 	return info;
 }
@@ -1310,7 +1333,7 @@ static Variable exprfunc_mml_load(Program *prg, const std::vector<Token> &v)
 	return v1;
 }
 
-static bool mmlfunc_play(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_mml_play(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 
@@ -1339,9 +1362,29 @@ static bool mmlfunc_play(Program *prg, const std::vector<Token> &v)
 
 	audio::MML *mml = info->mmls[id];
 
-	mml->play(volume, loop);
+	MML_Instance_Info *iinfo = mml_instance_info(prg);
 
-	return true;
+	MML_Instance *i = new MML_Instance;
+	i->mml = mml;
+	i->instance = mml->play(volume, loop);
+
+	iinfo->instances[iinfo->instance_id++] = i;
+
+	// clean up old instances
+	for (std::map<int, MML_Instance *>::iterator it = iinfo->instances.begin(); it != iinfo->instances.end();) {
+		std::pair<int, MML_Instance *> p = *it;
+		if (p.second->mml->track_active(p.second->instance) == false) {
+			it = iinfo->instances.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
+
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = id;
+	return var;
 }
 
 static bool mmlfunc_stop(Program *prg, const std::vector<Token> &v)
@@ -1350,13 +1393,43 @@ static bool mmlfunc_stop(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v[0]);
 
-	MML_Info *info = mml_info(prg);
+	MML_Instance_Info *info = mml_instance_info(prg);
 
-	INFO_EXISTS(info->mmls, id)
+	MML_Instance *i = info->instances[id];
 
-	audio::MML *mml = info->mmls[id];
+	i->mml->stop(i->instance);
 
-	mml->stop();
+	return true;
+}
+
+static bool mmlfunc_set_volume(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int inst = as_number(prg, v[0]);
+	float vol = as_number(prg, v[1]);
+
+	MML_Instance_Info *info = mml_instance_info(prg);
+
+	MML_Instance *i = info->instances[inst];
+
+	i->mml->set_master_volume(i->instance, vol);
+
+	return true;
+}
+
+static bool mmlfunc_set_tempo(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int inst = as_number(prg, v[0]);
+	int bpm = as_number(prg, v[1]);
+
+	MML_Instance_Info *info = mml_instance_info(prg);
+
+	MML_Instance *i = info->instances[inst];
+
+	i->mml->set_tempo(i->instance, bpm);
 
 	return true;
 }
@@ -1403,7 +1476,7 @@ static bool samplefunc_destroy(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static bool samplefunc_play(Program *prg, const std::vector<Token> &v)
+static Variable exprfunc_sample_play(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 
@@ -1432,9 +1505,48 @@ static bool samplefunc_play(Program *prg, const std::vector<Token> &v)
 
 	audio::Sample *sample = info->samples[id];
 
-	sample->play(volume, loop);
+	double secs;
 
-	return true;
+	if (v.size() > 3) {
+		secs = as_number(prg, v[3]);
+	}
+	else {
+		secs = audio::samples_to_millis(sample->get_length());
+	}
+
+	audio::Sample_Instance *inst = sample->play_stretched(volume, 0, audio::millis_to_samples(secs*1000.0), loop);
+
+	Sample_Instance_Info *iinfo = sample_instance_info(prg);
+
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = iinfo->instance_id;
+
+	iinfo->instances[iinfo->instance_id++] = inst;
+
+	// clean up old instances
+	audio::lock_mutex();
+	for (std::map<int, audio::Sample_Instance *>::iterator it = iinfo->instances.begin(); it != iinfo->instances.end();) {
+		std::pair<int, audio::Sample_Instance *> p = *it;
+		bool found = false;
+		std::vector<audio::Sample_Instance *>::iterator it2;
+		for (it2 = audio::internal::audio_context.playing_samples.begin(); it2 != audio::internal::audio_context.playing_samples.end(); it2++) {
+			audio::Sample_Instance *s2 = *it2;
+			if (s2 == p.second) {
+				found = true;
+				break;
+			}
+		}
+		if (found) {
+			it++;
+		}
+		else {
+			it = iinfo->instances.erase(it);
+		}
+	}
+	audio::unlock_mutex();
+
+	return var;
 }
 
 static bool samplefunc_stop(Program *prg, const std::vector<Token> &v)
@@ -1443,13 +1555,27 @@ static bool samplefunc_stop(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v[0]);
 
-	Sample_Info *info = sample_info(prg);
+	Sample_Instance_Info *info = sample_instance_info(prg);
 
-	INFO_EXISTS(info->samples, id)
+	INFO_EXISTS(info->instances, id)
 
-	audio::Sample *sample = info->samples[id];
+	audio::Sample::stop_instance(info->instances[id]);
 
-	sample->stop();
+	return true;
+}
+
+static bool samplefunc_set_volume(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	float vol = as_number(prg, v[1]);
+
+	Sample_Instance_Info *info = sample_instance_info(prg);
+
+	INFO_EXISTS(info->instances, id)
+
+	info->instances[id]->volume = vol;
 
 	return true;
 }
@@ -5504,12 +5630,15 @@ void start_lib_game()
 	add_expression_handler("mml_create", exprfunc_mml_create);
 	add_expression_handler("mml_load", exprfunc_mml_load);
 	add_instruction("mml_destroy", mmlfunc_destroy);
-	add_instruction("mml_play", mmlfunc_play);
+	add_expression_handler("mml_play", exprfunc_mml_play);
 	add_instruction("mml_stop", mmlfunc_stop);
+	add_instruction("mml_set_volume", mmlfunc_set_volume);
+	add_instruction("mml_set_tempo", mmlfunc_set_tempo);
 	add_expression_handler("sample_load", exprfunc_sample_load);
 	add_instruction("sample_destroy", samplefunc_destroy);
-	add_instruction("sample_play", samplefunc_play);
+	add_expression_handler("sample_play", exprfunc_sample_play);
 	add_instruction("sample_stop", samplefunc_stop);
+	add_instruction("sample_set_volume", samplefunc_set_volume);
 	add_expression_handler("joy_count", exprfunc_joy_count);
 	add_instruction("rumble", joyfunc_rumble);
 	add_expression_handler("joy_get_button", exprfunc_joy_get_button);
@@ -5606,6 +5735,10 @@ void end_lib_game()
 
 void game_lib_destroy_program(Program *prg)
 {
+	MML_Instance_Info *mml_instance_i = mml_instance_info(prg);
+	for (std::map<int, MML_Instance *>::iterator i = mml_instance_i->instances.begin(); i != mml_instance_i->instances.end(); i++) {
+		delete mml_instance_i->instances[(*i).first];
+	}
 	MML_Info *mml_i = mml_info(prg);
 	for (std::map<int, audio::MML *>::iterator i = mml_i->mmls.begin(); i != mml_i->mmls.end(); i++) {
 		delete mml_i->mmls[(*i).first];
@@ -5614,6 +5747,7 @@ void game_lib_destroy_program(Program *prg)
 	for (std::map<int, audio::Sample *>::iterator i = sample_i->samples.begin(); i != sample_i->samples.end(); i++) {
 		delete sample_i->samples[(*i).first];
 	}
+	Sample_Instance_Info *sample_instance_i = sample_instance_info(prg);
 	Image_Info *image_i = image_info(prg);
 	for (std::map<int, Image *>::iterator i = image_i->images.begin(); i != image_i->images.end(); i++) {
 		delete image_i->images[(*i).first]->image;
@@ -5658,7 +5792,9 @@ void game_lib_destroy_program(Program *prg)
 	}
 
 	delete mml_i;
+	delete mml_instance_i;
 	delete sample_i;
+	delete sample_instance_i;
 	delete image_i;
 	delete font_i;
 	delete tilemap_i;
@@ -5669,7 +5805,9 @@ void game_lib_destroy_program(Program *prg)
 	delete widget_i;
 
 	booboo::set_black_box(prg, "com.nooskewl.booboo.mml", nullptr);
+	booboo::set_black_box(prg, "com.nooskewl.booboo.mml_instance", nullptr);
 	booboo::set_black_box(prg, "com.nooskewl.booboo.sample", nullptr);
+	booboo::set_black_box(prg, "com.nooskewl.booboo.sample_instance", nullptr);
 	booboo::set_black_box(prg, "com.nooskewl.booboo.image", nullptr);
 	booboo::set_black_box(prg, "com.nooskewl.booboo.font", nullptr);
 	booboo::set_black_box(prg, "com.nooskewl.booboo.tilemap", nullptr);

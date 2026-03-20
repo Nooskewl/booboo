@@ -30,9 +30,24 @@ struct MML_Info {
 	std::map<int, audio::MML *> mmls;
 };
 
+struct MML_Instance {
+	audio::MML *mml;
+	int instance;
+};
+
+struct MML_Instance_Info {
+	unsigned int instance_id;
+	std::map<int, MML_Instance *> instances;
+};
+
 struct Sample_Info {
 	unsigned int sample_id;
 	std::map<int, audio::Sample *> samples;
+};
+
+struct Sample_Instance_Info {
+	unsigned int instance_id;
+	std::map<int, audio::Sample_Instance *> instances;
 };
 
 struct Image {
@@ -122,7 +137,9 @@ struct Widget_Info
 };
 
 MML_Info BOOBOO_EXPORT *mml_info(booboo::Program *prg);
+MML_Instance_Info BOOBOO_EXPORT *mml_instance_info(booboo::Program *prg);
 Sample_Info BOOBOO_EXPORT *sample_info(booboo::Program *prg);
+Sample_Instance_Info BOOBOO_EXPORT *sample_instance_info(booboo::Program *prg);
 Image_Info BOOBOO_EXPORT *image_info(booboo::Program *prg);
 Font_Info BOOBOO_EXPORT *font_info(booboo::Program *prg);
 Tilemap_Info BOOBOO_EXPORT *tilemap_info(booboo::Program *prg);

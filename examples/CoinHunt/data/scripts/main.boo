@@ -1,6 +1,6 @@
-var music
+var music inst
 = music (mml_load "music/menu.mml")
-mml_play music 0.5 1
+= inst (mml_play music 0.5 1)
 
 var font
 = font (font_load "skateblade.ttf" 92 1)
@@ -87,7 +87,7 @@ function run
 	je move_bar
 	goto no_move_bar
 :move_bar
-	mml_play sfx 1 0
+	= inst (mml_play sfx 1 0)
 	? selected 0
 	je make_1
 	= selected 0

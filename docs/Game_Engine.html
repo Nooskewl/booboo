@@ -1543,16 +1543,35 @@ and h are the calculated position and size of the widget in pixels.
 	Returns -1 on fail
 </pre>
 
-<h3>mml_play</h3>
+<h3>(mml_play)</h3>
 <pre>
-	play a sound
-	e.g. mml_play blast ^ volume loop
+	play a sound. Returns an instance that can be adjusted
+	e.g. = inst (mml_play blast ^ volume loop)
 </pre>
 
 <h3>mml_stop</h3>
 <pre>
-	stop a looping sound
-	e.g. mml_stop blast
+	stop an MML instance
+	e.g. mml_stop inst
+</pre>
+
+<h3>mml_set_volume</h3>
+<pre>
+	Set the volume of an MML instance
+	e.g. mml_set_volume inst 0.5
+</pre>
+
+<h3>mml_set_tempo</h3>
+<pre>
+	Set the tempo of all tracks of an MML. After this is called,
+	further 't's (in MML syntax) will be ignored
+	e.g. mml_set_tempo inst 120
+</pre>
+
+<h3>mml_destroy</h3>
+<pre>
+	Free an MML
+	e.g. mml_destroy mml
 </pre>
 
 <h3>(sample_load)</h3>
@@ -1564,20 +1583,22 @@ and h are the calculated position and size of the widget in pixels.
 
 <h3>sample_play</h3>
 <pre>
-	play a sample
-	e.g. sample_play s ^ volume loop
+	play a sample. Returns a sample instance that can be adjusted
+	An optional duration can be used otherwise it will playback
+	at normal speed
+	e.g. = inst (sample_play s ^ volume loop playtime_seconds)
 </pre>
 
 <h3>sample_stop</h3>
 <pre>
-	Stop a looping sample
-	e.g. sample_stop s
+	Stop a sample instance
+	e.g. sample_stop inst
 </pre>
 
-<h3>mml_destroy</h3>
+<h3>sample_set_volume</h3>
 <pre>
-	Free an MML
-	e.g. mml_destroy mml
+	Set the volume of a playing sample instance
+	e.g. sample_set_volume inst 0.5
 </pre>
 
 <h3>sample_destroy</h3>
