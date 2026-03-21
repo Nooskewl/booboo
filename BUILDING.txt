@@ -10,7 +10,7 @@ you will not use twinkle and will usually use wedge too.
    git clone https://codeberg.org/nooskewl/twinkle.git
 
 3) cd twinkle
-   g++ -c -O2 twinkle.cpp
+   g++ -c -O2 -fPIC twinkle.cpp
    ar rc libtwinkle.a twinkle.o
    ranlib libtwinkle.a
 
