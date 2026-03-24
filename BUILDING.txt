@@ -4,10 +4,10 @@ you will not use twinkle and will usually use wedge too.
 
 1) sudo apt install g++ libsdl3-dev libsdl3-ttf-dev libfreetype-dev libglm-dev cmake git libflac-dev libogg-dev libvorbis-dev libpng-dev
 
-2) git clone https://codeberg.org/CMYKilluminatiNetwork/tgui6.git
-   git clone https://codeberg.org/CMYKilluminatiNetwork/shim5.git
-   git clone https://codeberg.org/CMYKilluminatiNetwork/booboo.git
-   git clone https://codeberg.org/CMYKilluminatiNetwork/twinkle.git
+2) git clone https://github.com/Nooskewl/tgui6.git
+   git clone https://github.com/Nooskewl/shim5.git
+   git clone https://github.com/Nooskewl/booboo.git
+   git clone https://github.com/Nooskewl/twinkle.git
 
 3) cd twinkle
    g++ -c -O2 -fPIC twinkle.cpp
