@@ -1,5 +1,0 @@
-Congrats! You can now redistribute the
-BooBoo interpreter with all of your
-games/apps!
-
-- Nooskewl
