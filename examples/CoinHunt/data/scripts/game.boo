@@ -422,16 +422,7 @@ function do_explode x y max_r r g b
 
 function zero_padded_string_from_number n
 {
-	var s
-
-	? n 10
-	jl pad
-	= s (string_format "%" n)
-	goto done_pad
-:pad
-	= s (string_format "0%" n)
-:done_pad
-	return s
+	return (string_format "%(02d)" n)
 }
 
 function draw_time_playing
