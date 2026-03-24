@@ -4,10 +4,10 @@ you will not use twinkle and will usually use wedge too.
 
 1) sudo apt install g++ libsdl3-dev libsdl3-ttf-dev libfreetype-dev libglm-dev cmake git libflac-dev libogg-dev libvorbis-dev libpng-dev
 
-2) git clone https://codeberg.org/nooskewl/tgui6.git
-   git clone https://codeberg.org/nooskewl/shim5.git
-   git clone https://codeberg.org/nooskewl/booboo.git
-   git clone https://codeberg.org/nooskewl/twinkle.git
+2) git clone https://codeberg.org/CMYKilluminatiNetwork/tgui6.git
+   git clone https://codeberg.org/CMYKilluminatiNetwork/shim5.git
+   git clone https://codeberg.org/CMYKilluminatiNetwork/booboo.git
+   git clone https://codeberg.org/CMYKilluminatiNetwork/twinkle.git
 
 3) cd twinkle
    g++ -c -O2 -fPIC twinkle.cpp
@@ -55,9 +55,7 @@ build.sh:
 
 cmake .. -DCMAKE_TOOLCHAIN_FILE=/home/trent/code/Toolchain-mingw64.cmake -DCMAKE_BUILD_TYPE=Release -DUSER_INCLUDE_PATH="/home/trent/code/twinkle:/home/trent/code/win-include64:/home/trent/code/tgui6/include:/home/trent/code/shim5/include:/home/trent/code/shim5/external:/home/trent/code/win-include64/SDL3" -DUSER_LIBRARY_PATH="/home/trent/code/twinkle:/home/trent/code/win-lib64:/home/trent/code/tgui6/build:/home/trent/code/shim5/build" -DGAME_LAUNCHER=on -G "Unix Makefiles"
 
-You can download all the dependencies (this has everything for all our games too) from:
-
-https://nooskewl.com/files/win-deps64-20250624.zip
+You can download all the dependencies from the "winlibs" file in the release.
 
 This also has a file called Toolchain-mingw64.cmake that you will need to have present.
 
