@@ -54,9 +54,9 @@ var win_sfx
 = gameover_sfx (mml_create "@PO0 = { 0 -500 100 -300 500 -500 0 -300 }\nA @TYPE1 o8 @PO0 c @PO0")
 = win_sfx (mml_load "sfx/win.mml")
 
-var music inst
+var music
 = music (mml_load "music/music.mml")
-= inst (mml_play music 0.5 1)
+= VOID (mml_play music 0.5 1)
 
 var ground
 = ground 300

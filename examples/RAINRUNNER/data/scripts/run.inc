@@ -1,5 +1,3 @@
-var inst
-
 function write_config
 {
 	var cfg
@@ -72,7 +70,7 @@ function run
 	= won 1
 	= exit_count 180
 	= score (+ score 1000)
-	= inst (mml_play win_sfx 1 0)
+	= VOID (mml_play win_sfx 1 0)
 	goto after_player_input
 
 :do_lr
@@ -138,7 +136,7 @@ function run
 	= jumping 1
 	= jumps (+ jumps 1)
 	= angle 0
-	= inst (mml_play jump_sfx 1 0)
+	= VOID (mml_play jump_sfx 1 0)
 	= vy (+ vy jump_accel)
 	? vy jump_accel
 	jge no_accel_fix
@@ -218,7 +216,7 @@ function run
 	? drop_y ground
 	jl drop_y_ok
 	vector_erase drops i
-	= inst (mml_play drop_ground_sfx 1 0)
+	= VOID (mml_play drop_ground_sfx 1 0)
 	= num_drops (- num_drops 1)
 	goto check_if_drops_to_move
 :drop_y_ok
@@ -238,7 +236,7 @@ function run
 	vector_add drop drop_x
 	vector_add drop drop_start_y
 	vector_add drops drop
-	= inst (mml_play drip_sfx 1 0)
+	= VOID (mml_play drip_sfx 1 0)
 	= next_drop drop_interval
 :no_drop
 
@@ -327,14 +325,14 @@ function run
 	? have_umbrella 1
 	jne do_damage
 	= have_umbrella 0
-	= inst (mml_play hit_umbrella_sfx 1 0)
+	= VOID (mml_play hit_umbrella_sfx 1 0)
 	goto solved_collision
 :do_damage
 	= life (- life 1)
-	= inst (mml_play hit_sfx 1 0)
+	= VOID (mml_play hit_sfx 1 0)
 	? life 0
 	jne solved_collision
-	= inst (mml_play gameover_sfx 1 0)
+	= VOID (mml_play gameover_sfx 1 0)
 	= exit_count 180
 :solved_collision
 	= num_drops (- num_drops 1)
@@ -433,7 +431,7 @@ function run
 	; touching umbrella
 	= have_umbrella 1
 	= score (+ score 100)
-	= inst (mml_play collect_sfx 1 0)
+	= VOID (mml_play collect_sfx 1 0)
 	= next_umbrella 1800
 	= umbrella 0
 :not_touching_umbrella
@@ -523,7 +521,7 @@ function run
 	= [numeral 0] 1
 	= [numerals i] numeral
 	= score (+ score 100)
-	= inst (mml_play collect_sfx 1 0)
+	= VOID (mml_play collect_sfx 1 0)
 :dont_process_numeral_cd
 	= i (+ i 1)
 	? i 10

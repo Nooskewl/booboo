@@ -95,8 +95,6 @@ vector_add initials " "
 vector_add initials " "
 vector_add initials " "
 
-var inst
-
 function write_scores name
 {
 	= [names place] name
@@ -192,7 +190,7 @@ function run
 	jne no_press
 	= [initials num_set] curr
 	= num_set (+ num_set 1)
-	= inst (mml_play drop_ground_sfx 1 0)
+	= VOID (mml_play drop_ground_sfx 1 0)
 	? num_set 3
 	jl no_press
 	var name
@@ -212,7 +210,7 @@ function run
 	= old_joy_d joy_d
 	? joy_d 1
 	jne check_joy_u
-	= inst (mml_play drip_sfx 1 0)
+	= VOID (mml_play drip_sfx 1 0)
 	= sel (- sel 1)
 	? sel 0
 	jge check_joy_u
@@ -224,7 +222,7 @@ function run
 	= old_joy_u joy_u
 	? joy_u 1
 	jne no_change
-	= inst (mml_play drip_sfx 1 0)
+	= VOID (mml_play drip_sfx 1 0)
 	= sel (+ sel 1)
 	? sel 36
 	jl no_change

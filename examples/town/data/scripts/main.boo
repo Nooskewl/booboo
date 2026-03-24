@@ -1,6 +1,6 @@
-var music inst
+var music
 = music (mml_load "music/town.mml")
-= inst (mml_play music 0.5 1)
+= VOID (mml_play music 0.5 1)
 
 var pickup
 = pickup (mml_load "sfx/pickup.mml")
@@ -259,7 +259,7 @@ function run
 		= cx [c 1]
 		= cy [c 2]
 		if (&& (== cx dx) (== cy dy)) pick_it_up
-			= inst (mml_play pickup 1 0)
+			= VOID (mml_play pickup 1 0)
 			vector_erase collectibles i
 			goto no_pickup
 		:pick_it_up

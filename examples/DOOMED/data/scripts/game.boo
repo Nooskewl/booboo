@@ -104,8 +104,6 @@ var bullets
 var fire_down
 = fire_down FALSE
 
-var inst
-
 function spawn_enemy
 {
 	var x
@@ -522,7 +520,7 @@ function run
 		vector_init v c c2 s
 		= v (normalize v)
 		call spawn_bullet (* x -1) 0.2 (* z -1) [v 0] [v 1] [v 2] TRUE
-		= inst (mml_play fire_sfx 1 0)
+		= VOID (mml_play fire_sfx 1 0)
 		= fired 30
 	:fire
 
@@ -553,7 +551,7 @@ function run
 	= [[enemies i] "dead_count"] 30
 	= nb (- nb 1)
 	vector_erase bullets j
-	= inst (mml_play hit 1 0)
+	= VOID (mml_play hit 1 0)
 	= score (+ score 100)
 	goto next_e2
 :no_collide
@@ -625,7 +623,7 @@ function run
 			screen_shake 1.5 500
 			rumble 500
 		:player_not_dead
-		= inst (mml_play hit 1 0)
+		= VOID (mml_play hit 1 0)
 		vector_erase bullets i
 		= nb (- nb 1)
 		? life 0
@@ -660,7 +658,7 @@ function do_enemy_attack e
 	vector_init v2 (* x -1) 0 (* z -1)
 	= diff (normalize (sub v2 v1))
 	call spawn_bullet [e "x"] 0.2 [e "z"] [diff 0] [diff 1] [diff 2] 0
-	= inst (mml_play fire_sfx 1 0)
+	= VOID (mml_play fire_sfx 1 0)
 }
 
 function write_config

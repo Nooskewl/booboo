@@ -31,8 +31,6 @@ explode (get_screen_size) W H
 var my_mml
 = my_mml -1
 
-var inst
-
 function draw
 {
 	var y
@@ -73,7 +71,7 @@ function event type a b c d
 				mml_stop my_mml
 			:stop_it2
 			= my_mml (mml_load [mmls selected])
-			= inst (mml_play my_mml 1.0 TRUE)
+			= VOID (mml_play my_mml 1.0 TRUE)
 		:play_it
 	:its_a_key
 }

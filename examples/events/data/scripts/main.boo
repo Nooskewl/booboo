@@ -1,4 +1,4 @@
-var cock fire inst
+var cock fire
 = cock (sample_load "gun-cocking-01.wav")
 = fire (sample_load "pistol.ogg")
 
@@ -10,9 +10,9 @@ function event type a b c d
 	if
 		(&& (== type EVENT_KEY_DOWN) (== a KEY_SPACE) (== b FALSE)) cock_it
 		(&& (== type EVENT_KEY_UP) (== a KEY_SPACE)) fire_it
-		= inst (sample_play cock 1 0)
+		= VOID (sample_play cock 1 0)
 	:cock_it
-		= inst (sample_play fire 1 0)
+		= VOID (sample_play fire 1 0)
 	:fire_it
 }
 
