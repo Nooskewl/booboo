@@ -1,27 +1,27 @@
 html {
 	font-family: sans-serif;
-	background-color: white;
-	color: black;
+	background-color: black;
+	color: #aaa;
 	line-height: 1.5;
 }
 a, a:visited {
-	color: blue;
-	text-decoration: underline;
+	color: #7777ff;
+	text-decoration: none;
 }
 h1, h2, h3 {
 	padding: 10px;
 	margin-top: 15px;
 	margin-bottom: 15px;
-	background-color: blue;
+	background-color: #7777ff;
 	color: white;
-	border: 2px solid black;
+	border: 2px solid white;
 }
 h2 {
 	page-break-before: always;
 }
 ::selection {
 	color: white;
-	background-color: red;
+	background-color: #ff7777;
 }
 #footer {
 	margin-top: 50px;
@@ -35,9 +35,6 @@ h2 {
 }
 .center {
 	text-align: center;
-}
-#nooskewl {
-	height: 128px;
 }
 pre {
 	font-size: 110%;
