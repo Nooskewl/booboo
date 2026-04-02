@@ -5,23 +5,23 @@ html {
 	line-height: 1.5;
 }
 a, a:visited {
-	color: #7777ff;
+	color: #ff00d8;
 	text-decoration: none;
 }
 h1, h2, h3 {
 	padding: 10px;
 	margin-top: 15px;
 	margin-bottom: 15px;
-	background-color: #7777ff;
-	color: white;
-	border: 2px solid white;
+	background-color: #00d8ff;
+	color: black;
+	border: 2px solid #ff00d8;
 }
 h2 {
 	page-break-before: always;
 }
 ::selection {
 	color: white;
-	background-color: #ff7777;
+	background-color: #aa00ff;
 }
 #footer {
 	margin-top: 50px;
