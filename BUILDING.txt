@@ -55,7 +55,7 @@ build.sh:
 
 cmake .. -DCMAKE_TOOLCHAIN_FILE=/home/trent/code/Toolchain-mingw64.cmake -DCMAKE_BUILD_TYPE=Release -DUSER_INCLUDE_PATH="/home/trent/code/twinkle:/home/trent/code/win-include64:/home/trent/code/tgui6/include:/home/trent/code/shim5/include:/home/trent/code/shim5/external:/home/trent/code/win-include64/SDL3" -DUSER_LIBRARY_PATH="/home/trent/code/twinkle:/home/trent/code/win-lib64:/home/trent/code/tgui6/build:/home/trent/code/shim5/build" -DGAME_LAUNCHER=on -G "Unix Makefiles"
 
-You can download all the dependencies from the "winlibs" file in the release.
+You can download all the dependencies from https://nooskewl.com/files/winlibs-20260404.zip.
 
 This also has a file called Toolchain-mingw64.cmake that you will need to have present.
 
