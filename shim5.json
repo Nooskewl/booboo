@@ -62,7 +62,6 @@
 			"debug": false
 		},
 		"audio": {
-			"samplerate": 0,
 			"mute": false,
 			"float_samples": false,
 			"freq": 48000
