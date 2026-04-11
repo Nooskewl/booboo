@@ -800,12 +800,6 @@ int main(int argc, char **argv)
 	}
 #endif
 
-#ifdef __linux__
-	if (std::string(getenv("XDG_SESSION_TYPE")) == "wayland") {
-		putenv("SDL_VIDEODRIVER=wayland");
-	}
-#endif
-
 	shim::window_title = "BooBoo";
 	shim::organisation_name = "Nooskewl";
 	shim::game_name = "BooBoo";
@@ -1062,19 +1056,6 @@ again:
 	}
 
 	if (beepboop) {
-#ifdef __linux__
-		pid_t pid = fork();
-		if (pid == 0) {
-			char * const args[] = {
-				orig_argv[0],
-				"+dir",
-				(char *)set_dir.c_str(),
-				nullptr
-			};
-			execv(argv[0], args);
-			exit(0);
-		}
-#else
 		STARTUPINFO si;
 		PROCESS_INFORMATION pi;
 		ZeroMemory(&si, sizeof(si));
@@ -1084,24 +1065,8 @@ again:
 		snprintf(cmd, 1000, "\"%s\" +dir \"%s\"", orig_argv[0], set_dir.c_str());
 		if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
 		}
-#endif
 	}
 	else if (relaunch) {
-#ifdef __linux__
-		pid_t pid = fork();
-		if (pid == 0) {
-			char * const args[] = {
-				orig_argv[0],
-				(char *)dir.c_str(),
-				"+beepboop",
-				"+set-dir",
-				(char *)dir.c_str(),
-				nullptr
-			};
-			execv(argv[0], args);
-			exit(0);
-		}
-#else
 		STARTUPINFO si;
 		PROCESS_INFORMATION pi;
 		ZeroMemory(&si, sizeof(si));
@@ -1111,7 +1076,6 @@ again:
 		snprintf(cmd, 1000, "\"%s\" \"%s\" +beepboop +set-dir \"%s\"", orig_argv[0], dir.c_str(), dir.c_str());
 		if (CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
 		}
-#endif
 	}
 
 	return return_code;
