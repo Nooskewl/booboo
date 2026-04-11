@@ -1,55 +1,5 @@
-These instructions are for Debian 13. Additional Windows instructions are
-below. These instructions are similar for any of our games using Shim, only
-you will not use twinkle and will usually use wedge too.
-
-1) sudo apt install g++ libsdl3-dev libsdl3-ttf-dev libfreetype-dev libglm-dev cmake git libflac-dev libogg-dev libvorbis-dev libpng-dev
-
-2) git clone https://github.com/Nooskewl/tgui6.git
-   git clone https://github.com/Nooskewl/shim5.git
-   git clone https://github.com/Nooskewl/booboo.git
-   git clone https://github.com/Nooskewl/twinkle.git
-
-3) cd twinkle
-   g++ -c -O2 -fPIC twinkle.cpp
-   ar rc libtwinkle.a twinkle.o
-   ranlib libtwinkle.a
-
---
-
 This shell script is used to run cmake... change the paths (trent/code)
 to suit your paths.
-
-build.sh:
-
-cmake .. -DCMAKE_BUILD_TYPE=Release -DUSER_INCLUDE_PATH="/home/trent/code/tgui6/include;/home/trent/code/shim5/include;/usr/local/include/SDL3;/usr/local/include/SDL3_ttf;/usr/include/freetype2;/home/trent/code/twinkle" -DUSER_LIBRARY_PATH="/home/trent/code/tgui6/build;/home/trent/code/shim5/build;/home/trent/code/twinkle"
-
---
-
-4) cd tgui6
-   mkdir build
-   cd build
-   sh ../../build.sh
-   make -j
-
-5) cd shim5
-   mkdir build
-   cd build
-   sh ../../build.sh
-   make -j
-
-6) cd booboo
-   mkdir build
-   cd build
-   sh ../../build.sh
-   make -j
-
-7) You now have BooBoo.exe and BooBooCLI.exe (or without exe on Linux.)
-   Remember that BooBoo.exe needs an app, the default is booboo.git/data
-   which is a default launcher.
-
---
-
-Windows specifics:
 
 build.sh:
 
@@ -72,3 +22,31 @@ mingw64/mingw-w64-x86_64-cmake 4.1.0-1
 So to install it run:
 
 > pacman -S mingw-w64-x86_64-cmake
+
+1) build twinkle:
+cd twinkle
+g++ -c -O2 -fPIC twinkle.cpp
+ar rc libtwinkle.a twinkle.o
+ranlib libtwinkle.a
+
+2) cd tgui6
+   mkdir build
+   cd build
+   sh ../../build.sh
+   make -j
+
+3) cd shim5
+   mkdir build
+   cd build
+   sh ../../build.sh
+   make -j
+
+4) cd booboo
+   mkdir build
+   cd build
+   sh ../../build.sh
+   make -j
+
+5) You now have BooBoo.exe and BooBooCLI.exe
+   Remember that BooBoo.exe needs an app, the default is booboo.git/data
+   which is a default launcher.
