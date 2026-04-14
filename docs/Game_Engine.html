@@ -1547,7 +1547,7 @@ and h are the calculated position and size of the widget in pixels.
 <h3>(mml_play)</h3>
 <pre>
 	play a sound. Returns an instance that can be adjusted
-	e.g. = inst (mml_play blast ^ volume loop)
+	e.g. = inst (mml_play blast ^ volume loop callback)
 </pre>
 
 <h3>mml_stop</h3>
@@ -1587,7 +1587,7 @@ and h are the calculated position and size of the widget in pixels.
 	play a sample. Returns a sample instance that can be adjusted
 	An optional duration can be used otherwise it will playback
 	at normal speed
-	e.g. = inst (sample_play s ^ volume loop playtime_seconds)
+	e.g. = inst (sample_play s ^ volume loop playtime_seconds callback)
 </pre>
 
 <h3>sample_stop</h3>

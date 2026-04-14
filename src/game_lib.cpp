@@ -1333,6 +1333,26 @@ static Variable exprfunc_mml_load(Program *prg, const std::vector<Token> &v)
 	return v1;
 }
 
+struct MML_Callback_Data
+{
+	Program *prg;
+	int function;
+	int id;
+};
+
+static void mml_callback(void *data)
+{
+	MML_Callback_Data *d = static_cast<MML_Callback_Data *>(data);
+	std::vector<Token> v;
+	Token t;
+	t.type = Token::NUMBER;
+	t.n = d->id;
+	t.dereference = 0;
+	v.push_back(t);
+	call_void_function(d->prg, d->function, v, 0);
+	delete d;
+}
+
 static Variable exprfunc_mml_play(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
@@ -1364,9 +1384,21 @@ static Variable exprfunc_mml_play(Program *prg, const std::vector<Token> &v)
 
 	MML_Instance_Info *iinfo = mml_instance_info(prg);
 
+	util::Callback callback;
+	void *callback_data;
+
+	if (v.size() > 3) {
+		MML_Callback_Data *d = new MML_Callback_Data;
+		d->prg = prg;
+		d->function = as_function(prg, v[3]);
+		d->id = iinfo->instance_id;
+		callback_data = d;
+		callback = mml_callback;
+	}
+
 	MML_Instance *i = new MML_Instance;
 	i->mml = mml;
-	i->instance = mml->play(volume, loop);
+	i->instance = mml->play(volume, loop, callback, callback_data);
 
 	iinfo->instances[iinfo->instance_id++] = i;
 
@@ -1476,6 +1508,26 @@ static bool samplefunc_destroy(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+struct Sample_Callback_Data
+{
+	Program *prg;
+	int function;
+	int id;
+};
+
+static void sample_callback(void *data)
+{
+	Sample_Callback_Data *d = static_cast<Sample_Callback_Data *>(data);
+	std::vector<Token> v;
+	Token t;
+	t.type = Token::NUMBER;
+	t.n = d->id;
+	t.dereference = 0;
+	v.push_back(t);
+	call_void_function(d->prg, d->function, v, 0);
+	delete d;
+}
+
 static Variable exprfunc_sample_play(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
@@ -1514,9 +1566,21 @@ static Variable exprfunc_sample_play(Program *prg, const std::vector<Token> &v)
 		millis = audio::samples_to_millis(sample->get_length(), sample->get_frequency());
 	}
 
-	audio::Sample_Instance *inst = sample->play_stretched(volume, 0, audio::millis_to_samples(millis), loop);
-
 	Sample_Instance_Info *iinfo = sample_instance_info(prg);
+
+	util::Callback callback;
+	void *callback_data;
+
+	if (v.size() > 4) {
+		Sample_Callback_Data *d = new Sample_Callback_Data;
+		d->prg = prg;
+		d->function = as_function(prg, v[4]);
+		d->id = iinfo->instance_id;
+		callback_data = d;
+		callback = sample_callback;
+	}
+
+	audio::Sample_Instance *inst = sample->play_stretched(volume, 0, audio::millis_to_samples(millis), loop, callback, callback_data);
 
 	Variable var;
 	var.type = Variable::NUMBER;
@@ -1560,7 +1624,11 @@ static bool samplefunc_seek(Program *prg, const std::vector<Token> &v)
 
 	INFO_EXISTS(info->instances, id)
 
-	info->instances[id]->offset = audio::millis_to_samples(millis, info->instances[id]->spec->freq);
+	audio::lock_mutex();
+
+	info->instances[id]->offset = audio::millis_to_samples(millis, audio::internal::audio_context.device_spec.freq);
+
+	audio::unlock_mutex();
 
 	return true;
 }
@@ -1599,7 +1667,7 @@ static Variable exprfunc_sample_elapsed(Program *prg, const std::vector<Token> &
 	Variable var;
 	var.type = Variable::NUMBER;
 
-	var.n = audio::samples_to_millis(info->instances[id]->offset, info->instances[id]->spec->freq);
+	var.n = audio::samples_to_millis(info->instances[id]->offset, audio::internal::audio_context.device_spec.freq);
 
 	return var;
 }
