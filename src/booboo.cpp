@@ -2498,6 +2498,21 @@ void add_special_function(std::string name)
 
 void call_function(Program *prg, int function, const std::vector<Token> &params, Variable &result, int ignore_params)
 {
+	bool backup_locals = false;
+	std::vector<Variable> locals_backup;
+
+	if (prg->function_name_map[prg->s->name] == function) {
+		backup_locals = true;
+	}
+
+	if (backup_locals) {
+		std::map<std::string, int>::iterator it;
+		for (it = prg->locals[function].begin(); it != prg->locals[function].end(); it++) {
+			std::pair<std::string, int> pair = *it;
+			locals_backup.push_back(prg->variables[pair.second]);
+		}
+	}
+
 	Program &func = prg->functions[function];
 
 	for (size_t j = 0; j < func.params.size(); j++) {
@@ -2572,6 +2587,15 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 				//v2.obfuscated = obfuscated;
 				v2.constant = constant;
 			}
+		}
+	}
+
+	if (backup_locals) {
+		int i = 0;
+		std::map<std::string, int>::iterator it;
+		for (it = prg->locals[function].begin(); it != prg->locals[function].end(); it++) {
+			std::pair<std::string, int> pair = *it;
+			prg->variables[pair.second] = locals_backup[i++];
 		}
 	}
 
