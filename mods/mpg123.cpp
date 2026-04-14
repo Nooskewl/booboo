@@ -59,20 +59,20 @@ Uint8 *decode_mp3(SDL_IOStream *file, char *errmsg, SDL_AudioSpec *spec, Uint32 
 		snprintf(errmsg,1000,"Unable to create mpg123 handle: %s\n", mpg123_plain_strerror(ret));
 		return nullptr;
 	}
-	mpg123_param(m, MPG123_VERBOSE, 2, 0); /* Brabble a bit about the parsing/decoding. */
+	/*mpg123_param(m, MPG123_VERBOSE, 2, 0);*/ /* Brabble a bit about the parsing/decoding. */
 
 	/* Now mpg123 is being prepared for feeding. The main loop will read chunks from stdin and feed them to mpg123;
 	   then take decoded data as available to write to stdout. */
 	mpg123_open_feed(m);
 	if(m == NULL) return nullptr;
 
-	fprintf(stderr, "Feed me some MPEG audio to stdin, I will decode to stdout.\n");
+	//fprintf(stderr, "Feed me some MPEG audio to stdin, I will decode to stdout.\n");
 	while(1) /* Read and write until everything is through. */
 	{
 		len = SDL_ReadIO(file,buf,INBUFF);
 		if(len <= 0)
 		{
-			fprintf(stderr, "input data end\n");
+			//fprintf(stderr, "input data end\n");
 			break;
 		}
 		in += len;
@@ -86,7 +86,7 @@ Uint8 *decode_mp3(SDL_IOStream *file, char *errmsg, SDL_AudioSpec *spec, Uint32 
 			spec->format = SDL_AUDIO_S16LE;
 			spec->channels = channels;
 			spec->freq = rate;
-			fprintf(stderr, "New format: %li Hz, %i channels, encoding value %i\n", rate, channels, enc);
+			//fprintf(stderr, "New format: %li Hz, %i channels, encoding value %i\n", rate, channels, enc);
 			data = new Uint8[mpg123_length(m)*spec->channels*2];
 		}
 
@@ -101,9 +101,9 @@ Uint8 *decode_mp3(SDL_IOStream *file, char *errmsg, SDL_AudioSpec *spec, Uint32 
 			data_sz += size;
 			outc += size;
 		}
-		if(ret == MPG123_ERR){ fprintf(stderr, "some error: %s", mpg123_strerror(m)); break; }
+		if(ret == MPG123_ERR){ /*fprintf(stderr, "some error: %s", mpg123_strerror(m));*/ break; }
 	}
-	fprintf(stderr, "%lu bytes in, %lu bytes out\n", (unsigned long)in, (unsigned long)outc);
+	//fprintf(stderr, "%lu bytes in, %lu bytes out\n", (unsigned long)in, (unsigned long)outc);
 
 	/* Done decoding, now just clean up and leave. */
 	mpg123_delete(m);
