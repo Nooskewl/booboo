@@ -1549,6 +1549,43 @@ static Variable exprfunc_sample_play(Program *prg, const std::vector<Token> &v)
 	return var;
 }
 
+static bool samplefunc_seek(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	int id = as_number(prg, v[0]);
+	int millis = as_number(prg, v[1]);
+
+	Sample_Instance_Info *info = sample_instance_info(prg);
+
+	INFO_EXISTS(info->instances, id)
+
+	info->instances[id]->offset = audio::millis_to_samples(millis, info->instances[id]->spec->freq);
+
+	return true;
+}
+
+static Variable exprfunc_sample_length(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number(prg, v[0]);
+
+	Sample_Info *info = sample_info(prg);
+
+	INFO_EXISTS(info->samples, id)
+
+	audio::Sample *sample = info->samples[id];
+
+	int millis = audio::samples_to_millis(sample->get_length(), sample->get_frequency());
+
+	Variable var;
+	var.type = Variable::NUMBER;
+	var.n = millis;
+
+	return var;
+}
+
 static bool samplefunc_stop(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -5639,6 +5676,8 @@ void start_lib_game()
 	add_expression_handler("sample_play", exprfunc_sample_play);
 	add_instruction("sample_stop", samplefunc_stop);
 	add_instruction("sample_set_volume", samplefunc_set_volume);
+	add_instruction("sample_seek", samplefunc_seek);
+	add_expression_handler("sample_length", exprfunc_sample_length);
 	add_expression_handler("joy_count", exprfunc_joy_count);
 	add_instruction("rumble", joyfunc_rumble);
 	add_expression_handler("joy_get_button", exprfunc_joy_get_button);
