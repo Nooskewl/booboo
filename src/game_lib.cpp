@@ -1511,7 +1511,7 @@ static Variable exprfunc_sample_play(Program *prg, const std::vector<Token> &v)
 		millis = as_number(prg, v[3]);
 	}
 	else {
-		millis = audio::samples_to_millis(sample->get_length());
+		millis = audio::samples_to_millis(sample->get_length(), sample->get_frequency());
 	}
 
 	audio::Sample_Instance *inst = sample->play_stretched(volume, 0, audio::millis_to_samples(millis), loop);
