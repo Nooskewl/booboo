@@ -1384,8 +1384,8 @@ static Variable exprfunc_mml_play(Program *prg, const std::vector<Token> &v)
 
 	MML_Instance_Info *iinfo = mml_instance_info(prg);
 
-	util::Callback callback;
-	void *callback_data;
+	util::Callback callback = nullptr;
+	void *callback_data = nullptr;
 
 	if (v.size() > 3) {
 		MML_Callback_Data *d = new MML_Callback_Data;
@@ -1568,8 +1568,8 @@ static Variable exprfunc_sample_play(Program *prg, const std::vector<Token> &v)
 
 	Sample_Instance_Info *iinfo = sample_instance_info(prg);
 
-	util::Callback callback;
-	void *callback_data;
+	util::Callback callback = nullptr;
+	void *callback_data = nullptr;
 
 	if (v.size() > 4) {
 		Sample_Callback_Data *d = new Sample_Callback_Data;
