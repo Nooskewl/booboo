@@ -1427,6 +1427,10 @@ static bool mmlfunc_stop(Program *prg, const std::vector<Token> &v)
 
 	MML_Instance_Info *info = mml_instance_info(prg);
 
+	if (info->instances.find(id) == info->instances.end()) {
+		return true;
+	}
+
 	MML_Instance *i = info->instances[id];
 
 	i->mml->stop(i->instance);
@@ -1443,6 +1447,10 @@ static bool mmlfunc_set_volume(Program *prg, const std::vector<Token> &v)
 
 	MML_Instance_Info *info = mml_instance_info(prg);
 
+	if (info->instances.find(inst) == info->instances.end()) {
+		return true;
+	}
+
 	MML_Instance *i = info->instances[inst];
 
 	i->mml->set_master_volume(i->instance, vol);
@@ -1458,6 +1466,10 @@ static bool mmlfunc_set_tempo(Program *prg, const std::vector<Token> &v)
 	int bpm = as_number(prg, v[1]);
 
 	MML_Instance_Info *info = mml_instance_info(prg);
+
+	if (info->instances.find(inst) == info->instances.end()) {
+		return true;
+	}
 
 	MML_Instance *i = info->instances[inst];
 
@@ -1526,6 +1538,20 @@ static void sample_callback(void *data)
 	v.push_back(t);
 	call_void_function(d->prg, d->function, v, 0);
 	delete d;
+}
+
+static bool sample_exists(audio::Sample_Instance *inst)
+{
+	bool found = false;
+	std::vector<audio::Sample_Instance *>::iterator it;
+	for (it = audio::internal::audio_context.playing_samples.begin(); it != audio::internal::audio_context.playing_samples.end(); it++) {
+		audio::Sample_Instance *s = *it;
+		if (s == inst) {
+			found = true;
+			break;
+		}
+	}
+	return found;
 }
 
 static Variable exprfunc_sample_play(Program *prg, const std::vector<Token> &v)
@@ -1622,11 +1648,17 @@ static bool samplefunc_seek(Program *prg, const std::vector<Token> &v)
 
 	Sample_Instance_Info *info = sample_instance_info(prg);
 
-	INFO_EXISTS(info->instances, id)
+	if (info->instances.find(id) == info->instances.end()) {
+		return true;
+	}
 
 	audio::lock_mutex();
 
-	info->instances[id]->offset = audio::millis_to_samples(millis, audio::internal::audio_context.device_spec.freq);
+	bool found = sample_exists(info->instances[id]);
+
+	if (found) {
+		info->instances[id]->offset = audio::millis_to_samples(millis, audio::internal::audio_context.device_spec.freq);
+	}
 
 	audio::unlock_mutex();
 
@@ -1662,12 +1694,21 @@ static Variable exprfunc_sample_elapsed(Program *prg, const std::vector<Token> &
 
 	Sample_Instance_Info *info = sample_instance_info(prg);
 
-	INFO_EXISTS(info->instances, id)
-
 	Variable var;
 	var.type = Variable::NUMBER;
 
-	var.n = audio::samples_to_millis(info->instances[id]->offset, audio::internal::audio_context.device_spec.freq);
+	audio::lock_mutex();
+
+	bool found = sample_exists(info->instances[id]);
+
+	if (found) {
+		var.n = audio::samples_to_millis(info->instances[id]->offset, audio::internal::audio_context.device_spec.freq);
+	}
+	else {
+		var.n = 0;
+	}
+
+	audio::unlock_mutex();
 
 	return var;
 }
@@ -1680,7 +1721,9 @@ static bool samplefunc_stop(Program *prg, const std::vector<Token> &v)
 
 	Sample_Instance_Info *info = sample_instance_info(prg);
 
-	INFO_EXISTS(info->instances, id)
+	if (info->instances.find(id) == info->instances.end()) {
+		return true;
+	}
 
 	audio::Sample::stop_instance(info->instances[id]);
 
@@ -1696,9 +1739,15 @@ static bool samplefunc_set_volume(Program *prg, const std::vector<Token> &v)
 
 	Sample_Instance_Info *info = sample_instance_info(prg);
 
-	INFO_EXISTS(info->instances, id)
+	audio::lock_mutex();
 
-	info->instances[id]->volume = vol;
+	bool found = sample_exists(info->instances[id]);
+
+	if (found) {
+		info->instances[id]->volume = vol;
+	}
+
+	audio::unlock_mutex();
 
 	return true;
 }
