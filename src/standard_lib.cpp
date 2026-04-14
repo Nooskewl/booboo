@@ -510,18 +510,9 @@ static Variable exprfunc_list_directory(Program *prg, const std::vector<Token> &
 			continue;
 		}
 		bool _is_dir = false;
-#ifdef _WIN32
 		if (PathIsDirectory((path_part + "/" + fn).c_str())) {
 			_is_dir = true;
 		}
-#else
-		struct stat s;
-		if (stat(fn.c_str(), &s) == 0) {
-			if (S_ISDIR(s.st_mode)) {
-				_is_dir = true;
-			}
-		}
-#endif
 		Variable v;
 		v.type = Variable::STRING;
 		v.s = fn;
