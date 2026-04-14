@@ -1586,6 +1586,24 @@ static Variable exprfunc_sample_length(Program *prg, const std::vector<Token> &v
 	return var;
 }
 
+static Variable exprfunc_sample_elapsed(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int id = as_number(prg, v[0]);
+
+	Sample_Instance_Info *info = sample_instance_info(prg);
+
+	INFO_EXISTS(info->instances, id)
+
+	Variable var;
+	var.type = Variable::NUMBER;
+
+	var.n = audio::samples_to_millis(info->instances[id]->offset, info->instances[id]->spec->freq);
+
+	return var;
+}
+
 static bool samplefunc_stop(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -5678,6 +5696,7 @@ void start_lib_game()
 	add_instruction("sample_set_volume", samplefunc_set_volume);
 	add_instruction("sample_seek", samplefunc_seek);
 	add_expression_handler("sample_length", exprfunc_sample_length);
+	add_expression_handler("sample_elapsed", exprfunc_sample_elapsed);
 	add_expression_handler("joy_count", exprfunc_joy_count);
 	add_instruction("rumble", joyfunc_rumble);
 	add_expression_handler("joy_get_button", exprfunc_joy_get_button);
