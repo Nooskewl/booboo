@@ -46,6 +46,7 @@ Uint8 *decode_mp3(SDL_IOStream *file, char *errmsg, SDL_AudioSpec *spec, Uint32 
 	mpg123_handle *m;
 
 	Uint8 *data = nullptr;
+	Uint32 data_count = 0;
 	Uint32 data_sz = 0;
 
 #if MPG123_API_VERSION < 46
@@ -87,18 +88,47 @@ Uint8 *decode_mp3(SDL_IOStream *file, char *errmsg, SDL_AudioSpec *spec, Uint32 
 			spec->channels = channels;
 			spec->freq = rate;
 			//fprintf(stderr, "New format: %li Hz, %i channels, encoding value %i\n", rate, channels, enc);
-			data = new Uint8[mpg123_length(m)*spec->channels*2];
 		}
 
-		memcpy(data+data_sz, out, size);
-		data_sz += size;
+		if (data_count+size > data_sz) {
+			if (data == nullptr) {
+				data_sz = 1024*1000;
+				data = new Uint8[data_sz];
+			}
+			else {
+				Uint8 *d = new Uint8[data_sz*2];
+				memcpy(d, data, data_sz);
+				data_sz *= 2;
+				delete[] data;
+				data = d;
+			}
+		}
+
+		memcpy(data+data_count, out, size);
+		data_count += size;
 
 		outc += size;
 		while(ret != MPG123_ERR && ret != MPG123_NEED_MORE)
 		{ /* Get all decoded audio that is available now before feeding more input. */
 			ret = mpg123_decode(m,NULL,0,out,OUTBUFF,&size);
-			memcpy(data+data_sz, out, size);
-			data_sz += size;
+
+			if (data_count+size > data_sz) {
+				if (data == nullptr) {
+					data_sz = 1024*1000;
+					data = new Uint8[data_sz];
+				}
+				else {
+					Uint8 *d = new Uint8[data_sz*2];
+					memcpy(d, data, data_sz);
+					data_sz *= 2;
+					delete[] data;
+					data = d;
+				}
+			}
+
+			memcpy(data+data_count, out, size);
+			data_count += size;
+
 			outc += size;
 		}
 		if(ret == MPG123_ERR){ /*fprintf(stderr, "some error: %s", mpg123_strerror(m));*/ break; }
