@@ -32,8 +32,8 @@ using namespace noo;
 
 #include <stdio.h>
 
-#define INBUFF  (256 * 1024) /**< input buffer size */
-#define OUTBUFF (INBUFF * 2) /**< output buffer size */
+#define INBUFF  (1 << 16) /**< input buffer size */
+#define OUTBUFF (1 << 17) /**< output buffer size */
 
 Uint8 *decode_mp3(SDL_IOStream *file, char *errmsg, SDL_AudioSpec *spec, Uint32 *sz)
 {
@@ -87,38 +87,18 @@ Uint8 *decode_mp3(SDL_IOStream *file, char *errmsg, SDL_AudioSpec *spec, Uint32 
 			spec->channels = channels;
 			spec->freq = rate;
 			fprintf(stderr, "New format: %li Hz, %i channels, encoding value %i\n", rate, channels, enc);
+			data = new Uint8[mpg123_length(m)*spec->channels*2];
 		}
 
-		if (data == nullptr) {
-			data = new Uint8[size];
-			memcpy(data, out, size);
-			data_sz = size;
-		}
-		else {
-			Uint8 *d = new Uint8[data_sz+size];
-			memcpy(d, data, data_sz);
-			memcpy(d+data_sz, out, size);
-			data_sz += size;
-			delete[] data;
-			data = d;
-		}
+		memcpy(data+data_sz, out, size);
+		data_sz += size;
+
 		outc += size;
 		while(ret != MPG123_ERR && ret != MPG123_NEED_MORE)
 		{ /* Get all decoded audio that is available now before feeding more input. */
 			ret = mpg123_decode(m,NULL,0,out,OUTBUFF,&size);
-		if (data == nullptr) {
-			data = new Uint8[size];
-			memcpy(data, out, size);
-			data_sz = size;
-		}
-		else {
-			Uint8 *d = new Uint8[data_sz+size];
-			memcpy(d, data, data_sz);
-			memcpy(d+data_sz, out, size);
+			memcpy(data+data_sz, out, size);
 			data_sz += size;
-			delete[] data;
-			data = d;
-		}
 			outc += size;
 		}
 		if(ret == MPG123_ERR){ fprintf(stderr, "some error: %s", mpg123_strerror(m)); break; }
