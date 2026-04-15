@@ -9,8 +9,12 @@ var have_music random prefix
 
 var file dir
 = file (file_open "dir.txt" "r")
-= dir (file_read_line file)
-= dir (string_trim dir)
+if (< file 0) def found
+	= dir (string_format "%\\Music" (getenv "USERPROFILE"))
+:def
+	= dir (file_read_line file)
+	= dir (string_trim dir)
+:found
 
 var mp3s mp3_dirs mp3_names
 vector_add mp3s ""
