@@ -1,4 +1,6 @@
-resize 1280 720
+var SCR_W SCR_H
+explode (get_screen_size) SCR_W SCR_H
+resize SCR_W SCR_H
 
 const SEEK 1000
 
@@ -28,9 +30,6 @@ var selected top
 = selected 0
 = top 0
 
-var W H
-explode (get_screen_size) W H
-
 var my_mp3 my_inst curr
 = my_mp3 -1
 = curr -1
@@ -52,7 +51,7 @@ function draw
 		= g 255
 		= b 255
 		if (== selected i) draw_bar
-			filled_rectangle 0 0 255 255 0 0 255 255 0 0 255 255 0 0 255 255 0 y W fh
+			filled_rectangle 0 0 255 255 0 0 255 255 0 0 255 255 0 0 255 255 0 y SCR_W fh
 		:draw_bar
 		if (== i curr) highlight
 			= r 0
@@ -70,7 +69,7 @@ function draw
 		= txt "ENTER: Play  ESCAPE: Skip  SPACE: Stop  LEFT/RIGHT: Seek"
 	:reg_msg
 
-	font_draw font 255 255 0 255 txt (- 1280 (font_width font txt) 10) (- 720 fh 10)
+	font_draw font 255 255 0 255 txt (- SCR_W (font_width font txt) 10) (- SCR_H fh 10)
 }
 
 function event type a b c d
@@ -133,7 +132,7 @@ function event type a b c d
 				call load_font
 			:dec_it
 		:font_dec
-			if (< font_h 64) inc_it
+			if (< font_h 32) inc_it
 				= font_h (+ font_h 1)
 				call load_font
 			:inc_it
@@ -179,6 +178,15 @@ function run
 		:next
 		call play_mp3
 	:go
+
+	var w h
+	explode (get_screen_size) w h
+	if (|| (!= w SCR_W) (!= h SCR_H)) res
+		resize w h
+		= SCR_W w
+		= SCR_H h
+		call load_font
+	:res
 }
 
 function fill_prefix
@@ -271,9 +279,9 @@ function load_font
 	if (!= font -1) destroy
 		font_destroy font
 	:destroy
-	= font (font_load "font.ttf" font_h 1)
+	= font (font_load "c:/Windows/Fonts/arial.ttf" font_h TRUE TRUE)
 	= fh (font_height font)
-	= lines (/ 640 fh)
+	= lines (/ (- SCR_H 75) fh)
 }
 
 function cursor_up
