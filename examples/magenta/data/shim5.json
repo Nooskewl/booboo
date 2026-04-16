@@ -1,7 +1,9 @@
 {
 	"shim": {
 		"gfx": {
-			"linear_filtering": true
+			"linear_filtering": true,
+			"multisampling": true,
+			"aa_samples": 4
 		},
 		"misc": {
 			"window_title": "Magenta",
