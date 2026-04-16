@@ -783,23 +783,6 @@ int main(int argc, char **argv)
 	orig_argc = argc;
 	orig_argv = argv;
 
-	// this must be before static_start which inits SDL
-#ifdef _WIN32
-	bool directsound = util::bool_arg(true, argc, argv, "directsound");
-	bool wasapi = util::bool_arg(false, argc, argv, "wasapi");
-	bool winmm = util::bool_arg(false, argc, argv, "winmm");
-
-	if (directsound) {
-		_putenv_s("SDL_AUDIODRIVER", "directsound");
-	}
-	else if (wasapi) {
-		_putenv_s("SDL_AUDIODRIVER", "wasapi");
-	}
-	else if (winmm) {
-		_putenv_s("SDL_AUDIODRIVER", "winmm");
-	}
-#endif
-
 	shim::window_title = "BooBoo";
 	shim::organisation_name = "Nooskewl";
 	shim::game_name = "BooBoo";
