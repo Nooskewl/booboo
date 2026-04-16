@@ -90,8 +90,8 @@ function draw
 		var p
 		= p (/ elapsed len)
 		line 0 0 0 255 10 (- SCR_H 15) 160 (- SCR_H 15) 2
-		filled_circle 255 255 255 255 (+ 10 (* p 150)) (- SCR_H 15) 4
-		circle 0 0 0 255 (+ 10 (* p 150)) (- SCR_H 15) 4
+		filled_circle 255 255 255 255 (+ 10 (* p 150)) (- SCR_H 15) 5
+		circle 0 0 0 255 (+ 10 (* p 150)) (- SCR_H 15) 5
 	:draw_status
 }
 
