@@ -1,0 +1,12 @@
+{
+	"shim": {
+		"gfx": {
+			"linear_filtering": true
+		},
+		"misc": {
+			"window_title": "Magenta",
+			"organisation_name": "ILLUMINATI NORTH",
+			"game_name": "Magenta"
+		}
+	}
+}

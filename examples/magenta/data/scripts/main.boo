@@ -74,6 +74,17 @@ function draw
 	:reg_msg
 
 	font_draw font 255 255 0 255 txt (- SCR_W (font_width font txt) 10) (- SCR_H fh 10)
+
+	if (!= my_mp3 -1) draw_status
+		var len elapsed
+		= len (sample_length my_mp3)
+		= elapsed (sample_elapsed my_mp3)
+		var p
+		= p (/ elapsed len)
+		line 0 0 0 255 10 (- SCR_H 15) 110 (- SCR_H 15)
+		filled_circle 255 255 255 255 (+ 10 (* p 100)) (- SCR_H 15) 3
+		circle 0 0 0 255 (+ 10 (* p 100)) (- SCR_H 15) 3
+	:draw_status
 }
 
 function event type a b c d
