@@ -46,7 +46,7 @@ function draw
 	clear 128 128 128
 
 	var y
-	= y 10
+	= y 20
 
 	var i
 	for i top (&& (< i size) (< i (+ top lines))) 1 draw_mp3_name
@@ -74,6 +74,14 @@ function draw
 	:reg_msg
 
 	font_draw font 255 255 0 255 txt (- SCR_W (font_width font txt) 10) (- SCR_H fh 10)
+		var y
+		= y (+ (* lines fh) 40)
+		triangle 255 0 255 255 15 (+ y 10) 10 y 20 y 2
+	if (> top 0) draw_up
+		triangle 255 0 255 255 15 1 10 11 20 11 2
+	:draw_up
+	if (< (+ top lines) size) draw_down
+	:draw_down
 
 	if (!= my_mp3 -1) draw_status
 		var len elapsed
@@ -81,9 +89,9 @@ function draw
 		= elapsed (sample_elapsed my_mp3)
 		var p
 		= p (/ elapsed len)
-		line 0 0 0 255 10 (- SCR_H 15) 110 (- SCR_H 15)
-		filled_circle 255 255 255 255 (+ 10 (* p 100)) (- SCR_H 15) 3
-		circle 0 0 0 255 (+ 10 (* p 100)) (- SCR_H 15) 3
+		line 0 0 0 255 10 (- SCR_H 15) 160 (- SCR_H 15) 2
+		filled_circle 255 255 255 255 (+ 10 (* p 150)) (- SCR_H 15) 4
+		circle 0 0 0 255 (+ 10 (* p 150)) (- SCR_H 15) 4
 	:draw_status
 }
 
@@ -296,7 +304,7 @@ function load_font
 	:destroy
 	= font (font_load "c:/Windows/Fonts/arial.ttf" font_h TRUE TRUE)
 	= fh (font_height font)
-	= lines (/ (- SCR_H 75) fh)
+	= lines (/ (- SCR_H 80) fh)
 }
 
 function cursor_up
