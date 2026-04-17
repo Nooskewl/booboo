@@ -59,7 +59,7 @@ function draw
 		= g 255
 		= b 255
 		if (== selected i) draw_bar
-			filled_rectangle 0 0 255 255 0 0 255 255 0 0 255 255 0 0 255 255 0 y (- SCR_W 10) fh
+			filled_rectangle 0 0 255 255 0 0 255 255 0 0 255 255 0 0 255 255 0 y (- SCR_W 30) fh
 		:draw_bar
 		if (== i curr) highlight
 			= r 0
@@ -82,24 +82,24 @@ function draw
 	font_draw font 255 255 0 255 txt (- SCR_W (font_width font txt) 10) (- SCR_H fh 10)
 
 	if (> top 0) draw_up
-		triangle 255 0 255 255 15 (+ 16 fh) 10 (+ 26 fh) 20 (+ 26 fh) 2
+		triangle 255 0 255 255 (- SCR_W 15) (+ 15 fh) (- SCR_W 10) (+ 25 fh) (- SCR_W 20) (+ 25 fh) 2
 	:draw_up
 	if (< (+ top lines) size) draw_down
 		var y
 		= y (+ (* lines fh) 35 fh)
-		triangle 255 0 255 255 15 (+ y 10) 10 y 20 y 2
+		triangle 255 0 255 255 (- SCR_W 15) (+ y 10) (- SCR_W 10) y (- SCR_W 20) y 2
 	:draw_down
 
 	if (< lines size) pos
 		var h
 		= h (* lines fh)
-		line 0 0 0 255 (- SCR_W 5) (+ 30 fh) (- SCR_W 5) (+ h 30 fh) 2
+		line 0 0 0 255 (- SCR_W 15) (+ 30 fh) (- SCR_W 15) (+ h 30 fh) 2
 		var last
 		= last (- size lines)
 		var p
 		= p (/ top last)
-		filled_circle 255 255 255 255 (- SCR_W 5) (+ 35 fh (* p h)) 5
-		circle 0 0 0 255 (- SCR_W 5) (+ 35 fh (* p h)) 5
+		filled_circle 255 255 255 255 (- SCR_W 15) (+ 30 fh (* p h)) 5
+		circle 0 0 0 255 (- SCR_W 15) (+ 30 fh (* p h)) 5
 	:pos
 	
 	if (== searching TRUE) draw_search draw_no_search
@@ -115,8 +115,8 @@ function draw
 			var y
 			= y (- SCR_H 10 (/ fh 2))
 			line 0 0 0 255 10 y 160 y 2
-			filled_circle 255 255 255 255 (+ 10 (* p 150)) y 5
-			circle 0 0 0 255 (+ 10 (* p 150)) y 5
+			filled_circle 255 255 255 255 (+ 10 (* p 149)) y 5
+			circle 0 0 0 255 (+ 10 (* p 149)) y 5
 		:draw_status
 	:draw_no_search
 
