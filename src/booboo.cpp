@@ -2686,10 +2686,10 @@ static bool do_set(Program *prg, const std::vector<Token> &v, bool const_ok)
 	else {
 		Variable v2 = as_variable_resolve(prg, v[1]);
 
-		std::string name = v1->name;
+		//std::string name = v1->name;
 		bool constant = v1->constant;
 		*v1 = v2;
-		v1->name = name;
+		//v1->name = name;
 		v1->constant = constant;
 	}
 
@@ -3312,9 +3312,9 @@ static bool corefunc_explode(Program *prg, const std::vector<Token> &v)
 
 	for (size_t i = 1; i < v.size(); i++) {
 		Variable &v1 = as_variable(prg, v[i]);
-		std::string name = v1.name;
+		//std::string name = v1.name;
 		v1 = vec.v[i-1];
-		v1.name = name;
+		//v1.name = name;
 	}
 
 	return true;
