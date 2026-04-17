@@ -4,34 +4,46 @@ html {
 	color: #aaa;
 	line-height: 1.5;
 }
+body {
+	margin: 0;
+	margin-top: 10px;
+	padding: 0;
+}
 a, a:visited {
-	color: #ff00d8;
+	color: #ffd800;
 	text-decoration: none;
 }
 h1, h2, h3 {
 	padding: 10px;
 	margin-top: 15px;
 	margin-bottom: 15px;
-	background-color: #00d8ff;
-	color: black;
-	border: 2px solid #ff00d8;
+	background-color: black;
+	color: #00d8ff;
+	border: 2px solid #00d8ff;
 }
 h2 {
 	page-break-before: always;
 }
 ::selection {
-	color: white;
-	background-color: #aa00ff;
+	color: black;
+	background-color: #ff00d8;
 }
 #footer {
-	margin-top: 50px;
 	text-align: center;
+	background-color: #ff00d8;
+	color: black;
+	height: 50px;
+}
+#footer p
+{
+	padding-top: 10px;
 }
 #outer {
 	max-width: 100%;
 	width: 1200px;
 	margin-left: auto;
 	margin-right: auto;
+	min-height: calc(100vh - 50);
 }
 .center {
 	text-align: center;
