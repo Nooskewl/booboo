@@ -102,26 +102,23 @@ function draw
 		circle 0 0 0 255 (- SCR_W 15) (+ 30 fh (* p h)) 5
 	:pos
 	
-	if (== searching TRUE) draw_search draw_no_search
-		filled_rectangle 0 0 0 255 0 0 0 255 0 0 0 255 0 0 0 255 30 (- SCR_H 10 fh) (+ (font_width font "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW") 20) fh
-		font_draw font 255 0 255 255 search 40 (- SCR_H 10 fh) FALSE
-	:draw_search
-		if (!= my_mp3 -1) draw_status
-			var len elapsed
-			= len (sample_length my_mp3)
-			= elapsed (sample_elapsed my_mp3)
-			var p
-			= p (/ elapsed len)
-			var y
-			= y (- SCR_H 10 (/ fh 2))
-			line 0 0 0 255 10 y 160 y 2
-			filled_circle 255 255 255 255 (+ 10 (* p 149)) y 5
-			circle 0 0 0 255 (+ 10 (* p 149)) y 5
-		:draw_status
-	:draw_no_search
+	if (!= my_mp3 -1) draw_status
+		var len elapsed
+		= len (sample_length my_mp3)
+		= elapsed (sample_elapsed my_mp3)
+		var p
+		= p (/ elapsed len)
+		var y
+		= y (- SCR_H 10 (/ fh 2))
+		line 0 0 0 255 10 y 160 y 2
+		filled_circle 255 255 255 255 (+ 10 (* p 149)) y 5
+		circle 0 0 0 255 (+ 10 (* p 149)) y 5
+	:draw_status
 
 	var ptxt
-	if (== my_mp3 -1) zzz playing
+	if (== searching TRUE) draw_search (== my_mp3 -1) zzz playing
+		= ptxt (string_format "SEARCH: %" search)
+	:draw_search
 		= ptxt "Zzz..."
 	:zzz
 		= ptxt (string_format "PLAYING: %" [mp3_names curr])
