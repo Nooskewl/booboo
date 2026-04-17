@@ -50,7 +50,7 @@ function draw
 	clear 128 128 128
 
 	var y
-	= y 20
+	= y (+ 30 fh)
 
 	var i
 	for i top (&& (< i size) (< i (+ top lines))) 1 draw_mp3_name
@@ -80,25 +80,26 @@ function draw
 	:reg_msg
 
 	font_draw font 255 255 0 255 txt (- SCR_W (font_width font txt) 10) (- SCR_H fh 10)
-		var y
-		= y (+ (* lines fh) 40)
-		triangle 255 0 255 255 15 (+ y 10) 10 y 20 y 2
+
 	if (> top 0) draw_up
-		triangle 255 0 255 255 15 1 10 11 20 11 2
+		triangle 255 0 255 255 15 (+ 16 fh) 10 (+ 26 fh) 20 (+ 26 fh) 2
 	:draw_up
 	if (< (+ top lines) size) draw_down
+		var y
+		= y (+ (* lines fh) 45 fh)
+		triangle 255 0 255 255 15 (+ y 10) 10 y 20 y 2
 	:draw_down
 
 	if (< lines size) pos
 		var h
 		= h (* lines fh)
-		line 0 0 0 255 (- SCR_W 5) 20 (- SCR_W 5) (+ h 20) 2
+		line 0 0 0 255 (- SCR_W 5) (+ 30 fh) (- SCR_W 5) (+ h 30 fh) 2
 		var last
 		= last (- size lines)
 		var p
 		= p (/ top last)
-		filled_circle 255 255 255 255 (- SCR_W 5) (+ 25 (* p h)) 5
-		circle 0 0 0 255 (- SCR_W 5) (+ 25 (* p h)) 5
+		filled_circle 255 255 255 255 (- SCR_W 5) (+ 35 fh (* p h)) 5
+		circle 0 0 0 255 (- SCR_W 5) (+ 35 fh (* p h)) 5
 	:pos
 	
 	if (== searching TRUE) draw_search draw_no_search
@@ -117,6 +118,15 @@ function draw
 			circle 0 0 0 255 (+ 10 (* p 150)) (- SCR_H 15) 5
 		:draw_status
 	:draw_no_search
+
+	var ptxt
+	if (== my_mp3 -1) zzz playing
+		= ptxt "Zzz..."
+	:zzz
+		= ptxt (string_format "PLAYING: %" [mp3_names curr])
+	:playing
+	filled_rectangle 0 0 0 255 0 0 0 255 0 0 0 255 0 0 0 255 0 10 SCR_W fh
+	font_draw font 255 0 255 255 ptxt 10 10
 }
 
 function event type a b c d
@@ -366,7 +376,7 @@ function load_font
 	:destroy
 	= font (font_load "c:/Windows/Fonts/arial.ttf" font_h TRUE TRUE)
 	= fh (font_height font)
-	= lines (/ (- SCR_H 80) fh)
+	= lines (/ (- SCR_H (+ 60 fh fh)) fh)
 }
 
 function cursor_up
