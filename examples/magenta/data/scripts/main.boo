@@ -86,7 +86,7 @@ function draw
 	:draw_up
 	if (< (+ top lines) size) draw_down
 		var y
-		= y (+ (* lines fh) 45 fh)
+		= y (+ (* lines fh) 35 fh)
 		triangle 255 0 255 255 15 (+ y 10) 10 y 20 y 2
 	:draw_down
 
@@ -103,8 +103,8 @@ function draw
 	:pos
 	
 	if (== searching TRUE) draw_search draw_no_search
-		filled_rectangle 0 0 0 255 0 0 0 255 0 0 0 255 0 0 0 255 30 (- SCR_H 10 fh) 250 fh
-		font_draw font 255 0 255 255 search 35 (- SCR_H 10 fh) FALSE
+		filled_rectangle 0 0 0 255 0 0 0 255 0 0 0 255 0 0 0 255 30 (- SCR_H 10 fh) (+ (font_width font "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW") 20) fh
+		font_draw font 255 0 255 255 search 40 (- SCR_H 10 fh) FALSE
 	:draw_search
 		if (!= my_mp3 -1) draw_status
 			var len elapsed
@@ -112,9 +112,11 @@ function draw
 			= elapsed (sample_elapsed my_mp3)
 			var p
 			= p (/ elapsed len)
-			line 0 0 0 255 10 (- SCR_H 15) 160 (- SCR_H 15) 2
-			filled_circle 255 255 255 255 (+ 10 (* p 150)) (- SCR_H 15) 5
-			circle 0 0 0 255 (+ 10 (* p 150)) (- SCR_H 15) 5
+			var y
+			= y (- SCR_H 10 (/ fh 2))
+			line 0 0 0 255 10 y 160 y 2
+			filled_circle 255 255 255 255 (+ 10 (* p 150)) y 5
+			circle 0 0 0 255 (+ 10 (* p 150)) y 5
 		:draw_status
 	:draw_no_search
 
@@ -244,7 +246,9 @@ function event type a b c d
 			:start_search
 		:not_searching
 	:its_a_key
-		= search (+ search a)
+		if (< (string_length search) 30) add_it
+			= search (+ search a)
+		:add_it
 	:its_text
 }
 
@@ -375,7 +379,7 @@ function load_font
 	:destroy
 	= font (font_load "c:/Windows/Fonts/arial.ttf" font_h TRUE TRUE)
 	= fh (font_height font)
-	= lines (/ (- SCR_H (+ 60 fh fh)) fh)
+	= lines (floor (/ (- SCR_H (+ 60 fh fh)) fh))
 }
 
 function cursor_up
