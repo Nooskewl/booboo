@@ -9,12 +9,12 @@ var have_music random prefix
 
 var file dir
 = file (file_open "dir.txt" "r")
-if (< file 0) def found
+if (< file 0) def user
 	= dir (string_format "%\\Music" (getenv "USERPROFILE"))
 :def
 	= dir (file_read_line file)
 	= dir (string_trim dir)
-:found
+:user
 
 var mp3s mp3_dirs mp3_names
 vector_add mp3s ""
@@ -40,6 +40,10 @@ var my_mp3 my_inst curr
 
 var do_play
 = do_play FALSE
+
+var searching
+var search newtxt
+= searching FALSE
 
 function draw
 {
@@ -67,10 +71,12 @@ function draw
 	:draw_mp3_name
 
 	var txt
-	if (== TRUE [mp3_dirs selected]) dir_msg reg_msg
-		= txt "ENTER: Play  R: Random  ESCAPE: Skip  SPACE: Stop  LEFT/RIGHT: Seek"
+	if (== TRUE searching) stxt (== TRUE [mp3_dirs selected]) dir_msg reg_msg
+		= txt "ENTER: Search  ESCAPE: Done"
+	:stxt
+		= txt "ENTER: Play  R: Random  ESCAPE: Skip  SPACE: Stop  LEFT/RIGHT: Seek  /: Search"
 	:dir_msg
-		= txt "ENTER: Play  ESCAPE: Skip  SPACE: Stop  LEFT/RIGHT: Seek"
+		= txt "ENTER: Play  ESCAPE: Skip  SPACE: Stop  LEFT/RIGHT: Seek  /: Search"
 	:reg_msg
 
 	font_draw font 255 255 0 255 txt (- SCR_W (font_width font txt) 10) (- SCR_H fh 10)
@@ -83,17 +89,6 @@ function draw
 	if (< (+ top lines) size) draw_down
 	:draw_down
 
-	if (!= my_mp3 -1) draw_status
-		var len elapsed
-		= len (sample_length my_mp3)
-		= elapsed (sample_elapsed my_mp3)
-		var p
-		= p (/ elapsed len)
-		line 0 0 0 255 10 (- SCR_H 15) 160 (- SCR_H 15) 2
-		filled_circle 255 255 255 255 (+ 10 (* p 150)) (- SCR_H 15) 5
-		circle 0 0 0 255 (+ 10 (* p 150)) (- SCR_H 15) 5
-	:draw_status
-
 	if (< lines size) pos
 		var h
 		= h (* lines fh)
@@ -105,88 +100,143 @@ function draw
 		filled_circle 255 255 255 255 (- SCR_W 5) (+ 25 (* p h)) 5
 		circle 0 0 0 255 (- SCR_W 5) (+ 25 (* p h)) 5
 	:pos
+	
+	if (== searching TRUE) draw_search draw_no_search
+		filled_rectangle 255 255 255 255 255 255 255 255 255 255 255 255 255 255 255 255 5 (- SCR_H 5 fh) 250 fh
+		rectangle 192 192 192 255 4 (- SCR_H 5 fh 1) 252 (+ fh 2)
+		font_draw font 0 0 0 255 search 10 (- SCR_H 5 fh) FALSE
+	:draw_search
+		if (!= my_mp3 -1) draw_status
+			var len elapsed
+			= len (sample_length my_mp3)
+			= elapsed (sample_elapsed my_mp3)
+			var p
+			= p (/ elapsed len)
+			line 0 0 0 255 10 (- SCR_H 15) 160 (- SCR_H 15) 2
+			filled_circle 255 255 255 255 (+ 10 (* p 150)) (- SCR_H 15) 5
+			circle 0 0 0 255 (+ 10 (* p 150)) (- SCR_H 15) 5
+		:draw_status
+	:draw_no_search
 }
 
 function event type a b c d
 {
-	if (== type EVENT_KEY_DOWN) its_a_key
-		if (== a KEY_UP) dec (== a KEY_DOWN) inc (== a KEY_PAGEUP) pgup (== a KEY_PAGEDOWN) pgdn (== a KEY_HOME) _home (== a KEY_END) _end
-			call cursor_up
-		:dec
-			call cursor_down
-		:inc
-			var i
-			for i 0 (< i lines) 1 nl
+	if (== type EVENT_KEY_DOWN) its_a_key (== type EVENT_TEXT) its_text
+		if (== searching TRUE) am_searching not_searching
+			if (== a KEY_RETURN) do_search check_bs 
+				var i found
+				= found FALSE
+				for i (+ selected 1) (< i size) 1 next_search
+					if (string_matches [mp3_names i] search) go
+						while (< selected i) cd
+							call cursor_down
+						:cd
+						= found TRUE
+						break
+					:go
+				:next_search
+				if (== found FALSE) not_found
+					for i 0 (< i selected) 1 next_search2
+						if (string_matches [mp3_names i] search) go2
+							while (> selected i) cd2
+								call cursor_up
+							:cd2
+						:go2
+					:next_search2
+				:not_found
+			:do_search
+				if (&& (== a KEY_BACKSPACE) (> (string_length search) 0)) its_bs (== a KEY_ESCAPE) cancel_search
+					= search (string_substr search 0 (- (string_length search) 1))
+				:its_bs
+					= searching FALSE
+					end_text_input
+				:cancel_search
+			:check_bs
+		:am_searching
+			if (== a KEY_UP) dec (== a KEY_DOWN) inc (== a KEY_PAGEUP) pgup (== a KEY_PAGEDOWN) pgdn (== a KEY_HOME) _home (== a KEY_END) _end (&& (== a KEY_SPACE) (!= my_mp3 -1)) stop_it (== a KEY_RETURN) play_it (== a KEY_R) rando (== a KEY_MINUS) font_dec (== a KEY_EQUALS) font_inc (&& (!= my_mp3 -1) (== a KEY_LEFT)) seek_left (&& (!= my_mp3 -1) (== a KEY_RIGHT)) seek_right (== a KEY_ESCAPE) skip (&& (== searching FALSE) (== a KEY_SLASH)) start_search
 				call cursor_up
-			:nl
-		:pgup
-			var i
-			for i 0 (< i lines) 1 nl2
+			:dec
 				call cursor_down
-			:nl2
-		:pgdn
-			var i
-			for i 0 (< i size) 1 nl3
-				call cursor_up
-			:nl3
-		:_home
-			var i
-			for i 0 (< i size) 1 nl4
-				call cursor_down
-			:nl4
-		:_end
-		if (&& (== a KEY_SPACE) (!= my_mp3 -1)) stop_it (== a KEY_RETURN) play_it (== a KEY_R) rando (== a KEY_MINUS) font_dec (== a KEY_EQUALS) font_inc
-			sample_stop my_inst
-			= my_mp3 -1
-		:stop_it
-			if (!= my_mp3 -1) stop_it2
-				sample_destroy my_mp3
-			:stop_it2
-			= curr selected
-			if (== TRUE [mp3_dirs selected]) dir file
-				= prefix [mp3_names selected]
-				call next_playlist
-			:dir
-				= prefix ""
-			:file
-			= random FALSE
-			call play_mp3
-		:play_it
-			if (== TRUE [mp3_dirs selected]) ok
-				if (!= my_mp3 -1) stop_it3
+			:inc
+				var i
+				for i 0 (< i lines) 1 nl
+					call cursor_up
+				:nl
+			:pgup
+				var i
+				for i 0 (< i lines) 1 nl2
+					call cursor_down
+				:nl2
+			:pgdn
+				var i
+				for i 0 (< i size) 1 nl3
+					call cursor_up
+				:nl3
+			:_home
+				var i
+				for i 0 (< i size) 1 nl4
+					call cursor_down
+				:nl4
+			:_end
+				sample_stop my_inst
+				= my_mp3 -1
+			:stop_it
+				if (!= my_mp3 -1) stop_it2
 					sample_destroy my_mp3
-				:stop_it3
-				= prefix [mp3_names selected]
-				= random TRUE
-				call rand_track
+				:stop_it2
+				= curr selected
+				if (== TRUE [mp3_dirs selected]) dir file
+					= prefix [mp3_names selected]
+					call next_playlist
+				:dir
+					= prefix ""
+				:file
+				= random FALSE
 				call play_mp3
-			:ok
-		:rando
-			if (> font_h 12) dec_it
-				= font_h (- font_h 1)
-				call load_font
-			:dec_it
-		:font_dec
-			if (< font_h 32) inc_it
-				= font_h (+ font_h 1)
-				call load_font
-			:inc_it
-		:font_inc
-		if (&& (!= my_mp3 -1) (== a KEY_LEFT)) seek_left (&& (!= my_mp3 -1) (== a KEY_RIGHT)) seek_right (== a KEY_ESCAPE) skip
-			var m
-			= m (sample_elapsed my_inst)
-			= m (max 0 (- m SEEK))
-			sample_seek my_inst m
-		:seek_left
-			var len m
-			= len (sample_length my_mp3)
-			= m (sample_elapsed my_inst)
-			= m (min len (+ m SEEK))
-			sample_seek my_inst m
-		:seek_right
-			= do_play TRUE
-		:skip
+			:play_it
+				if (== TRUE [mp3_dirs selected]) ok
+					if (!= my_mp3 -1) stop_it3
+						sample_destroy my_mp3
+					:stop_it3
+					= prefix [mp3_names selected]
+					= random TRUE
+					call rand_track
+					call play_mp3
+				:ok
+			:rando
+				if (> font_h 12) dec_it
+					= font_h (- font_h 1)
+					call load_font
+				:dec_it
+			:font_dec
+				if (< font_h 32) inc_it
+					= font_h (+ font_h 1)
+					call load_font
+				:inc_it
+			:font_inc
+				var m
+				= m (sample_elapsed my_inst)
+				= m (max 0 (- m SEEK))
+				sample_seek my_inst m
+			:seek_left
+				var len m
+				= len (sample_length my_mp3)
+				= m (sample_elapsed my_inst)
+				= m (min len (+ m SEEK))
+				sample_seek my_inst m
+			:seek_right
+				if (!= my_mp3 -1) skip_it
+					= do_play TRUE
+				:skip_it
+			:skip
+				= searching TRUE
+				= search ""
+				start_text_input
+			:start_search
+		:not_searching
 	:its_a_key
+		= search (+ search a)
+	:its_text
 }
 
 function run
