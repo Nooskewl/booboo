@@ -40,10 +40,6 @@ static bool delta_got;
 
 static int exit_key = TGUIK_F12;
 
-Uint64 op_time = 0;
-double ops_sec = 0;
-bool show_ops;
-
 static bool mousefunc_set_relative(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -248,8 +244,6 @@ bool start()
 	
 	util::JSON::Node *root = shim::shim_json->get_root();
 	exit_key = root->get_nested_int("booboo>input>exit_key", &exit_key, TGUIK_F12);
-	show_ops = util::bool_arg(false, shim::argc, shim::argv, "ops");
-	show_ops = root->get_nested_bool("booboo>misc>show_ops", &show_ops, show_ops);
 
 	return true;
 }
@@ -423,33 +417,6 @@ void draw_all()
 
 	gfx::draw_guis();
 	gfx::draw_notifications();
-
-	if (shim::font && show_ops) {
-		Uint64 now = SDL_GetTicks();
-		Uint64 diff = now - op_time;
-		if (diff >= 5000) {
-			ops_sec = num_ops / (diff / 1000.0);
-			num_ops = 0;
-			op_time = now;
-		}
-		std::string d;
-		if (ops_sec > 1000000) {
-			d = util::string_printf("%.2f", ops_sec/1000000) + "m";
-		}
-		else if (ops_sec > 1000) {
-			d = util::string_printf("%.2f", ops_sec/1000) + "k";
-		}
-		else {
-			d = util::string_printf("%.2f", ops_sec);
-		}
-		int w = shim::font->get_text_width(d);
-		for (float y = 0; y < 4; y++) {
-			for (float x = 0; x < 4; x++) {
-				shim::font->draw(shim::white, d, {shim::screen_size.w-w-x, y});
-			}
-		}
-		shim::font->draw(shim::black, d, {(float)(shim::screen_size.w-w-2), 2.0});
-	}
 
 	gfx::set_matrices(_mv, _proj);
 	gfx::update_projection();
@@ -844,21 +811,6 @@ int main(int argc, char **argv)
 	start_lib_standard();
 	start_lib_game();
 
-	int obfuscate_index = util::check_args(argc, argv, "+no-obfuscate");
-	if (obfuscate_index > 0) {
-		std::string filename = std::string(argv[obfuscate_index+1]);
-		std::fstream *f = new std::fstream;
-		f->open(filename, std::fstream::in);
-		std::string s;
-		while (!f->eof()) {
-			(*f) >> s;
-			if (s != "") {
-				booboo::add_special_function(s);
-			}
-		}
-		f->close();
-	}
-
 	add_instruction("mouse_set_relative", mousefunc_set_relative);
 	add_expression_handler("mouse_get_delta", exprfunc_mouse_get_delta);
 	add_expression_handler("mouse_get_position", exprfunc_mouse_get_position);
@@ -941,32 +893,19 @@ again:
 
 	prg = create_program(code);
 
-	bool ob = false;
-	for (int i = 1; i < argc; i++) {
-		if (std::string(argv[i]) == "+obfuscate") {
-			ob = true;
-			break;
-		}
+	register_game_callbacks();
+
+	while (interpret(prg)) {
 	}
 
-	if (ob) {
-		booboo::obfuscate(prg);
+	if (reset_game_name == "") {
+		go();
 	}
-	else {
-		register_game_callbacks();
 
-		while (interpret(prg)) {
-		}
+	std::vector<Token> tmp;
+	call_void_function(prg, "end", tmp);
 
-		if (reset_game_name == "") {
-			go();
-		}
-
-		std::vector<Token> tmp;
-		call_void_function(prg, "end", tmp);
-
-		unregister_game_callbacks();
-	}
+	unregister_game_callbacks();
 
 	shim::current_shader = shim::default_shader;
 	shim::current_shader->use();

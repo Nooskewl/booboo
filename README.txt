@@ -30,16 +30,6 @@ Blender yet.
 
 --
 
-You can obfuscate code with the +obfuscate switch. Examples:
-
-> ./BooBooCLI dragonslayer.boo +obfuscate
-> ./BooBoo town +obfuscate > foo.boo
-
-You can put a list of function names not to obfuscate in a text file
-and add +no-obfuscate <filename> to your command line arguments.
-
---
-
 DLLs can extend BooBoo. Use the BooBoo SDK and create an
 app/dll.txt (or dll.txt for BooBooCLI) with the names of DLLs to
 load separated by a newline.

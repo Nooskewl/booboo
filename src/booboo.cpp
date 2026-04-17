@@ -19,7 +19,6 @@ static std::map<std::string, int> library_map;
 static std::map<char, booboo::token_func> token_map;
 static std::map<std::string, int> expression_map;
 static std::vector<booboo::expression_func> expression_handlers;
-static std::vector<std::string> special_functions;
 
 // First off maybe 10 utility functions taken from Nooskewl Shim
 
@@ -78,7 +77,6 @@ Variable::Variable(const Variable &var)
 {
 	type = var.type;
 	name = var.name;
-	obfuscated = var.obfuscated;
 	constant = var.constant;
 
 	switch (type) {
@@ -118,35 +116,12 @@ Variable::Variable(const Variable &var)
 }
 
 Variable::Variable() :
-	type(UNTYPED),
 	constant(false)
 {
 }
 
 Variable::~Variable()
 {
-}
-
-static bool is_special(std::string func)
-{
-	for (size_t i = 0; i < special_functions.size(); i++) {
-		if (func == special_functions[i]) {
-			return true;
-		}
-	}
-	return false;
-}
-
-static std::string obfuscated_name(Program *prg)
-{
-	while (true) {
-		int r = prg->obfuscated_count++;
-		std::string ob = std::string("__") + util::itos(r);
-		if (prg->variables_map.find(ob) != prg->variables_map.end()) {
-			continue;
-		}
-		return ob;
-	}
 }
 
 static std::string escape_string(std::string s)
@@ -688,7 +663,6 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 	if (name.length() > 0 && name[0] == '(') {
 		Variable v1;
 		v1.name = "__e" + util::itos(expression_i++);
-		//v1.obfuscated = v1.name;
 		v1.type = Variable::EXPRESSION;
 
 		int i = var_i++;
@@ -708,7 +682,6 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 	else if (name.length() > 0 && name[0] == '[') {
 		Variable v1;
 		v1.name = "__f" + util::itos(fish_i++);
-		//v1.obfuscated = v1.name;
 		v1.type = Variable::FISH;
 
 		int i = var_i++;
@@ -796,7 +769,6 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 
 			Variable v1;
 			v1.name = "__e" + util::itos(expression_i++);
-			//v1.obfuscated = v1.name;
 			v1.type = Variable::EXPRESSION;
 
 			if (pass == PASS1) {
@@ -840,7 +812,6 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 
 			Variable v1;
 			v1.name = "__f" + util::itos(fish_i++);
-			//v1.obfuscated = v1.name;
 			v1.type = Variable::FISH;
 
 			if (pass == PASS1) {
@@ -1029,7 +1000,6 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 
 		Variable v;
 		v.name = "__f" + util::itos(fish_i++);
-		//v.obfuscated = v.name;
 		v.type = Variable::FISH;
 
 		if (pass == PASS1) {
@@ -1066,7 +1036,6 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 
 			Variable v;
 			v.name = "__e" + util::itos(expression_i++);
-			//v.obfuscated = v.name;
 			v.type = Variable::EXPRESSION;
 
 			if (pass == PASS1) {
@@ -1156,7 +1125,6 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 
 			Variable v1;
 			v1.name = "__e" + util::itos(expression_i++);
-			//v1.obfuscated = v1.name;
 			v1.type = Variable::EXPRESSION;
 
 			if (pass == PASS1) {
@@ -1195,7 +1163,6 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 
 			Variable v1;
 			v1.name = "__f" + util::itos(fish_i++);
-			//v1.obfuscated = v1.name;
 			v1.type = Variable::FISH;
 
 			if (pass == PASS1) {
@@ -1356,7 +1323,6 @@ static void insert_constant(Program *prg, std::string name, double value, Pass p
 	v.constant = true;
 	char buf[1000];
 	snprintf(buf, 1000, "%f", value);
-	v.obfuscated = buf;
 	if (pass == PASS1) {
 		prg->variables.push_back(v);
 	}
@@ -1376,7 +1342,6 @@ static void insert_pointer(Program *prg, std::string name, Variable *value, Pass
 	v.constant = true;
 	char buf[1000];
 	snprintf(buf, 1000, "%p", value);
-	v.obfuscated = buf;
 	if (pass == PASS1) {
 		prg->variables.push_back(v);
 	}
@@ -1391,7 +1356,6 @@ static void insert_var(Program *prg, std::string name, Pass pass, int &var_i)
 	}
 	Variable v;
 	v.name = name;
-	v.constant = false;
 	if (pass == PASS1) {
 		prg->variables.push_back(v);
 	}
@@ -1763,7 +1727,6 @@ static void compile(Program *prg, Pass pass)
 		Variable v;
 		v.name = name;
 		v.type = Variable::UNTYPED;
-		v.obfuscated = name;
 		if (pass == PASS1) {
 			prg->variables.push_back(v);
 		}
@@ -1784,7 +1747,7 @@ top:
 				backup(prg, func_index, false);
 			}
 
-			std::string nm = is_special(func_name) ? func_name : obfuscated_name(prg);
+			std::string nm = func_name;
 
 			if (pass == PASS1) {
 				prg->orig_function_names.push_back(func_name);
@@ -1795,7 +1758,6 @@ top:
 			v.name = func_name;
 			v.type = Variable::FUNCTION;
 			v.n = func_i++;
-			v.obfuscated = nm;
 			v.constant = true;
 			std::map<std::string, int> tmp;
 			prg->locals.push_back(tmp);
@@ -1837,7 +1799,6 @@ func_top:
 					v.name = tok2;
 					v.type = Variable::LABEL;
 					v.n = func.s->program.size();
-					v.obfuscated = obfuscated_name(prg);
 					v.constant = true;
 
 					Statement s;
@@ -1893,7 +1854,6 @@ func_top:
 						Variable v;
 						v.name = tok2;
 						v.type = Variable::UNTYPED;
-						v.obfuscated = obfuscated_name(prg);
 						v.constant = true;
 						std::map<std::string, int>::iterator it;
 						it = prg->variables_map.find(tok2);
@@ -1920,7 +1880,6 @@ func_top:
 						if (valtok[0] == '(') {
 							Variable v;
 							v.name = "__e" + util::itos(expression_i++);
-							//v.obfuscated = v.name;
 							v.type = Variable::EXPRESSION;
 
 							int var_index = var_i;
@@ -1951,7 +1910,6 @@ func_top:
 						else if (valtok[0] == '[') {
 							Variable v;
 							v.name = "__f" + util::itos(fish_i++);
-							//v.obfuscated = v.name;
 							v.type = Variable::FISH;
 
 							int var_index = var_i;
@@ -2027,7 +1985,6 @@ func_top:
 						Variable v;
 						v.name = tok2;
 						v.type = Variable::UNTYPED;
-						v.obfuscated = obfuscated_name(prg);
 						std::map<std::string, int>::iterator it;
 						it = prg->variables_map.find(tok2);
 						if (it != prg->variables_map.end()) {
@@ -2054,7 +2011,6 @@ func_top:
 				else if (tok[0] == '(') {
 					Variable v;
 					v.name = "__e" + util::itos(expression_i++);
-					//v.obfuscated = v.name;
 					v.type = Variable::EXPRESSION;
 
 					int var_index = var_i;
@@ -2085,7 +2041,6 @@ func_top:
 				else if (tok[0] == '[') {
 					Variable v;
 					v.name = "__f" + util::itos(fish_i++);
-					//v.obfuscated = v.name;
 					v.type = Variable::FISH;
 
 					int var_index = var_i;
@@ -2135,7 +2090,6 @@ func_top:
 						}
 						Variable v;
 						v.name = tok;
-						v.obfuscated = obfuscated_name(prg);
 						if (pass == PASS1) {
 							prg->variables.push_back(v);
 						}
@@ -2205,7 +2159,6 @@ func_top:
 			v.name = tok2;
 			v.type = Variable::LABEL;
 			v.n = prg->s->program.size();
-			v.obfuscated = obfuscated_name(prg);
 			v.constant = true;
 
 			Statement s;
@@ -2256,7 +2209,6 @@ func_top:
 				Variable v;
 				v.name = tok2;
 				v.type = Variable::UNTYPED;
-				v.obfuscated = obfuscated_name(prg);
 				v.constant = true;
 				if (pass == PASS1) {
 					prg->variables.push_back(v);
@@ -2275,7 +2227,6 @@ func_top:
 				if (valtok[0] == '(') {
 					Variable v;
 					v.name = "__e" + util::itos(expression_i++);
-					//v.obfuscated = v.name;
 					v.type = Variable::EXPRESSION;
 
 					int var_index = var_i;
@@ -2304,7 +2255,6 @@ func_top:
 				else if (valtok[0] == '[') {
 					Variable v;
 					v.name = "__f" + util::itos(fish_i++);
-					//v.obfuscated = v.name;
 					v.type = Variable::FISH;
 
 					int var_index = var_i;
@@ -2373,7 +2323,6 @@ func_top:
 				Variable v;
 				v.name = tok2;
 				v.type = Variable::UNTYPED;
-				v.obfuscated = obfuscated_name(prg);
 				if (pass == PASS1) {
 					prg->variables.push_back(v);
 				}
@@ -2392,7 +2341,6 @@ func_top:
 		else if (tok[0] == '(') {
 			Variable v;
 			v.name = "__e" + util::itos(expression_i++);
-			//v.obfuscated = v.name;
 			v.type = Variable::EXPRESSION;
 
 			int var_index = var_i;
@@ -2421,7 +2369,6 @@ func_top:
 		else if (tok[0] == '[') {
 			Variable v;
 			v.name = "__f" + util::itos(fish_i++);
-			//v.obfuscated = v.name;
 			v.type = Variable::FISH;
 
 			int var_index = var_i;
@@ -2491,11 +2438,6 @@ func_top:
 	prg->complete_pass = pass;
 }
 
-void add_special_function(std::string name)
-{
-	special_functions.push_back(name);
-}
-
 void call_function(Program *prg, int function, const std::vector<Token> &params, Variable &result, int ignore_params)
 {
 	bool backup_locals = false;
@@ -2537,9 +2479,7 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 			var = go_fish(prg, prg->variables[param.i].f);
 		}
 		else {
-			//std::string tmp = var.obfuscated;
 			var = prg->variables[param.i];
-			//var.obfuscated = tmp;
 		}
 	}
 
@@ -2570,21 +2510,17 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 			if (prg->variables[param.i].type == Variable::FISH) {
 				Variable &v2 = go_fish(prg, prg->variables[param.i].f);
 				std::string name = v2.name;
-				//std::string obfuscated = v2.obfuscated;
 				bool constant = v2.constant;
 			       	v2 = var;
 				v2.name = name;
-				//v2.obfuscated = obfuscated;
 				v2.constant = constant;
 			}
 			else {
 				Variable &v2 = prg->variables[param.i];
 				std::string name = v2.name;
-				//std::string obfuscated = v2.obfuscated;
 				bool constant = v2.constant;
 				v2 = var;
 				v2.name = name;
-				//v2.obfuscated = obfuscated;
 				v2.constant = constant;
 			}
 		}
@@ -2639,8 +2575,6 @@ bool interpret(Program *prg)
 	if (pc_bak == prg->s->pc) {
 		prg->s->pc++;
 	}
-
-	num_ops++;
 
 	return ret;
 }
@@ -2753,11 +2687,9 @@ static bool do_set(Program *prg, const std::vector<Token> &v, bool const_ok)
 		Variable v2 = as_variable_resolve(prg, v[1]);
 
 		std::string name = v1->name;
-		//std::string obfuscated = v1->obfuscated;
 		bool constant = v1->constant;
 		*v1 = v2;
 		v1->name = name;
-		//v1->obfuscated = obfuscated;
 		v1->constant = constant;
 	}
 
@@ -3381,10 +3313,8 @@ static bool corefunc_explode(Program *prg, const std::vector<Token> &v)
 	for (size_t i = 1; i < v.size(); i++) {
 		Variable &v1 = as_variable(prg, v[i]);
 		std::string name = v1.name;
-		//std::string obfuscated = v1.obfuscated;
 		v1 = vec.v[i-1];
 		v1.name = name;
-		//v1.obfuscated = obfuscated;
 	}
 
 	return true;
@@ -4586,7 +4516,6 @@ void start()
 void end()
 {
 	library_map.clear();
-	special_functions.clear();
 }
 
 Program *create_program(std::string code)
@@ -4618,7 +4547,6 @@ Program *create_program(std::string code)
 	prg->s->p = 0;
 	prg->s->pc = 0;
 	prg->complete_pass = PASS0;
-	prg->obfuscated_count = 0;
 	
 	while(process_includes(prg));
 
@@ -4652,7 +4580,6 @@ Program *create_program(std::string code)
 	prg->s->program.clear();
 	prg->functions.clear();
 	prg->s->line_numbers.clear();
-	prg->obfuscated_count = 0;
 
 	compile(prg, PASS2);
 
@@ -4714,83 +4641,6 @@ void *get_black_box(Program *prg, std::string id)
 void set_black_box(Program *prg, std::string id, void *data)
 {
 	prg->black_box[id] = data;
-}
-
-static void obfuscate_tokens(Program *prg, std::vector<Token> &v);
-
-static void print_fish(Program *prg, Variable &parent, Variable &param)
-{
-	printf("[");
-	if (param.type == Variable::FISH) {
-		print_fish(prg, param, prg->variables[param.f.c_i]);
-	}
-	else {
-		printf("%s ", param.obfuscated.c_str());
-	}
-	obfuscate_tokens(prg, parent.f.v);
-	printf("]");
-}
-
-static void obfuscate_tokens(Program *prg, std::vector<Token> &v)
-{
-	for (size_t j = 0; j < v.size(); j++) {
-		switch (v[j].type) {
-			case Token::NUMBER:
-				printf("%f ", v[j].n);
-				break;
-			case Token::STRING:
-				printf("\"%s\" ", escape_string(v[j].s).c_str());
-				break;
-			case Token::SYMBOL:
-				if (v[j].dereference) {
-					printf("`");
-				}
-				Variable &var = prg->variables[v[j].i];
-				if (var.type == Variable::EXPRESSION) {
-					printf("(%s ", var.e.name.c_str());
-					obfuscate_tokens(prg, var.e.v);
-					printf(")");
-				}
-				else if (var.type == Variable::FISH) {
-					Variable &v2 = prg->variables[var.f.c_i];
-					print_fish(prg, var, v2);
-				}
-				else {
-					printf("%s ", var.obfuscated.c_str());
-				}
-				break;
-		}
-	}
-}
-
-void obfuscate(Program *prg)
-{
-	for (size_t i = 0; i < prg->s->program.size(); i++) {
-		std::string n = prg->s->program[i].name.c_str();
-		printf("%s", n.c_str());
-		if (n != ":") {
-			printf(" ");
-		}
-		obfuscate_tokens(prg, prg->s->program[i].data);
-	}
-	for (size_t i = 0; i < prg->functions.size(); i++) {
-		printf("function %s ", prg->function_names[i].c_str());
-		for (size_t j = 0; j < prg->functions[i].params.size(); j++) {
-			Variable &var = prg->variables[prg->functions[i].params[j]];
-			printf("%s%s ", prg->functions[i].ref[j] ? "~" : "", var.obfuscated.c_str());
-		}
-		printf("{");
-		for (size_t j = 0; j < prg->functions[i].s->program.size(); j++) {
-			std::string n = prg->functions[i].s->program[j].name;
-			printf("%s", n.c_str());
-			if (n != ":") {
-				printf(" ");
-			}
-			obfuscate_tokens(prg, prg->functions[i].s->program[j].data);
-		}
-		printf("}");
-	}
-	printf("\n");
 }
 
 Variable &get_variable(Program *prg, int index)

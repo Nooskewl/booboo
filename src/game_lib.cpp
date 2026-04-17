@@ -5894,14 +5894,6 @@ void start_lib_game()
 	add_instruction("gui_set_transition_types", widgetfunc_gui_set_transition_types);
 	add_instruction("start_text_input", miscfunc_start_text_input);
 	add_instruction("end_text_input", miscfunc_end_text_input);
-
-	add_special_function("end");
-	add_special_function("run");
-	add_special_function("draw");
-	add_special_function("event");
-	add_special_function("gui_event");
-	add_special_function("gui_draw");
-	add_special_function("draw_letterbox");
 }
 
 void end_lib_game()

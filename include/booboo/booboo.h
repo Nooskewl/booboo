@@ -123,8 +123,6 @@ struct Variable
 	Expression e;
 	Fish f;
 
-	std::string obfuscated;
-
 	bool constant;
 
 	BOOBOO_EXPORT bool operator==(const Variable &var) const;
@@ -148,9 +146,6 @@ void BOOBOO_EXPORT end();
 Program BOOBOO_EXPORT *create_program(std::string code);
 void BOOBOO_EXPORT destroy_program(Program *prg);
 bool BOOBOO_EXPORT interpret(Program *prg);
-
-// Special functions are left unobfuscated
-void BOOBOO_EXPORT add_special_function(std::string name);
 
 // Functions calling
 void BOOBOO_EXPORT call_function(Program *prg, int function, const std::vector<Token> &params, Variable &result, int ignore_params = 0);
@@ -191,8 +186,6 @@ Variable BOOBOO_EXPORT as_pointer(Program *prg, const Token &t);
 // The black box allows you to store anything you want
 void BOOBOO_EXPORT *get_black_box(Program *prg, std::string id);
 void BOOBOO_EXPORT set_black_box(Program *prg, std::string id, void *data);
-
-void BOOBOO_EXPORT obfuscate(Program *prg);
 
 // If you have a variable of type SYMBOL then 'i' is the index you pass here to retrive the variable
 Variable BOOBOO_EXPORT &get_variable(Program *prg, int index);

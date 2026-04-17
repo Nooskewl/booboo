@@ -42,7 +42,6 @@ struct Program {
 	bool break_flag;
 	bool continue_flag;
 	Pass complete_pass;
-	int obfuscated_count;
 
 	std::vector<Variable> variables;
 	std::map<std::string, int> variables_map;
@@ -68,8 +67,6 @@ Variable BOOBOO_EXPORT from_glm_mat4(glm::mat4 m);
 extern std::vector<booboo::library_func> library;
 
 extern BOOBOO_EXPORT std::vector<std::string> cli_args;
-
-extern BOOBOO_EXPORT int num_ops;
 
 } // End namespace booboo
 

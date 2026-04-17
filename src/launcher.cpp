@@ -58,21 +58,6 @@ int main(int argc, char **argv)
 	booboo::start();
 	start_lib_standard();
 	
-	int obfuscate_index = util::check_args(argc, argv, "+no-obfuscate");
-	if (obfuscate_index > 0) {
-		std::string filename = std::string(argv[obfuscate_index+1]);
-		std::fstream *f = new std::fstream;
-		f->open(filename, std::fstream::in);
-		std::string s;
-		while (!f->eof()) {
-			(*f) >> s;
-			if (s != "") {
-				booboo::add_special_function(s);
-			}
-		}
-		f->close();
-	}
-
 	std::string dlls = util::load_text_from_filesystem("dll.txt");
 	util::Tokenizer tok(dlls, '\n');
 	std::string dll;
@@ -152,20 +137,7 @@ again:
 
 	booboo::prg = booboo::create_program(code);
 
-	bool ob = false;
-	for (int i = 1; i < argc; i++) {
-		if (std::string(argv[i]) == "+obfuscate") {
-			ob = true;
-			break;
-		}
-	}
-
-	if (ob) {
-		booboo::obfuscate(booboo::prg);
-	}
-	else {
-		while (booboo::interpret(booboo::prg)) {
-		}
+	while (booboo::interpret(booboo::prg)) {
 	}
 
 	standard_lib_destroy_program(booboo::prg);
