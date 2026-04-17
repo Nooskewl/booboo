@@ -116,6 +116,7 @@ Variable::Variable(const Variable &var)
 }
 
 Variable::Variable() :
+	type(UNTYPED),
 	constant(false)
 {
 }

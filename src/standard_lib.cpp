@@ -785,6 +785,27 @@ static Variable exprfunc_string_rtrim(Program *prg, const std::vector<Token> &v)
 	return v1;
 }
 
+static Variable exprfunc_string_find(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable v1;
+       	v1.type = Variable::NUMBER;
+	std::string str = as_string(prg, v[0]);
+	std::string needle = as_string(prg, v[1]);
+
+	size_t pos = str.find(needle);
+
+	if (pos == std::string::npos) {
+		v1.n = -1;
+	}
+	else {
+		v1.n = pos;
+	}
+
+	return v1;
+}
+
 static Variable exprfunc_string_replace(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
@@ -2359,6 +2380,7 @@ void start_lib_standard()
 	add_expression_handler("string_trim", exprfunc_string_trim);
 	add_expression_handler("string_ltrim", exprfunc_string_ltrim);
 	add_expression_handler("string_rtrim", exprfunc_string_rtrim);
+	add_expression_handler("string_find", exprfunc_string_find);
 	add_expression_handler("string_replace", exprfunc_string_replace);
 	add_expression_handler("string_match", exprfunc_string_match);
 	add_expression_handler("string_matches", exprfunc_string_matches);
