@@ -30,20 +30,14 @@ h2 {
 }
 #footer {
 	text-align: center;
-	background-color: #ff00d8;
-	color: black;
-	height: 50px;
-}
-#footer p
-{
-	padding-top: 10px;
+	color: #ff00d8;
+	padding: 10x;
 }
 #outer {
 	max-width: 100%;
 	width: 1200px;
 	margin-left: auto;
 	margin-right: auto;
-	min-height: calc(100vh - 50);
 }
 .center {
 	text-align: center;
