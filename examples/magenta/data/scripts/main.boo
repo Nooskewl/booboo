@@ -55,7 +55,7 @@ function draw
 		= g 255
 		= b 255
 		if (== selected i) draw_bar
-			filled_rectangle 0 0 255 255 0 0 255 255 0 0 255 255 0 0 255 255 0 y SCR_W fh
+			filled_rectangle 0 0 255 255 0 0 255 255 0 0 255 255 0 0 255 255 0 y (- SCR_W 10) fh
 		:draw_bar
 		if (== i curr) highlight
 			= r 0
@@ -93,6 +93,18 @@ function draw
 		filled_circle 255 255 255 255 (+ 10 (* p 150)) (- SCR_H 15) 5
 		circle 0 0 0 255 (+ 10 (* p 150)) (- SCR_H 15) 5
 	:draw_status
+
+	if (< lines size) pos
+		var h
+		= h (* lines fh)
+		line 0 0 0 255 (- SCR_W 5) 20 (- SCR_W 5) (+ h 20) 2
+		var last
+		= last (- size lines)
+		var p
+		= p (/ top last)
+		filled_circle 255 255 255 255 (- SCR_W 5) (+ 25 (* p h)) 5
+		circle 0 0 0 255 (- SCR_W 5) (+ 25 (* p h)) 5
+	:pos
 }
 
 function event type a b c d
