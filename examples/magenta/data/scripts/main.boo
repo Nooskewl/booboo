@@ -72,14 +72,18 @@ function draw
 
 	var txt
 	if (== TRUE searching) stxt (== TRUE [mp3_dirs selected]) dir_msg reg_msg
-		= txt "ENTER: Search  ESCAPE: Done"
+		= txt "(ENTER)Search (ESCAPE)Done"
 	:stxt
-		= txt "ENTER: Play  R: Random  ESCAPE: Skip  SPACE: Stop  LEFT/RIGHT: Seek  /: Search"
+		= txt "(ENTER)Play (R)Random (ESCAPE)Skip (SPACE)Stop (LEFT/RIGHT)Seek (/)Search"
 	:dir_msg
-		= txt "ENTER: Play  ESCAPE: Skip  SPACE: Stop  LEFT/RIGHT: Seek  /: Search"
+		= txt "(ENTER)Play (ESCAPE)Skip (SPACE)Stop (LEFT/RIGHT)Seek (/)Search"
 	:reg_msg
 
-	font_draw font 255 255 0 255 txt (- SCR_W (font_width font txt) 10) (- SCR_H fh 10)
+	var w
+	= w (font_width font txt)
+	filled_rectangle 0 0 0 255 0 0 0 255 0 0 0 255 0 0 0 255 (- SCR_W w 20 10) (- SCR_H fh 15) (+ w 20) (+ fh 10)
+	rectangle 255 0 255 255 (- SCR_W w 28) (- SCR_H fh 13) (+ w 16) (+ fh 6)
+	font_draw font 255 255 0 255 txt (- SCR_W w 20) (- SCR_H fh 10)
 
 	if (> top 0) draw_up
 		triangle 255 0 255 255 (- SCR_W 15) (+ 15 fh) (- SCR_W 10) (+ 25 fh) (- SCR_W 20) (+ 25 fh) 2
@@ -243,7 +247,7 @@ function event type a b c d
 			:start_search
 		:not_searching
 	:its_a_key
-		if (< (string_length search) 30) add_it
+		if (< (string_length search) 50) add_it
 			= search (+ search a)
 		:add_it
 	:its_text
