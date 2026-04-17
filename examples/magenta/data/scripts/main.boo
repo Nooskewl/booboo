@@ -103,9 +103,8 @@ function draw
 	:pos
 	
 	if (== searching TRUE) draw_search draw_no_search
-		filled_rectangle 255 255 255 255 255 255 255 255 255 255 255 255 255 255 255 255 30 (- SCR_H 10 fh) 250 fh
-		rectangle 192 192 192 255 29 (- SCR_H 10 fh 1) 252 (+ fh 2)
-		font_draw font 0 0 0 255 search 35 (- SCR_H 10 fh) FALSE
+		filled_rectangle 0 0 0 255 0 0 0 255 0 0 0 255 0 0 0 255 30 (- SCR_H 10 fh) 250 fh
+		font_draw font 255 0 255 255 search 35 (- SCR_H 10 fh) FALSE
 	:draw_search
 		if (!= my_mp3 -1) draw_status
 			var len elapsed
