@@ -1,0 +1,168 @@
+cmake_minimum_required(VERSION 3.5)
+project("BooBoo")
+
+# Options
+
+option(GAME_LAUNCHER "Build the game launcher" ON)
+option(USE_STATIC_LIBS "Link with static libraries" OFF)
+option(RASPBERRYPI "Build for Raspberry Pi" OFF)
+option(DBG "Debug build" OFF)
+
+set(USER_INCLUDE_PATH "" CACHE FILEPATH "Any extra include directories you want")
+set(USER_LIBRARY_PATH "" CACHE FILEPATH "Any extra library directories you want")
+
+include_directories("include")
+include_directories(${USER_INCLUDE_PATH})
+link_directories(${USER_LIBRARY_PATH})
+
+set(SHIM5_LIB shim5)
+set(TGUI6_LIB tgui6)
+
+# Inputs
+
+set(LIB_SOURCES
+	src/booboo.cpp
+	src/standard_lib.cpp
+)
+
+set(GAME_LIB_SOURCES
+	src/game_lib.cpp
+)
+
+set(CORE_LAUNCHER_SOURCES
+	src/launcher.cpp
+)
+
+set(GAME_LAUNCHER_SOURCES
+	src/game_launcher.cpp
+)
+
+if (MINGW)
+	LIST(APPEND LIB_SOURCES misc/versioninfo_core.rc misc/booboo.manifest)
+	LIST(APPEND GAME_LIB_SOURCES misc/versioninfo_game.rc misc/booboo.manifest)
+	LIST(APPEND CORE_LAUNCHER_SOURCES misc/versioninfo_cli.rc misc/booboo.manifest misc/windows_icons.rc)
+	LIST(APPEND GAME_LAUNCHER_SOURCES misc/versioninfo.rc misc/booboo.manifest misc/windows_icons.rc)
+endif()
+
+# Outputs
+
+add_library("corelibrary" SHARED ${LIB_SOURCES})
+add_executable("corelauncher" ${CORE_LAUNCHER_SOURCES})
+
+if(GAME_LAUNCHER)
+	add_library("gamelibrary" SHARED ${GAME_LIB_SOURCES})
+	add_executable("gamelauncher" ${GAME_LAUNCHER_SOURCES})
+endif()
+
+# Platform specifics
+
+if(MINGW)
+	if (DBG)
+		SET(FLAGS "${FLAGS} -g -fsanitize=address -shared-libasan")
+		SET(LFLAGS "${LFLAGS} -g -fsanitize=address -shared-libasan")
+	endif()
+	if(GAME_LAUNCHER)
+		SET(FLAGS "${FLAGS} -DUSE_TTF -DUSE_PNG")
+	endif()
+	set(LFLAGS_WIN32 "${LFLAGS} -Wl,--subsystem,windows")
+	if(USE_STATIC_LIBS AND GAME_LAUNCHER)
+		set(FLAGS "${FLAGS} -DTGUI6_STATIC -DSHIM5_STATIC")
+	endif()
+	set_target_properties("corelibrary" PROPERTIES COMPILE_FLAGS "${FLAGS} -DBOOBOO_LIB_BUILD")
+	set_target_properties("corelibrary" PROPERTIES LINK_FLAGS "${LFLAGS}")
+	set_target_properties("corelibrary" PROPERTIES OUTPUT_NAME "BooBooCore")
+	set_target_properties("corelauncher" PROPERTIES COMPILE_FLAGS "${FLAGS}")
+	set_target_properties("corelauncher" PROPERTIES LINK_FLAGS "${LFLAGS}")
+	set_target_properties("corelauncher" PROPERTIES OUTPUT_NAME "BooBooCLI")
+
+	if(GAME_LAUNCHER)
+		set_target_properties("gamelibrary" PROPERTIES COMPILE_FLAGS "${FLAGS} -DBOOBOO_GAME_BUILD")
+		set_target_properties("gamelibrary" PROPERTIES LINK_FLAGS "${LFLAGS}")
+		set_target_properties("gamelibrary" PROPERTIES OUTPUT_NAME "BooBooGame")
+		set_target_properties("gamelauncher" PROPERTIES COMPILE_FLAGS "${FLAGS}")
+		set_target_properties("gamelauncher" PROPERTIES LINK_FLAGS "${LFLAGS_WIN32}")
+		set_target_properties("gamelauncher" PROPERTIES OUTPUT_NAME "BooBoo")
+	endif()
+	set(LIBS twinkle ${SHIM5_LIB} ${TGUI6_LIB} mingw32 SDL3 SDL3_ttf png16 vorbis FLAC ogg zlibstatic winmm dbghelp shcore msvcrt imm32 setupapi shlwapi version)
+elseif(WIN32)
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /IGNORE:4075 /IGNORE:4099")
+	SET(FLAGS "${FLAGS} /D_CRT_SECURE_NO_WARNINGS /D_USE_MATH_DEFINES /EHsc /MP /W3 /wd4244 /wd4800 /wd4101 /MT")
+	SET(FLAGS "${FLAGS} /DNTDDI_VERSION=0x06010000 /D_WIN32_WINNT=0x601")
+	SET(FLAGS "${FLAGS} /DUSE_TTF /DUSE_PNG")
+	if(USE_STATIC_LIBS)
+		set(FLAGS "${FLAGS} /DTGUI6_STATIC /DSHIM5_STATIC")
+	endif()
+	#set(FLAGS "${FLAGS} /DUSE_TTF")
+	set_target_properties("gamelauncher" PROPERTIES COMPILE_FLAGS "${FLAGS}")
+	set_target_properties("gamelauncher" PROPERTIES OUTPUT_NAME "BooBoo")
+	set(LIBS ${LIBS} twinkle ${SHIM5_LIB} ${TGUI6_LIB} SDL3 SDL3_ttf libpng16_static ogg libvorbis_static FLAC zlib winmm dbghelp shcore msvcrt)
+
+elseif(APPLE)
+	SET(FLAGS "-Wall -Wno-extern-c-compat -Wno-c++11-narrowing -Wno-overloaded-virtual -DTGUI6_STATIC -DSHIM5_STATIC")
+	set(FLAGS "${FLAGS} -stdlib=libc++ -std=c++11")
+	set_target_properties("gamelauncher" PROPERTIES BUILD_WITH_INSTALL_RPATH on)
+	set_target_properties("gamelauncher" PROPERTIES INSTALL_RPATH "@executable_path/")
+	set_target_properties("gamelauncher" PROPERTIES COMPILE_FLAGS "${FLAGS}")
+	set_target_properties("gamelauncher" PROPERTIES LINK_FLAGS "-framework Cocoa -framework IOKit -framework OpenGL -framework CoreAudio -framework AudioUnit -framework ForceFeedback -framework Carbon")
+	set_target_properties("gamelauncher" PROPERTIES OUTPUT_NAME "BooBoo")
+	set(LIBS ${LIBS} twinkle ${SHIM5_LIB} ${TGUI6_LIB} SDL3 SDL3_ttf z)
+else() # Linux
+	SET(FLAGS "-Wall -Wno-comment -Wno-strict-aliasing -std=c++0x")
+	SET(FLAGS "${FLAGS} -DUSE_TTF -DUSE_PNG")
+	if (RASPBERRYPI)
+		SET(FLAGS "${FLAGS} -DRASPBERRYPI")
+	endif()
+	#set(LFLAGS "-Wl,-rpath,\$ORIGIN")
+	set(CMAKE_C_FLAGS_RELEASE "-O3")
+	set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+	set_target_properties("corelibrary" PROPERTIES COMPILE_FLAGS "${FLAGS}")
+	set_target_properties("corelibrary" PROPERTIES OUTPUT_NAME "BooBooCore")
+	set_target_properties("corelauncher" PROPERTIES COMPILE_FLAGS "${FLAGS}")
+	set_target_properties("corelauncher" PROPERTIES LINK_FLAGS "${LFLAGS}")
+	set_target_properties("corelauncher" PROPERTIES OUTPUT_NAME "BooBooCLI")
+	if(GAME_LAUNCHER)
+		set_target_properties("gamelibrary" PROPERTIES COMPILE_FLAGS "${FLAGS}")
+		set_target_properties("gamelibrary" PROPERTIES OUTPUT_NAME "BooBooGame")
+		set_target_properties("gamelauncher" PROPERTIES COMPILE_FLAGS "${FLAGS}")
+		set_target_properties("gamelauncher" PROPERTIES LINK_FLAGS "${LFLAGS}")
+		set_target_properties("gamelauncher" PROPERTIES OUTPUT_NAME "BooBoo")
+	endif()
+	set(LIBS twinkle ${SHIM5_LIB} ${TGUI6_LIB} SDL3 SDL3_ttf GL Xcursor X11 FLAC vorbis ogg png z)
+endif()
+
+add_custom_command(
+    TARGET "corelibrary"
+    POST_BUILD
+    COMMAND "c:/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/10.0.19041.0/x64/mt.exe" -manifest c:/msys64/home/trent/code/booboo/misc/booboo.manifest -outputresource:"c:/msys64/home/trent/code/booboo/bclang/libBooBooCore.dll"
+    COMMENT "Adding manifest..."
+)
+
+add_custom_command(
+    TARGET "gamelibrary"
+    POST_BUILD
+    COMMAND "c:/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/10.0.19041.0/x64/mt.exe" -manifest c:/msys64/home/trent/code/booboo/misc/booboo.manifest -outputresource:"c:/msys64/home/trent/code/booboo/bclang/libBooBooGame.dll"
+    COMMENT "Adding manifest..."
+)
+
+add_custom_command(
+    TARGET "corelauncher"
+    POST_BUILD
+    COMMAND "c:/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/10.0.19041.0/x64/mt.exe" -manifest c:/msys64/home/trent/code/booboo/misc/booboo.manifest -outputresource:"c:/msys64/home/trent/code/booboo/bclang/BooBooCLI.exe"
+    COMMENT "Adding manifest..."
+)
+
+add_custom_command(
+    TARGET "gamelauncher"
+    POST_BUILD
+    COMMAND "c:/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/10.0.19041.0/x64/mt.exe" -manifest c:/msys64/home/trent/code/booboo/misc/booboo.manifest -outputresource:"c:/msys64/home/trent/code/booboo/bclang/BooBoo.exe"
+    COMMENT "Adding manifest..."
+)
+
+target_link_libraries("corelibrary" ${LIBS})
+target_link_libraries("gamelibrary" corelibrary ${LIBS})
+
+target_link_libraries("corelauncher" corelibrary ${LIBS})
+
+if(GAME_LAUNCHER)
+	target_link_libraries("gamelauncher" gamelibrary corelibrary ${LIBS})
+endif()

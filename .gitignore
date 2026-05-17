@@ -1,0 +1,11 @@
+/build
+/misc/versioninfo.rc.res
+/misc/windows_icons.rc.res
+x64/
+Release/
+Debug/
+.vs/
+BooBoo.vcxproj.user
+/bclang
+*.vcxproj.user
+/b32

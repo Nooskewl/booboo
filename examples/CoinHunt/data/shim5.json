@@ -1,0 +1,9 @@
+{
+	"shim": {
+		"misc": {
+			"window_title": "CoinHunt",
+			"organisation_name": "Nooskewl",
+			"game_name": "CoinHunt"
+		}
+	}
+}

@@ -1,0 +1,17 @@
+@S0 = { kick.flac }
+@S1 = { drop.flac }
+@R0 = { 8 0 500 255 16 }
+
+A t130 @S0 v384
+A o6c16r16c16r16c16r8.c16r8.c16r8.
+A c16r16c16r16c16r16c16r16c16r8.c16r8.
+A r192
+
+B t130 @S1 v16384
+B r2o6c16r8.c16r2...
+B c16r8.
+B r192
+
+C t130 @TYPE3 @R0
+C o6e16f16g16r16e16f16g16r16e16f16g16f16e16r8.
+C g16r8g16r8a16r8.a16r8...r12 @R0

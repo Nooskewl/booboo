@@ -1,0 +1,17 @@
+@S0 = { kick.flac }
+@S1 = { clap.flac }
+@R0 = { 8 0 500 255 16 }
+
+A @S0 v512
+A t150
+A o6c16r16c16r8.c16r16c16r16c16r4r16
+A c16r16c16r8.c16r16c16r16c16r16c16r16c16r16
+
+B @S1 v1024
+B t150
+B r4o6c16r4..c16r4..
+B c16r2r8.
+
+C t150 @R0
+C o5e16f16g16f16g16a16g16a16b16r4..
+C b16<d16e16r4r16e16f16g16a16g16f16g16r16 @R0

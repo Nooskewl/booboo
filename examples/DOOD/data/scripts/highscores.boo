@@ -1,0 +1,228 @@
+clear 0 0 0
+
+var font
+= font (font_load "Horror.ttf" 88 1)
+var small_font
+= small_font (font_load "font.ttf" 40 1)
+
+var highlight
+= highlight -1
+
+var cfg
+= cfg (cfg_load "com.nooskewl.doomed")
+var exists
+= exists (cfg_exists cfg "last_score")
+? exists 0
+jne dont_set_defaults
+cfg_set_number cfg "score0" 5000
+cfg_set_number cfg "score1" 4000
+cfg_set_number cfg "score2" 3000
+cfg_set_number cfg "score3" 2000
+cfg_set_number cfg "score4" 1000
+cfg_set_string cfg "name0" "ILL"
+cfg_set_string cfg "name1" "ILL"
+cfg_set_string cfg "name2" "ILL"
+cfg_set_string cfg "name3" "ILL"
+cfg_set_string cfg "name4" "ILL"
+:dont_set_defaults
+
+var names
+var scores
+var n
+var s
+= n (cfg_get_string cfg "name0")
+vector_add names n
+= n (cfg_get_string cfg "name1")
+vector_add names n
+= n (cfg_get_string cfg "name2")
+vector_add names n
+= n (cfg_get_string cfg "name3")
+vector_add names n
+= n (cfg_get_string cfg "name4")
+vector_add names n
+= s (cfg_get_number cfg "score0")
+vector_add scores s
+= s (cfg_get_number cfg "score1")
+vector_add scores s
+= s (cfg_get_number cfg "score2")
+vector_add scores s
+= s (cfg_get_number cfg "score3")
+vector_add scores s
+= s (cfg_get_number cfg "score4")
+vector_add scores s
+var last_score
+= last_score (cfg_get_number cfg "last_score")
+? last_score 0
+jl no_highlight
+var i
+= i 0
+:next_highlight_check
+var j
+= j i
+var s
+= s [scores j]
+? s last_score
+jne continue_loop
+= highlight j
+goto no_highlight
+:continue_loop
+= i (+ i 1)
+? i 5
+jl next_highlight_check
+:no_highlight
+
+function draw {	
+	var text
+	= text "HIGH SCORES"
+	var tw
+	var th
+	= tw (font_width font text)
+	= th (font_height font)
+	= tw (/ tw 2)
+	var dx
+	var dy
+	= dx (- 320 tw)
+	= dy 50
+	font_draw font 255 255 255 255 text dx dy
+
+	var dy
+	= dy (+ 50 th 20)
+	var w
+	var h
+	= w 360
+	= h 32
+	var rect_x1
+	= rect_x1 (- 320 (/ w 2))
+
+	var i
+	= i 0
+	:draw_next_score2
+	var m
+	= m (% i 2)
+	? m 1
+	jne no_bg2
+	filled_rectangle 64 64 64 255 64 64 64 255 64 64 64 255 64 64 64 255 rect_x1 dy w h
+	:no_bg2
+	var text
+	var sc
+	= text [names i]
+	= sc [scores i]
+	var text2
+	= text2 (string_format "%" sc)
+	var tr
+	var tg
+	var tb
+	? i highlight
+	jne white2
+	= tr 0
+	= tg 255
+	= tb 0
+	goto after_colour2
+	:white2
+	= tr 255
+	= tg 255
+	= tb 255
+	:after_colour2
+	var i_x
+	var i_y
+	var small_h
+	= small_h (font_height small_font)
+	var pad
+	= pad (/ (- h small_h) 2)
+	= small_h (/ small_h 2)
+	= i_x rect_x1
+	= i_x (+ i_x pad)
+	= i_y dy
+	var half
+	= half (/ h 2)
+	= i_y (+ i_y half)
+	= i_y (- i_y small_h)
+	;font_draw small_font tr tg tb 255 text i_x i_y
+	= i_x 360
+	= i_x (+ i_x (/ w 2))
+	= i_x (- i_x pad)
+	var sw
+	= sw (font_width small_font text2)
+	= i_x (- i_x sw)
+	;font_draw small_font tr tg tb 255 text2 i_x i_y
+	= dy (+ dy h)
+	= i (+ i 1)
+	? i 5
+	jl draw_next_score2
+
+	var dy
+	= dy (+ 50 th 20)
+
+	var i
+	= i 0
+	:draw_next_score
+	var m
+	= m (% i 2)
+	? m 1
+	jne no_bg
+	;filled_rectangle 64 64 64 255 64 64 64 255 64 64 64 255 64 64 64 255 rect_x1 dy w h
+	:no_bg
+	var text
+	var sc
+	= text [names i]
+	= sc [scores i]
+	var text2
+	= text2 (string_format "%" sc)
+	var tr
+	var tg
+	var tb
+	? i highlight
+	jne white
+	= tr 0
+	= tg 255
+	= tb 0
+	goto after_colour
+	:white
+	= tr 255
+	= tg 255
+	= tb 255
+	:after_colour
+	var i_x
+	var i_y
+	var small_h
+	= small_h (font_height small_font)
+	var pad
+	= pad (/ (- h small_h) 2)
+	= small_h (/ small_h 2)
+	= i_x rect_x1
+	= i_x (+ i_x pad)
+	= i_y dy
+	var half
+	= half (/ h 2)
+	= i_y (+ i_y half)
+	= i_y (- i_y small_h)
+	font_draw small_font tr tg tb 255 text i_x i_y
+	= i_x 360
+	= i_x (+ i_x 128)
+	= i_x (- i_x pad)
+	var sw
+	= sw (font_width small_font text2)
+	= i_x (- i_x sw)
+	font_draw small_font tr tg tb 255 text2 i_x i_y
+	= dy (+ dy h)
+	= i (+ i 1)
+	? i 5
+	jl draw_next_score
+}
+
+var up
+= up FALSE
+
+function run
+{
+	include "poll_joystick.inc"
+
+	if (&& (== up FALSE) (== joy_a FALSE)) doup (&& (== up TRUE) (== TRUE joy_a)) go
+		= up TRUE
+	:doup
+		cfg_set_number cfg "last_score" -1
+		var success
+		= success (cfg_save cfg "com.nooskewl.doomed")
+		reset "main.boo"
+	:go
+}

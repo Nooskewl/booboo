@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>BooBoo Documentation</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8"> 
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="outer">
+
+<div class="center"><a href="https://nooskewl.com"><img alt="BooBoo logo" src="booboo.png"></a></div>
+
+<div class="box pad">
+<p>Jump to:</p>
+
+<ul>
+<li><a href="BooBoo.html">Core Functionality</a></li>
+<li><a href="Game_Engine.html">Game Engine</a></li>
+<li><a href="Music.html">Music Language</a></li>
+<li><a href="Tutorial.html">Tutorial</a></li>
+</ul>
+</div>
+
+<h1>BooBoo Core Functionality</h1>
+
+<p>
+The following describe the core functions of BooBoo. All of this can be used from the CLI
+version as well as the game engine.
+</p>
+
+<p>Many or most operators/functions support multiple parameters, e.g. (+ 1 2 3 4 5) is 15.</p>
+
+<p>
+Sections:
+</p>
+
+<ul>
+<li><a href="#Core">Core</a></li>
+<li><a href="#Flow">Flow Control</a></li>
+<li><a href="#Strings">Strings</a></li>
+<li><a href="#Math">Math</a></li>
+<li><a href="#Vector">Vectors</a></li>
+<li><a href="#Map">Maps</a></li>
+<li><a href="#Files">Files</a></li>
+<li><a href="#CFG">Configuration Functions</a></li>
+<li><a href="#JSON">JSON Functions</a></li>
+<li><a href="#CPA">CPA Functions</a></li>
+<li><a href="#Audio">Audio Functions</a></li>
+<li><a href="#Other">Other</a></li>
+<li><a href="#Constants">Constants</a></li>
+</ul>
+
+<a id="Core"></a>
+<h2>Core Functions</h2>
+
+<h3>var</h3>
+<pre>
+	declare a variable or variables
+	e.g. var x y z
+</pre>
+
+<h3>const</h3>
+<pre>
+	Declare one or more constants. You must set a value for every constant.
+	e.g. const var1 val1 var2 val2
+</pre>
+	
+<h3>reset</h3>
+<pre>
+	load a different BooBoo script
+	This is seamless and more or less instant. If you start drawing
+	the same thing in the next script, the player may not know the
+	script changed. It's useful for different game modes, menus,
+	high scores etc... state information can be passed between scripts
+	using the configuration API.
+	e.g. reset "next_slide.boo"
+</pre>
+
+<h3>exit</h3>
+<pre>
+	Exit the app with a return code to the environment
+	e.g. exit 0
+</pre>
+
+<h3>return</h3>
+<pre>
+	Return a value from a function
+	e.g. return 1
+	or just return if the function doesn't return a value
+</pre>
+
+<h3>include</h3>
+<pre>
+	Include a BooBoo file at this point in the code
+	e.g. include "my_functions.inc"
+</pre>
+
+<h3>:</h3>
+<pre>
+	Define a label
+	e.g. :jump_here
+</pre>
+
+<h3>;</h3>
+<pre>
+	Define a comment
+	e.g. = x 1 ; assign 1 to x
+</pre>
+
+<h3>/* */</h3>
+<pre>
+	A multiline comment
+	e.g. call foo bar /* foo bar */ baz
+</pre>
+
+<h3>" "</h3>
+<pre>
+	a string
+	e.g. = name "Pelvis Johnson"
+</pre>
+
+<h3>function</h3>
+<pre>
+	define a function
+	References can be defined by prefixing a parameter name by a tilde (~)
+	e.g. function foo param1 param2 ~param3 { ... }
+</pre>
+
+<h3>(typeof)</h3>
+<pre>
+	Returns a string respresentation of the type of the second parameter
+	e.g. = type_string (typeof my_var)
+</pre>
+
+<h3>()</h3>
+<pre>
+	an expression
+	e.g. (+ x (* y (* z w 2))) in C would be x+(y*(z*w*2))
+	Supported operators are: + - * / % &amp;&amp; || &gt; &lt; &gt;= &lt;= == != ! | ^ &amp; &lt;&lt; &gt;&gt;
+	The boolean operators return 1 or 0
+	Your own functions can be supplied as operators
+</pre>
+
+<h3>[]</h3>
+<pre>
+	Vector/map indexing operator
+	e.g. = x [v [m "key"]] in C++ would be x = v[m["key"]]
+	Can be used anywhere a variable is expected.
+	You can use multiple indexes
+	e.g. [v 3 2 1 0] is like v[3][2][1][0] in C.
+</pre>
+
+<h3>#</h3>
+<pre>
+	Start a hexadecimal number
+	e.g. #FF is equivalent to 255
+</pre>
+
+<h3>' '</h3>
+<pre>
+	A character. The character between quotes is turned to a
+	number between 0 and 255.
+	e.g. print "%(c)\n" 'a'
+</pre>
+
+<h3>~</h3>
+<pre>
+	A reference. Function parameters preceded by a ~ can be modified
+	by a function
+	e.g. function foo a b ~c d ~e { ... } ; c and e can be modified
+</pre>
+
+<h3>@</h3>
+<pre>
+	The address operator
+	e.g. = my_pointer (@ my_var)
+	or
+	call foo (@ bar) ; where foo is expecting a pointer
+</pre>
+
+<h3>`</h3>
+<pre>
+	Dereference operator. This is used to get/set the value pointed
+	to by a pointer
+	e.g. = p (@ some_num)
+	e.g. = `p 10 ; some_num is now 10
+</pre>
+
+<h3>(toptr)</h3>
+<pre>
+	You can do some basic "reflection" using toptr to get a pointer
+	to the variable with the name in a string.
+	e.g. var foo
+	e.g. = number 10
+	e.g. var bar
+	e.g. = bar "foo"
+	e.g. = `(toptr bar) 1000 ; foo is now 1000
+	You can use this to script BooBoo with function names/etc in a text file.
+	Returns NULL if the variable isn't found
+</pre>
+
+<h3>=</h3>
+<pre>
+	assign
+	e.g. = x 1
+</pre>
+
+<h3>(number)</h3>
+<pre>
+	Cast to a number
+	e.g. = n (number str)
+</pre>
+
+<h3>(string)</h3>
+<pre>
+	Cast to a string
+	e.g. = str (string num)
+</pre>
+
+<h3>(vector)</h3>
+<pre>
+	Cast to a vector
+	e.g. var foo
+	e.g. = foo (vector foo)
+</pre>
+
+<h3>(map)</h3>
+<pre>
+	Cast to a map
+	e.g. var foo
+	e.g. = foo (map foo)
+</pre>
+
+<h3>(function)</h3>
+<pre>
+	Cast to a function
+	e.g. var foo
+	e.g. = foo (function foo)
+</pre>
+
+<h3>(label)</h3>
+<pre>
+	Cast to a label
+	e.g. var foo
+	e.g. = foo (label foo)
+</pre>
+
+<h3>(pointer)</h3>
+<pre>
+	Cast to a pointer
+	e.g. var foo
+	e.g. = foo (pointer foo)
+</pre>
+
+<a id="Flow"></a>
+<h2>Flow Control</h2>
+
+<h3>goto</h3>
+<pre>
+	jump to a label
+	e.g. goto next_loop
+</pre>
+
+<h3>?</h3>
+<pre>
+	Comparison
+	e.g. ? x 1
+	You can also evaluate an expression
+	? 1 (&amp;&amp; (&gt; a b) (&lt; x y)) je true jne false
+</pre>
+
+<h3>je</h3>
+<pre>
+	Jumps like this one are based on the last comparison. If it was equal,
+	this will jump, if not, it won't
+	e.g. je process_x_equals_1
+</pre>
+
+<h3>jne</h3>
+<pre>
+	Jump if not equal
+	e.g. jne process_x_not_1
+</pre>
+
+<h3>jl</h3>
+<pre>
+	Jump if less
+	e.g. jl my_label
+</pre>
+
+<h3>jle</h3>
+<pre>
+	Jump if less or equal
+	e.g. jle my_label
+</pre>
+
+<h3 style="page-break-before: always;">jg</h3>
+<pre>
+	Jump if greater
+	e.g. jg my_label
+</pre>
+
+<h3>jge</h3>
+<pre>
+	Jump if greater or equal
+	e.g. jge my_label
+</pre>
+
+<h3>call</h3>
+<pre>
+	Call a function that doesn't return anything
+	e.g. call my_func param1 param2 param2
+</pre>
+
+<h3>call_result</h3>
+<pre>
+	Call a function that returns a value
+	e.g. call_result result my_func param1 param2
+</pre>
+
+<h3>if</h3>
+<pre>
+	compare and jump
+	e.g. if (expr1) the_if (expr2) elseif1 (expr3) elseif2 the_else
+		; expr1 true code
+	:the_if
+		; expr2 true code
+	:elseif1
+		; expr3 true code
+	:elseif2
+		; else code
+	:the_else
+
+	the_if elseif1 elseif2 and the_else are labels that are the bottom of
+	their code blocks. The else block is optional. Labels need to be in
+	order of appearance in the if statement or behaviour is undefined.
+</pre>
+
+<h3 style="page-break-before: always;">for</h3>
+<pre>
+	A for loop
+	e.g. for i start (expression) increment end_label
+		; your loop code here
+	:end_label
+	i is initialised to "start" then gets incremented
+	by increment each loop until expression returns
+	FALSE.
+	break and continue work in loops
+</pre>
+
+<h3>while</h3>
+<pre>
+	A while loop
+	break and continue work in loops
+	e.g. while (&lt; i 10) loop /* code here */ :loop
+</pre>
+
+<h3>do_while</h3>
+<pre>
+	A do/while loop
+	The expression is first evaluated after the body is run, despite
+	it being at the top...
+	break and continue work in loops
+	e.g. do_while (&lt; i 10) loop /* code here */ :loop
+</pre>
+
+<a id="Strings"></a>
+<h2>String Functions</h2>
+
+<h3>(string_format)</h3>
+<pre>
+	format strings with replacements
+	e.g. = dest (string_format "I'm % years old" age)
+	printf-equivalent formating options are available with %(...) for
+	example %(3.16g)
+</pre>
+
+<h3>(string_char_at)</h3>
+<pre>
+	Get the value of character at index in a string
+	This function is UTF8 compliant
+	e.g. = dest (string_char_at str index)
+</pre>
+
+<h3>string_set_char_at</h3>
+<pre>
+	Set character at position in string
+	This is UTF8 compliant
+	e.g. string_set_char_at s pos value
+</pre>
+
+<h3>(string_length)</h3>
+<pre>
+	Get the length of a string
+	This function is UTF8 compliant
+	e.g. = dest (string_length str)
+</pre>
+
+<h3>(string_from_number)</h3>
+<pre>
+	Turns the ascii value into a one character length string
+	This function is UTF8 compliant
+	e.g. = str (string_from_number 97) ; creates "a"
+</pre>
+
+<h3 style="page-break-before: always;">(string_substr)</h3>
+<pre>
+	Create a substring of a string
+	e.g. = s (string_substr s start end)
+	End is optional, if not specified it will cut from start till the
+	end of the string.
+	This is UTF8 compliant
+</pre>
+
+<h3>(string_trim)</h3>
+<pre>
+	Trim leading and trailing whitespace from a string
+	The trim functions are UTF8 compliant
+	e.g. = s (string_trim s)
+</pre>
+
+<h3>(string_ltrim)</h3>
+<pre>
+	Trim leading whitespace from a string
+	The trim functions are UTF8 compliant
+	e.g. = s (string_trim s)
+</pre>
+
+<h3>(string_rtrim)</h3>
+<pre>
+	Trim trailing whitespace from a string
+	The trim functions are UTF8 compliant
+	e.g. = s (string_trim s)
+</pre>
+
+<h3>(string_uppercase)</h3>
+<pre>
+	Make a string uppercase
+	e.g. = s (string_uppercase s)
+</pre>
+
+<h3>(string_lowercase)</h3>
+<pre>
+	Make a string lowercase
+	e.g. = s (string_lowercase s)
+</pre>
+
+<h3>(string_replace)</h3>
+<pre>
+	regex replacement
+	Default is case sensitive
+	e.g. = str (string_replace str regex replacement ^ ignore_case)
+</pre>
+
+<h3>(string_match)</h3>
+<pre>
+	Extract sub-strings from a string
+	Default is case sensitive
+	e.g. = out_vector (string_match str regex ^ ignorecase)
+</pre>
+
+<h3>(string_matches)</h3>
+<pre>
+	Check if a string matches a regex
+	Default is case sensitive
+	e.g. = yesno (string_matches str regex ^ ignorecase)
+</pre>
+
+<a id="Math"></a>
+<h2>Math Functions</h2>
+
+<h3>(fmod)</h3>
+<pre>
+	floating point modulus
+	e.g. = x (fmod x 1.5)
+</pre>
+
+<h3>(sin)</h3>
+<pre>
+	trigonometry functions
+	e.g. = n (sin n)
+</pre>
+
+<h3>(cos)</h3>
+<pre>
+	trigonometry functions
+	e.g. = n (cos n)
+</pre>
+
+<h3>(tan)</h3>
+<pre>
+	trigonometry functions
+	e.g. = n (tan n)
+</pre>
+
+<h3>(asin)</h3>
+<pre>
+	trigonometry functions
+	e.g. = n (asin n)
+</pre>
+
+<h3>(acos)</h3>
+<pre>
+	trigonometry functions
+	e.g. = n (acos n)
+</pre>
+
+<h3>(atan)</h3>
+<pre>
+	trigonometry functions
+	e.g. = n (atan n)
+</pre>
+
+<h3>(atan2)</h3>
+<pre>
+	trigonometry functions
+	e.g. = n (atan2 y x)
+</pre>
+
+<h3>(abs)</h3>
+<pre>
+	absolute value
+	e.g. = n (abs value)
+</pre>
+
+<h3>(pow)</h3>
+<pre>
+	exponentiation
+	e.g. = n (pow x 2)
+</pre>
+
+<h3>(sqrt)</h3>
+<pre>
+	square root
+	e.g. = n (sqrt x)
+</pre>
+
+<h3>(hypot)</h3>
+<pre>
+	Calculate hypotenuse of a and b
+	e.g. = n (hypot a b)
+</pre>
+
+<h3>(floor)</h3>
+<pre>
+	Drop the fractional part of a number
+	e.g. = n (floor x)
+</pre>
+
+<h3>(ceil)</h3>
+<pre>
+	Round to the next highest integer
+	e.g. = n (ceil x)
+</pre>
+
+<h3 style="page-break-before: always;">(neg)</h3>
+<pre>
+	Invert the sign of a number
+	e.g. = n (neg x)
+</pre>
+
+<h3>(sign)</h3>
+<pre>
+	Returns the sign of a number
+	e.g. = n (sign x)
+</pre>
+
+<h3>(exp)</h3>
+<pre>
+	Calculate the value of e
+	e.g. = n (exp x)
+</pre>
+
+<h3>(log)</h3>
+<pre>
+	Logarithm function
+	e.g. = n (log x)
+</pre>
+
+<h3>(log10)</h3>
+<pre>
+	Base 10 logarithm
+	e.g. = n (log10 x)
+</pre>
+
+<h3>(min)</h3>
+<pre>
+	Get the minimum number in a list of values
+	e.g. = n (min a b c d e f g)
+</pre>
+
+<h3>(max)</h3>
+<pre>
+	Get the max number in a list of values
+	e.g. = n (max a b)
+</pre>
+
+<h3 style="page-break-before: always;">Vector and matrix math</h3>
+<pre>
+	Some vector and matrix math is available through expression
+	operators. Supported are: mul, identity, scale, rotate,
+	translate, length, dot, angle, cross, normalize, add, sub,
+	inverse, transpose, frustum, perspective, ortho
+	Most of these behave as you'd expect. identity takes 1 argument,
+	the size of the matrix. scale, rotate and translate produce
+	transformation matrices to be multiplied by another matrix
+	(scale and translate take 3 parameters, rotate takes 4.)
+</pre>
+
+<a id="Vector"></a>
+<h2>Vector Functions</h2>
+
+<h3>vector_add</h3>
+<pre>
+	push a value onto a vector
+	e.g. vector_add v 0
+</pre>
+
+<h3>(vector_size)</h3>
+<pre>
+	get the number of elements in a vector
+	e.g. = size (vector_size vec)
+</pre>
+
+<h3>vector_insert</h3>
+<pre>
+	insert a value in any position in a vector
+	e.g. vector_insert v index value
+</pre>
+
+<h3>vector_erase</h3>
+<pre>
+	remove from a vector
+	e.g. vector_erase v index
+</pre>
+
+<h3>vector_clear</h3>
+<pre>
+	empty a vector or vectors
+	e.g. vector_clear v1 v2
+</pre>
+
+<h3>vector_reserve</h3>
+<pre>
+	Allocate space for at least n elements to avoid reallocations
+	e.g. vector_reserve v n
+</pre>
+
+<h3 style="page-break-before: always;">sort</h3>
+<pre>
+	Sort a vector
+	Takes a vector and a comparator function.
+	The comparator function should take 2 arguments and return
+	TRUE if the first is less than the second, otherwise FALSE.
+	e.g. sort vec y_sort
+</pre>
+
+<h3>unique</h3>
+<pre>
+	Remove all non-unique elements from a sorted vector
+	e.g. unique vec
+</pre>
+
+<h3>explode</h3>
+<pre>
+	Assign sequential vector elements to variables
+	e.g. var v
+	e.g. vector_init v 1 2 3 4 5
+	e.g. var a b c
+	e.g. explode v a b c ; 1 2 3 in a b c
+</pre>
+
+<a id="Map"></a>
+<h2>Map Functions</h2>
+
+<h3>map_erase</h3>
+<pre>
+	erase a key/value pair from a map
+	e.g. map_erase m "key"
+</pre>
+
+<h3>map_clear</h3>
+<pre>
+	clear a map or maps
+	e.g. map_clear m
+</pre>
+
+<h3>(map_keys)</h3>
+<pre>
+	Get the names of the keys from a map into a vector of strings
+	e.g. = v (map_keys m)
+</pre>
+
+<a id="Files"></a>
+<h2>File Functions</h2>
+
+<h3>(file_open)</h3>
+<pre>
+	open a file, mode can be either "a" "r" or "w"
+	"a" means append, "w" means write (overwrite)
+	and "r" means read mode.
+	e.g. var f
+	e.g. = f (file_open "out.txt "w")
+	f will be -1 on failure
+</pre>
+
+<h3>(file_open_cpa)</h3>
+<pre>
+	open a file from CPA. These are read only. All file read operations are supported.
+	e.g. = f (file_open_cpa "foo.txt")
+</pre>
+
+<h3>file_close</h3>
+<pre>
+	You should always close files you open with this
+	e.g. file_close f
+</pre>
+
+<h3>(file_read)</h3>
+<pre>
+	Read a word from a file
+	Returns empty string on eof
+	e.g. = s (file_read f)
+</pre>
+
+<h3>(file_read_line)</h3>
+<pre>
+	Read a line from a file
+	Returns empty string (no newline) on eof
+	e.g. = s (file_read_line f)
+</pre>
+
+<h3>(file_read_byte)</h3>
+<pre>
+	Read a byte from a file. Returns a negative number on eof
+	e.g. = n (file_read_byte f)
+</pre>
+
+<h3>file_write_byte</h3>
+<pre>
+	Write a byte to a file
+	e.g. file_write_byte f 255
+</pre>
+
+<h3>file_write</h3>
+<pre>
+	Write a word to a file
+	e.g. file_write f "turkey"
+</pre>
+
+<h3>file_print</h3>
+<pre>
+	Print to a file. Behaves exactly like print but takes a file
+	e.g. file_print f "%(20s)%(20s)%(20s)" x y z
+</pre>
+
+<h3>(file_tell)</h3>
+<pre>
+	Return the current file offset
+	e.g. = o (file_tell f)
+</pre>
+
+<h3>file_seek</h3>
+<pre>
+	Seek within file. Uses SEEK_* constants.
+	e.g. file_seek f 0 SEEK_END
+</pre>
+
+<a id="CFG"></a>
+<h2>Configuration Functions</h2>
+
+<h3>(cfg_load)</h3>
+<pre>
+	load a config file
+	These files are saved in Saved Games\BooBoo along with
+	every BooBoo app, so you should use a domain name or
+	unique name
+	e.g. = cfg (cfg_load "com.nooskewl.example")
+</pre>
+
+<h3>(cfg_save)</h3>
+<pre>
+	save a config file
+	e.g. = success (cfg_save cfg "com.nooskewl.example")
+</pre>
+
+<h3>(cfg_get_number)</h3>
+<pre>
+	read a number from config.
+	e.g. = dest (cfg_get_number cfg "x")
+</pre>
+
+<h3>(cfg_get_string)</h3>
+<pre>
+	read a string from config
+	e.g. = dest (cfg_get_string cfg "name")
+</pre>
+
+<h3>cfg_set_number</h3>
+<pre>
+	set a value to be saved in a config file
+	e.g. cfg_set_number cfg "x" 1
+</pre>
+
+<h3>cfg_set_string</h3>
+<pre>
+	set a string value in a config file
+	e.g. cfg_set_string cfg "name" "Trent"
+</pre>
+
+<h3 style="page-break-before: always;">(cfg_exists)</h3>
+<pre>
+	check if a value exists in a config file
+	e.g. = exists (cfg_exists cfg "x")
+</pre>
+
+<h3>cfg_erase</h3>
+<pre>
+	Erase a value in a config file
+	e.g. cfg_erase cfg "example"
+</pre>
+
+<h3>cfg_destroy</h3>
+<pre>
+	Free a configuration object
+	e.g. cfg_destroy cfg
+</pre>
+
+<a id="JSON"></a>
+<h2>JSON Functions</h2>
+
+<p>You can dig down into the file by separating keys with "&gt;"</p>
+<p>"[0]" "[1]" etc can be used to access arrays.</p>
+<p>You can use NULL to access the shim5.json object.</p>
+
+<h3>(json_load)</h3>
+<pre>
+	Load a JSON file. This loads from CPA unless lffs is TRUE.
+	e.g. = j (json_load "file.json" ^ lffs)
+	Returns -1 on fail
+</pre>
+
+<h3>(json_create)</h3>
+<pre>
+	Create a blank JSON file. Takes a boolean that creates the root
+	as either an array (TRUE) or hash (FALSE)
+	e.g. = j (json_create FALSE)
+	Returns -1 on fail
+</pre>
+
+<h3>(json_exists)</h3>
+<pre>
+	Check if a key exists in a JSON object
+	e.g. = yesno (json_exists json "foo&gt;bar&gt;baz")
+</pre>
+
+<h3>(json_typeof)</h3>
+<pre>
+	Return a string representation of JSON key type
+	e.g. = val (json_typeof json "foo&gt;bar&gt;baz")
+</pre>
+
+<h3>(json_size)</h3>
+<pre>
+	Return the number of children of a JSON key
+	e.g. = n (json_size json "foo&gt;bar&gt;baz")
+</pre>
+
+<h3>(json_get_string)</h3>
+<pre>
+	Read a string from JSON
+	e.g. = s (json_get_string json "settings&gt;profile&gt;name")
+</pre>
+
+<h3>(json_get_number)</h3>
+<pre>
+	Read a number from JSON
+	e.g. = n (json_get_number json "settings&gt;mouse&gt;sensitivity")
+</pre>
+
+<h3>(json_get_bool)</h3>
+<pre>
+	Read a boolean from JSON
+	e.g. = n (json_get_boolean json "settings&gt;gfx&gt;crt_filter")
+</pre>
+
+<h3>json_set_string</h3>
+<pre>
+	Set a string in a JSON object
+	e.g. json_set_string json "foo&gt;bar&gt;baz" "TURNIPS"
+</pre>
+
+<h3>json_set_number</h3>
+<pre>
+	Set a number in a JSON object
+	e.g. json_set_number json "foo&gt;bar&gt;baz" 762.4
+</pre>
+
+<h3>json_set_bool</h3>
+<pre>
+	Set a boolean in a JSON object
+	e.g. json_set_bool json "foo&gt;bar&gt;baz" TRUE
+</pre>
+
+<h3>json_add_array</h3>
+<pre>
+	Add an array element to a json object.
+	e.g. json_add_array json "foo&gt;bar&gt;baz"
+</pre>
+
+<h3>json_add_hash</h3>
+<pre>
+	Add a hash element to a json object.
+	e.g. json_add_array json "foo&gt;bar&gt;baz"
+</pre>
+
+<h3>json_remove</h3>
+<pre>
+	Remove a child from JSON tree
+	e.g. json_remove json "foo&gt;bar&gt;baz"
+</pre>
+
+<h3>(json_save)</h3>
+<pre>
+	Save a json object to json file
+	e.g. = succeeded (json_save json "foo.json")
+</pre>
+
+<h3>json_destroy</h3>
+<pre>
+	Free a JSON object
+	e.g. json_destroy json
+</pre>
+
+<h3>json_register_number</h3>
+<pre>
+	Register a number with DevSettings
+	You can access devsettings by running with +debug and pressing F9
+	A "game&gt;" prefix is added automatically. The optional callback is
+	called with the key's name when the value is changed in devsettings
+	e.g. json_register_number n "foo&gt;baz" readonly ^ callback
+</pre>
+
+<h3>json_register_string</h3>
+<pre>
+	Register a string with DevSettings
+	You can access devsettings by running with +debug and pressing F9
+	A "game&gt;" prefix is added automatically. The optional callback is
+	called with the key's name when the value is changed in devsettings
+	e.g. json_register_string s "foo&gt;baz" readonly ^ callback
+</pre>
+
+<a id="CPA"></a>
+<h2>CPA Functions</h2>
+
+<p>CPAs are extra datafiles with the same structure as data.cpa.</p>
+
+<h3>(cpa_load)</h3>
+<pre>
+	Load a CPA datafile.
+	e.g. = cpa (cpa_load "file.cpa" ^ lffs)
+	Returns -1 on fail
+</pre>
+
+<h3>cpa_set</h3>
+<pre>
+	Change the default CPA file. All functions that load from data/data.cpa will
+	now load from this CPA, until cpa_set_default is called.
+	e.g. cpa_set cpa
+</pre>
+
+<h3>cpa_set_default</h3>
+<pre>
+	Restore the default CPA datafile
+	e.g. cpa_set_default
+</pre>
+
+<h3>(file_list)</h3>
+<pre>
+	Get a list of files in the data/ directory or data.cpa (just the current
+	CPA in the CLI version)
+	e.g. = vec (file_list)
+</pre>
+
+<h3>cpa_destroy</h3>
+<pre>
+	Free a CPA datafile
+	e.g. cpa_destroy cpa
+</pre>
+
+<a id="Audio"></a>
+<h2>Audio Functions</h2>
+
+<p>Supported sample types are wav, ogg and flac. There is an MP3 mod in the SDK.</p>
+
+<p>Since there is no engine loop in the CLI version, audio callbacks are called between statements in that version.</p>
+
+<p>The _load functions load from CPA by default, so in CLI, you'll want to set TRUE for lffs (load from filesystem) unless you have set a CPA with cpa_set.</p>
+
+<h3>(get_audio_properties)</h3>
+<pre>
+	Get device frequency/channels
+	e.g. explode (get_audio_properties) freq channels
+</pre>
+
+<h3>(mml_create)</h3>
+<pre>
+	create an MML from a string. See the Music documentation section.
+	e.g. = dest (mml_create "A @TYPE3 abcdefg")
+	; this plays a b c d e f g 16th notes with a sine wave generator
+	Returns -1 on fail
+</pre>
+
+<h3>(mml_load)</h3>
+<pre>
+	load an MML from file
+	e.g. = dest (mml_load "sfx/blast.mml" ^ lffs)
+	Returns -1 on fail
+</pre>
+
+<h3>mml_set_sample</h3>
+<pre>
+	Use a BooBoo sample as an MML instrument.
+	This should be called immediately after mml_load/mml_create.
+	New samples can be added by using a higher number, otherwise samples will be overwritten.
+	e.g. mml_set_sample mml s_index sample
+</pre>
+
+<h3>(mml_length)</h3>
+<pre>
+	Get the length of an MML in milliseconds
+	e.g. = millis (mml_length mml)
+</pre>
+
+<h3>(mml_play)</h3>
+<pre>
+	play a sound. Returns an instance that can be adjusted
+	e.g. = inst (mml_play blast ^ volume loop pan callback)
+</pre>
+
+<h3>mml_stop</h3>
+<pre>
+	stop an MML instance
+	e.g. mml_stop inst
+</pre>
+
+<h3>mml_set_volume</h3>
+<pre>
+	Set the volume of an MML instance
+	Set a specific track or -1 the default is all tracks
+	e.g. mml_set_volume inst 0.5 ^ track
+</pre>
+
+<h3>mml_set_pan</h3>
+<pre>
+	Set the pan of an MML instance
+	-1: left 0: center 1: right
+	Set a specific track or -1 the default is all tracks
+	e.g. mml_set_pan inst -1 ^ track
+</pre>
+
+<h3>mml_set_tempo</h3>
+<pre>
+	Set the tempo of all tracks of an MML. After this is called,
+	further 't's (in MML syntax) will be ignored
+	Set a specific track or -1 the default is all tracks
+	e.g. mml_set_tempo inst 120 ^ track
+</pre>
+
+<h3>(mml_get_volume)</h3>
+<pre>
+	Get the volume of a track. Track is mandatory. If you're just setting them all
+	at once, just use track 0 here.
+	= vol (mml_get_volume inst track)
+</pre>
+
+<h3>(mml_get_pan)</h3>
+<pre>
+	Get the pan of a track. Track is mandatory. If you're just setting them all
+	at once, just use track 0 here.
+	= pan (mml_get_pan inst track)
+</pre>
+
+<h3>(mml_get_tempo)</h3>
+<pre>
+	Get the tempo of a track. Track is mandatory. If you're just setting them all
+	at once, just use track 0 here.
+	= tempo (mml_get_tempo inst track)
+</pre>
+
+<h3>(mml_elapsed)</h3>
+<pre>
+	Get the elapsed time of a playing MML in milliseconds
+	e.g. = millis (mml_elapsed inst)
+</pre>
+
+<h3>(mml_num_tracks)</h3>
+<pre>
+	Get the number of tracks in an MML file
+	e.g. = tracks (mml_num_tracks mml)
+</pre>
+
+<h3>mml_destroy</h3>
+<pre>
+	Free an MML
+	e.g. mml_destroy mml
+</pre>
+
+<h3>(sample_load)</h3>
+<pre>
+	load a sample
+	e.g. = s (sample_load "example.wav" ^ lffs)
+	Returns -1 on fail
+</pre>
+
+<h3>(sample_create)</h3>
+<pre>
+	Create a sample from vector of sample data
+	The vector contains S16LE (-32767 to 32768) interlaced for each channel
+	e.g. = samp (sample_create vec freq channels)
+</pre>
+
+<h3>sample_play</h3>
+<pre>
+	play a sample. Returns a sample instance that can be adjusted
+	An optional duration can be used otherwise it will playback
+	at normal speed
+	e.g. = inst (sample_play s ^ volume loop pan playtime_millis callback)
+</pre>
+
+<h3>sample_stop</h3>
+<pre>
+	Stop a sample instance
+	e.g. sample_stop inst
+</pre>
+
+<h3>sample_set_volume</h3>
+<pre>
+	Set the volume of a playing sample instance
+	e.g. sample_set_volume inst 0.5
+</pre>
+
+<h3>sample_set_pan</h3>
+<pre>
+	Set the pan of an MML instance
+	-1: left 0: center 1: right
+	e.g. sample_set_pan inst -1
+</pre>
+
+<h3>(sample_length)</h3>
+<pre>
+	Returns the length in milliseconds of a sample
+	e.g. = len (sample_length samp)
+</pre>
+
+<h3>(sample_elapsed)</h3>
+<pre>
+	Get elapsed time of sample in milliseconds
+	e.g. = millis (sample_elapsed samp)
+</pre>
+
+<h3>(sample_get_volume)</h3>
+<pre>
+	Get the volume of a sample instance
+	e.g. = vol (sample_get_volume inst)
+</pre>
+
+<h3>(sample_get_pan)</h3>
+<pre>
+	Get the pan of a sample instance
+	e.g. = pan (sample_get_pan inst)
+</pre>
+
+<h3>sample_seek</h3>
+<pre>
+	Seek to milliseconds position in sample
+	e.g. sample_seek inst 1000
+</pre>
+
+<h3>sample_destroy</h3>
+<pre>
+	Destroy a sample
+	e.g. sample_destroy sample
+</pre>
+
+<a id="Other"></a>
+<h2>Other</h2>
+
+<h3>(rand)</h3>
+<pre>
+	random integers between two numbers inclusive
+	This uses a Mersenne Twister algorithm
+	e.g. = r (rand 0 99)
+</pre>
+
+<h3>srand</h3>
+<pre>
+	Seed the random number generator
+	e.g. srand (time)
+</pre>
+
+<h3>(time)</h3>
+<pre>
+	Return time since epoch in seconds
+	e.g. = t (time)
+</pre>
+
+<h3>print</h3>
+<pre>
+	print a string (like string_format)
+	e.g. print "Hello, I'm % and I like % and %" name like1 like2
+	printf-equivalent formating options are available with %(...) for
+	example %(3.16g)
+</pre>
+
+<h3>(input)</h3>
+<pre>
+	Read a word from stdin
+	e.g. = str (input)
+</pre>
+
+<h3>(getenv)</h3>
+<pre>
+	Get an environment variable
+	e.g. = dest (getenv "HOME")
+</pre>
+
+<h3 style="page-break-before: always;">mkdir</h3>
+<pre>
+	Create a directory
+	e.g. mkdir my_string_path
+</pre>
+
+<h3>(list_directory)</h3>
+<pre>
+	List files and directories in a glob
+	e.g. explode (list_directory "/home/Pelvis/*") filenames is_dir_flags
+</pre>
+
+<h3 style="page-break-before: always;">(get_system_language)</h3>
+<pre>
+	Returns the user interface language of the system
+	e.g. = lang (get_system_language)
+	lang will be in Steam format e.g. "french", "brazilian" etc
+	Currently supported are:
+		arabic
+		bulgarian
+		schinese
+		tchinese
+		czech
+		danish
+		dutch
+		english
+		finnish
+		french
+		german
+		greek
+		hungarian
+		indonesian
+		italian
+		japanese
+		korean
+		norwegian
+		polish
+		portuguese
+		brazilian
+		romanian
+		russian
+		spanish
+		latam
+		swedish
+		thai
+		turkish
+		ukrainian
+		vietnamese
+</pre>
+
+<h3>(list_drives)</h3>
+<pre>
+	Get a list of active drive letters in a vector (e.g. "A", "C", ...)
+	e.g. = v (list_drives)
+</pre>
+
+<h3 style="page-break-before: always;">(get_full_path)</h3>
+<pre>
+	Convert a pathname to a fully qualified pathname
+	e.g. = filename (get_full_path filename)
+</pre>
+
+<h3>(get_args)</h3>
+<pre>
+	Populate a vector with strings of the command line arguments
+	e.g. = v (get_args)
+</pre>
+
+<h3>(get_savedgames_path)</h3>
+<pre>
+	Returns the path to the Saved Games folder
+	e.g. = s (get_savedgames_path)
+</pre>
+
+<h3>inspect</h3>
+<pre>
+	print a value in a popup for debugging
+	e.g. inspect x
+</pre>
+
+<h3>delay</h3>
+<pre>
+	delay an amount of milliseconds
+	e.g. delay 1000
+</pre>
+
+<h3>(get_ticks)</h3>
+<pre>
+	Get milliseconds since BooBoo interpreter launch
+	e.g. = ticks (get_ticks)
+</pre>
+
+<h3>text_fore</h3>
+<pre>
+	Change the text foreground colour. See constants for colours.
+	Each colour has a bright version toggleable by a boolean.
+	e.g. text_fore RED TRUE
+</pre>
+
+<h3>text_back</h3>
+<pre>
+	Change the text background colour. See constants for colours.
+	Each colour has a bright version toggleable by a boolean.
+	e.g. text_back WHITE FALSE
+</pre>
+
+<h3>text_reset</h3>
+<pre>
+	Reset the text colour
+	e.g. text_reset
+</pre>
+
+<h3>text_clear</h3>
+<pre>
+	Clear the screen
+	e.g. text_clear
+</pre>
+
+<h3>text_set_cursor_pos</h3>
+<pre>
+	Set the console cursor position
+	e.g. text_set_cursor_pos 40 12
+</pre>
+
+<h3>(get_console_size)</h3>
+<pre>
+	Get text console dimensions
+	e.g. explode (get_console_size) width height
+</pre>
+
+<h3 style="page-break-before: always;">(getch)</h3>
+<pre>
+	Input a single character from the terminal, not waiting for newline
+	e.g. = input_number (getch)
+</pre>
+
+<h3>(kbhit)</h3>
+<pre>
+	Allows non-blocking use of getch. Returns nonzero if a key awaits in the buffer else FALSE.
+	e.g. :loop
+	e.g. call redraw_ascii_anim
+	e.g. ? FALSE (kbhit)
+	e.g. je loop
+	e.g. = key (getch)
+	; Note, while/for loops are considered one instruction, so audio callbacks won't be
+	; received unless you use jumps like above (because audio callbacks are called between
+	; instructions...) This is referencing callbacks passed to sample_play etc. If you're
+	; not using them, audio will play just fine if you use a while loop here.
+</pre>
+
+<a id="Constants"></a>
+<h2>Constants</h2>
+
+<ul>
+	<li>TRUE - 1</li>
+	<li>FALSE - 0</li>
+	<li>PI - it's pi</li>
+	<li>E - It's e</li>
+	<li>NULL - a NULL pointer</li>
+</ul>
+
+<p>VOID is a generic non-constant variable you can use for example to ignore returns values from expression handlers:</p>
+<pre>
+	= VOID (sample_play samp)
+</pre>
+
+<p>
+These are used with text_fore/text_back:
+</p>
+
+<ul>
+	<li>BLACK</li>
+	<li>BLUE</li>
+	<li>GREEN</li>
+	<li>CYAN</li>
+	<li>RED</li>
+	<li>PURPLE</li>
+	<li>YELLOW</li>
+	<li>WHITE</li>
+</ul>
+
+<p>Used with file_seek:</p>
+
+<ul>
+	<li>SEEK_SET</li>
+	<li>SEEK_CUR</li>
+	<li>SEEK_END</li>
+</ul>
+
+</div>
+
+<div id="footer">
+	<p>&copy; 2026 Nooskewl</p>
+</div>
+</body>
+</html>

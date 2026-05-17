@@ -1,0 +1,10 @@
+{
+	"shim": {
+		"gfx": {
+			"linear_filtering": true
+		},
+		"misc": {
+			"window_title": "BooBoo Launcher",
+		}
+	}
+}
