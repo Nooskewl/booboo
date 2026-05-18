@@ -808,7 +808,7 @@ function draw
 			= el 1
 		:eq1
 		= el (* (- 1 el) 255)
-		image_draw_rotated_scaled exhaust_img el el el el (- ex_w (/ ex_h 2)) (/ ex_h 2) (- [ex 0] ox) (+ (- [ex 1] oy) 16) [ex 2] 1 1
+		image_draw_rotated_scaled exhaust_img el el el el (- ex_w (/ ex_h 2)) (/ ex_h 2) (- [ex 0] ox) (+ (- [ex 1] oy) 16) (+ [ex 2] PI) 1 1
 	:next_ex
 	
 	; Draw explosions
@@ -1160,13 +1160,13 @@ function run
 		:negit
 		var f2
 		= f2 (rand 0 1000)
-		= f2 (* (/ f2 1000) 0.4 f)
+		= f2 (* (/ f2 1000) 0.30 f)
 
 		var inv
 		= inv (+ (- real_a PI) f2)
 		var ex ex_x ex_y
-		= ex_x (+ pos_x (* (cos inv) 15))
-		= ex_y (+ pos_y (* (sin inv) 15))
+		= ex_x (+ pos_x (* (cos inv) 10))
+		= ex_y (+ pos_y (* (sin inv) 10))
 		vector_add ex ex_x
 		vector_add ex ex_y
 		vector_add ex inv
@@ -1174,7 +1174,7 @@ function run
 		var f
 		= f (rand 0 1000)
 		= f (/ f 1000)
-		= f (+ (* f 0.15) 0.15)
+		= f (+ (* f 0.1) 0.1)
 		vector_add ex f
 		vector_add exhaust ex
 	:add_another_ex
