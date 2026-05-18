@@ -716,6 +716,16 @@ function draw
 
 	image_stretch_region moon2_img 255 255 255 255 0 0 m2_w m2_h (- 100 ox) (- 200 oy) (* m2_w 4) (* m2_h 4)
 	image_stretch_region moon1_img 255 255 255 255 0 0 m1_w m1_h (- 450 ox) (- 300 oy) (* m1_w 4) (* m1_h 4)
+	
+	call draw_bloom orig_buf 10
+
+	set_target_backbuffer
+
+	image_stretch_region [bloombufs bbidx] 255 255 255 255 0 16 SCR_W (- SCR_H 16) 0 16 SCR_W (- SCR_H 16)
+	image_stretch_region orig_buf 255 255 255 255 0 16 SCR_W (- SCR_H 16) 0 16 SCR_W (- SCR_H 16)
+
+	set_target orig_buf
+	clear 0 0 0 0
 
 	; Draw coins
 
@@ -917,7 +927,7 @@ function draw
 
 	end_primitives
 
-	call draw_bloom orig_buf 3
+	call draw_bloom orig_buf 5
 
 	set_target_backbuffer
 
