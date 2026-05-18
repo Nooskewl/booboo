@@ -1,3 +1,5 @@
+include "bloom.inc"
+
 function zero_padded_string_from_number n
 {
 	var s
@@ -88,6 +90,9 @@ jl next_highlight_check
 
 function draw
 {	
+	set_target orig_buf
+	clear 0 0 0 0	
+
 	var text
 	= text "High Scores"
 	var tw
@@ -255,6 +260,13 @@ function draw
 	= i (+ i 1)
 	? i 5
 	jl draw_next_score
+	
+	call draw_bloom orig_buf BLOOMS
+
+	set_target_backbuffer
+
+	image_draw [bloombufs bbidx] 255 255 255 255 0 0
+	image_draw orig_buf 255 255 255 255 0 0
 }
 
 var up

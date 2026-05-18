@@ -1,3 +1,5 @@
+include "bloom.inc"
+
 var font
 = font (font_load "FragileBombers.ttf" 92 1)
 var small_font
@@ -122,6 +124,9 @@ function write_scores name
 
 function draw
 {
+	set_target orig_buf
+	clear 0 0 0 0	
+
 	var text
 	= text "High Score"
 	var tw
@@ -178,6 +183,13 @@ function draw
 	font_draw small_font 255 216 0 255 curr dx2 dy
 
 :done_draw_initials
+	
+	call draw_bloom orig_buf BLOOMS
+
+	set_target_backbuffer
+
+	image_draw [bloombufs bbidx] 255 255 255 255 0 0
+	image_draw orig_buf 255 255 255 255 0 0
 }
 
 function run

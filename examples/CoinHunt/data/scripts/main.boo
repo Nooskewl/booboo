@@ -1,3 +1,5 @@
+include "bloom.inc"
+
 var music
 = music (mml_load "music/menu.mml")
 = VOID (mml_play music 0.5 1)
@@ -24,6 +26,9 @@ var old_joy_d
 
 function draw
 {
+	set_target orig_buf
+	clear 0 0 0 0	
+
 	var logo_w logo_h
 	explode (image_size logo) logo_w logo_h
 	image_draw logo 255 255 255 255 (- 320 (/ logo_w 2)) 50
@@ -78,6 +83,13 @@ function draw
 	= dx (- 320 tw2)
 	= dy (+ dy h)
 	font_draw small_font r2 g2 b2 255 text dx dy
+	
+	call draw_bloom orig_buf BLOOMS
+
+	set_target_backbuffer
+
+	image_draw [bloombufs bbidx] 255 255 255 255 0 0
+	image_draw orig_buf 255 255 255 255 0 0
 }
 
 function run
