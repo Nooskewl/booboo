@@ -8,7 +8,7 @@ varying vec2 texcoord;
 
 void main()
 {
-	int kernel = 5;
+	int kernel = 7;
 	float span = float(kernel - 1);
 
 	float onex = 1.0 / float(tex_w);

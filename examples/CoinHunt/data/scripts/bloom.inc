@@ -1,6 +1,6 @@
 var bloom
 = bloom (shader_load "" "bloom")
-const BLOOMS 8
+const BLOOMS 2
 
 var SCR_W SCR_H
 explode (get_buffer_size) SCR_W SCR_H
