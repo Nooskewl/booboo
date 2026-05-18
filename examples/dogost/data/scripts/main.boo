@@ -28,8 +28,9 @@ var selected
 var W H
 explode (get_screen_size) W H
 
-var my_mml
+var my_mml my_inst
 = my_mml -1
+= my_inst -1
 
 function draw
 {
@@ -64,14 +65,16 @@ function event type a b c d
 			= selected (+ selected 1)
 		:inc
 		if (&& (== a KEY_SPACE) (!= my_mml -1)) stop_it (== a KEY_RETURN) play_it
-			mml_stop my_mml
+			mml_stop my_inst
+			mml_destroy my_mml
 			= my_mml -1
+			= my_inst -1
 		:stop_it
 			if (!= my_mml -1) stop_it2
 				mml_stop my_mml
 			:stop_it2
 			= my_mml (mml_load [mmls selected])
-			= VOID (mml_play my_mml 1.0 TRUE)
+			= my_inst (mml_play my_mml 1.0 TRUE)
 		:play_it
 	:its_a_key
 }

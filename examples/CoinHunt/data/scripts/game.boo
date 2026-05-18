@@ -29,6 +29,10 @@ var shot_coin_sfx
 = shot_coin_sfx (mml_load "sfx/shot_coin.mml")
 var count_sfx
 = count_sfx (mml_create "A a32")
+var thrust_sfx
+= thrust_sfx (mml_load "sfx/thrust.mml")
+var thrust_inst
+= thrust_inst -1
 var small_font
 var big_font
 = small_font (font_load "font.ttf" 20 TRUE)
@@ -90,6 +94,9 @@ var NUM_COINS
 var NUM_ENEMIES
 = NUM_ENEMIES 32
 const STARS_PER_SCREEN 32
+
+var old_a
+= old_a FALSE
 
 call start_game
 
@@ -941,6 +948,11 @@ function write_config score
 
 function run
 {
+	if (== dead TRUE) stop_thrust
+		mml_stop thrust_inst
+		= thrust_inst -1
+	:stop_thrust
+
 	? killed_all 1
 	jne no_win
 	? got_coins 1
@@ -1098,6 +1110,17 @@ function run
 	; Do thrust
 
 :do_thrust
+
+	if (&& (== old_a FALSE) (== joy_a TRUE)) start_th (&& (== old_a TRUE) (== joy_a FALSE)) stop_th
+		if (== thrust_inst -1) loopit
+			= thrust_inst (mml_play thrust_sfx 1 TRUE)
+		:loopit
+	:start_th
+		mml_stop thrust_inst
+		= thrust_inst -1
+	:stop_th
+	= old_a joy_a
+
 	call calc_real_a
 
 	= ship_acc 0
