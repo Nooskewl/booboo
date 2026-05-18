@@ -1,5 +1,6 @@
 var bloom
 = bloom (shader_load "" "bloom")
+const BLOOMS 8
 
 var SCR_W SCR_H
 explode (get_buffer_size) SCR_W SCR_H
@@ -604,6 +605,9 @@ function draw_time
 
 function draw_bloom img loops
 {
+	if (< loops 1) ret
+		return
+	:ret
 	set_target [bloombufs bbidx]
 	clear 0 0 0 0
 	shader_use bloom
@@ -712,7 +716,7 @@ function draw
 	image_stretch_region moon2_img 255 255 255 255 0 0 m2_w m2_h (- 100 ox) (- 200 oy) (* m2_w 4) (* m2_h 4)
 	image_stretch_region moon1_img 255 255 255 255 0 0 m1_w m1_h (- 450 ox) (- 300 oy) (* m1_w 4) (* m1_h 4)
 	
-	call draw_bloom orig_buf 5
+	call draw_bloom orig_buf BLOOMS
 
 	set_target_backbuffer
 
@@ -922,7 +926,7 @@ function draw
 
 	end_primitives
 
-	call draw_bloom orig_buf 5
+	call draw_bloom orig_buf BLOOMS
 
 	set_target_backbuffer
 
