@@ -9,23 +9,32 @@ varying vec2 texcoord;
 void main()
 {
 	int kernel = 5;
+	float span = float(kernel - 1);
 
-	float f = 1.0 / (float(kernel - 1) * 2.0 + 1.0);
-	vec4 result = texture2D(tex, texcoord) * f;
-	if (horizontal) {
-		float onex = 1.0 / float(tex_w);
-		for (int i = 1; i < kernel; i++) {
-			result += texture2D(tex, texcoord + vec2(onex*i, 0.0)) * f;
-			result += texture2D(tex, texcoord - vec2(onex*i, 0.0)) * f;
-		}
+	float onex = 1.0 / float(tex_w);
+	float oney = 1.0 / float(tex_h);
+
+	vec4 result = texture2D(tex, texcoord);
+	if (texcoord.x < (onex*span) || texcoord.y < (oney*span) || texcoord.x > 1.0-(onex*span) || texcoord.y > 1.0-(oney*span)) {
+		gl_FragColor = result;
 	}
 	else {
-		float oney = 1.0 / float(tex_h);
-		for (int i = 1; i < kernel; i++) {
-			result += texture2D(tex, texcoord + vec2(0.0, oney*i)) * f;
-			result += texture2D(tex, texcoord - vec2(0.0, oney*i)) * f;
-		}
-	}
+		float f = 1.0 / (float(kernel - 1) * 2.0 + 1.0);
+		result = result * f;
 
-	gl_FragColor = result;
+		if (horizontal) {
+			for (int i = 1; i < kernel; i++) {
+				result += texture2D(tex, texcoord + vec2(onex*i, 0.0)) * f;
+				result += texture2D(tex, texcoord - vec2(onex*i, 0.0)) * f;
+			}
+		}
+		else {
+			for (int i = 1; i < kernel; i++) {
+				result += texture2D(tex, texcoord + vec2(0.0, oney*i)) * f;
+				result += texture2D(tex, texcoord - vec2(0.0, oney*i)) * f;
+			}
+		}
+
+		gl_FragColor = result;
+	}
 }
