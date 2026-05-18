@@ -17,6 +17,8 @@ var saturn_img
 var moon1_img moon2_img
 = moon1_img (image_load "misc/moon1.png")
 = moon2_img (image_load "misc/moon2.png")
+var exhaust_img
+= exhaust_img (image_load "misc/exhaust.png")
 var coin_sfx
 = coin_sfx (mml_load "sfx/coin.mml")
 var hit_sfx
@@ -66,6 +68,7 @@ var coins
 var enemies
 var bullets
 var explosions
+var exhaust
 
 var got_coins_ticks
 = got_coins_ticks 0
@@ -766,6 +769,24 @@ function draw
 	image_draw_rotated_scaled ship_img 255 255 255 255 8 8 xx yy ship_a 1 1 0 0
 
 :skip_draw_player
+
+	; Draw exhaust
+
+	var ex_w ex_h
+	explode (image_size exhaust_img) ex_w ex_h
+
+	var i
+	for i 0 (< i (vector_size exhaust)) 1 next_ex
+		var ex
+		= ex [exhaust i]
+		var el
+		= el (/ [ex 3] 25)
+		if (> el 1) eq1
+			= el 1
+		:eq1
+		= el (* (- 1 el) 255)
+		image_draw_rotated_scaled exhaust_img el el el el (- ex_w (/ ex_h 2)) (/ ex_h 2) (- [ex 0] ox) (+ (- [ex 1] oy) 16) [ex 2] 1 1
+	:next_ex
 	
 	; Draw explosions
 
@@ -982,6 +1003,37 @@ function run
 
 :no_tick
 
+	; Move exhaust
+	var i
+	= i 0
+	var sz
+	= sz (vector_size exhaust)
+	if (<= sz 0) skip_exhaust
+		goto no_exhaust
+	:skip_exhaust
+:next_ex
+	var ex
+	= ex [exhaust i]
+	var ex_x ex_y ex_a ex_l es
+	explode ex ex_x ex_y ex_a ex_l es
+	= ex_x (+ ex_x (* (cos ex_a) es))
+	= ex_y (+ ex_y (* (sin ex_a) es))
+	= ex_l (+ ex_l 1)
+	? ex_l 25
+	jle skip_ex
+	vector_erase exhaust i
+	= i (- i 1)
+	goto bak_ex
+:skip_ex
+	= [exhaust i 0] ex_x
+	= [exhaust i 1] ex_y
+	= [exhaust i 3] ex_l
+:bak_ex
+	= i (+ i 1)
+	? i (vector_size exhaust)
+	jl next_ex
+:no_exhaust
+
 	? dead 1
 	je skip_player_movement
 	
@@ -1046,13 +1098,42 @@ function run
 	; Do thrust
 
 :do_thrust
+	call calc_real_a
+
 	= ship_acc 0
 	? joy_a 0
 	je done_thrust
 	= ship_acc 0.1
-:done_thrust
 
-	call calc_real_a
+	var i
+	for i 0 (< i 2) 1 add_another_ex
+		var f
+		= f (rand 0 1)
+		if (== 0 f) negit
+			= f -1
+		:negit
+		var f2
+		= f2 (rand 0 1000)
+		= f2 (* (/ f2 1000) 0.25 f)
+
+		var inv
+		= inv (+ (- real_a PI) f2)
+		var ex ex_x ex_y
+		= ex_x (+ pos_x (* (cos inv) 12))
+		= ex_y (+ pos_y (* (sin inv) 12))
+		vector_add ex ex_x
+		vector_add ex ex_y
+		vector_add ex inv
+		vector_add ex 0
+		var f
+		= f (rand 0 1000)
+		= f (/ f 1000)
+		= f (+ (* f 0.125) 0.125)
+		vector_add ex f
+		vector_add exhaust ex
+	:add_another_ex
+
+:done_thrust
 
 	var f
 
