@@ -604,15 +604,12 @@ function draw_time
 
 function draw_bloom img loops
 {
-	var kernel
-	= kernel 3
 	set_target [bloombufs bbidx]
 	clear 0 0 0 0
 	shader_use bloom
 	shader_set_int bloom "tex_w" SCR_W
 	shader_set_int bloom "tex_h" SCR_H
 	shader_set_bool bloom "horizontal" TRUE
-	shader_set_int bloom "kernel" kernel
 	image_draw img 255 255 255 255 0 0
 	var old
 	= old bbidx
@@ -627,9 +624,7 @@ function draw_bloom img loops
 
 	var i
 	for i 0 (< i (- loops 1)) 1 loop
-		= kernel (+ kernel 1)
 		shader_set_bool bloom "horizontal" TRUE
-		shader_set_int bloom "kernel" kernel
 		var old
 		= old bbidx
 		= bbidx (+ bbidx 1)
@@ -717,7 +712,7 @@ function draw
 	image_stretch_region moon2_img 255 255 255 255 0 0 m2_w m2_h (- 100 ox) (- 200 oy) (* m2_w 4) (* m2_h 4)
 	image_stretch_region moon1_img 255 255 255 255 0 0 m1_w m1_h (- 450 ox) (- 300 oy) (* m1_w 4) (* m1_h 4)
 	
-	call draw_bloom orig_buf 10
+	call draw_bloom orig_buf 5
 
 	set_target_backbuffer
 

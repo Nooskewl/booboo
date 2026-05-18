@@ -3,12 +3,13 @@ uniform sampler2D tex;
 uniform int tex_w;
 uniform int tex_h;
 uniform bool horizontal;
-uniform int kernel;
 
 varying vec2 texcoord;
 
 void main()
 {
+	int kernel = 5;
+
 	float f = 1.0 / (float(kernel - 1) * 2.0 + 1.0);
 	vec4 result = texture2D(tex, texcoord) * f;
 	if (horizontal) {
