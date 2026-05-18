@@ -133,28 +133,28 @@ endif()
 add_custom_command(
     TARGET "corelibrary"
     POST_BUILD
-    COMMAND "c:/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/10.0.19041.0/x64/mt.exe" -manifest c:/msys64/home/trent/code/booboo/misc/booboo.manifest -outputresource:"c:/msys64/home/trent/code/booboo/bclang/libBooBooCore.dll"
+    COMMAND "c:/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/10.0.19041.0/x64/mt.exe" -manifest c:/msys64/home/trent/code/booboo/misc/booboo.manifest -outputresource:"c:/msys64/home/trent/code/booboo/b32/libBooBooCore.dll"
     COMMENT "Adding manifest..."
 )
 
 add_custom_command(
     TARGET "gamelibrary"
     POST_BUILD
-    COMMAND "c:/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/10.0.19041.0/x64/mt.exe" -manifest c:/msys64/home/trent/code/booboo/misc/booboo.manifest -outputresource:"c:/msys64/home/trent/code/booboo/bclang/libBooBooGame.dll"
+    COMMAND "c:/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/10.0.19041.0/x64/mt.exe" -manifest c:/msys64/home/trent/code/booboo/misc/booboo.manifest -outputresource:"c:/msys64/home/trent/code/booboo/b32/libBooBooGame.dll"
     COMMENT "Adding manifest..."
 )
 
 add_custom_command(
     TARGET "corelauncher"
     POST_BUILD
-    COMMAND "c:/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/10.0.19041.0/x64/mt.exe" -manifest c:/msys64/home/trent/code/booboo/misc/booboo.manifest -outputresource:"c:/msys64/home/trent/code/booboo/bclang/BooBooCLI.exe"
+    COMMAND "c:/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/10.0.19041.0/x64/mt.exe" -manifest c:/msys64/home/trent/code/booboo/misc/booboo.manifest -outputresource:"c:/msys64/home/trent/code/booboo/b32/BooBooCLI.exe"
     COMMENT "Adding manifest..."
 )
 
 add_custom_command(
     TARGET "gamelauncher"
     POST_BUILD
-    COMMAND "c:/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/10.0.19041.0/x64/mt.exe" -manifest c:/msys64/home/trent/code/booboo/misc/booboo.manifest -outputresource:"c:/msys64/home/trent/code/booboo/bclang/BooBoo.exe"
+    COMMAND "c:/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/10.0.19041.0/x64/mt.exe" -manifest c:/msys64/home/trent/code/booboo/misc/booboo.manifest -outputresource:"c:/msys64/home/trent/code/booboo/b32/BooBoo.exe"
     COMMENT "Adding manifest..."
 )
 
