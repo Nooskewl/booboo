@@ -1160,7 +1160,7 @@ function run
 		:negit
 		var f2
 		= f2 (rand 0 1000)
-		= f2 (* (/ f2 1000) 0.25 f)
+		= f2 (* (/ f2 1000) 0.4 f)
 
 		var inv
 		= inv (+ (- real_a PI) f2)
@@ -1174,7 +1174,7 @@ function run
 		var f
 		= f (rand 0 1000)
 		= f (/ f 1000)
-		= f (+ (* f 0.25) 0.25)
+		= f (+ (* f 0.15) 0.15)
 		vector_add ex f
 		vector_add exhaust ex
 	:add_another_ex
