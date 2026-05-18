@@ -1,3 +1,17 @@
+var bloom
+= bloom (shader_load "" "bloom")
+
+var SCR_W SCR_H
+explode (get_buffer_size) SCR_W SCR_H
+
+var bloombufs buf orig_buf bbidx
+= buf (image_create SCR_W SCR_H)
+vector_add bloombufs buf
+= buf (image_create SCR_W SCR_H)
+vector_add bloombufs buf
+= orig_buf (image_create SCR_W SCR_H)
+= bbidx 0
+
 var music
 = music (mml_load "music/game.mml")
 = VOID (mml_play music 0.5 1)
@@ -132,7 +146,7 @@ function star_close x y start
 {
 	var i
 	for i start (< i (vector_size stars)) 1 next
-		if (&& (<= (abs (- [stars i 0] x)) 3) (<= (abs (- [stars i 1] y)) 3)) ret
+		if (&& (<= (abs (- [stars i 0] x)) 5) (<= (abs (- [stars i 1] y)) 5)) ret
 			return TRUE
 		:ret
 	:next
@@ -588,9 +602,64 @@ function draw_time
 :draw_time_end
 }
 
+function draw_bloom img loops
+{
+	var kernel
+	= kernel 3
+	set_target [bloombufs bbidx]
+	clear 0 0 0 0
+	shader_use bloom
+	shader_set_int bloom "tex_w" SCR_W
+	shader_set_int bloom "tex_h" SCR_H
+	shader_set_bool bloom "horizontal" TRUE
+	shader_set_int bloom "kernel" kernel
+	image_draw img 255 255 255 255 0 0
+	var old
+	= old bbidx
+	= bbidx (+ bbidx 1)
+	if (> bbidx 1) set03
+		= bbidx 0
+	:set03
+	set_target [bloombufs bbidx]
+	clear 0 0 0 0
+	shader_set_bool bloom "horizontal" FALSE
+	image_draw [bloombufs old] 255 255 255 255 0 0
+
+	var i
+	for i 0 (< i (- loops 1)) 1 loop
+		= kernel (+ kernel 1)
+		shader_set_bool bloom "horizontal" TRUE
+		shader_set_int bloom "kernel" kernel
+		var old
+		= old bbidx
+		= bbidx (+ bbidx 1)
+		if (> bbidx 1) set0
+			= bbidx 0
+		:set0
+		set_target [bloombufs bbidx]
+		clear 0 0 0 0
+		image_draw [bloombufs old] 255 255 255 255 0 0
+		
+		shader_set_bool bloom "horizontal" FALSE
+		= old bbidx
+		= bbidx (+ bbidx 1)
+		if (> bbidx 1) set02
+			= bbidx 0
+		:set02
+		set_target [bloombufs bbidx]
+		clear 0 0 0 0
+		image_draw [bloombufs old] 255 255 255 255 0 0
+	:loop
+
+	shader_use_default
+}
+
 function draw
 {
 	call calc_offset
+
+	set_target orig_buf
+	clear 0 0 0 0	
 
 	; Draw stars
 
@@ -625,7 +694,8 @@ function draw
 		= blink (rand 0 BLINK)
 	:blinkit
 	= [stars i 2] blink
-	filled_rectangle sr sg sb 255 sr sg sb 255 sr sg sb 255 sr sg sb 255 star_x star_y 2 2
+	;filled_rectangle sr sg sb 255 sr sg sb 255 sr sg sb 255 sr sg sb 255 star_x star_y 2 2
+	filled_circle sr sg sb 255 star_x star_y 2 32
 	= i (+ i 1)
 	? i (vector_size stars)
 	jl draw_next_star
@@ -846,6 +916,13 @@ function draw
 :no_explosions2
 
 	end_primitives
+
+	call draw_bloom orig_buf 3
+
+	set_target_backbuffer
+
+	image_stretch_region [bloombufs bbidx] 255 255 255 255 0 16 SCR_W (- SCR_H 16) 0 16 SCR_W (- SCR_H 16)
+	image_stretch_region orig_buf 255 255 255 255 0 16 SCR_W (- SCR_H 16) 0 16 SCR_W (- SCR_H 16)
 
 	; Draw status bar
 
@@ -1142,8 +1219,8 @@ function run
 		var inv
 		= inv (+ (- real_a PI) f2)
 		var ex ex_x ex_y
-		= ex_x (+ pos_x (* (cos inv) 12))
-		= ex_y (+ pos_y (* (sin inv) 12))
+		= ex_x (+ pos_x (* (cos inv) 15))
+		= ex_y (+ pos_y (* (sin inv) 15))
 		vector_add ex ex_x
 		vector_add ex ex_y
 		vector_add ex inv
@@ -1151,7 +1228,7 @@ function run
 		var f
 		= f (rand 0 1000)
 		= f (/ f 1000)
-		= f (+ (* f 0.125) 0.125)
+		= f (+ (* f 0.25) 0.25)
 		vector_add ex f
 		vector_add exhaust ex
 	:add_another_ex

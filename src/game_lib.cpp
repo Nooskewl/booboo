@@ -247,13 +247,17 @@ static void exprfunc_gfx_get_viewport(Program *prg, const std::vector<Token> &v)
 
 static bool gfxfunc_clear(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(3)
+	MIN_ARGS(3)
 
 	SDL_Color c;
 	c.r = as_number(prg, v[0]);
 	c.g = as_number(prg, v[1]);
 	c.b = as_number(prg, v[2]);
+
 	c.a = 255;
+	if (v.size() > 3) {
+		c.a = as_number(prg, v[3]);
+	}
 
 	gfx::clear(c);
 

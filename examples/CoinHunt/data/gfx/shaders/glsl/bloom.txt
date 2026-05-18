@@ -1,0 +1,30 @@
+uniform sampler2D tex;
+
+uniform int tex_w;
+uniform int tex_h;
+uniform bool horizontal;
+uniform int kernel;
+
+varying vec2 texcoord;
+
+void main()
+{
+	float f = 1.0 / (float(kernel - 1) * 2.0 + 1.0);
+	vec4 result = texture2D(tex, texcoord) * f;
+	if (horizontal) {
+		float onex = 1.0 / float(tex_w);
+		for (int i = 1; i < kernel; i++) {
+			result += texture2D(tex, texcoord + vec2(onex*i, 0.0)) * f;
+			result += texture2D(tex, texcoord - vec2(onex*i, 0.0)) * f;
+		}
+	}
+	else {
+		float oney = 1.0 / float(tex_h);
+		for (int i = 1; i < kernel; i++) {
+			result += texture2D(tex, texcoord + vec2(0.0, oney*i)) * f;
+			result += texture2D(tex, texcoord - vec2(0.0, oney*i)) * f;
+		}
+	}
+
+	gl_FragColor = result;
+}
