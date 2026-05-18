@@ -2484,6 +2484,8 @@ static void exprfunc_mml_play(Program *prg, const std::vector<Token> &v)
 	i->mml = mml;
 	i->instance = mml->play(volume, loop, pan, callback, callback_data);
 
+	int inst = iinfo->instance_id;
+
 	iinfo->instances[iinfo->instance_id++] = i;
 
 	// clean up old instances
@@ -2498,7 +2500,7 @@ static void exprfunc_mml_play(Program *prg, const std::vector<Token> &v)
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = id;
+	prg->result.n = inst;
 }
 
 static void exprfunc_mml_num_tracks(Program *prg, const std::vector<Token> &v)
