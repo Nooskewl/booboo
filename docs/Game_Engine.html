@@ -655,6 +655,15 @@ The following sections describe the API:
 	e.g. = green [v y x 1]
 </pre>
 
+<h3>(image_read_backbuffer)</h3>
+<pre>
+	Read the backbuffer. Same format as image_read_texture.
+	Takes 1 parameter, a boolean specifying whether or not to include the letterbox.
+	(vector_size v) is the height and (vector_size [v 0]) is the width of the texture.
+	e.g. = v (image_read_backbuffer FALSE)
+	e.g. = green [v y x 1]
+</pre>
+
 <h3>(image_to_texture)</h3>
 <pre>
 	Convert a vector of colour components to a image

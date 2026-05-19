@@ -1544,6 +1544,41 @@ static void exprfunc_image_read_texture(Program *prg, const std::vector<Token> &
 	delete[] pixels;
 }
 
+static void exprfunc_image_read_backbuffer(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	bool read_letterbox = as_number(prg, v[0]);
+
+	prg->result.set_type(Variable::VECTOR);
+
+	int w, h;
+	unsigned char *pixels = gfx::Image::read_backbuffer(read_letterbox, &w, &h);
+
+	for (int y = 0; y < h; y++) {
+		Variable var;
+		var.type = Variable::VECTOR;
+		for (int x = 0; x < w; x++) {
+			Variable var2;
+			var2.type = Variable::VECTOR;
+			Variable var3;
+			var3.type = Variable::NUMBER;
+			var3.n = pixels[(h-y-1)*w*4+x*4+0];
+			var2.v.push_back(var3);
+			var3.n = pixels[(h-y-1)*w*4+x*4+1];
+			var2.v.push_back(var3);
+			var3.n = pixels[(h-y-1)*w*4+x*4+2];
+			var2.v.push_back(var3);
+			var3.n = pixels[(h-y-1)*w*4+x*4+3];
+			var2.v.push_back(var3);
+			var.v.push_back(var2);
+		}
+		prg->result.v.push_back(var);
+	}
+
+	delete[] pixels;
+}
+
 static void exprfunc_image_to_texture(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -5029,6 +5064,7 @@ void start_lib_game()
 	add_expression_handler("image_size", exprfunc_image_size);
 	add_instruction("image_draw_9patch", imagefunc_draw_9patch);
 	add_expression_handler("image_read_texture", exprfunc_image_read_texture);
+	add_expression_handler("image_read_backbuffer", exprfunc_image_read_backbuffer);
 	add_expression_handler("image_to_texture", exprfunc_image_to_texture);
 	add_instruction("image_update", imagefunc_update);
 	add_expression_handler("font_load", exprfunc_font_load);
