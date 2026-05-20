@@ -795,6 +795,8 @@ function draw
 
 	; Draw exhaust
 
+	set_blend_mode BLEND_ONE BLEND_ONE
+
 	var ex_w ex_h
 	explode (image_size exhaust_img) ex_w ex_h
 
@@ -862,6 +864,8 @@ function draw
 :no_explosions2
 
 	end_primitives
+
+	set_blend_mode BLEND_ONE BLEND_INVSRCALPHA
 
 	call draw_bloom orig_buf BLOOMS
 
