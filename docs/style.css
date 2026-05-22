@@ -1,13 +1,5 @@
-@font-face {
-	font-family: FiraCode;
-	src: url(/FiraCode-Regular.ttf);
-}
-@font-face {
-	font-family: FiraSans;
-	src: url(/FiraSans-Regular.ttf);
-}
 html {
-	font-family: FiraSans, serif;
+	font-family: Arial, sans-serif;
 	background-color: #abc;
 	color: black;
 	line-height: 1.5;
@@ -50,8 +42,7 @@ h2 {
 	text-align: center;
 }
 pre, code {
-	font-size: 110%;
-	font-family: FiraCode;
+	font-family: "MS Gothic", monospace;
 }
 hr {
 	border: 0;
