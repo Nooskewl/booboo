@@ -1554,29 +1554,19 @@ static void exprfunc_image_read_backbuffer(Program *prg, const std::vector<Token
 
 	int w, h;
 	unsigned char *pixels = gfx::Image::read_backbuffer(read_letterbox, &w, &h);
+	
+	gfx::Image *img = new gfx::Image(pixels, util::Size<int>(w, h));
 
-	for (int y = 0; y < h; y++) {
-		Variable var;
-		var.type = Variable::VECTOR;
-		for (int x = 0; x < w; x++) {
-			Variable var2;
-			var2.type = Variable::VECTOR;
-			Variable var3;
-			var3.type = Variable::NUMBER;
-			var3.n = pixels[(h-y-1)*w*4+x*4+0];
-			var2.v.push_back(var3);
-			var3.n = pixels[(h-y-1)*w*4+x*4+1];
-			var2.v.push_back(var3);
-			var3.n = pixels[(h-y-1)*w*4+x*4+2];
-			var2.v.push_back(var3);
-			var3.n = pixels[(h-y-1)*w*4+x*4+3];
-			var2.v.push_back(var3);
-			var.v.push_back(var2);
-		}
-		prg->result.v.push_back(var);
-	}
+	Image_Info *info = image_info(prg);
 
-	delete[] pixels;
+	prg->result.set_type(Variable::NUMBER);
+
+	prg->result.n = info->image_id;
+
+	Image *i = new Image;
+	i->image = img;
+
+	info->images[info->image_id++] = i;
 }
 
 static void exprfunc_image_to_texture(Program *prg, const std::vector<Token> &v)

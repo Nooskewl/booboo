@@ -657,11 +657,8 @@ The following sections describe the API:
 
 <h3>(image_read_backbuffer)</h3>
 <pre>
-	Read the backbuffer. Same format as image_read_texture.
-	Takes 1 parameter, a boolean specifying whether or not to include the letterbox.
-	(vector_size v) is the height and (vector_size [v 0]) is the width of the texture.
-	e.g. = v (image_read_backbuffer FALSE)
-	e.g. = green [v y x 1]
+	Read the backbuffer into a texture. Optionally reads the letterbox
+	e.g. = n (image_read_backbuffer ^ read_letterbox)
 </pre>
 
 <h3>(image_to_texture)</h3>
