@@ -124,11 +124,19 @@ Variable::~Variable()
 {
 }
 
+void Variable::clear()
+{
+	v.clear();
+	m.clear();
+	n = 0;
+	s = "";
+	p = nullptr;
+}
+
 void Variable::set_type(Variable_Type type)
 {
 	this->type = type;
-	v.clear();
-	m.clear();
+	clear();
 }
 
 static std::string escape_string(std::string s)

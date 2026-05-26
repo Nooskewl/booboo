@@ -137,6 +137,7 @@ struct BOOBOO_EXPORT Variable
 	// This sets type and clears memory (vector/map), should be used when setting
 	// type of prg->result to avoid copying that memory
 	void set_type(Variable_Type type);
+	void clear();
 };
 
 struct Statement {

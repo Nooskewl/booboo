@@ -1300,6 +1300,62 @@ static bool vectorfunc_reserve(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static void exprfunc_vector_it_start(Program *prg, const std::vector<Token> &v)
+{
+	Variable *vec = as_variable_pointer(prg, v, 0);
+
+	prg->result.set_type(Variable::USER);
+	prg->result.n = 0;
+	prg->result.p = vec;
+}
+
+static void exprfunc_vector_it_end(Program *prg, const std::vector<Token> &v)
+{
+	Variable *vec = as_variable_pointer(prg, v, 0);
+
+	prg->result.set_type(Variable::USER);
+	prg->result.n = vec->v.size();
+	prg->result.p = vec;
+}
+
+static void exprfunc_vector_it_inc(Program *prg, const std::vector<Token> &v)
+{
+	Variable *it = as_variable_pointer(prg, v, 0);
+	int inc = as_number(prg, v[1]);
+
+	prg->result.set_type(Variable::USER);
+	prg->result.n = MIN(it->p->v.size(), it->n + inc);
+	prg->result.p = it->p;
+}
+
+static void exprfunc_vector_it_get(Program *prg, const std::vector<Token> &v)
+{
+	Variable *it = as_variable_pointer(prg, v, 0);
+
+	prg->result.set_type(Variable::POINTER);
+	prg->result.p = &it->p->v[it->n];
+}
+
+static void exprfunc_vector_it_erase(Program *prg, const std::vector<Token> &v)
+{
+	Variable *it = as_variable_pointer(prg, v, 0);
+
+	it->p->v.erase(it->p->v.begin()+it->n);
+	
+	prg->result.set_type(Variable::USER);
+	prg->result.n = it->n;
+	prg->result.p = it->p;
+}
+
+static void exprfunc_vector_it_equal(Program *prg, const std::vector<Token> &v)
+{
+	Variable *it1 = as_variable_pointer(prg, v, 0);
+	Variable *it2 = as_variable_pointer(prg, v, 1);
+
+	prg->result.set_type(Variable::NUMBER);
+	prg->result.n = it1->n == it2->n && it1->p == it2->p;
+}
+
 static bool mapfunc_clear(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
@@ -3237,6 +3293,12 @@ void start_lib_standard()
 	add_instruction("vector_erase", vectorfunc_erase);
 	add_instruction("vector_clear", vectorfunc_clear);
 	add_instruction("vector_reserve", vectorfunc_reserve);
+	add_expression_handler("vector_it_start", exprfunc_vector_it_start);
+	add_expression_handler("vector_it_end", exprfunc_vector_it_end);
+	add_expression_handler("vector_it_get", exprfunc_vector_it_get);
+	add_expression_handler("vector_it_erase", exprfunc_vector_it_erase);
+	add_expression_handler("vector_it_inc", exprfunc_vector_it_inc);
+	add_expression_handler("vector_it_equal", exprfunc_vector_it_equal);
 
 	add_instruction("map_clear", mapfunc_clear);
 	add_instruction("map_erase", mapfunc_erase);

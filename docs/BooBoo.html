@@ -671,6 +671,44 @@ Sections:
 	e.g. explode v a b c ; 1 2 3 in a b c
 </pre>
 
+<h2>Vector Iterators</h2>
+
+<h3>(vector_it_start)</h3>
+<pre>
+	Get an iterator to the start of a vector
+	e.g. = it (vector_it_start vec)
+</pre>
+
+<h3>(vector_it_end)</h3>
+<pre>
+	Get an iterator to the end of the vector. This is one past the last element.
+	e.g. = it (vector_it_end vec)
+</pre>
+
+<h3>(vector_it_inc)</h3>
+<pre>
+	Increment an iterator
+	e.g. = it (vector_it_inc it 1)
+</pre>
+
+<h3>(vector_it_erase)</h3>
+<pre>
+	Erase at iterator location
+	e.g. = it (vector_it_erase it)
+</pre>
+
+<h3>(vector_it_get)</h3>
+<pre>
+	Get a pointer to the element pointed to by the iterator
+	e.g. = my_pointer (vector_it_get it)
+</pre>
+
+<h3>(vector_it_equal)</h3>
+<pre>
+	Compare iterators
+	e.g. while (! (vector_it_equal it (vector_it_end vec))) loop :loop
+</pre>
+
 <a id="Map"></a>
 <h2>Map Functions</h2>
 
