@@ -3596,7 +3596,7 @@ static void exprfunc_equal(Program *prg, const std::vector<Token> &v)
 	else if  (p->type == Variable::USER) {
 		for (size_t i = 1; i < v.size(); i++) {
 			Variable *p2 = as_variable_pointer(prg, v, i);
-			b = b && (p->n == p2->n && p->s == p2->s && p->p == p2->p && p->v == p2->v && p->m == p2->m);
+			b = b && (p->type == p2->type && p->n == p2->n && p->s == p2->s && p->p == p2->p && p->v == p2->v && p->m == p2->m);
 		}
 	}
 
@@ -3630,7 +3630,7 @@ static void exprfunc_notequal(Program *prg, const std::vector<Token> &v)
 	else if  (p->type == Variable::USER) {
 		for (size_t i = 1; i < v.size(); i++) {
 			Variable *p2 = as_variable_pointer(prg, v, i);
-			b = b && (p->n != p2->n || p->s != p2->s || p->p != p2->p || p->v != p2->v || p->m != p2->m);
+			b = b && (p->type != p2->type || p->n != p2->n || p->s != p2->s || p->p != p2->p || p->v != p2->v || p->m != p2->m);
 		}
 	}
 
