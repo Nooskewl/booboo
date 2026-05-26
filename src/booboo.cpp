@@ -3460,41 +3460,25 @@ static void exprfunc_not(Program *prg, const std::vector<Token> &v)
 
 static void exprfunc_greater(Program *prg, const std::vector<Token> &v)
 {
+	Variable *p = nullptr;
+	if (!(v[0].type == Token::NUMBER || v[0].type == Token::STRING)) {
+		p = as_variable_pointer(prg, v, 0);
+	}
+
 	bool b = true;
 
-	bool string = v[0].type == Token::STRING ? true : false;
-
-	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = as_variable(prg, v[0]);
-		if (IS_STRING(var)) {
-			string = true;
-		}
-		else if (var.type == Variable::FISH) {
-			Variable &var2 = go_fish(prg, var.f);
-			if (IS_STRING(var2)) {
-				string = true;
-			}
-		}
-		else if (var.type == Variable::EXPRESSION) {
-			evaluate_expression(prg, var.e);
-			if (IS_STRING(prg->result)) {
-				string = true;
-			}
-		}
-	}
-
-	if (string) {
-		std::string s = as_string(prg, v[0]);
-
-		for (size_t i = 1; i < v.size(); i++) {
-			b = b && s > as_string(prg, v[i]);
-		}
-	}
-	else {
+	if (v[0].type == Token::NUMBER || p->type == Variable::NUMBER) {
 		double n = as_number(prg, v[0]);
 
 		for (size_t i = 1; i < v.size(); i++) {
 			b = b && n > as_number(prg, v[i]);
+		}
+	}
+	else {
+		std::string s = as_string(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && s > as_string(prg, v[i]);
 		}
 	}
 
@@ -3504,41 +3488,25 @@ static void exprfunc_greater(Program *prg, const std::vector<Token> &v)
 
 static void exprfunc_less(Program *prg, const std::vector<Token> &v)
 {
+	Variable *p = nullptr;
+	if (!(v[0].type == Token::NUMBER || v[0].type == Token::STRING)) {
+		p = as_variable_pointer(prg, v, 0);
+	}
+
 	bool b = true;
-	
-	bool string = v[0].type == Token::STRING ? true : false;
 
-	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = as_variable(prg, v[0]);
-		if (IS_STRING(var)) {
-			string = true;
-		}
-		else if (var.type == Variable::FISH) {
-			Variable &var2 = go_fish(prg, var.f);
-			if (IS_STRING(var2)) {
-				string = true;
-			}
-		}
-		else if (var.type == Variable::EXPRESSION) {
-			evaluate_expression(prg, var.e);
-			if (IS_STRING(prg->result)) {
-				string = true;
-			}
-		}
-	}
-
-	if (string) {
-		std::string s = as_string(prg, v[0]);
-
-		for (size_t i = 1; i < v.size(); i++) {
-			b = b && s < as_string(prg, v[i]);
-		}
-	}
-	else {
+	if (v[0].type == Token::NUMBER || p->type == Variable::NUMBER) {
 		double n = as_number(prg, v[0]);
 
 		for (size_t i = 1; i < v.size(); i++) {
 			b = b && n < as_number(prg, v[i]);
+		}
+	}
+	else {
+		std::string s = as_string(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && s < as_string(prg, v[i]);
 		}
 	}
 
@@ -3548,41 +3516,25 @@ static void exprfunc_less(Program *prg, const std::vector<Token> &v)
 
 static void exprfunc_greaterequal(Program *prg, const std::vector<Token> &v)
 {
+	Variable *p = nullptr;
+	if (!(v[0].type == Token::NUMBER || v[0].type == Token::STRING)) {
+		p = as_variable_pointer(prg, v, 0);
+	}
+
 	bool b = true;
-	
-	bool string = v[0].type == Token::STRING ? true : false;
 
-	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = as_variable(prg, v[0]);
-		if (IS_STRING(var)) {
-			string = true;
-		}
-		else if (var.type == Variable::FISH) {
-			Variable &var2 = go_fish(prg, var.f);
-			if (IS_STRING(var2)) {
-				string = true;
-			}
-		}
-		else if (var.type == Variable::EXPRESSION) {
-			evaluate_expression(prg, var.e);
-			if (IS_STRING(prg->result)) {
-				string = true;
-			}
-		}
-	}
-
-	if (string) {
-		std::string s = as_string(prg, v[0]);
-
-		for (size_t i = 1; i < v.size(); i++) {
-			b = b && s >= as_string(prg, v[i]);
-		}
-	}
-	else {
+	if (v[0].type == Token::NUMBER || p->type == Variable::NUMBER) {
 		double n = as_number(prg, v[0]);
 
 		for (size_t i = 1; i < v.size(); i++) {
 			b = b && n >= as_number(prg, v[i]);
+		}
+	}
+	else {
+		std::string s = as_string(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && s >= as_string(prg, v[i]);
 		}
 	}
 
@@ -3592,41 +3544,25 @@ static void exprfunc_greaterequal(Program *prg, const std::vector<Token> &v)
 
 static void exprfunc_lessequal(Program *prg, const std::vector<Token> &v)
 {
+	Variable *p = nullptr;
+	if (!(v[0].type == Token::NUMBER || v[0].type == Token::STRING)) {
+		p = as_variable_pointer(prg, v, 0);
+	}
+
 	bool b = true;
-	
-	bool string = v[0].type == Token::STRING ? true : false;
 
-	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = as_variable(prg, v[0]);
-		if (IS_STRING(var)) {
-			string = true;
-		}
-		else if (var.type == Variable::FISH) {
-			Variable &var2 = go_fish(prg, var.f);
-			if (IS_STRING(var2)) {
-				string = true;
-			}
-		}
-		else if (var.type == Variable::EXPRESSION) {
-			evaluate_expression(prg, var.e);
-			if (IS_STRING(prg->result)) {
-				string = true;
-			}
-		}
-	}
-
-	if (string) {
-		std::string s = as_string(prg, v[0]);
-
-		for (size_t i = 1; i < v.size(); i++) {
-			b = b && s <= as_string(prg, v[i]);
-		}
-	}
-	else {
+	if (v[0].type == Token::NUMBER || p->type == Variable::NUMBER) {
 		double n = as_number(prg, v[0]);
 
 		for (size_t i = 1; i < v.size(); i++) {
 			b = b && n <= as_number(prg, v[i]);
+		}
+	}
+	else {
+		std::string s = as_string(prg, v[0]);
+
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && s <= as_string(prg, v[i]);
 		}
 	}
 
@@ -3636,71 +3572,31 @@ static void exprfunc_lessequal(Program *prg, const std::vector<Token> &v)
 
 static void exprfunc_equal(Program *prg, const std::vector<Token> &v)
 {
-	if (v[0].type == Token::SYMBOL) {
-		Variable *v1;
-		Variable tmp;
-
-		if (v[0].dereference) {
-			if (prg->variables[v[0].i].type == Variable::EXPRESSION) {
-				tmp = as_variable_resolve(prg, v[0]);
-				v1 = tmp.p;
-			}
-			else {
-				v1 = dereference(prg, v[0]);
-			}
-		}
-		else {
-			v1 = &as_variable(prg, v[0]);
-		}
-		if (v1->type == Variable::POINTER) {
-			COUNT_ARGS(2)
-			Variable var2 = as_variable_resolve(prg, v[1]);
-			if (var2.type == Variable::POINTER) {
-				prg->result.set_type(Variable::NUMBER);
-				prg->result.n = v1->p == var2.p;
-				return;
-			}
-			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Invalid comparison to pointer at " + get_error_info(prg));
-			}
-		}
+	Variable *p = nullptr;
+	if (!(v[0].type == Token::NUMBER || v[0].type == Token::STRING)) {
+		p = as_variable_pointer(prg, v, 0);
 	}
 
 	bool b = true;
 
-	bool string = v[0].type == Token::STRING ? true : false;
+	if (v[0].type == Token::NUMBER || p->type == Variable::NUMBER) {
+		double n = as_number(prg, v[0]);
 
-	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = as_variable(prg, v[0]);
-		if (IS_STRING(var)) {
-			string = true;
-		}
-		else if (var.type == Variable::FISH) {
-			Variable &var2 = go_fish(prg, var.f);
-			if (IS_STRING(var2)) {
-				string = true;
-			}
-		}
-		else if (var.type == Variable::EXPRESSION) {
-			evaluate_expression(prg, var.e);
-			if (IS_STRING(prg->result)) {
-				string = true;
-			}
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && n == as_number(prg, v[i]);
 		}
 	}
-
-	if (string) {
+	else if (v[0].type == Token::STRING || p->type == Variable::STRING) {
 		std::string s = as_string(prg, v[0]);
 
 		for (size_t i = 1; i < v.size(); i++) {
 			b = b && s == as_string(prg, v[i]);
 		}
 	}
-	else {
-		double n = as_number(prg, v[0]);
-
+	else if  (p->type == Variable::USER) {
 		for (size_t i = 1; i < v.size(); i++) {
-			b = b && n == as_number(prg, v[i]);
+			Variable *p2 = as_variable_pointer(prg, v, i);
+			b = b && (p->n == p2->n && p->s == p2->s && p->p == p2->p && p->v == p2->v && p->m == p2->m);
 		}
 	}
 
@@ -3710,57 +3606,31 @@ static void exprfunc_equal(Program *prg, const std::vector<Token> &v)
 
 static void exprfunc_notequal(Program *prg, const std::vector<Token> &v)
 {
-	if (v[0].type == Token::SYMBOL) {
-		Variable var1 = as_variable_resolve(prg, v[0]);
-		if (var1.type == Variable::POINTER) {
-			COUNT_ARGS(2)
-			Variable var2 = as_variable_resolve(prg, v[1]);
-			if (var2.type == Variable::POINTER) {
-				prg->result.set_type(Variable::NUMBER);
-				prg->result.n = var1.p != var2.p;
-				return;
-			}
-			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Invalid comparison to pointer at " + get_error_info(prg));
-			}
-		}
+	Variable *p = nullptr;
+	if (!(v[0].type == Token::NUMBER || v[0].type == Token::STRING)) {
+		p = as_variable_pointer(prg, v, 0);
 	}
 
 	bool b = true;
 
-	bool string = v[0].type == Token::STRING ? true : false;
+	if (v[0].type == Token::NUMBER || p->type == Variable::NUMBER) {
+		double n = as_number(prg, v[0]);
 
-	if (string == false && v[0].type == Token::SYMBOL) {
-		Variable &var = as_variable(prg, v[0]);
-		if (IS_STRING(var)) {
-			string = true;
-		}
-		else if (var.type == Variable::FISH) {
-			Variable &var2 = go_fish(prg, var.f);
-			if (IS_STRING(var2)) {
-				string = true;
-			}
-		}
-		else if (var.type == Variable::EXPRESSION) {
-			evaluate_expression(prg, var.e);
-			if (IS_STRING(prg->result)) {
-				string = true;
-			}
+		for (size_t i = 1; i < v.size(); i++) {
+			b = b && n != as_number(prg, v[i]);
 		}
 	}
-
-	if (string) {
+	else if (v[0].type == Token::STRING || p->type == Variable::STRING) {
 		std::string s = as_string(prg, v[0]);
 
 		for (size_t i = 1; i < v.size(); i++) {
 			b = b && s != as_string(prg, v[i]);
 		}
 	}
-	else {
-		double n = as_number(prg, v[0]);
-
+	else if  (p->type == Variable::USER) {
 		for (size_t i = 1; i < v.size(); i++) {
-			b = b && n != as_number(prg, v[i]);
+			Variable *p2 = as_variable_pointer(prg, v, i);
+			b = b && (p->n != p2->n || p->s != p2->s || p->p != p2->p || p->v != p2->v || p->m != p2->m);
 		}
 	}
 

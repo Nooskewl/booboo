@@ -1347,15 +1347,6 @@ static void exprfunc_vector_it_erase(Program *prg, const std::vector<Token> &v)
 	prg->result.p = it->p;
 }
 
-static void exprfunc_vector_it_equal(Program *prg, const std::vector<Token> &v)
-{
-	Variable *it1 = as_variable_pointer(prg, v, 0);
-	Variable *it2 = as_variable_pointer(prg, v, 1);
-
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = it1->n == it2->n && it1->p == it2->p;
-}
-
 static bool mapfunc_clear(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
@@ -3298,7 +3289,6 @@ void start_lib_standard()
 	add_expression_handler("vector_it_get", exprfunc_vector_it_get);
 	add_expression_handler("vector_it_erase", exprfunc_vector_it_erase);
 	add_expression_handler("vector_it_inc", exprfunc_vector_it_inc);
-	add_expression_handler("vector_it_equal", exprfunc_vector_it_equal);
 
 	add_instruction("map_clear", mapfunc_clear);
 	add_instruction("map_erase", mapfunc_erase);
