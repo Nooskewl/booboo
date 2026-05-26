@@ -2626,20 +2626,7 @@ static bool do_set(Program *prg, const std::vector<Token> &v, bool const_ok)
 {
 	COUNT_ARGS(2)
 
-	Variable *v1;
-
-	if (v[0].dereference) {
-		if (prg->variables[v[0].i].type == Variable::EXPRESSION) {
-			Variable tmp = as_variable_resolve(prg, v[0]);
-			v1 = tmp.p;
-		}
-		else {
-			v1 = dereference(prg, v[0]);
-		}
-	}
-	else {
-		v1 = &as_variable(prg, v[0]);
-	}
+	Variable *v1 = as_variable_pointer(prg, v, 0);
 
 	if (const_ok == false && v1->constant == true) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to set constant at " + get_error_info(prg));
@@ -2654,33 +2641,13 @@ static bool do_set(Program *prg, const std::vector<Token> &v, bool const_ok)
 		v1->s = as_string(prg, v[1]);
 	}
 	else {
-		Variable &v2 = as_variable(prg, v[1]);
-
-		Variable *var;
-		var = &v2;
-
-		if (v2.type == Variable::POINTER) {
-			var = dereference(prg, v[1]);
-		}
-		else {
-			var = &v2;
-		}
-		
-		if (var->type == Variable::EXPRESSION) {
-			evaluate_expression(prg, var->e);
-			var = &prg->result;
-		}
+		Variable *v2 = as_variable_pointer(prg, v, 1, true);
 
 		std::string name = v1->name;
 		bool constant = v1->constant;
-		*v1 = *var;
+		*v1 = *v2;
 		v1->name = name;
 		v1->constant = constant;
-		
-		if (var->type == Variable::EXPRESSION) {
-			prg->result.v.clear();
-			prg->result.m.clear();
-		}
 	}
 
 	return true;
@@ -4511,7 +4478,7 @@ Variable &as_variable(Program *prg, const Token &t)
 	return prg->variables[t.i];
 }
 
-Variable *as_variable_pointer(Program *prg, const std::vector<Token> &v, int index)
+Variable *as_variable_pointer(Program *prg, const std::vector<Token> &v, int index, bool use_result)
 {
 	static Variable vars[100];
 
@@ -4533,8 +4500,13 @@ Variable *as_variable_pointer(Program *prg, const std::vector<Token> &v, int ind
 	
 	if (var->type == Variable::EXPRESSION) {
 		evaluate_expression(prg, var->e);
-		vars[index] = prg->result;
-		var = &vars[index];
+		if (use_result) {
+			var = &prg->result;
+		}
+		else {
+			vars[index] = prg->result;
+			var = &vars[index];
+		}
 	}
 
 	return var;
