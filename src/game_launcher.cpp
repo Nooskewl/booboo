@@ -246,9 +246,16 @@ void handle_event(TGUI_Event *event)
 	if (event->type == TGUI_UNKNOWN) {
 		return;
 	}
-	else if (event->type == TGUI_QUIT || (event->type == TGUI_KEY_DOWN && event->keyboard.code == exit_key)) {
+	else if (event->type == TGUI_QUIT) {
 		quit = true;
 		return;
+	}
+	else if (event->type == TGUI_KEY_DOWN && event->keyboard.code == exit_key) {
+		int result = gui::popup("Really quit?", "Are you sure?", gui::YESNO);
+		if (result != 0) {
+			quit = true;
+			return;
+		}
 	}
 	else if (event->type == TGUI_MOUSE_AXIS) {
 		if (event->mouse.normalised) {
