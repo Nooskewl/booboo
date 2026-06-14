@@ -333,8 +333,11 @@ void handle_event(TGUI_Event *event)
 	}
 	else if (event->type == TGUI_JOY_DOWN) {
 		if (event->joystick.button == TGUI_B_GUIDE) {
-			quit = true;
-			return;
+			int result = gui::popup("Really quit?", "Are you sure?", gui::YESNO);
+			if (result != 0) {
+				quit = true;
+				return;
+			}
 		}
 	}
 

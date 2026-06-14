@@ -235,15 +235,15 @@ std::string BOOBOO_EXPORT get_file_name(Program *prg);
 std::string BOOBOO_EXPORT get_error_info(Program *prg);
 
 // These are helpful within your own library functions
-Variable BOOBOO_EXPORT &as_variable(Program *prg, const Token &t);
-// If you know result will not be overwritten by further calls, setting use_result is going to be faster because it avoids copying result into a temp static var
 Variable BOOBOO_EXPORT *as_variable_pointer(Program *prg, const std::vector<Token> &v, int index, bool use_result = false);
-Variable BOOBOO_EXPORT as_variable_resolve(Program *prg, const Token &t);
-double BOOBOO_EXPORT as_number(Program *prg, const Token &t);
-std::string BOOBOO_EXPORT as_string(Program *prg, const Token &t);
-int BOOBOO_EXPORT as_label(Program *prg, const Token &t);
-int BOOBOO_EXPORT as_function(Program *prg, const Token &t);
-Variable BOOBOO_EXPORT as_pointer(Program *prg, const Token &t);
+Variable BOOBOO_EXPORT &as_variable(Program *prg, const std::vector<Token> &v, int index);
+// If you know result will not be overwritten by further calls, setting use_result is going to be faster because it avoids copying result into a temp static var
+Variable BOOBOO_EXPORT as_variable_resolve(Program *prg, const std::vector<Token> &v, int index);
+double BOOBOO_EXPORT as_number(Program *prg, const std::vector<Token> &v, int index);
+std::string BOOBOO_EXPORT as_string(Program *prg, const std::vector<Token> &v, int index);
+int BOOBOO_EXPORT as_label(Program *prg, const std::vector<Token> &v, int index);
+int BOOBOO_EXPORT as_function(Program *prg, const std::vector<Token> &v, int index);
+Variable BOOBOO_EXPORT as_pointer(Program *prg, const std::vector<Token> &v, int index);
 
 // The black box allows you to store anything you want
 void BOOBOO_EXPORT *get_black_box(Program *prg, std::string id);

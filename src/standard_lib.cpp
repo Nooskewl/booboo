@@ -200,7 +200,7 @@ static bool save_cfg(Program *prg, int id, std::string cfg_name)
 
 static std::string sformat(Program *prg, const std::vector<Token> &v, int skip)
 {
-	std::string fmt = as_string(prg, v[skip]);
+	std::string fmt = as_string(prg, v, skip);
 	int _tok = skip+1;
 	
 	int prev = 0;
@@ -276,7 +276,7 @@ static std::string sformat(Program *prg, const std::vector<Token> &v, int skip)
 				v1 = dereference(prg, v[_tok]);
 			}
 			else {
-				v1 = &as_variable(prg, v[_tok]);
+				v1 = &as_variable(prg, v, _tok);
 			}
 			if (IS_NUMBER(*v1)) {
 				format = (format == "") ? "g" : format;
@@ -410,7 +410,7 @@ static void exprfunc_getenv(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	std::string get = as_string(prg, v[0]);
+	std::string get = as_string(prg, v, 0);
 
 	char *ptr;
 #ifdef __GNUC__
@@ -453,7 +453,7 @@ static bool corefunc_mkdir(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	std::string path = as_string(prg, v[0]);
+	std::string path = as_string(prg, v, 0);
 
 	util::mkdir(path);
 
@@ -472,7 +472,7 @@ static void exprfunc_get_full_path(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	std::string str = as_string(prg, v[0]);
+	std::string str = as_string(prg, v, 0);
 
 	prg->result.set_type(Variable::STRING);
 
@@ -505,7 +505,7 @@ static void exprfunc_list_directory(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	std::string glob = as_string(prg, v[0]);
+	std::string glob = as_string(prg, v, 0);
 
 	prg->result.set_type(Variable::VECTOR);
 
@@ -597,13 +597,13 @@ static bool corefunc_sort(Program *prg, const std::vector<Token> &v)
 			vec = &_v;
 		}
 		else {
-			vec = &as_variable(prg, v[0]);
+			vec = &as_variable(prg, v, 0);
 		}
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg));
 	}
-	int func = as_function(prg, v[1]);
+	int func = as_function(prg, v, 1);
 
 	if (vec->v.size() <= 1) {
 		return true;
@@ -627,7 +627,7 @@ static bool corefunc_unique(Program *prg, const std::vector<Token> &v)
 			vec = &_v;
 		}
 		else {
-			vec = &as_variable(prg, v[0]);
+			vec = &as_variable(prg, v, 0);
 		}
 	}
 	else {
@@ -654,8 +654,8 @@ static void exprfunc_string_char_at(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	std::string s = as_string(prg, v[0]);
-	int index = as_number(prg, v[1]);
+	std::string s = as_string(prg, v, 0);
+	int index = as_number(prg, v, 1);
 
 	prg->result.set_type(Variable::NUMBER);
 	
@@ -668,9 +668,9 @@ static bool stringfunc_set_char_at(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &s = as_variable(prg, v[0]);
-	int index = as_number(prg, v[1]);
-	uint32_t value = as_number(prg, v[2]);
+	Variable &s = as_variable(prg, v, 0);
+	int index = as_number(prg, v, 1);
+	uint32_t value = as_number(prg, v, 2);
 
 	Variable *p;
 	if (v[0].dereference) {
@@ -689,7 +689,7 @@ static void exprfunc_string_length(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	std::string s = as_string(prg, v[0]);
+	std::string s = as_string(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -700,7 +700,7 @@ static void exprfunc_string_from_number(Program *prg, const std::vector<Token> &
 {
 	COUNT_ARGS(1)
 
-	uint32_t n = as_number(prg, v[0]);
+	uint32_t n = as_number(prg, v, 0);
 
        	prg->result.set_type(Variable::STRING);
 
@@ -711,13 +711,13 @@ static void exprfunc_string_substr(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	std::string str = as_string(prg, v[0]);
+	std::string str = as_string(prg, v, 0);
 
-	int start = as_number(prg, v[1]);
+	int start = as_number(prg, v, 1);
 	int count = -1;
 
 	if (v.size() >= 3) {
-		count = as_number(prg, v[2]);
+		count = as_number(prg, v, 2);
 	}
 
 	prg->result.set_type(Variable::STRING);
@@ -729,7 +729,7 @@ static void exprfunc_string_uppercase(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	std::string str = as_string(prg, v[0]);
+	std::string str = as_string(prg, v, 0);
 
 	prg->result.set_type(Variable::STRING);
 
@@ -740,7 +740,7 @@ static void exprfunc_string_lowercase(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	std::string str = as_string(prg, v[0]);
+	std::string str = as_string(prg, v, 0);
 
 	prg->result.set_type(Variable::STRING);
 
@@ -751,7 +751,7 @@ static void exprfunc_string_trim(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	std::string str = as_string(prg, v[0]);
+	std::string str = as_string(prg, v, 0);
 
 	prg->result.set_type(Variable::STRING);
 
@@ -762,7 +762,7 @@ static void exprfunc_string_ltrim(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	std::string str = as_string(prg, v[0]);
+	std::string str = as_string(prg, v, 0);
 
 	prg->result.set_type(Variable::STRING);
 
@@ -773,7 +773,7 @@ static void exprfunc_string_rtrim(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	std::string str = as_string(prg, v[0]);
+	std::string str = as_string(prg, v, 0);
 
 	prg->result.set_type(Variable::STRING);
 
@@ -784,8 +784,8 @@ static void exprfunc_string_find(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	std::string str = as_string(prg, v[0]);
-	std::string needle = as_string(prg, v[1]);
+	std::string str = as_string(prg, v, 0);
+	std::string needle = as_string(prg, v, 1);
 
 	size_t pos = str.find(needle);
        	
@@ -803,13 +803,13 @@ static void exprfunc_string_replace(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(3)
 
-	std::string str = as_string(prg, v[0]);
-	std::string regex = as_string(prg, v[1]);
-	std::string fmt = as_string(prg, v[2]);
+	std::string str = as_string(prg, v, 0);
+	std::string regex = as_string(prg, v, 1);
+	std::string fmt = as_string(prg, v, 2);
 
 	bool ignore_case;
 	if (v.size() > 3) {
-		ignore_case = as_number(prg, v[3]);
+		ignore_case = as_number(prg, v, 3);
 	}
 	else {
 		ignore_case = false;
@@ -826,12 +826,12 @@ static void exprfunc_string_match(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	std::string str = as_string(prg, v[0]);
-	std::string regex = as_string(prg, v[1]);
+	std::string str = as_string(prg, v, 0);
+	std::string regex = as_string(prg, v, 1);
 
 	bool ignore_case;
 	if (v.size() > 2) {
-		ignore_case = as_number(prg, v[2]);
+		ignore_case = as_number(prg, v, 2);
 	}
 	else {
 		ignore_case = false;
@@ -858,12 +858,12 @@ static void exprfunc_string_matches(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	std::string str = as_string(prg, v[0]);
-	std::string regex = as_string(prg, v[1]);
+	std::string str = as_string(prg, v, 0);
+	std::string regex = as_string(prg, v, 1);
        	
 	bool ignore_case;
 	if (v.size() > 2) {
-		ignore_case = as_number(prg, v[2]);
+		ignore_case = as_number(prg, v, 2);
 	}
 	else {
 		ignore_case = false;
@@ -880,7 +880,7 @@ static void exprfunc_math_sin(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double n = as_number(prg, v[0]);
+	double n = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -891,7 +891,7 @@ static void exprfunc_math_cos(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double n = as_number(prg, v[0]);
+	double n = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -902,7 +902,7 @@ static void exprfunc_math_tan(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double n = as_number(prg, v[0]);
+	double n = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -913,7 +913,7 @@ static void exprfunc_math_asin(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double n = as_number(prg, v[0]);
+	double n = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -924,7 +924,7 @@ static void exprfunc_math_acos(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double n = as_number(prg, v[0]);
+	double n = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -935,7 +935,7 @@ static void exprfunc_math_atan(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double n = as_number(prg, v[0]);
+	double n = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -946,8 +946,8 @@ static void exprfunc_math_atan2(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	double n = as_number(prg, v[0]);
-	double n2 = as_number(prg, v[1]);
+	double n = as_number(prg, v, 0);
+	double n2 = as_number(prg, v, 1);
 
 
 	prg->result.set_type(Variable::NUMBER);
@@ -959,7 +959,7 @@ static void exprfunc_math_abs(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double n = as_number(prg, v[0]);
+	double n = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 		
@@ -970,8 +970,8 @@ static void exprfunc_math_pow(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	double n = as_number(prg, v[0]);
-	double n2 = as_number(prg, v[1]);
+	double n = as_number(prg, v, 0);
+	double n2 = as_number(prg, v, 1);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -982,7 +982,7 @@ static void exprfunc_math_sqrt(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double n = as_number(prg, v[0]);
+	double n = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -993,7 +993,7 @@ static void exprfunc_math_floor(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double n = as_number(prg, v[0]);
+	double n = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -1004,7 +1004,7 @@ static void exprfunc_math_ceil(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double n = as_number(prg, v[0]);
+	double n = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -1015,7 +1015,7 @@ static void exprfunc_math_neg(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double n = as_number(prg, v[0]);
+	double n = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -1026,8 +1026,8 @@ static void exprfunc_math_intmod(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int n1 = (int)as_number(prg, v[0]);
-	int n2 = (int)as_number(prg, v[1]);
+	int n1 = (int)as_number(prg, v, 0);
+	int n2 = (int)as_number(prg, v, 1);
 
        	prg->result.set_type(Variable::NUMBER);
 
@@ -1038,8 +1038,8 @@ static void exprfunc_math_fmod(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	double n1 = as_number(prg, v[0]);
-	double n2 = as_number(prg, v[1]);
+	double n1 = as_number(prg, v, 0);
+	double n2 = as_number(prg, v, 1);
 
        	prg->result.set_type(Variable::NUMBER);
 
@@ -1050,7 +1050,7 @@ static void exprfunc_math_sign(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double n = as_number(prg, v[0]);
+	double n = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 		
@@ -1061,7 +1061,7 @@ static void exprfunc_math_exp(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double n = as_number(prg, v[0]);
+	double n = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 		
@@ -1072,8 +1072,8 @@ static void exprfunc_math_hypot(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	double n = as_number(prg, v[0]);
-	double n2 = as_number(prg, v[1]);
+	double n = as_number(prg, v, 0);
+	double n2 = as_number(prg, v, 1);
 
 	prg->result.set_type(Variable::NUMBER);
 		
@@ -1084,7 +1084,7 @@ static void exprfunc_math_log(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double n = as_number(prg, v[0]);
+	double n = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 		
@@ -1095,7 +1095,7 @@ static void exprfunc_math_log10(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	double n = as_number(prg, v[0]);
+	double n = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 		
@@ -1106,10 +1106,10 @@ static void exprfunc_math_min(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	double n = as_number(prg, v[0]);
+	double n = as_number(prg, v, 0);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		n = MIN(n, as_number(prg, v[i]));
+		n = MIN(n, as_number(prg, v, i));
 	}
 	
 	prg->result.set_type(Variable::NUMBER);
@@ -1120,10 +1120,10 @@ static void exprfunc_math_max(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	double n = as_number(prg, v[0]);
+	double n = as_number(prg, v, 0);
 
 	for (size_t i = 1; i < v.size(); i++) {
-		n = MAX(n, as_number(prg, v[i]));
+		n = MAX(n, as_number(prg, v, i));
 	}
 	
 	prg->result.set_type(Variable::NUMBER);
@@ -1134,7 +1134,7 @@ static bool vectorfunc_init(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 
-	Variable &vec = as_variable(prg, v[0]);
+	Variable &vec = as_variable(prg, v, 0);
 	
 	if (vec.constant) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
@@ -1147,17 +1147,17 @@ static bool vectorfunc_init(Program *prg, const std::vector<Token> &v)
 		if (v[i].type == Token::NUMBER) {
 			Variable var;
 			var.type = Variable::NUMBER;
-			var.n = as_number(prg, v[i]);
+			var.n = as_number(prg, v, i);
 			vec.v.push_back(var);
 		}
 		else if (v[i].type == Token::STRING) {
 			Variable var;
 			var.type = Variable::STRING;
-			var.s = as_string(prg, v[i]);
+			var.s = as_string(prg, v, i);
 			vec.v.push_back(var);
 		}
 		else {
-			Variable var = as_variable_resolve(prg, v[i]);
+			Variable var = as_variable_resolve(prg, v, i);
 			var.constant = false;
 			vec.v.push_back(var);
 		}
@@ -1170,7 +1170,7 @@ static bool vectorfunc_add(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable(prg, v, 0);
 	
 	if (id.constant) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
@@ -1179,7 +1179,7 @@ static bool vectorfunc_add(Program *prg, const std::vector<Token> &v)
 	id.type = Variable::VECTOR;
 
 	for (size_t i  = 1; i < v.size(); i++) {
-		Variable var = as_variable_resolve(prg, v[i]);
+		Variable var = as_variable_resolve(prg, v, i);
 
 		var.constant = false;
 
@@ -1203,13 +1203,13 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable(prg, v, 0);
 	
 	if (id.constant) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
 	}
 
-	double index = as_number(prg, v[1]);
+	double index = as_number(prg, v, 1);
 
 	id.type = Variable::VECTOR;
 
@@ -1224,7 +1224,7 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 		var.n = v[2].n;
 	}
 	else if (v[2].type == Token::SYMBOL) {
-		var = as_variable(prg, v[2]);
+		var = as_variable(prg, v, 2);
 		var.constant = false;
 	}
 	else {
@@ -1242,13 +1242,13 @@ static bool vectorfunc_erase(Program *prg, const std::vector<Token> &v)
 
 	COUNT_ARGS(2)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable(prg, v, 0);
 	
 	if (id.constant) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
 	}
 
-	double index = as_number(prg, v[1]);
+	double index = as_number(prg, v, 1);
 
 	CHECK_VECTOR(id)
 
@@ -1266,7 +1266,7 @@ static bool vectorfunc_clear(Program *prg, const std::vector<Token> &v)
 	MIN_ARGS(1)
 
 	for (size_t i = 0; i < v.size(); i++) {
-		Variable &id = as_variable(prg, v[i]);
+		Variable &id = as_variable(prg, v, i);
 
 		if (id.constant) {
 			throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
@@ -1285,13 +1285,13 @@ static bool vectorfunc_reserve(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable(prg, v, 0);
 	
 	if (id.constant) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
 	}
 
-	int n = as_number(prg, v[1]);
+	int n = as_number(prg, v, 1);
 
 	id.type = Variable::VECTOR;
 
@@ -1321,7 +1321,7 @@ static void exprfunc_vector_it_end(Program *prg, const std::vector<Token> &v)
 static void exprfunc_vector_it_inc(Program *prg, const std::vector<Token> &v)
 {
 	Variable *it = as_variable_pointer(prg, v, 0);
-	int inc = as_number(prg, v[1]);
+	int inc = as_number(prg, v, 1);
 
 	prg->result.set_type(Variable::USER);
 	prg->result.n = MIN(it->p->v.size(), it->n + inc);
@@ -1352,7 +1352,7 @@ static bool mapfunc_clear(Program *prg, const std::vector<Token> &v)
 	MIN_ARGS(1)
 
 	for (size_t i = 0; i < v.size(); i++) {
-		Variable &id = as_variable(prg, v[i]);
+		Variable &id = as_variable(prg, v, i);
 
 		if (id.constant) {
 			throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant map at " + get_error_info(prg));
@@ -1370,13 +1370,13 @@ static bool mapfunc_erase(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	Variable &id = as_variable(prg, v[0]);
+	Variable &id = as_variable(prg, v, 0);
 	
 	if (id.constant) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant map at " + get_error_info(prg));
 	}
 
-	std::string key = as_string(prg, v[1]);
+	std::string key = as_string(prg, v, 1);
 
 	CHECK_MAP(id)
 
@@ -1395,7 +1395,7 @@ static void exprfunc_map_keys(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable m = as_variable_resolve(prg, v[0]);
+	Variable m = as_variable_resolve(prg, v, 0);
 
 	CHECK_MAP(m)
 
@@ -1416,8 +1416,8 @@ static void exprfunc_file_open(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	std::string filename = as_string(prg, v[0]);
-	std::string mode = as_string(prg, v[1]);
+	std::string filename = as_string(prg, v, 0);
+	std::string mode = as_string(prg, v, 1);
 	
 	File_Info *info = file_info(prg);
 
@@ -1438,7 +1438,7 @@ static void exprfunc_file_open_cpa(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	std::string filename = as_string(prg, v[0]);
+	std::string filename = as_string(prg, v, 0);
 	
 	File_Info *info = file_info(prg);
 
@@ -1461,7 +1461,7 @@ static bool filefunc_close(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 	
 	File_Info *info = file_info(prg);
 	INFO_EXISTS(info->files, id)
@@ -1476,7 +1476,7 @@ static void exprfunc_file_read(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::STRING);
 
@@ -1513,7 +1513,7 @@ static void exprfunc_file_read_line(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::STRING);
 
@@ -1542,7 +1542,7 @@ static void exprfunc_file_read_byte(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -1559,8 +1559,8 @@ static bool filefunc_write_byte(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	int b = as_number(prg, v[1]);
+	int id = as_number(prg, v, 0);
+	int b = as_number(prg, v, 1);
 
 	File_Info *info = file_info(prg);
 	INFO_EXISTS(info->files, id)
@@ -1576,8 +1576,8 @@ static bool filefunc_write(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	std::string val = as_string(prg, v[1]);
+	int id = as_number(prg, v, 0);
+	std::string val = as_string(prg, v, 1);
 
 	File_Info *info = file_info(prg);
 	INFO_EXISTS(info->files, id)
@@ -1591,7 +1591,7 @@ static bool filefunc_print(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 
 	std::string val = sformat(prg, v, 1);
 
@@ -1607,7 +1607,7 @@ static void exprfunc_file_tell(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 
 	File_Info *info = file_info(prg);
 	INFO_EXISTS(info->files, id)
@@ -1621,9 +1621,9 @@ static bool filefunc_seek(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	int id = as_number(prg, v[0]);
-	Sint64 o = as_number(prg, v[1]);
-	int whence = as_number(prg, v[2]);
+	int id = as_number(prg, v, 0);
+	Sint64 o = as_number(prg, v, 1);
+	int whence = as_number(prg, v, 2);
 
 	File_Info *info = file_info(prg);
 	INFO_EXISTS(info->files, id)
@@ -1637,7 +1637,7 @@ static void exprfunc_file_eof(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 
 	File_Info *info = file_info(prg);
 	INFO_EXISTS(info->files, id)
@@ -1651,8 +1651,8 @@ static bool twinklefunc_text_fore(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int c = as_number(prg, v[0]);
-	int c_b = as_number(prg, v[1]);
+	int c = as_number(prg, v, 0);
+	int c_b = as_number(prg, v, 1);
 
 	twinkle::set_fore((twinkle::TWINKLE_COLOR)c, c_b);
 
@@ -1663,8 +1663,8 @@ static bool twinklefunc_text_back(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int c = as_number(prg, v[0]);
-	int c_b = as_number(prg, v[1]);
+	int c = as_number(prg, v, 0);
+	int c_b = as_number(prg, v, 1);
 
 	twinkle::set_back((twinkle::TWINKLE_COLOR)c, c_b);
 
@@ -1721,8 +1721,8 @@ static bool twinklefunc_set_cursor_pos(Program *prg, const std::vector<Token> &v
 {
 	COUNT_ARGS(2)
 
-	int x = as_number(prg, v[0]);
-	int y = as_number(prg, v[1]);
+	int x = as_number(prg, v, 0);
+	int y = as_number(prg, v, 1);
 
 	twinkle::set_cursor_pos(x, y);
 
@@ -1742,7 +1742,7 @@ static void exprfunc_cfg_load(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	std::string cfg_name = as_string(prg, v[0]);
+	std::string cfg_name = as_string(prg, v, 0);
 
 	CFG_Info *info = cfg_info(prg);
 
@@ -1758,7 +1758,7 @@ static bool cfgfunc_destroy(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 	CFG_Info *info = cfg_info(prg);
 	INFO_EXISTS(info->cfgs, id)
 	info->cfgs.erase(id);
@@ -1770,8 +1770,8 @@ static void exprfunc_cfg_save(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	std::string cfg_name = as_string(prg, v[1]);
+	int id = as_number(prg, v, 0);
+	std::string cfg_name = as_string(prg, v, 1);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -1784,8 +1784,8 @@ static void exprfunc_cfg_typeof(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	int id = as_number(prg, v, 0);
+	std::string name = as_string(prg, v, 1);
 
 	CFG_Info *info = cfg_info(prg);
 	
@@ -1808,8 +1808,8 @@ static void exprfunc_cfg_get_number(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	int id = as_number(prg, v, 0);
+	std::string name = as_string(prg, v, 1);
 
 	CFG_Info *info = cfg_info(prg);
 	
@@ -1829,8 +1829,8 @@ static void exprfunc_cfg_get_string(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	int id = as_number(prg, v, 0);
+	std::string name = as_string(prg, v, 1);
 
 	CFG_Info *info = cfg_info(prg);
 	
@@ -1850,9 +1850,9 @@ static bool cfgfunc_set_number(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	int id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-	double val = as_number(prg, v[2]);
+	int id = as_number(prg, v, 0);
+	std::string name = as_string(prg, v, 1);
+	double val = as_number(prg, v, 2);
 
 	CFG_Info *info = cfg_info(prg);
 	
@@ -1871,9 +1871,9 @@ static bool cfgfunc_set_string(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	int id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-	std::string val = as_string(prg, v[2]);
+	int id = as_number(prg, v, 0);
+	std::string name = as_string(prg, v, 1);
+	std::string val = as_string(prg, v, 2);
 
 	CFG_Info *info = cfg_info(prg);
 	
@@ -1892,8 +1892,8 @@ static void exprfunc_cfg_exists(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	int id = as_number(prg, v, 0);
+	std::string name = as_string(prg, v, 1);
 
 	CFG_Info *info = cfg_info(prg);
 
@@ -1909,8 +1909,8 @@ static bool cfgfunc_erase(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	int id = as_number(prg, v, 0);
+	std::string name = as_string(prg, v, 1);
 
 	CFG_Info *info = cfg_info(prg);
 	
@@ -1946,13 +1946,13 @@ static void exprfunc_json_load(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 
-	std::string name = as_string(prg, v[0]);
+	std::string name = as_string(prg, v, 0);
 
 	JSON_Info *info = json_info(prg);
 
 	bool load_from_filesystem = false;
 	if (v.size() > 1) {
-		load_from_filesystem = as_number(prg, v[1]);
+		load_from_filesystem = as_number(prg, v, 1);
 	}
 
 	prg->result.set_type(Variable::NUMBER);
@@ -1973,7 +1973,7 @@ static void exprfunc_json_create(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	bool array = as_number(prg, v[0]);
+	bool array = as_number(prg, v, 0);
 
 	JSON_Info *info = json_info(prg);
 
@@ -1995,7 +1995,7 @@ static bool jsonfunc_destroy(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 	JSON_Info *info = json_info(prg);
 	INFO_EXISTS(info->jsons, id)
 	delete info->jsons[id];
@@ -2009,7 +2009,7 @@ static void exprfunc_json_exists(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	util::JSON *json = json_from_arg(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	std::string name = as_string(prg, v, 1);
 	
 	prg->result.set_type(Variable::NUMBER);
 
@@ -2022,7 +2022,7 @@ static void exprfunc_json_typeof(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	util::JSON *json = json_from_arg(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	std::string name = as_string(prg, v, 1);
 	
 	prg->result.set_type(Variable::STRING);
 
@@ -2052,7 +2052,7 @@ static void exprfunc_json_size(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	util::JSON *json = json_from_arg(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	std::string name = as_string(prg, v, 1);
 	
 	prg->result.set_type(Variable::NUMBER);
 
@@ -2065,7 +2065,7 @@ static void exprfunc_json_get_string(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	util::JSON *json = json_from_arg(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	std::string name = as_string(prg, v, 1);
 	
 	prg->result.set_type(Variable::STRING);
 
@@ -2078,7 +2078,7 @@ static void exprfunc_json_get_number(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	util::JSON *json = json_from_arg(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	std::string name = as_string(prg, v, 1);
 	
 	prg->result.set_type(Variable::NUMBER);
 
@@ -2091,7 +2091,7 @@ static void exprfunc_json_get_bool(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	util::JSON *json = json_from_arg(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	std::string name = as_string(prg, v, 1);
 	
 	prg->result.set_type(Variable::NUMBER);
 
@@ -2104,8 +2104,8 @@ static bool jsonfunc_set_string(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(3)
 
 	util::JSON *json = json_from_arg(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-	std::string val = as_string(prg, v[2]);
+	std::string name = as_string(prg, v, 1);
+	std::string val = as_string(prg, v, 2);
 	
 	util::JSON::Node *n = json->get_root();
 	n->add_nested_string(name, nullptr, val, NULL, true);
@@ -2118,8 +2118,8 @@ static bool jsonfunc_set_number(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(3)
 
 	util::JSON *json = json_from_arg(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-	double val = as_number(prg, v[2]);
+	std::string name = as_string(prg, v, 1);
+	double val = as_number(prg, v, 2);
 	
 	util::JSON::Node *n = json->get_root();
 	n->add_nested_double(name, nullptr, val, NULL, true);
@@ -2132,8 +2132,8 @@ static bool jsonfunc_set_bool(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(3)
 
 	util::JSON *json = json_from_arg(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
-	bool val = (bool)as_number(prg, v[2]);
+	std::string name = as_string(prg, v, 1);
+	bool val = (bool)as_number(prg, v, 2);
 	
 	util::JSON::Node *n = json->get_root();
 	n->add_nested_bool(name, nullptr, val, NULL, true);
@@ -2146,7 +2146,7 @@ static bool jsonfunc_add_array(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	util::JSON *json = json_from_arg(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	std::string name = as_string(prg, v, 1);
 	
 	util::JSON::Node *n = json->get_root();
 	n->add_nested_array(name);
@@ -2159,7 +2159,7 @@ static bool jsonfunc_add_hash(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	util::JSON *json = json_from_arg(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	std::string name = as_string(prg, v, 1);
 	
 	util::JSON::Node *n = json->get_root();
 	n->add_nested_hash(name);
@@ -2172,7 +2172,7 @@ static bool jsonfunc_remove(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	util::JSON *json = json_from_arg(prg, v[0]);
-	std::string name = as_string(prg, v[1]);
+	std::string name = as_string(prg, v, 1);
 	
 	json->remove(name);
 
@@ -2184,7 +2184,7 @@ static void exprfunc_json_save(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	util::JSON *json = json_from_arg(prg, v[0]);
-	std::string fn = as_string(prg, v[1]);
+	std::string fn = as_string(prg, v, 1);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -2246,13 +2246,13 @@ static bool jsonfunc_register_number(Program *prg, const std::vector<Token> &v)
 	MIN_ARGS(3)
 
 	Variable &var = prg->variables[v[0].i];
-	std::string name = as_string(prg, v[1]);
-	bool readonly = (bool)as_number(prg, v[2]);
+	std::string name = as_string(prg, v, 1);
+	bool readonly = (bool)as_number(prg, v, 2);
 
 	BooBoo_Trigger *trigger;
 	
 	if (v.size() > 3) {
-		trigger = new BooBoo_Trigger(prg, name, as_function(prg, v[3]));
+		trigger = new BooBoo_Trigger(prg, name, as_function(prg, v, 3));
 	}
 	else {
 		trigger = nullptr;
@@ -2269,13 +2269,13 @@ static bool jsonfunc_register_string(Program *prg, const std::vector<Token> &v)
 	MIN_ARGS(3)
 
 	Variable &var = prg->variables[v[0].i];
-	std::string name = as_string(prg, v[1]);
-	bool readonly = (bool)as_number(prg, v[2]);
+	std::string name = as_string(prg, v, 1);
+	bool readonly = (bool)as_number(prg, v, 2);
 	
 	BooBoo_Trigger *trigger;
 	
 	if (v.size() > 3) {
-		trigger = new BooBoo_Trigger(prg, name, as_function(prg, v[3]));
+		trigger = new BooBoo_Trigger(prg, name, as_function(prg, v, 3));
 	}
 	else {
 		trigger = nullptr;
@@ -2291,13 +2291,13 @@ static void exprfunc_load_cpa(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 
-	std::string name = as_string(prg, v[0]);
+	std::string name = as_string(prg, v, 0);
 
 	CPA_Info *info = cpa_info(prg);
 
 	bool load_from_filesystem = false;
 	if (v.size() > 1) {
-		load_from_filesystem = as_number(prg, v[1]);
+		load_from_filesystem = as_number(prg, v, 1);
 	}
 
 	prg->result.set_type(Variable::NUMBER);
@@ -2329,7 +2329,7 @@ static bool cpafunc_set_cpa(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 	
 	CPA_Info *info = cpa_info(prg);
 
@@ -2355,7 +2355,7 @@ static bool cpafunc_destroy(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 	CPA_Info *info = cpa_info(prg);
 	INFO_EXISTS(info->cpas, id)
 	delete info->cpas[id]->cpa;
@@ -2383,7 +2383,7 @@ static void exprfunc_mml_create(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	std::string str = as_string(prg, v[0]);
+	std::string str = as_string(prg, v, 0);
 	
        	prg->result.set_type(Variable::NUMBER);
 
@@ -2407,7 +2407,7 @@ static bool mmlfunc_destroy(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 	MML_Info *info = mml_info(prg);
 	INFO_EXISTS(info->mmls, id)
 	delete info->mmls[id];
@@ -2420,7 +2420,7 @@ static void exprfunc_mml_length(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 	MML_Info *info = mml_info(prg);
 	INFO_EXISTS(info->mmls, id)
 	prg->result.set_type(Variable::NUMBER);
@@ -2431,13 +2431,13 @@ static void exprfunc_mml_load(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 
-	std::string name = as_string(prg, v[0]);
+	std::string name = as_string(prg, v, 0);
 
 	MML_Info *info = mml_info(prg);
 
 	bool load_from_filesystem = false;
 	if (v.size() > 1) {
-		load_from_filesystem = as_number(prg, v[1]);
+		load_from_filesystem = as_number(prg, v, 1);
 	}
 
        	prg->result.set_type(Variable::NUMBER);
@@ -2479,20 +2479,20 @@ static void exprfunc_mml_play(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 
 	double volume;
 	bool loop;
 
 	if (v.size() > 1) {
-		volume = as_number(prg, v[1]);
+		volume = as_number(prg, v, 1);
 	}
 	else {
 		volume = 1.0;
 	}
 
 	if (v.size() > 2) {
-		loop = as_number(prg, v[2]);
+		loop = as_number(prg, v, 2);
 	}
 	else {
 		loop = false;
@@ -2501,7 +2501,7 @@ static void exprfunc_mml_play(Program *prg, const std::vector<Token> &v)
 	float pan;
 
 	if (v.size() > 3) {
-		pan = as_number(prg, v[3]);
+		pan = as_number(prg, v, 3);
 	}
 	else {
 		pan = 0.0f;
@@ -2521,7 +2521,7 @@ static void exprfunc_mml_play(Program *prg, const std::vector<Token> &v)
 	if (v.size() > 4) {
 		MML_Callback_Data *d = new MML_Callback_Data;
 		d->prg = prg;
-		d->function = as_function(prg, v[4]);
+		d->function = as_function(prg, v, 4);
 		d->id = iinfo->instance_id;
 		callback_data = d;
 		callback = mml_callback;
@@ -2554,7 +2554,7 @@ static void exprfunc_mml_num_tracks(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 
 	MML_Info *info = mml_info(prg);
 
@@ -2570,9 +2570,9 @@ static bool mmlfunc_set_sample(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	int id = as_number(prg, v[0]);
-	int index = as_number(prg, v[1]);
-	int sid = as_number(prg, v[2]);
+	int id = as_number(prg, v, 0);
+	int index = as_number(prg, v, 1);
+	int sid = as_number(prg, v, 2);
 
 	MML_Info *info = mml_info(prg);
 
@@ -2595,7 +2595,7 @@ static bool mmlfunc_stop(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 
 	MML_Instance_Info *info = mml_instance_info(prg);
 
@@ -2614,13 +2614,13 @@ static bool mmlfunc_set_volume(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	int inst = as_number(prg, v[0]);
-	float vol = as_number(prg, v[1]);
+	int inst = as_number(prg, v, 0);
+	float vol = as_number(prg, v, 1);
 
 	int track;
 
 	if (v.size() > 2) {
-		track = as_number(prg, v[2]);
+		track = as_number(prg, v, 2);
 	}
 	else {
 		track = -1;
@@ -2643,13 +2643,13 @@ static bool mmlfunc_set_pan(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	int inst = as_number(prg, v[0]);
-	float pan = as_number(prg, v[1]);
+	int inst = as_number(prg, v, 0);
+	float pan = as_number(prg, v, 1);
 
 	int track;
 
 	if (v.size() > 2) {
-		track = as_number(prg, v[2]);
+		track = as_number(prg, v, 2);
 	}
 	else {
 		track = -1;
@@ -2672,13 +2672,13 @@ static bool mmlfunc_set_tempo(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	int inst = as_number(prg, v[0]);
-	int bpm = as_number(prg, v[1]);
+	int inst = as_number(prg, v, 0);
+	int bpm = as_number(prg, v, 1);
 
 	int track;
 
 	if (v.size() > 2) {
-		track = as_number(prg, v[2]);
+		track = as_number(prg, v, 2);
 	}
 	else {
 		track = -1;
@@ -2701,8 +2701,8 @@ static void exprfunc_mml_get_volume(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int inst = as_number(prg, v[0]);
-	int track = as_number(prg, v[1]);
+	int inst = as_number(prg, v, 0);
+	int track = as_number(prg, v, 1);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -2721,8 +2721,8 @@ static void exprfunc_mml_get_tempo(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int inst = as_number(prg, v[0]);
-	int track = as_number(prg, v[1]);
+	int inst = as_number(prg, v, 0);
+	int track = as_number(prg, v, 1);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -2741,8 +2741,8 @@ static void exprfunc_mml_get_pan(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int inst = as_number(prg, v[0]);
-	int track = as_number(prg, v[1]);
+	int inst = as_number(prg, v, 0);
+	int track = as_number(prg, v, 1);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -2761,7 +2761,7 @@ static void exprfunc_mml_elapsed(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int inst = as_number(prg, v[0]);
+	int inst = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
 
@@ -2780,13 +2780,13 @@ static void exprfunc_sample_load(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 
-	std::string name = as_string(prg, v[0]);
+	std::string name = as_string(prg, v, 0);
 
 	Sample_Info *info = sample_info(prg);
 
 	bool load_from_filesystem = false;
 	if (v.size() > 1) {
-		load_from_filesystem = as_number(prg, v[1]);
+		load_from_filesystem = as_number(prg, v, 1);
 	}
 
 	prg->result.set_type(Variable::NUMBER);
@@ -2806,9 +2806,9 @@ static void exprfunc_sample_create(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	Variable vec = as_variable_resolve(prg, v[0]);
-	int freq = as_number(prg, v[1]);
-	int channels = as_number(prg, v[2]);
+	Variable vec = as_variable_resolve(prg, v, 0);
+	int freq = as_number(prg, v, 1);
+	int channels = as_number(prg, v, 2);
 
 	Sample_Info *info = sample_info(prg);
 
@@ -2837,7 +2837,7 @@ static bool samplefunc_destroy(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 	Sample_Info *info = sample_info(prg);
 	INFO_EXISTS(info->samples, id)
 	delete info->samples[id];
@@ -2886,20 +2886,20 @@ static void exprfunc_sample_play(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 
 	double volume;
 	bool loop;
 
 	if (v.size() > 1) {
-		volume = as_number(prg, v[1]);
+		volume = as_number(prg, v, 1);
 	}
 	else {
 		volume = 1.0;
 	}
 
 	if (v.size() > 2) {
-		loop = as_number(prg, v[2]);
+		loop = as_number(prg, v, 2);
 	}
 	else {
 		loop = false;
@@ -2908,7 +2908,7 @@ static void exprfunc_sample_play(Program *prg, const std::vector<Token> &v)
 	float pan;
 
 	if (v.size() > 3) {
-		pan = as_number(prg, v[3]);
+		pan = as_number(prg, v, 3);
 	}
 	else {
 		pan = 0.0f;
@@ -2923,7 +2923,7 @@ static void exprfunc_sample_play(Program *prg, const std::vector<Token> &v)
 	int millis;
 
 	if (v.size() > 4) {
-		millis = as_number(prg, v[4]);
+		millis = as_number(prg, v, 4);
 	}
 	else {
 		millis = audio::samples_to_millis(sample->get_length(), sample->get_frequency());
@@ -2937,7 +2937,7 @@ static void exprfunc_sample_play(Program *prg, const std::vector<Token> &v)
 	if (v.size() > 5) {
 		Sample_Callback_Data *d = new Sample_Callback_Data;
 		d->prg = prg;
-		d->function = as_function(prg, v[5]);
+		d->function = as_function(prg, v, 5);
 		d->id = iinfo->instance_id;
 		callback_data = d;
 		callback = sample_callback;
@@ -2977,8 +2977,8 @@ static bool samplefunc_seek(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	int millis = as_number(prg, v[1]);
+	int id = as_number(prg, v, 0);
+	int millis = as_number(prg, v, 1);
 
 	Sample_Instance_Info *info = sample_instance_info(prg);
 
@@ -3003,7 +3003,7 @@ static void exprfunc_sample_length(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 
 	Sample_Info *info = sample_info(prg);
 
@@ -3021,7 +3021,7 @@ static void exprfunc_sample_elapsed(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 
 	Sample_Instance_Info *info = sample_instance_info(prg);
 
@@ -3045,7 +3045,7 @@ static void exprfunc_sample_get_volume(Program *prg, const std::vector<Token> &v
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 
 	Sample_Instance_Info *info = sample_instance_info(prg);
 
@@ -3069,7 +3069,7 @@ static void exprfunc_sample_get_pan(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 
 	Sample_Instance_Info *info = sample_instance_info(prg);
 
@@ -3093,7 +3093,7 @@ static bool samplefunc_stop(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int id = as_number(prg, v[0]);
+	int id = as_number(prg, v, 0);
 
 	Sample_Instance_Info *info = sample_instance_info(prg);
 
@@ -3110,8 +3110,8 @@ static bool samplefunc_set_volume(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	float vol = as_number(prg, v[1]);
+	int id = as_number(prg, v, 0);
+	float vol = as_number(prg, v, 1);
 
 	Sample_Instance_Info *info = sample_instance_info(prg);
 
@@ -3132,8 +3132,8 @@ static bool samplefunc_set_pan(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	int id = as_number(prg, v[0]);
-	float pan = as_number(prg, v[1]);
+	int id = as_number(prg, v, 0);
+	float pan = as_number(prg, v, 1);
 
 	Sample_Instance_Info *info = sample_instance_info(prg);
 
@@ -3196,7 +3196,7 @@ static bool miscfunc_delay(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	int millis = (int)as_number(prg, v[0]);
+	int millis = (int)as_number(prg, v, 0);
 	SDL_Delay(millis);
 	return true;
 }
