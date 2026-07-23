@@ -3255,15 +3255,17 @@ static bool corefunc_explode(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
-	Variable vec = as_variable_resolve(prg, v, 0);
+	Variable *vec = as_variable_pointer(prg, v, 0);
 
-	CHECK_VECTOR(vec)
+	//printf("vec->size=%d vec->v[0]->size=%d 1=%d\n", vec->v.size(), vec->v[0].v.size(), vec->v[1].v.size());
+
+	CHECK_VECTOR(*vec)
 
 	for (size_t i = 1; i < v.size(); i++) {
 		Variable &v1 = as_variable(prg, v, i);
 		std::string name = v1.name;
 		//bool constant = v1.constant;
-		v1 = vec.v[i-1];
+		v1 = vec->v[i-1];
 		v1.name = name;
 		prg->result.v.clear();
 		prg->result.m.clear();
@@ -4494,9 +4496,6 @@ Variable *as_variable_pointer(Program *prg, const std::vector<Token> &v, int ind
 	if (v2.type == Variable::POINTER) {
 		var = dereference(prg, v, index);
 	}
-	else {
-		var = &v2;
-	}
 	
 	if (var->type == Variable::EXPRESSION) {
 		evaluate_expression(prg, var->e);
@@ -4592,7 +4591,10 @@ double as_number(Program *prg, const std::vector<Token> &v, int index)
 
 std::string as_string(Program *prg, const std::vector<Token> &v, int index)
 {
-	if (v[index].type == Token::NUMBER) {
+	if (v[index].type == Token::STRING) {
+		return v[index].s;
+	}
+	else if (v[index].type == Token::NUMBER) {
 		char buf[1000];
 		snprintf(buf, 1000, "%f", v[index].n);
 		return buf;
@@ -4624,9 +4626,6 @@ std::string as_string(Program *prg, const std::vector<Token> &v, int index)
 		else {
 			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 		}
-	}
-	else if (v[index].type == Token::STRING) {
-		return v[index].s;
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));

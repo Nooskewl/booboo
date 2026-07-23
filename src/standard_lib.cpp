@@ -508,6 +508,7 @@ static void exprfunc_list_directory(Program *prg, const std::vector<Token> &v)
 	std::string glob = as_string(prg, v, 0);
 
 	prg->result.set_type(Variable::VECTOR);
+	prg->result.clear();
 
 	std::string path_part;
 	int p = glob.length() - 1;

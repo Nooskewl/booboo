@@ -235,6 +235,7 @@ std::string BOOBOO_EXPORT get_file_name(Program *prg);
 std::string BOOBOO_EXPORT get_error_info(Program *prg);
 
 // These are helpful within your own library functions
+// use_result is faster when you aren't calling as_* after this call
 Variable BOOBOO_EXPORT *as_variable_pointer(Program *prg, const std::vector<Token> &v, int index, bool use_result = false);
 Variable BOOBOO_EXPORT &as_variable(Program *prg, const std::vector<Token> &v, int index);
 // If you know result will not be overwritten by further calls, setting use_result is going to be faster because it avoids copying result into a temp static var
