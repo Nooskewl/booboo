@@ -255,7 +255,7 @@ Variable BOOBOO_EXPORT &get_variable(Program *prg, int index);
 void BOOBOO_EXPORT evaluate_expression(Program *prg, const Variable::Expression &e);
 Variable BOOBOO_EXPORT &go_fish(Program *prg, const Variable::Fish &f);
 
-extern BOOBOO_EXPORT Variable *dereference(Program *prg, const Token &t);
+extern BOOBOO_EXPORT Variable *dereference(Program *prg, const std::vector<Token> &v, int index);
 
 // This stuff can be used but it's used by the BooBoo interpreter
 extern BOOBOO_EXPORT std::string reset_game_name;

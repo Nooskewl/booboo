@@ -273,7 +273,7 @@ static std::string sformat(Program *prg, const std::vector<Token> &v, int skip)
 		else {
 			Variable *v1;
 			if (v[_tok].dereference > 0) {
-				v1 = dereference(prg, v[_tok]);
+				v1 = dereference(prg, v, _tok);
 			}
 			else {
 				v1 = &as_variable(prg, v, _tok);
@@ -674,7 +674,7 @@ static bool stringfunc_set_char_at(Program *prg, const std::vector<Token> &v)
 
 	Variable *p;
 	if (v[0].dereference) {
-		p = dereference(prg, v[0]);
+		p = dereference(prg, v, 0);
 	}
 	else {
 		p = &s;
@@ -1925,15 +1925,15 @@ static bool cfgfunc_erase(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static util::JSON *json_from_arg(Program *prg, const Token &t)
+static util::JSON *json_from_arg(Program *prg, const std::vector<Token> &v, int index)
 {
-	if (t.type == Token::SYMBOL) {
-		Variable &var = as_variable(prg, t);
+	if (v[index].type == Token::SYMBOL) {
+		Variable &var = as_variable(prg, v, index);
 		if (var.type == Variable::POINTER) {
 			return shim::shim_json;
 		}
 		else {
-			int id = as_number(prg, t);
+			int id = as_number(prg, v, index);
 			JSON_Info *info = json_info(prg);
 			INFO_EXISTS(info->jsons, id)
 			return info->jsons[id];
@@ -2008,7 +2008,7 @@ static void exprfunc_json_exists(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	util::JSON *json = json_from_arg(prg, v[0]);
+	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	
 	prg->result.set_type(Variable::NUMBER);
@@ -2021,7 +2021,7 @@ static void exprfunc_json_typeof(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	util::JSON *json = json_from_arg(prg, v[0]);
+	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	
 	prg->result.set_type(Variable::STRING);
@@ -2051,7 +2051,7 @@ static void exprfunc_json_size(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	util::JSON *json = json_from_arg(prg, v[0]);
+	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	
 	prg->result.set_type(Variable::NUMBER);
@@ -2064,7 +2064,7 @@ static void exprfunc_json_get_string(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	util::JSON *json = json_from_arg(prg, v[0]);
+	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	
 	prg->result.set_type(Variable::STRING);
@@ -2077,7 +2077,7 @@ static void exprfunc_json_get_number(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	util::JSON *json = json_from_arg(prg, v[0]);
+	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	
 	prg->result.set_type(Variable::NUMBER);
@@ -2090,7 +2090,7 @@ static void exprfunc_json_get_bool(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	util::JSON *json = json_from_arg(prg, v[0]);
+	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	
 	prg->result.set_type(Variable::NUMBER);
@@ -2103,7 +2103,7 @@ static bool jsonfunc_set_string(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	util::JSON *json = json_from_arg(prg, v[0]);
+	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	std::string val = as_string(prg, v, 2);
 	
@@ -2117,7 +2117,7 @@ static bool jsonfunc_set_number(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	util::JSON *json = json_from_arg(prg, v[0]);
+	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	double val = as_number(prg, v, 2);
 	
@@ -2131,7 +2131,7 @@ static bool jsonfunc_set_bool(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
-	util::JSON *json = json_from_arg(prg, v[0]);
+	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	bool val = (bool)as_number(prg, v, 2);
 	
@@ -2145,7 +2145,7 @@ static bool jsonfunc_add_array(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	util::JSON *json = json_from_arg(prg, v[0]);
+	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	
 	util::JSON::Node *n = json->get_root();
@@ -2158,7 +2158,7 @@ static bool jsonfunc_add_hash(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	util::JSON *json = json_from_arg(prg, v[0]);
+	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	
 	util::JSON::Node *n = json->get_root();
@@ -2171,7 +2171,7 @@ static bool jsonfunc_remove(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	util::JSON *json = json_from_arg(prg, v[0]);
+	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	
 	json->remove(name);
@@ -2183,7 +2183,7 @@ static void exprfunc_json_save(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	util::JSON *json = json_from_arg(prg, v[0]);
+	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string fn = as_string(prg, v, 1);
 
 	prg->result.set_type(Variable::NUMBER);

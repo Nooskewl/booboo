@@ -46,7 +46,7 @@ static bool mousefunc_set_relative(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	bool onoff = as_number(prg, v[0]);
+	bool onoff = as_number(prg, v, 0);
 
 	SDL_SetWindowRelativeMouseMode(gfx::internal::gfx_context.window, (bool)onoff);
 
@@ -131,7 +131,7 @@ static void exprfunc_key_get(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(1)
 
 	bool pressed = false;
-	int checking = as_number(prg, v[0]);
+	int checking = as_number(prg, v, 0);
 
 	for (std::list<int>::iterator it = keys_pressed.begin(); it != keys_pressed.end(); it++) {
 		int &k = *it;
