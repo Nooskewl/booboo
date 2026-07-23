@@ -4467,15 +4467,15 @@ Variable &get_variable(Program *prg, int index)
 	return prg->variables[index];
 }
 
-Variable &as_variable(Program *prg, const Token &t)
+Variable &as_variable(Program *prg, const std::vector<Token> &v, int index)
 {
-	if (t.type != Token::SYMBOL) {
+	if (v[index].type != Token::SYMBOL) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
-	if (prg->variables[t.i].type == Variable::FISH) {
-		return go_fish(prg, prg->variables[t.i].f);
+	if (prg->variables[v[index].i].type == Variable::FISH) {
+		return go_fish(prg, prg->variables[v[index].i].f);
 	}
-	return prg->variables[t.i];
+	return prg->variables[v[index].i];
 }
 
 Variable *as_variable_pointer(Program *prg, const std::vector<Token> &v, int index, bool use_result)
@@ -4492,7 +4492,7 @@ Variable *as_variable_pointer(Program *prg, const std::vector<Token> &v, int ind
 	var = &v2;
 
 	if (v2.type == Variable::POINTER) {
-		var = dereference(prg, v[index]);
+		var = dereference(prg, v, index);
 	}
 	else {
 		var = &v2;
@@ -4512,70 +4512,42 @@ Variable *as_variable_pointer(Program *prg, const std::vector<Token> &v, int ind
 	return var;
 }
 
-Variable as_variable_resolve(Program *prg, const Token &t)
+Variable as_variable_resolve(Program *prg, const std::vector<Token> &v, int index)
 {
-	if (t.type == Token::NUMBER) {
+	if (v[index].type == Token::NUMBER) {
 		Variable var;
 		var.type = Variable::NUMBER;
-		var.n = t.n;
+		var.n = v[index].n;
 		return var;
 	}
-	else if (t.type == Token::STRING) {
+	else if (v[index].type == Token::STRING) {
 		Variable var;
 		var.type = Variable::STRING;
-		var.s = t.s;
+		var.s = v[index].s;
 		return var;
 	}
-	else if (prg->variables[t.i].type == Variable::FISH) {
-		return go_fish(prg, prg->variables[t.i].f);
+	else if (prg->variables[v[index].i].type == Variable::FISH) {
+		return go_fish(prg, prg->variables[v[index].i].f);
 	}
-	else if (prg->variables[t.i].type == Variable::EXPRESSION) {
-		evaluate_expression(prg, prg->variables[t.i].e);
+	else if (prg->variables[v[index].i].type == Variable::EXPRESSION) {
+		evaluate_expression(prg, prg->variables[v[index].i].e);
 		return prg->result;
 	}
-	else if (t.dereference > 0) {
-		return *dereference(prg, t);
+	else if (v[index].dereference > 0) {
+		return *dereference(prg, v, index);
 	}
 	else {
-		return prg->variables[t.i];
+		return prg->variables[v[index].i];
 	}
 }
 
-double as_number(Program *prg, const Token &t)
+double as_number(Program *prg, const std::vector<Token> &v, int index)
 {
-	if (t.type == Token::NUMBER) {
-		return t.n;
+	if (v[index].type == Token::NUMBER) {
+		return v[index].n;
 	}
-	else if (t.type == Token::SYMBOL) {
-		Variable *v;
-		if (t.dereference) {
-			if (prg->variables[t.i].type == Variable::EXPRESSION) {
-				evaluate_expression(prg, prg->variables[t.i].e);
-				//std::string name = v->name;
-				//bool constant = v->constant;
-				v = prg->result.p;
-				//v->name = name;
-				//v->constant = constant;
-			}
-			else if (prg->variables[t.i].type == Variable::FISH) {
-				Variable &var = go_fish(prg, prg->variables[t.i].f);
-				//std::string name = v->name;
-				//bool constant = v->constant;
-				v = var.p;
-				//v->name = name;
-				//v->constant = constant;
-			}
-			else {
-				//std::string name = v->name;
-				//bool constant = v->constant;
-				v = prg->variables[t.i].p;
-				//v->name = name;
-				//v->constant = constant;
-			}
-		}
-		else {
-			v = &prg->variables[t.i];
-		}
+	else if (v[index].type == Token::SYMBOL) {
+		Variable *v = as_variable_pointer(prg, v, index);
 		if (v->type == Variable::NUMBER) {
 			return v->n;
 		}
@@ -4593,11 +4565,11 @@ double as_number(Program *prg, const Token &t)
 		}
 		else if (v->type == Variable::EXPRESSION) {
 			evaluate_expression(prg, v->e);
-			if (prg->result.type == Variable::NUMBER) {
-				return prg->result.n;
+			if (prg->resulv[index].type == Variable::NUMBER) {
+				return prg->resulv[index].n;
 			}
-			else if (prg->result.type == Variable::STRING) {
-				return atof(prg->result.s.c_str());
+			else if (prg->resulv[index].type == Variable::STRING) {
+				return atof(prg->resulv[index].s.c_str());
 			}
 			else {
 				throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
@@ -4610,51 +4582,23 @@ double as_number(Program *prg, const Token &t)
 			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 		}
 	}
-	else if (t.type == Token::STRING) {
-		return atof(t.s.c_str());
+	else if (v[index].type == Token::STRING) {
+		return atof(v[index].s.c_str());
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 }
 
-std::string as_string(Program *prg, const Token &t)
+std::string as_string(Program *prg, const std::vector<Token> &v, int index)
 {
-	if (t.type == Token::NUMBER) {
+	if (v[index].type == Token::NUMBER) {
 		char buf[1000];
-		snprintf(buf, 1000, "%f", t.n);
+		snprintf(buf, 1000, "%f", v[index].n);
 		return buf;
 	}
-	else if (t.type == Token::SYMBOL) {
-		Variable *v;
-		if (t.dereference) {
-			if (prg->variables[t.i].type == Variable::EXPRESSION) {
-				evaluate_expression(prg, prg->variables[t.i].e);
-				//std::string name = v->name;
-				//bool constant = v->constant;
-				v = prg->result.p;
-				//v->name = name;
-				//v->constant = constant;
-			}
-			else if (prg->variables[t.i].type == Variable::FISH) {
-				Variable &var = go_fish(prg, prg->variables[t.i].f);
-				//std::string name = v->name;
-				//bool constant = v->constant;
-				v = var.p;
-				//v->name = name;
-				//v->constant = constant;
-			}
-			else {
-				//std::string name = v->name;
-				//bool constant = v->constant;
-				v = prg->variables[t.i].p;
-				//v->name = name;
-				//v->constant = constant;
-			}
-		}
-		else {
-			v = &prg->variables[t.i];
-		}
+	else if (v[index].type == Token::SYMBOL) {
+		Variable *v = as_variable_pointer(prg, v, index);
 		if (v->type == Variable::STRING) {
 			return v->s;
 		}
@@ -4665,10 +4609,10 @@ std::string as_string(Program *prg, const Token &t)
 		}
 		else if (v->type == Variable::EXPRESSION) {
 			evaluate_expression(prg, v->e);
-			if (prg->result.type != Variable::STRING) {
+			if (prg->resulv[index].type != Variable::STRING) {
 				throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 			}
-			return prg->result.s;
+			return prg->resulv[index].s;
 		}
 		else if (v->type == Variable::FISH) {
 			Variable &var = go_fish(prg, v->f);
@@ -4681,48 +4625,20 @@ std::string as_string(Program *prg, const Token &t)
 			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 		}
 	}
-	else if (t.type == Token::STRING) {
-		return t.s;
+	else if (v[index].type == Token::STRING) {
+		return v[index].s;
 	}
 	else {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
 }
 
-int as_label(Program *prg, const Token &t)
+int as_label(Program *prg, const std::vector<Token> &v, int index)
 {
-	if (t.type != Token::SYMBOL) {
+	if (v[index].type != Token::SYMBOL) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
-	Variable *v;
-	if (t.dereference) {
-		if (prg->variables[t.i].type == Variable::EXPRESSION) {
-			evaluate_expression(prg, prg->variables[t.i].e);
-			//std::string name = v->name;
-			//bool constant = v->constant;
-			v = prg->result.p;
-			//v->name = name;
-			//v->constant = constant;
-		}
-		else if (prg->variables[t.i].type == Variable::FISH) {
-			Variable &var = go_fish(prg, prg->variables[t.i].f);
-			//std::string name = v->name;
-			//bool constant = v->constant;
-			v = var.p;
-			//v->name = name;
-			//v->constant = constant;
-		}
-		else {
-			//std::string name = v->name;
-			//bool constant = v->constant;
-			v = prg->variables[t.i].p;
-			//v->name = name;
-			//v->constant = constant;
-		}
-	}
-	else {
-		v = &prg->variables[t.i];
-	}
+	Variable *v = as_variable_pointer(prg, v, index);
 	if (v->type == Variable::FISH) {
 		Variable &var = go_fish(prg, v->f);
 		if (var.type != Variable::LABEL) {
@@ -4736,40 +4652,12 @@ int as_label(Program *prg, const Token &t)
 	return v->n;
 }
 
-int as_function(Program *prg, const Token &t)
+int as_function(Program *prg, const std::vector<Token> &v, int index)
 {
-	if (t.type != Token::SYMBOL) {
+	if (v[index].type != Token::SYMBOL) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
-	Variable *v;
-	if (t.dereference) {
-		if (prg->variables[t.i].type == Variable::EXPRESSION) {
-			evaluate_expression(prg, prg->variables[t.i].e);
-			//std::string name = v->name;
-			//bool constant = v->constant;
-			v = prg->result.p;
-			//v->name = name;
-			//v->constant = constant;
-		}
-		else if (prg->variables[t.i].type == Variable::FISH) {
-			Variable &var = go_fish(prg, prg->variables[t.i].f);
-			//std::string name = v->name;
-			//bool constant = v->constant;
-			v = var.p;
-			//v->name = name;
-			//v->constant = constant;
-		}
-		else {
-			//std::string name = v->name;
-			//bool constant = v->constant;
-			v = prg->variables[t.i].p;
-			//v->name = name;
-			//v->constant = constant;
-		}
-	}
-	else {
-		v = &prg->variables[t.i];
-	}
+	Variable *v = as_variable_pointer(prg, v, index);
 	if (v->type == Variable::FISH) {
 		Variable &var = go_fish(prg, v->f);
 		if (var.type != Variable::FUNCTION) {
@@ -4783,23 +4671,23 @@ int as_function(Program *prg, const Token &t)
 	return v->n;
 }
 
-Variable as_pointer(Program *prg, const Token &t)
+Variable as_pointer(Program *prg, const std::vector<Token> &v, int index)
 {
-	if (t.type != Token::SYMBOL) {
+	if (v[index].type != Token::SYMBOL) {
 		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
 	}
-	if (prg->variables[t.i].type == Variable::FISH) {
-		return go_fish(prg, prg->variables[t.i].f);
+	if (prg->variables[v[index].i].type == Variable::FISH) {
+		return go_fish(prg, prg->variables[v[index].i].f);
 	}
-	else if (prg->variables[t.i].type == Variable::EXPRESSION) {
-		evaluate_expression(prg, prg->variables[t.i].e);
+	else if (prg->variables[v[index].i].type == Variable::EXPRESSION) {
+		evaluate_expression(prg, prg->variables[v[index].i].e);
 		return prg->result;
 	}
-	else if (t.dereference) {
-		return *prg->variables[t.i].p;
+	else if (v[index].dereference) {
+		return *prg->variables[v[index].i].p;
 	}
 	else {
-		return prg->variables[t.i];
+		return prg->variables[v[index].i];
 	}
 }
 
