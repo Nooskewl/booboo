@@ -136,7 +136,7 @@ void Variable::clear()
 void Variable::set_type(Variable_Type type)
 {
 	this->type = type;
-	//clear();
+	clear();
 }
 
 static std::string escape_string(std::string s)
@@ -3256,8 +3256,6 @@ static bool corefunc_explode(Program *prg, const std::vector<Token> &v)
 	MIN_ARGS(2)
 
 	Variable *vec = as_variable_pointer(prg, v, 0);
-
-	//printf("vec->size=%d vec->v[0]->size=%d 1=%d\n", vec->v.size(), vec->v[0].v.size(), vec->v[1].v.size());
 
 	CHECK_VECTOR(*vec)
 
