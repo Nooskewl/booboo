@@ -3217,6 +3217,26 @@ static void exprfunc_misc_get_ticks(Program *prg, const std::vector<Token> &v)
 	prg->result.n = SDL_GetTicks();
 }
 
+static bool miscfunc_die(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable &expr = prg->variables[v[0].i];
+	std::string msg = as_string(prg, v, 1);
+
+	CHECK_EXPRESSION(expr)
+
+	evaluate_expression(prg, expr.e);
+
+	if (prg->result.n == 0) {
+	Variable &expr = prg->variables[v[2].i];
+		gui::popup("Error", msg, gui::OK);
+		exit(1);
+	}
+
+	return true;	
+}
+
 static void exprfunc_misc_file_list(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -3389,6 +3409,7 @@ void start_lib_standard()
 	add_instruction("delay", miscfunc_delay);
 	add_expression_handler("get_ticks", exprfunc_misc_get_ticks);
 	add_expression_handler("file_list", exprfunc_misc_file_list);
+	add_instruction("die", miscfunc_die);
 }
 
 void end_lib_standard()
