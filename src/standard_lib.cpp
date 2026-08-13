@@ -424,6 +424,17 @@ static void exprfunc_getenv(Program *prg, const std::vector<Token> &v)
 	prg->result.s = ptr == nullptr ? "" : ptr;
 }
 
+static void exprfunc_getcwd(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	char buf[2048];
+	char *res = getcwd(buf, 2048);
+
+	prg->result.set_type(Variable::STRING);
+	prg->result.s = res == nullptr ? "" : buf;
+}
+
 static bool corefunc_print(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
@@ -3228,6 +3239,7 @@ static void exprfunc_misc_file_list(Program *prg, const std::vector<Token> &v)
 void start_lib_standard()
 {
 	add_expression_handler("getenv", exprfunc_getenv);
+	add_expression_handler("getcwd", exprfunc_getcwd);
 	add_expression_handler("list_directory", exprfunc_list_directory);
 	add_instruction("print", corefunc_print);
 	add_expression_handler("input", exprfunc_input);
