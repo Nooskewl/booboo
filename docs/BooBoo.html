@@ -771,22 +771,22 @@ Sections:
 	e.g. = n (file_read_byte f)
 </pre>
 
-<h3>file_write_byte</h3>
+<h3>(file_write_byte)</h3>
 <pre>
 	Write a byte to a file
-	e.g. file_write_byte f 255
+	e.g. = success (file_write_byte f 255)
 </pre>
 
-<h3>file_write</h3>
+<h3>(file_write)</h3>
 <pre>
 	Write a word to a file
-	e.g. file_write f "turkey"
+	e.g. = success (file_write f "turkey")
 </pre>
 
-<h3>file_print</h3>
+<h3>(file_print)</h3>
 <pre>
 	Print to a file. Behaves exactly like print but takes a file
-	e.g. file_print f "%(20s)%(20s)%(20s)" x y z
+	e.g. = success (file_print f "%(20s)%(20s)%(20s)" x y z)
 </pre>
 
 <h3>(file_tell)</h3>
@@ -795,10 +795,10 @@ Sections:
 	e.g. = o (file_tell f)
 </pre>
 
-<h3>file_seek</h3>
+<h3>(file_seek)</h3>
 <pre>
 	Seek within file. Uses SEEK_* constants.
-	e.g. file_seek f 0 SEEK_END
+	e.g. = success (file_seek f 0 SEEK_END)
 </pre>
 
 <a id="CFG"></a>

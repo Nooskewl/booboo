@@ -1567,7 +1567,7 @@ static void exprfunc_file_read_byte(Program *prg, const std::vector<Token> &v)
 	prg->result.n = c;
 }
 
-static bool filefunc_write_byte(Program *prg, const std::vector<Token> &v)
+static void exprfunc_file_write_byte(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1579,12 +1579,11 @@ static bool filefunc_write_byte(Program *prg, const std::vector<Token> &v)
 
 	SDL_IOStream *f = info->files[id];
 
-	SDL_WriteU8(f, (Uint8)b);
-
-	return true;
+	prg->result.set_type(Variable::NUMBER);
+	prg->result.n = SDL_WriteU8(f, (Uint8)b);
 }
 
-static bool filefunc_write(Program *prg, const std::vector<Token> &v)
+static void exprfunc_file_write(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1594,12 +1593,11 @@ static bool filefunc_write(Program *prg, const std::vector<Token> &v)
 	File_Info *info = file_info(prg);
 	INFO_EXISTS(info->files, id)
 
-	SDL_WriteIO(info->files[id], val.c_str(), val.length());
-
-	return true;
+	prg->result.set_type(Variable::NUMBER);
+	prg->result.n = SDL_WriteIO(info->files[id], val.c_str(), val.length()) == val.length();
 }
 
-static bool filefunc_print(Program *prg, const std::vector<Token> &v)
+static void exprfunc_file_print(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 
@@ -1610,9 +1608,8 @@ static bool filefunc_print(Program *prg, const std::vector<Token> &v)
 	File_Info *info = file_info(prg);
 	INFO_EXISTS(info->files, id)
 
-	SDL_WriteIO(info->files[id], val.c_str(), val.length());
-
-	return true;
+	prg->result.set_type(Variable::NUMBER);
+	prg->result.n = SDL_WriteIO(info->files[id], val.c_str(), val.length()) == val.length();
 }
 
 static void exprfunc_file_tell(Program *prg, const std::vector<Token> &v)
@@ -1629,7 +1626,7 @@ static void exprfunc_file_tell(Program *prg, const std::vector<Token> &v)
 	prg->result.n = SDL_TellIO(info->files[id]);
 }
 
-static bool filefunc_seek(Program *prg, const std::vector<Token> &v)
+static void exprfunc_file_seek(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(3)
 
@@ -1640,9 +1637,8 @@ static bool filefunc_seek(Program *prg, const std::vector<Token> &v)
 	File_Info *info = file_info(prg);
 	INFO_EXISTS(info->files, id)
 
-	SDL_SeekIO(info->files[id], o, (SDL_IOWhence)whence);
-
-	return true;
+	prg->result.set_type(Variable::NUMBER);
+	prg->result.n = SDL_SeekIO(info->files[id], o, (SDL_IOWhence)whence) != -1;
 }
 
 static void exprfunc_file_eof(Program *prg, const std::vector<Token> &v)
@@ -3313,12 +3309,12 @@ void start_lib_standard()
 	add_expression_handler("file_read", exprfunc_file_read);
 	add_expression_handler("file_read_line", exprfunc_file_read_line);
 	add_expression_handler("file_read_byte", exprfunc_file_read_byte);
-	add_instruction("file_write_byte", filefunc_write_byte);
-	add_instruction("file_write", filefunc_write);
-	add_instruction("file_print", filefunc_print);
+	add_expression_handler("file_write_byte", exprfunc_file_write_byte);
+	add_expression_handler("file_write", exprfunc_file_write);
+	add_expression_handler("file_print", exprfunc_file_print);
 	add_expression_handler("file_eof", exprfunc_file_eof);
 	add_expression_handler("file_tell", exprfunc_file_tell);
-	add_instruction("file_seek", filefunc_seek);
+	add_expression_handler("file_seek", exprfunc_file_seek);
 	
 	add_instruction("text_fore", twinklefunc_text_fore);
 	add_instruction("text_back", twinklefunc_text_back);
