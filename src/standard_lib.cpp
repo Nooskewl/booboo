@@ -460,15 +460,16 @@ static void exprfunc_input(Program *prg, const std::vector<Token> &v)
 	}
 }
 
-static bool corefunc_mkdir(Program *prg, const std::vector<Token> &v)
+static void exprfunc_mkdir(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
 	std::string path = as_string(prg, v, 0);
 
-	util::mkdir(path);
+	bool success = util::mkdir(path);
 
-	return true;
+	prg->result.set_type(Variable::NUMBER);
+	prg->result.n = success;
 }
 
 static void exprfunc_get_system_language(Program *prg, const std::vector<Token> &v)
@@ -3243,7 +3244,7 @@ void start_lib_standard()
 	add_expression_handler("list_directory", exprfunc_list_directory);
 	add_instruction("print", corefunc_print);
 	add_expression_handler("input", exprfunc_input);
-	add_instruction("mkdir", corefunc_mkdir);
+	add_expression_handler("mkdir", exprfunc_mkdir);
 	add_expression_handler("get_system_language", exprfunc_get_system_language);
 	add_expression_handler("get_full_path", exprfunc_get_full_path);
 	add_expression_handler("list_drives", exprfunc_list_drives);
