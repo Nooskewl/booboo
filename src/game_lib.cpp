@@ -1181,7 +1181,7 @@ static void exprfunc_image_load(Program *prg, const std::vector<Token> &v)
 	}
 }
 
-static bool imagefunc_save(Program *prg, const std::vector<Token> &v)
+static void exprfunc_image_save(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
@@ -1196,14 +1196,13 @@ static bool imagefunc_save(Program *prg, const std::vector<Token> &v)
 
 	unsigned char *buf = gfx::Image::read_texture(img);
 
-	gfx::Image::save_image(filename, buf, img->size);
+	prg->result.set_type(Variable::NUMBER);
+	prg->result.n = gfx::Image::save_image(filename, buf, img->size);
 
 	delete[] buf;
-
-	return true;
 }
 
-static bool imagefunc_screenshot(Program *prg, const std::vector<Token> &v)
+static void exprfunc_image_screenshot(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 
@@ -1218,16 +1217,17 @@ static bool imagefunc_screenshot(Program *prg, const std::vector<Token> &v)
 
 	unsigned char *buf = gfx::Image::read_backbuffer(include_letterbox, &size.w, &size.h);
 
+	prg->result.set_type(Variable::NUMBER);
+
 	if (buf != nullptr) {
-		gfx::Image::save_image(filename, buf, size);
+		prg->result.n = gfx::Image::save_image(filename, buf, size);
 
 		delete[] buf;
 	}
 	else {
 		// Error!
+		prg->result.n = 0;
 	}
-
-	return true;
 }
 
 static bool imagefunc_destroy(Program *prg, const std::vector<Token> &v)
@@ -5043,8 +5043,8 @@ void start_lib_game()
 	add_instruction("filled_circle", primfunc_filled_circle);
 	add_expression_handler("image_create", exprfunc_image_create);
 	add_expression_handler("image_load", exprfunc_image_load);
-	add_instruction("image_save", imagefunc_save);
-	add_instruction("screenshot", imagefunc_screenshot);
+	add_expression_handler("image_save", exprfunc_image_save);
+	add_expression_handler("screenshot", exprfunc_image_screenshot);
 	add_instruction("image_destroy", imagefunc_destroy);
 	add_instruction("image_draw", imagefunc_draw);
 	add_instruction("image_stretch_region", imagefunc_stretch_region);
