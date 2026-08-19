@@ -3073,6 +3073,48 @@ static bool modelfunc_destroy(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static void exprfunc_model_decompose(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int model_id = as_number(prg, v, 0);
+
+	Model_Info *info = model_info(prg);
+	INFO_EXISTS(info->models, model_id)
+	Model *model = info->models[model_id];
+
+	prg->result.set_type(Variable::VECTOR);
+	Variable var;
+	var.type = Variable::NUMBER;
+
+	glm::vec3 scale, translation, skew;
+	glm::quat rotation;
+	glm::vec4 perspective;
+
+	glm::decompose(model->mat, scale, rotation, translation, skew, perspective);
+
+	glm::vec3 euler = glm::eulerAngles(rotation);
+
+	var.n = translation[0];
+	prg->result.v.push_back(var);
+	var.n = translation[1];
+	prg->result.v.push_back(var);
+	var.n = translation[2];
+	prg->result.v.push_back(var);
+	var.n = scale[0];
+	prg->result.v.push_back(var);
+	var.n = scale[1];
+	prg->result.v.push_back(var);
+	var.n = scale[2];
+	prg->result.v.push_back(var);
+	var.n = euler[0];
+	prg->result.v.push_back(var);
+	var.n = euler[1];
+	prg->result.v.push_back(var);
+	var.n = euler[2];
+	prg->result.v.push_back(var);
+}
+
 static bool modelfunc_draw(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(5)
@@ -3717,6 +3759,60 @@ static bool billboardfunc_destroy(Program *prg, const std::vector<Token> &v)
 	info->billboards.erase(info->billboards.find(id));
 
 	return true;
+}
+
+static void exprfunc_billboard_size(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int billboard_id = as_number(prg, v, 0);
+
+	Billboard_Info *info = billboard_info(prg);
+	INFO_EXISTS(info->billboards, billboard_id)
+	Billboard *billboard = info->billboards[billboard_id];
+
+	prg->result.set_type(Variable::VECTOR);
+	Variable var;
+	var.type = Variable::NUMBER;
+
+	gfx::Image *img = billboard->image;
+	if (img == nullptr) {
+		img = billboard->sprite->get_current_image();
+		var.n = img->size.w / (float)billboard->unit;
+		prg->result.v.push_back(var);
+		var.n = img->size.h / (float)billboard->unit;
+		prg->result.v.push_back(var);
+	}
+	else {
+		var.n = billboard->w;
+		prg->result.v.push_back(var);
+		var.n = billboard->h;
+		prg->result.v.push_back(var);
+	}
+}
+
+static void exprfunc_billboard_decompose(Program *prg, const std::vector<Token> &v)
+{
+	int billboard_id = as_number(prg, v, 0);
+
+	Billboard_Info *info = billboard_info(prg);
+	INFO_EXISTS(info->billboards, billboard_id)
+	Billboard *billboard = info->billboards[billboard_id];
+
+	prg->result.set_type(Variable::VECTOR);
+	Variable var;
+	var.type = Variable::NUMBER;
+
+	var.n = billboard->tx;
+	prg->result.v.push_back(var);
+	var.n = billboard->ty;
+	prg->result.v.push_back(var);
+	var.n = billboard->tz;
+	prg->result.v.push_back(var);
+	var.n = billboard->sx;
+	prg->result.v.push_back(var);
+	var.n = billboard->sy;
+	prg->result.v.push_back(var);
 }
 
 static void exprfunc_billboard_from_sprite(Program *prg, const std::vector<Token> &v)
@@ -5114,6 +5210,7 @@ void start_lib_game()
 	add_instruction("shader_set_matrix_array", shaderfunc_set_matrix_array);
 	add_expression_handler("model_load", exprfunc_model_load);
 	add_instruction("model_destroy", modelfunc_destroy);
+	add_expression_handler("model_decompose", exprfunc_model_decompose);
 	add_instruction("model_draw", modelfunc_draw);
 	add_instruction("set_2d", modelfunc_set_2d);
 	add_instruction("set_3d", modelfunc_set_3d);
@@ -5136,6 +5233,8 @@ void start_lib_game()
 	add_expression_handler("model_clone", exprfunc_model_clone);
 	add_expression_handler("billboard_create", exprfunc_billboard_create);
 	add_expression_handler("billboard_from_sprite", exprfunc_billboard_from_sprite);
+	add_expression_handler("billboard_size", exprfunc_billboard_size);
+	add_expression_handler("billboard_decompose", exprfunc_billboard_decompose);
 	add_instruction("billboard_destroy", billboardfunc_destroy);
 	add_instruction("billboard_draw", billboardfunc_draw);
 	add_instruction("billboard_translate", billboardfunc_translate);

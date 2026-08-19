@@ -85,7 +85,7 @@ few of them:
 <li>+float-samples ; use floating point (audio) samples</li>
 </ul>
 
-<p style="page-break-before: always;">
+<p>
 Lots of the demos and examples use a simple Z/X key to A/B button mapping,
 so the keys are Z/X and arrows if you're using a keyboard. Most but not all
 included examples support the keyboard as well as joysticks.
@@ -399,7 +399,7 @@ The following sections describe the API:
 	e.g. enable_stencil onoff
 </pre>
 
-<h3 style="page-break-before: always;">(is_stencil_enabled)</h3>
+<h3>(is_stencil_enabled)</h3>
 <pre>
 	Returns whether or not stencil is enabled
 	e.g. = onoff (is_stencil_enabled)
@@ -459,7 +459,7 @@ The following sections describe the API:
 	e.g. set_cull_mode FRONT_FACE
 </pre>
 
-<h3 style="page-break-before: always;">(get_cull_mode)</h3>
+<h3>(get_cull_mode)</h3>
 <pre>
 	Returns the cull mode
 	e.g. = mode (get_cull_mode)
@@ -505,7 +505,7 @@ The following sections describe the API:
 	e.g. resize_vertex_cache (* 1024 256)
 </pre>
 
-<h3 style="page-break-before: always;">(create_vertex_buffer)</h3>
+<h3>(create_vertex_buffer)</h3>
 <pre>
 	Draw arbitrary 3d geometry
 	All vectors are vectors of numbers
@@ -596,7 +596,7 @@ The following sections describe the API:
 	e.g. filled_ellipse r g b a x y radius_x radius_y ^ sections
 </pre>
 
-<h3 style="page-break-before: always;">circle</h3>
+<h3>circle</h3>
 <pre>
 	draw a outline circle with given number of pie slices (-1 for auto)
 	e.g. circle r g b a x y radius ^ thickness sections
@@ -677,7 +677,7 @@ The following sections describe the API:
 	image_read_texture describes */
 </pre>
 
-<h3 style="page-break-before: always;">image_draw</h3>
+<h3>image_draw</h3>
 <pre>
 	draw an image
 	e.g. image_draw img tint_r tint_g tint_b tint_a x y ^ flip_h flip_v
@@ -852,7 +852,7 @@ of animation names.</p>
 	e.g. = v (sprite_frame_times sprite)
 </pre>
 
-<h3 style="page-break-before: always;">(sprite_is_started)</h3>
+<h3>(sprite_is_started)</h3>
 <pre>
 	Check if a sprite is started or not
 	e.g. = onoff (sprite_is_started sprite)
@@ -974,7 +974,7 @@ tiles1.png, etc (or tga.)</p>
 	with number 74 to be a question block in your platformer.
 </pre>
 
-<h3 style="page-break-before: always;">tilemap_set_animated_tiles</h3>
+<h3>tilemap_set_animated_tiles</h3>
 <pre>
 	Tiles can be animated. The delay is in milliseconds. Width
 	and height are the width and height of the area to animate. Then
@@ -1162,7 +1162,7 @@ model) using convert_model in tools to convert.</p>
 	e.g. model_translate model add_x add_y add_z
 </pre>
 
-<h3 style="page-break-before: always;">model_set_animation</h3>
+<h3>model_set_animation</h3>
 <pre>
 	Set the animation to the one named. You can optionally pass a BooBoo
 	function that takes a number as parameter (model id) that will be
@@ -1186,6 +1186,12 @@ model) using convert_model in tools to convert.</p>
 <pre>
 	Get the dimensions of a model
 	e.g. explode (model_size model) szx szy szz
+</pre>
+
+<h3>(model_decompose)</h3>
+<pre>
+	Get the position, scale and rotation of a model
+	e.g. explode (model_decompose model) tx ty tz sx sy sz rx ry rz
 </pre>
 
 <h3>model_destroy</h3>
@@ -1218,7 +1224,7 @@ model) using convert_model in tools to convert.</p>
 	e.g. translate_3d x y z
 </pre>
 
-<h3 style="page-break-before: always;">(billboard_create)</h3>
+<h3>(billboard_create)</h3>
 <pre>
 	Create a billboard
 	e.g. = result (billboard_create image x y z w h)
@@ -1231,6 +1237,19 @@ model) using convert_model in tools to convert.</p>
 	unit is the number of pixels that spans 1 3D unit
 	e.g. = result (billboard_from_sprite sprite x y z w h unit)
 	Returns -1 on fail
+</pre>
+
+<h3>(billboard_size)</h3>
+<pre>
+	Get the size of a billboard in 3D units. For sprites, it gets
+	the size of the current frame.
+	e.g. explode (billboard_size b) w h
+</pre>
+
+<h3>(billboard_decompose</h3>
+<pre>
+	Get the position and scale of a billboard
+	e.g. explode (billboard_decompose b) tx ty tz sx sy
 </pre>
 
 <h3>billboard_draw</h3>
@@ -1381,7 +1400,7 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. widget_set_padding_bottom widget px
 </pre>
 
-<h3 style="page-break-before: always;">(widget_get_padding_left)</h3>
+<h3>(widget_get_padding_left)</h3>
 <pre>
 	Get left padding of a widget
 	e.g. = pad (widget_get_padding_left widget)
@@ -1441,7 +1460,7 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. widget_set_down_widget widget down_widget
 </pre>
 
-<h3 style="page-break-before: always;">gui_start</h3>
+<h3>gui_start</h3>
 <pre>
 	Start executing a gui
 	e.g. gui_start root_widget
@@ -1890,7 +1909,7 @@ Joystick buttons:
 	<li>JOY_TRIGGERRIGHT</li>
 </ul>
 
-<p style="page-break-before: always;">
+<p>
 GUI constants:
 </p>
 
@@ -2039,7 +2058,7 @@ are:
 	d - the delta y movement
 </pre>
 
-<h3 style="page-break-before: always;">EVENT_MOUSE_WHEEL</h3>
+<h3>EVENT_MOUSE_WHEEL</h3>
 <pre>
 	a - the horizontal wheel movement
 	b - the vertical wheel movement
