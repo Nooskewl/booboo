@@ -12,4 +12,8 @@ load and smaller
 
 io_scene_goobliata_x - Blender 2.78 model import/exporter
 
-Some of these tools DLLs from the root of the BooBoo installation.
+play_mml is a player for MML audio files. It supports all the flags from shim5.json
+as well as +loop.
+
+Some of these tools need SDL3.dll and SDL3_ttf.dll and shim5.dll, located in the
+root of the BooBoo installation.
