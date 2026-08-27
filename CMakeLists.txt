@@ -38,10 +38,10 @@ set(GAME_LAUNCHER_SOURCES
 )
 
 if (MINGW)
-	LIST(APPEND LIB_SOURCES misc/versioninfo_core.rc misc/booboo.manifest)
-	LIST(APPEND GAME_LIB_SOURCES misc/versioninfo_game.rc misc/booboo.manifest)
-	LIST(APPEND CORE_LAUNCHER_SOURCES misc/versioninfo_cli.rc misc/booboo.manifest misc/windows_icons.rc)
-	LIST(APPEND GAME_LAUNCHER_SOURCES misc/versioninfo.rc misc/booboo.manifest misc/windows_icons.rc)
+	LIST(APPEND LIB_SOURCES misc/versioninfo_core.rc)
+	LIST(APPEND GAME_LIB_SOURCES misc/versioninfo_game.rc)
+	LIST(APPEND CORE_LAUNCHER_SOURCES misc/versioninfo_cli.rc misc/windows_icons.rc)
+	LIST(APPEND GAME_LAUNCHER_SOURCES misc/versioninfo.rc misc/windows_icons.rc)
 endif()
 
 # Outputs
@@ -129,34 +129,6 @@ else() # Linux
 	endif()
 	set(LIBS twinkle ${SHIM5_LIB} ${TGUI6_LIB} SDL3 SDL3_ttf GL Xcursor X11 FLAC vorbis ogg png z)
 endif()
-
-add_custom_command(
-    TARGET "corelibrary"
-    POST_BUILD
-    COMMAND "c:/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/10.0.19041.0/x64/mt.exe" -manifest c:/msys64/home/trent/code/booboo/misc/booboo.manifest -outputresource:"c:/msys64/home/trent/code/booboo/b32/libBooBooCore.dll"
-    COMMENT "Adding manifest..."
-)
-
-add_custom_command(
-    TARGET "gamelibrary"
-    POST_BUILD
-    COMMAND "c:/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/10.0.19041.0/x64/mt.exe" -manifest c:/msys64/home/trent/code/booboo/misc/booboo.manifest -outputresource:"c:/msys64/home/trent/code/booboo/b32/libBooBooGame.dll"
-    COMMENT "Adding manifest..."
-)
-
-add_custom_command(
-    TARGET "corelauncher"
-    POST_BUILD
-    COMMAND "c:/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/10.0.19041.0/x64/mt.exe" -manifest c:/msys64/home/trent/code/booboo/misc/booboo.manifest -outputresource:"c:/msys64/home/trent/code/booboo/b32/BooBooCLI.exe"
-    COMMENT "Adding manifest..."
-)
-
-add_custom_command(
-    TARGET "gamelauncher"
-    POST_BUILD
-    COMMAND "c:/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/10.0.19041.0/x64/mt.exe" -manifest c:/msys64/home/trent/code/booboo/misc/booboo.manifest -outputresource:"c:/msys64/home/trent/code/booboo/b32/BooBoo.exe"
-    COMMENT "Adding manifest..."
-)
 
 target_link_libraries("corelibrary" ${LIBS})
 target_link_libraries("gamelibrary" corelibrary ${LIBS})
