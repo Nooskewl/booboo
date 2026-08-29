@@ -42,6 +42,8 @@ static bool delta_got;
 
 static int exit_key = TGUIK_F12;
 
+static bool mouse_relative = false;
+
 static bool mousefunc_set_relative(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -49,6 +51,8 @@ static bool mousefunc_set_relative(Program *prg, const std::vector<Token> &v)
 	bool onoff = as_number(prg, v, 0);
 
 	SDL_SetWindowRelativeMouseMode(gfx::internal::gfx_context.window, (bool)onoff);
+
+	mouse_relative = onoff;
 
 	return true;
 }
@@ -251,7 +255,9 @@ void handle_event(TGUI_Event *event)
 		return;
 	}
 	else if (event->type == TGUI_KEY_DOWN && event->keyboard.code == exit_key) {
+		SDL_SetWindowRelativeMouseMode(gfx::internal::gfx_context.window, false);
 		int result = gui::popup("Really quit?", "Are you sure?", gui::YESNO);
+		SDL_SetWindowRelativeMouseMode(gfx::internal::gfx_context.window, mouse_relative);
 		if (result != 0) {
 			quit = true;
 			return;
@@ -333,7 +339,9 @@ void handle_event(TGUI_Event *event)
 	}
 	else if (event->type == TGUI_JOY_DOWN) {
 		if (event->joystick.button == TGUI_B_GUIDE) {
+			SDL_SetWindowRelativeMouseMode(gfx::internal::gfx_context.window, false);
 			int result = gui::popup("Really quit?", "Are you sure?", gui::YESNO);
+			SDL_SetWindowRelativeMouseMode(gfx::internal::gfx_context.window, mouse_relative);
 			if (result != 0) {
 				quit = true;
 				return;
