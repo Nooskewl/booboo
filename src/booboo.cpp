@@ -2658,6 +2658,15 @@ static bool corefunc_set(Program *prg, const std::vector<Token> &v)
 	return do_set(prg, v, false);
 }
 
+static void exprfunc_set(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	Variable *dst = as_variable_pointer(prg, v, 0);
+	*dst = as_variable_resolve(prg, v, 1);
+	prg->result = *dst;
+}
+
 static bool corefunc_break(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -4298,6 +4307,7 @@ void start()
 	add_instruction("const", corefunc_const);
 	
 	add_instruction("=", corefunc_set);
+	add_expression_handler("=", exprfunc_set);
 	
 	add_instruction(":", corefunc_label);
 	add_instruction("goto", corefunc_goto);
