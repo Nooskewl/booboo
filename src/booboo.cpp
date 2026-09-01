@@ -1713,8 +1713,8 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "SEEK_CUR", SDL_IO_SEEK_CUR, pass, var_i);
 	insert_constant(prg, "SEEK_END", SDL_IO_SEEK_END, pass, var_i);
 	insert_constant(prg, "STDIN", 0, pass, var_i);
-	insert_constant(prg, "STDOUT", 0, pass, var_i);
-	insert_constant(prg, "STDERR", 0, pass, var_i);
+	insert_constant(prg, "STDOUT", 1, pass, var_i);
+	insert_constant(prg, "STDERR", 2, pass, var_i);
 
 	for (int i = 0; i < 100; i++) {
 		std::string name = "__tmp" + util::itos(i);
