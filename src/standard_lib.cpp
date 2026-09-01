@@ -1655,6 +1655,42 @@ static void exprfunc_file_eof(Program *prg, const std::vector<Token> &v)
 	prg->result.n = SDL_GetIOStatus(info->files[id]) == SDL_IO_STATUS_EOF;
 }
 
+static bool twinklefunc_print_coloured_text(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	std::string s = as_string(prg, v, 0);
+
+	int p = 0;
+
+	while (s[p]) {
+		if (s[p] == '|' && ((p > 0 && s[p-1] != '\\') || p == 0) && p < s.length()-2) {
+			int c;
+			bool b = s[p+1] != '0';
+			if (isdigit(s[p+2])) {
+				c = s[p+2] - '0';
+				twinkle::set_fore((twinkle::TWINKLE_COLOR)c, b);
+			}
+			else {
+				c = s[p+2] - 'A';
+				twinkle::set_back((twinkle::TWINKLE_COLOR)c, b);
+			}
+			p++;
+			p++;
+		}
+		else if (s[p] == '\\' && p < s.length()-1 && s[p+1] == '|') {
+			printf("%c", '|');
+			p++;
+		}
+		else {
+			printf("%c", s[p]);
+		}
+		p++;
+	}
+
+	return true;
+}
+
 static bool twinklefunc_text_fore(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
@@ -3445,6 +3481,7 @@ void start_lib_standard()
 	add_expression_handler("file_tell", exprfunc_file_tell);
 	add_expression_handler("file_seek", exprfunc_file_seek);
 	
+	add_instruction("print_coloured_text", twinklefunc_print_coloured_text);
 	add_instruction("text_fore", twinklefunc_text_fore);
 	add_instruction("text_back", twinklefunc_text_back);
 	add_instruction("text_reset", twinklefunc_reset);

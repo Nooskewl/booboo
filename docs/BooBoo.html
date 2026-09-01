@@ -1330,6 +1330,18 @@ Sections:
 	e.g. die (== result 1) "DEAD"
 </pre>
 
+<h3>print_coloured_text</h3>
+<pre>
+	Uses colour codes for coloured console text. If you want
+	formatting, use string_format and feed its output to this.
+	e.g. print_coloured_text "|04RED|16YELLOW"
+	Colour codes are supplied as 2 numbers after a |. Use \|
+	if you want a pipe.
+	The first number is 0 or 1 (bright is 1)
+	The second is either 0-7 (foreground) or A-H (background)
+	colours from constants.
+<pre>
+
 <h3>text_fore</h3>
 <pre>
 	Change the text foreground colour. See constants for colours.
