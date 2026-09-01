@@ -3253,6 +3253,8 @@ static void exprfunc_misc_file_list(Program *prg, const std::vector<Token> &v)
 	}
 }
 
+// This stdio to SDL_IOStream wrapper is from the SDL3 migration README
+
 typedef struct IOStreamStdioFPData
 {
     FILE *fp;
