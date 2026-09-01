@@ -277,6 +277,7 @@ extern BOOBOO_EXPORT std::map<std::string, void *> black_box;
 #define IS_EXPRESSION(v) ((v).type == Variable::EXPRESSION)
 #define IS_FISH(v) ((v).type == Variable::FISH)
 #define IS_POINTER(v) ((v).type == Variable::POINTER)
+#define IS_USER(v) ((v).type == Variable::USER)
 
 #if 1
 // You can use this at the start of your library functions to ensure correct number of arguments

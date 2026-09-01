@@ -2924,6 +2924,15 @@ static std::string typeof_var(Variable &v1)
 	else if (IS_POINTER(v1)) {
 		res = "pointer";
 	}
+	else if (IS_EXPRESSION(v1)) {
+		res = "expression";
+	}
+	else if (IS_FISH(v1)) {
+		res = "fish";
+	}
+	else if (IS_USER(v1)) {
+		res = "user";
+	}
 	else {
 		res = "unknown";
 	}
