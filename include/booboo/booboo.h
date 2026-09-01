@@ -192,8 +192,6 @@ struct Program {
 
 	std::vector<int> real_line_numbers;
 	std::vector<std::string> real_file_names;
-
-	std::map<std::string, void *> black_box;
 };
 
 typedef bool (*library_func)(Program *prg, const std::vector<Token> &v);
@@ -247,8 +245,8 @@ int BOOBOO_EXPORT as_function(Program *prg, const std::vector<Token> &v, int ind
 Variable BOOBOO_EXPORT as_pointer(Program *prg, const std::vector<Token> &v, int index);
 
 // The black box allows you to store anything you want
-void BOOBOO_EXPORT *get_black_box(Program *prg, std::string id);
-void BOOBOO_EXPORT set_black_box(Program *prg, std::string id, void *data);
+void BOOBOO_EXPORT *get_black_box(std::string id);
+void BOOBOO_EXPORT set_black_box(std::string id, void *data);
 
 // If you have a variable of type SYMBOL then 'i' is the index you pass here to retrive the variable
 Variable BOOBOO_EXPORT &get_variable(Program *prg, int index);
@@ -266,6 +264,7 @@ extern BOOBOO_EXPORT bool quit;
 extern BOOBOO_EXPORT bool callbacks_enabled;
 extern BOOBOO_EXPORT std::string (*load_text)(std::string filename); // must be set
 extern BOOBOO_EXPORT Program *prg;
+extern BOOBOO_EXPORT std::map<std::string, void *> black_box;
 
 } // End namespace booboo
 

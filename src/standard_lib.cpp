@@ -27,88 +27,88 @@ template <typename T> T sign(T v) { return (T(0) < v) - (v < T(0)); }
 
 File_Info *file_info(Program *prg)
 {
-	File_Info *info = (File_Info *)get_black_box(prg, "com.nooskewl.booboo.files");
+	File_Info *info = (File_Info *)get_black_box("com.nooskewl.booboo.files");
 	if (info == nullptr) {
 		info = new File_Info;
 		info->file_id = 0;
-		set_black_box(prg, "com.nooskewl.booboo.files", info);
+		set_black_box("com.nooskewl.booboo.files", info);
 	}
 	return info;
 }
 
 CFG_Info *cfg_info(Program *prg)
 {
-	CFG_Info *info = (CFG_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.cfg");
+	CFG_Info *info = (CFG_Info *)booboo::get_black_box("com.nooskewl.booboo.cfg");
 	if (info == nullptr) {
 		info = new CFG_Info;
 		info->cfg_id = 0;
-		booboo::set_black_box(prg, "com.nooskewl.booboo.cfg", info);
+		booboo::set_black_box("com.nooskewl.booboo.cfg", info);
 	}
 	return info;
 }
 
 JSON_Info *json_info(Program *prg)
 {
-	JSON_Info *info = (JSON_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.json");
+	JSON_Info *info = (JSON_Info *)booboo::get_black_box("com.nooskewl.booboo.json");
 	if (info == nullptr) {
 		info = new JSON_Info;
 		info->json_id = 0;
-		booboo::set_black_box(prg, "com.nooskewl.booboo.json", info);
+		booboo::set_black_box("com.nooskewl.booboo.json", info);
 	}
 	return info;
 }
 
 CPA_Info *cpa_info(Program *prg)
 {
-	CPA_Info *info = (CPA_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.cpa");
+	CPA_Info *info = (CPA_Info *)booboo::get_black_box("com.nooskewl.booboo.cpa");
 	if (info == nullptr) {
 		info = new CPA_Info;
 		info->cpa_id = 0;
-		booboo::set_black_box(prg, "com.nooskewl.booboo.cpa", info);
+		booboo::set_black_box("com.nooskewl.booboo.cpa", info);
 	}
 	return info;
 }
 
 MML_Info *mml_info(Program *prg)
 {
-	MML_Info *info = (MML_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.mml");
+	MML_Info *info = (MML_Info *)booboo::get_black_box("com.nooskewl.booboo.mml");
 	if (info == nullptr) {
 		info = new MML_Info;
 		info->mml_id = 0;
-		booboo::set_black_box(prg, "com.nooskewl.booboo.mml", info);
+		booboo::set_black_box("com.nooskewl.booboo.mml", info);
 	}
 	return info;
 }
 
 MML_Instance_Info *mml_instance_info(Program *prg)
 {
-	MML_Instance_Info *info = (MML_Instance_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.mml_instance");
+	MML_Instance_Info *info = (MML_Instance_Info *)booboo::get_black_box("com.nooskewl.booboo.mml_instance");
 	if (info == nullptr) {
 		info = new MML_Instance_Info;
 		info->instance_id = 0;
-		booboo::set_black_box(prg, "com.nooskewl.booboo.mml_instance", info);
+		booboo::set_black_box("com.nooskewl.booboo.mml_instance", info);
 	}
 	return info;
 }
 
 Sample_Info *sample_info(Program *prg)
 {
-	Sample_Info *info = (Sample_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.sample");
+	Sample_Info *info = (Sample_Info *)booboo::get_black_box("com.nooskewl.booboo.sample");
 	if (info == nullptr) {
 		info = new Sample_Info;
 		info->sample_id = 0;
-		booboo::set_black_box(prg, "com.nooskewl.booboo.sample", info);
+		booboo::set_black_box("com.nooskewl.booboo.sample", info);
 	}
 	return info;
 }
 
 Sample_Instance_Info *sample_instance_info(Program *prg)
 {
-	Sample_Instance_Info *info = (Sample_Instance_Info *)booboo::get_black_box(prg, "com.nooskewl.booboo.sample_instance");
+	Sample_Instance_Info *info = (Sample_Instance_Info *)booboo::get_black_box("com.nooskewl.booboo.sample_instance");
 	if (info == nullptr) {
 		info = new Sample_Instance_Info;
 		info->instance_id = 0;
-		booboo::set_black_box(prg, "com.nooskewl.booboo.sample_instance", info);
+		booboo::set_black_box("com.nooskewl.booboo.sample_instance", info);
 	}
 	return info;
 }
@@ -3253,8 +3253,115 @@ static void exprfunc_misc_file_list(Program *prg, const std::vector<Token> &v)
 	}
 }
 
+typedef struct IOStreamStdioFPData
+{
+    FILE *fp;
+    bool autoclose;
+} IOStreamStdioFPData;
+
+static Sint64 SDLCALL stdio_seek(void *userdata, Sint64 offset, SDL_IOWhence whence)
+{
+    FILE *fp = ((IOStreamStdioFPData *) userdata)->fp;
+    int stdiowhence;
+
+    switch (whence) {
+    case SDL_IO_SEEK_SET:
+        stdiowhence = SEEK_SET;
+        break;
+    case SDL_IO_SEEK_CUR:
+        stdiowhence = SEEK_CUR;
+        break;
+    case SDL_IO_SEEK_END:
+        stdiowhence = SEEK_END;
+        break;
+    default:
+        SDL_SetError("Unknown value for 'whence'");
+        return -1;
+    }
+
+    if (fseek(fp, (long)offset, stdiowhence) == 0) {
+        const Sint64 pos = ftell(fp);
+        if (pos < 0) {
+            SDL_SetError("Couldn't get stream offset");
+            return -1;
+        }
+        return pos;
+    }
+    SDL_SetError("Couldn't seek in stream");
+    return -1;
+}
+
+static size_t SDLCALL stdio_read(void *userdata, void *ptr, size_t size, SDL_IOStatus *status)
+{
+    FILE *fp = ((IOStreamStdioFPData *) userdata)->fp;
+    const size_t bytes = fread(ptr, 1, size, fp);
+    if (bytes == 0 && ferror(fp)) {
+        SDL_SetError("Couldn't read stream");
+    }
+    return bytes;
+}
+
+static size_t SDLCALL stdio_write(void *userdata, const void *ptr, size_t size, SDL_IOStatus *status)
+{
+    FILE *fp = ((IOStreamStdioFPData *) userdata)->fp;
+    const size_t bytes = fwrite(ptr, 1, size, fp);
+    if (bytes == 0 && ferror(fp)) {
+        SDL_SetError("Couldn't write stream");
+    }
+    return bytes;
+}
+
+static bool SDLCALL stdio_close(void *userdata)
+{
+    IOStreamStdioFPData *rwopsdata = (IOStreamStdioFPData *) userdata;
+    bool status = true;
+    if (rwopsdata->autoclose) {
+        if (fclose(rwopsdata->fp) != 0) {
+            SDL_SetError("Couldn't close stream");
+            status = false;
+        }
+    }
+    return status;
+}
+
+SDL_IOStream *SDL_RWFromFP(FILE *fp, bool autoclose)
+{
+    SDL_IOStreamInterface iface;
+    IOStreamStdioFPData *rwopsdata;
+    SDL_IOStream *rwops;
+
+    rwopsdata = (IOStreamStdioFPData *) SDL_malloc(sizeof (*rwopsdata));
+    if (!rwopsdata) {
+        return NULL;
+    }
+
+    SDL_INIT_INTERFACE(&iface);
+    /* There's no stdio_size because SDL_GetIOSize emulates it the same way we'd do it for stdio anyhow. */
+    iface.seek = stdio_seek;
+    iface.read = stdio_read;
+    iface.write = stdio_write;
+    iface.close = stdio_close;
+
+    rwopsdata->fp = fp;
+    rwopsdata->autoclose = autoclose;
+
+    rwops = SDL_OpenIO(&iface, rwopsdata);
+    if (!rwops) {
+        iface.close(rwopsdata);
+    }
+    return rwops;
+}
+
 void start_lib_standard()
 {
+	File_Info *info = file_info(prg);
+	SDL_IOStream *in = SDL_RWFromFP(stdin, false);
+	SDL_IOStream *out = SDL_RWFromFP(stdout, false);
+	SDL_IOStream *err = SDL_RWFromFP(stderr, false);
+	info->files[info->file_id++] = in;
+	info->files[info->file_id++] = out;
+	info->files[info->file_id++] = err;
+
 	add_expression_handler("getenv", exprfunc_getenv);
 	add_expression_handler("getcwd", exprfunc_getcwd);
 	add_expression_handler("list_directory", exprfunc_list_directory);
@@ -3457,12 +3564,12 @@ void standard_lib_destroy_program(Program *prg)
 	CFG_Info *cfg_i = cfg_info(prg);
 	delete cfg_i;
 
-	set_black_box(prg, "com.nooskewl.booboo.files", nullptr);
-	set_black_box(prg, "com.nooskewl.booboo.cfg", nullptr);
-	set_black_box(prg, "com.nooskewl.booboo.json", nullptr);
-	set_black_box(prg, "com.nooskewl.booboo.cpa", nullptr);
-	booboo::set_black_box(prg, "com.nooskewl.booboo.mml", nullptr);
-	booboo::set_black_box(prg, "com.nooskewl.booboo.mml_instance", nullptr);
-	booboo::set_black_box(prg, "com.nooskewl.booboo.sample", nullptr);
-	booboo::set_black_box(prg, "com.nooskewl.booboo.sample_instance", nullptr);
+	set_black_box("com.nooskewl.booboo.files", nullptr);
+	set_black_box("com.nooskewl.booboo.cfg", nullptr);
+	set_black_box("com.nooskewl.booboo.json", nullptr);
+	set_black_box("com.nooskewl.booboo.cpa", nullptr);
+	set_black_box("com.nooskewl.booboo.mml", nullptr);
+	set_black_box("com.nooskewl.booboo.mml_instance", nullptr);
+	set_black_box("com.nooskewl.booboo.sample", nullptr);
+	set_black_box("com.nooskewl.booboo.sample_instance", nullptr);
 }

@@ -33,6 +33,7 @@ static void skip_whitespace(booboo::Program *prg)
 namespace booboo {
 
 Program *prg;
+std::map<std::string, void *> black_box;
 std::string reset_game_name;
 std::string main_program_name;
 int return_code;
@@ -1711,6 +1712,9 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "SEEK_SET", SDL_IO_SEEK_SET, pass, var_i);
 	insert_constant(prg, "SEEK_CUR", SDL_IO_SEEK_CUR, pass, var_i);
 	insert_constant(prg, "SEEK_END", SDL_IO_SEEK_END, pass, var_i);
+	insert_constant(prg, "STDIN", 0, pass, var_i);
+	insert_constant(prg, "STDOUT", 0, pass, var_i);
+	insert_constant(prg, "STDERR", 0, pass, var_i);
 
 	for (int i = 0; i < 100; i++) {
 		std::string name = "__tmp" + util::itos(i);
@@ -2563,7 +2567,7 @@ void destroy_program(Program *prg)
 	prg->functions.clear();
 
 	delete prg->s;
-	prg->black_box.clear();
+	black_box.clear();
 	delete prg;
 }
 
@@ -4256,7 +4260,7 @@ void start()
 	twinkle::start();
 
 	init_token_map();
-	
+
 	add_expression_handler("+", exprfunc_add);
 	add_expression_handler("-", exprfunc_subtract);
 	add_expression_handler("*", exprfunc_multiply);
@@ -4459,17 +4463,17 @@ std::vector<Variable> get_vector(Variable &v)
 	return v.v;
 }
 
-void *get_black_box(Program *prg, std::string id)
+void *get_black_box(std::string id)
 {
-	if (prg->black_box.find(id) == prg->black_box.end()) {
+	if (black_box.find(id) == black_box.end()) {
 		return nullptr;
 	}
-	return prg->black_box[id];
+	return black_box[id];
 }
 
-void set_black_box(Program *prg, std::string id, void *data)
+void set_black_box(std::string id, void *data)
 {
-	prg->black_box[id] = data;
+	black_box[id] = data;
 }
 
 Variable &get_variable(Program *prg, int index)
