@@ -413,9 +413,9 @@ function bullet_collide oldx oldy newx newy
 	= VOID (mml_play shot_coin_sfx 1 0)
 	call do_explode cx cy 80 255 216 0
 	? dead 1
-	jne die
+	jne die_
 	return 1
-:die
+:die_
 	= dead 1
 	call do_explode pos_x pos_y 80 255 255 255
 	return 1
