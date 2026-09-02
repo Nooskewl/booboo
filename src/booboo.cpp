@@ -4274,11 +4274,15 @@ static void exprfunc_get_var_arg(Program *prg, const std::vector<Token> &v)
 	const std::vector<Token> &params = var_args.top();
 	int num_hard_params = num_var_args_args.top();
 
-	if (params[i].type == Token::NUMBER) {
+	if (i+num_hard_params >= params.size() || i+num_hard_params < 0) {
+		throw Error(std::string(__FUNCTION__) + ": " + "Parameter out of range at " + get_error_info(prg));
+	}
+
+	if (params[i+num_hard_params].type == Token::NUMBER) {
 		prg->result.set_type(Variable::NUMBER);
 		prg->result.n = params[i+num_hard_params].n;
 	}
-	else if (params[i].type == Token::STRING) {
+	else if (params[i+num_hard_params].type == Token::STRING) {
 		prg->result.set_type(Variable::STRING);
 		prg->result.s = params[i+num_hard_params].s;
 	}
