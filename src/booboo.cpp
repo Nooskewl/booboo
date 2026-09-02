@@ -406,12 +406,6 @@ static std::string tokenfunc_ref(Program *prg)
 	return "~";
 }
 
-static std::string tokenfunc_varargs(Program *prg)
-{
-	prg->s->p++;
-	return ",";
-}
-
 static std::string tokenfunc_mlcomment(Program *prg)
 {
 	prg->s->p++;
@@ -2075,8 +2069,6 @@ func_top:
 				else if (is_param) {
 					if (tok == "~") {
 						param_is_ref = true;
-					}
-					else if (tok == ",") {
 					}
 					else {
 						int param_i = var_i++;
@@ -4313,7 +4305,6 @@ static void init_token_map()
 	add_token_handler('*', tokenfunc_mlcomment);
 	add_token_handler('\'', tokenfunc_char);
 	add_token_handler('`', tokenfunc_deref);
-	add_token_handler(',', tokenfunc_varargs);
 }
 
 void start()
