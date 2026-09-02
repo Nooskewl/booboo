@@ -49,6 +49,7 @@ Sections:
 <li><a href="#JSON">JSON Functions</a></li>
 <li><a href="#CPA">CPA Functions</a></li>
 <li><a href="#Audio">Audio Functions</a></li>
+<li><a href="#Varargs">Varargs</a></li>
 <li><a href="#Other">Other</a></li>
 <li><a href="#Constants">Constants</a></li>
 </ul>
@@ -1181,6 +1182,34 @@ Sections:
 <pre>
 	Destroy a sample
 	e.g. sample_destroy sample
+</pre>
+
+<a id="Varargs"></a>
+<h2>Varargs</h2>
+
+<p>Allows writing BooBoo functions that accept a variable number of arguments.</p>
+
+<p>Functions can accept a variable number of arguments by making the name of the last parameter
+in the function definition a comma (,), e.g.:</p>
+
+<pre>
+	function foo a b c ,
+	{
+		...
+	}
+</pre>
+
+<h3>(num_var_args)</h3>
+<pre>
+	Returns the number of extra arguments passed to the function beyond named arguments.
+	The main body always has 0.
+	e.g. = n (num_var_args)
+</pre>
+
+<h3>(get_var_arg)</h3>
+<pre>
+	Get the value of an extra parameter passed to a varargs function.
+	e.g. = var (get_var_arg index)
 </pre>
 
 <a id="Other"></a>

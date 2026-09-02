@@ -15,10 +15,14 @@ using namespace noo;
 #include "booboo/internal.h"
 #include "booboo/game_lib.h"
 
+#include <stack>
+
 static std::map<std::string, int> library_map;
 static std::map<char, booboo::token_func> token_map;
 static std::map<std::string, int> expression_map;
 static std::vector<booboo::expression_func> expression_handlers;
+static std::stack< std::vector<booboo::Token> > var_args;
+static std::stack<int> num_var_args_args;
 
 static void skip_whitespace(booboo::Program *prg)
 {
@@ -400,6 +404,12 @@ static std::string tokenfunc_ref(Program *prg)
 {
 	prg->s->p++;
 	return "~";
+}
+
+static std::string tokenfunc_varargs(Program *prg)
+{
+	prg->s->p++;
+	return ",";
 }
 
 static std::string tokenfunc_mlcomment(Program *prg)
@@ -2066,6 +2076,8 @@ func_top:
 					if (tok == "~") {
 						param_is_ref = true;
 					}
+					else if (tok == ",") {
+					}
 					else {
 						int param_i = var_i++;
 						if (pass == PASS1) {
@@ -2433,6 +2445,9 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 
 	Program &func = prg->functions[function];
 
+	var_args.push(params);
+	num_var_args_args.push(func.params.size()+ignore_params);
+
 	for (size_t j = 0; j < func.params.size(); j++) {
 		const Token &param = params[j+ignore_params];
 
@@ -2489,6 +2504,9 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 	prg->compare_flag = c_bak;
 
 	prg->result.name = bak;
+	
+	var_args.pop();
+	num_var_args_args.pop();
 
 	// keep values for references
 	for (size_t j = 0; j < func.params.size(); j++) {
@@ -4244,6 +4262,39 @@ static void exprfunc_get_args(Program *prg, const std::vector<Token> &v)
 	}
 }
 
+static void exprfunc_num_var_args(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(0)
+
+	const std::vector<Token> &params = var_args.top();
+	int num_hard_params = num_var_args_args.top();
+
+	prg->result.set_type(Variable::NUMBER);
+	prg->result.n = params.size()-num_hard_params;
+}
+
+static void exprfunc_get_var_arg(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(1)
+
+	int i = as_number(prg, v, 0);
+
+	const std::vector<Token> &params = var_args.top();
+	int num_hard_params = num_var_args_args.top();
+
+	if (params[i].type == Token::NUMBER) {
+		prg->result.set_type(Variable::NUMBER);
+		prg->result.n = params[i+num_hard_params].n;
+	}
+	else if (params[i].type == Token::STRING) {
+		prg->result.set_type(Variable::STRING);
+		prg->result.s = params[i+num_hard_params].s;
+	}
+	else {
+		prg->result = *as_variable_pointer(prg, params, i+num_hard_params);
+	}
+}
+
 static void init_token_map()
 {
 	add_token_handler(':', tokenfunc_label);
@@ -4262,6 +4313,7 @@ static void init_token_map()
 	add_token_handler('*', tokenfunc_mlcomment);
 	add_token_handler('\'', tokenfunc_char);
 	add_token_handler('`', tokenfunc_deref);
+	add_token_handler(',', tokenfunc_varargs);
 }
 
 void start()
@@ -4356,12 +4408,26 @@ void start()
 	add_expression_handler("get_savedgames_path", exprfunc_core_get_savedgames_path);
 	add_expression_handler("get_args", exprfunc_get_args);
 	
+	add_expression_handler("num_var_args", exprfunc_num_var_args);
+	add_expression_handler("get_var_arg", exprfunc_get_var_arg);
+
+	std::vector<Token> tmp;
+	var_args.push(tmp);
+	num_var_args_args.push(0);
+	
 	return_code = 0;
 }
 
 void end()
 {
 	library_map.clear();
+
+	while (var_args.size() > 0) {
+		var_args.pop();
+	}
+	while (num_var_args_args.size() > 0) {
+		num_var_args_args.pop();
+	}
 }
 
 Program *create_program(std::string code)
