@@ -3293,7 +3293,7 @@ static bool corefunc_explode(Program *prg, const std::vector<Token> &v)
 
 	CHECK_VECTOR(*vec)
 
-	for (size_t i = 1; i < v.size(); i++) {
+	for (size_t i = 1; i < v.size() && (i-1) < vec->v.size(); i++) {
 		Variable &v1 = as_variable(prg, v, i);
 		std::string name = v1.name;
 		//bool constant = v1.constant;
