@@ -207,7 +207,7 @@ static std::string sformat(Program *prg, const std::vector<Token> &v, int skip)
 	int arg_count = 0;
 
 	for (size_t i = 0; i < fmt.length(); i++) {
-		if (fmt[i] == '%' && prev != '%') {
+		if (fmt[i] == '%' && prev != '\\') {
 			arg_count++;
 		}
 		prev = fmt[i];
@@ -222,7 +222,7 @@ static std::string sformat(Program *prg, const std::vector<Token> &v, int skip)
 		std::string format;
 		int fmt_len = 1;
 		while (c < (int)fmt.length()) {
-			if (fmt[c] == '%' && prev != '%') {
+			if (fmt[c] == '%' && prev != '\\') {
 				if (c < (int)fmt.length()-1) {
 					if (fmt[c+1] == '(') {
 						int l = 2;
@@ -241,6 +241,13 @@ static std::string sformat(Program *prg, const std::vector<Token> &v, int skip)
 					}
 				}
 				break;
+			}
+			else if (prev == '\\' && fmt[c] == '%') {
+				std::string s;
+				s = fmt.substr(0, c-1);
+				s += fmt.substr(c);
+				fmt = s;
+				c--;
 			}
 			prev = fmt[c];
 			c++;
@@ -399,9 +406,20 @@ static std::string sformat(Program *prg, const std::vector<Token> &v, int skip)
 		result += val;
 	}
 
-	if (c < (int)fmt.length()) {
-		result += fmt.substr(c);
+	int start = c;
+	prev = 0;
+	while (c < (int)fmt.length()) {
+		if (prev == '\\' && fmt[c] == '%') {
+			std::string s;
+			s = fmt.substr(0, c-1);
+			s += fmt.substr(c);
+			fmt = s;
+			c--;
+		}
+		prev = fmt[c];
+		c++;
 	}
+	result += fmt.substr(start);
 
 	return result;
 }
@@ -1657,9 +1675,9 @@ static void exprfunc_file_eof(Program *prg, const std::vector<Token> &v)
 
 static bool twinklefunc_print_coloured_text(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	MIN_ARGS(1)
 
-	std::string s = as_string(prg, v, 0);
+	std::string s = sformat(prg, v, 0);
 
 	int p = 0;
 
