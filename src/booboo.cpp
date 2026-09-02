@@ -2924,12 +2924,14 @@ static std::string typeof_var(Variable &v1)
 	else if (IS_POINTER(v1)) {
 		res = "pointer";
 	}
+	/*
 	else if (IS_EXPRESSION(v1)) {
 		res = "expression";
 	}
 	else if (IS_FISH(v1)) {
 		res = "fish";
 	}
+	*/
 	else if (IS_USER(v1)) {
 		res = "user";
 	}
@@ -3014,9 +3016,8 @@ static void exprfunc_typeof(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 	
-	prg->result.set_type(Variable::STRING);
-
 	if (v[0].type != Token::SYMBOL) {
+		prg->result.set_type(Variable::STRING);
 		if (v[0].type == Token::NUMBER) {
 			prg->result.s = "number";
 		}
@@ -3030,6 +3031,7 @@ static void exprfunc_typeof(Program *prg, const std::vector<Token> &v)
 	else {
 		Variable v1 = as_variable_resolve(prg, v, 0);
 
+		prg->result.set_type(Variable::STRING);
 		prg->result.s = typeof_var(v1);
 	}
 }
