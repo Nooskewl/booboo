@@ -2910,39 +2910,37 @@ static bool corefunc_call_result(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static std::string typeof_var(Variable &v1)
+static std::string typeof_var(Variable *v1)
 {
 	std::string res;
-	if (IS_NUMBER(v1)) {
+	if (v1->type == Variable::NUMBER) {
 		res = "number";
 	}
-	else if (IS_STRING(v1)) {
+	else if (v1->type == Variable::STRING) {
 		res = "string";
 	}
-	else if (IS_VECTOR(v1)) {
+	else if (v1->type == Variable::VECTOR) {
 		res = "vector";
 	}
-	else if (IS_MAP(v1)) {
+	else if (v1->type == Variable::MAP) {
 		res = "map";
 	}
-	else if (IS_FUNCTION(v1)) {
+	else if (v1->type == Variable::FUNCTION) {
 		res = "function";
 	}
-	else if (IS_LABEL(v1)) {
+	else if (v1->type == Variable::LABEL) {
 		res = "label";
 	}
-	else if (IS_POINTER(v1)) {
+	else if (v1->type == Variable::POINTER) {
 		res = "pointer";
 	}
-	/*
-	else if (IS_EXPRESSION(v1)) {
+	else if (v1->type == Variable::EXPRESSION) {
 		res = "expression";
 	}
-	else if (IS_FISH(v1)) {
+	else if (v1->type == Variable::FISH) {
 		res = "fish";
 	}
-	*/
-	else if (IS_USER(v1)) {
+	else if (v1->type == Variable::USER) {
 		res = "user";
 	}
 	else {
@@ -3039,7 +3037,7 @@ static void exprfunc_typeof(Program *prg, const std::vector<Token> &v)
 		}
 	}
 	else {
-		Variable v1 = as_variable_resolve(prg, v, 0);
+		Variable *v1 = as_variable_pointer(prg, v, 0);
 
 		prg->result.set_type(Variable::STRING);
 		prg->result.s = typeof_var(v1);
