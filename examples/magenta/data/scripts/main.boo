@@ -162,7 +162,7 @@ function event type a b c d
 				var i found
 				= found FALSE
 				for i (+ selected 1) (< i size) 1 next_search
-					if (string_matches [mp3_names i] search) go
+					if (string_matches [mp3_names i] search TRUE) go
 						while (< selected i) cd
 							call cursor_down
 						:cd
@@ -172,7 +172,7 @@ function event type a b c d
 				:next_search
 				if (== found FALSE) not_found
 					for i 0 (< i selected) 1 next_search2
-						if (string_matches [mp3_names i] search) go2
+						if (string_matches [mp3_names i] search TRUE) go2
 							while (> selected i) cd2
 								call cursor_up
 							:cd2
@@ -377,7 +377,7 @@ function mp3_end inst
 function play_mp3
 {
 	= my_mp3 (sample_load [mp3s curr] TRUE)
-	= my_inst (sample_play my_mp3 1.0 FALSE (sample_length my_mp3) mp3_end)
+	= my_inst (sample_play my_mp3 1.0 FALSE 0.0 (sample_length my_mp3) mp3_end)
 }
 
 function read_dir dir concat
@@ -399,7 +399,7 @@ function read_dir dir concat
 			var lc
 			= lc (string_lowercase file)
 			var matches
-			= matches (|| (string_matches lc "mp3$") (string_matches lc "ogg$") (string_matches lc "flac$") (string_matches lc "wav$"))
+			= matches (|| (string_matches lc "mp3$" TRUE) (string_matches lc "ogg$" TRUE) (string_matches lc "flac$" TRUE) (string_matches lc "wav$" TRUE))
 			if (== TRUE matches) add_it
 				= have_music TRUE
 				vector_add mp3s (+ dir "/" file)
@@ -415,7 +415,7 @@ function load_font
 	if (!= font -1) destroy
 		font_destroy font
 	:destroy
-	= font (font_load "c:/Windows/Fonts/arial.ttf" font_h TRUE TRUE)
+	= font (font_load "c:/Windows/Fonts/arial.ttf" font_h TRUE 512 TRUE)
 	= fh (font_height font)
 	= lines (floor (/ (- SCR_H (+ 60 fh fh)) fh))
 	= redraw_list TRUE
