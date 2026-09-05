@@ -501,10 +501,9 @@ The following sections describe the API:
 	image_start/image_end or start_primitives/end_primitives, the vertex
 	cache could need to be resized frequently on the next frame drawn, so you can
 	use this to reserve a larger amount. This is in addition to whatever
-	has already been reserved. NOTE: IT'S ONE FRAME THAT'S TAKES LONGER, DO NOT
-	CALL THIS IN YOUR GAME LOOP. FIGURE OUT THE MAXIMUM AMOUNT OF VERTICES YOU
-	NEED AND CALL THIS ONCE AT THE BEGINNING OF YOUR GAME
-	e.g. resize_vertex_cache (* 1024 256)
+	has already been reserved. This can be called once at the beginning of your code
+	with the maximum number of vertices you'll be using, to avoid untimely micro-freezes
+	when a large amount of geometry is drawn.
 </pre>
 
 <h3>(create_vertex_buffer)</h3>
