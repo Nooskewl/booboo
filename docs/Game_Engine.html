@@ -504,6 +504,7 @@ The following sections describe the API:
 	has already been reserved. This can be called once at the beginning of your code
 	with the maximum number of vertices you'll be using, to avoid an untimely micro-freeze
 	when a larger than has been drawn so far amount of geometry is drawn.
+	The vertex cache has a 0 initial size and increases 32K at a time.
 </pre>
 
 <h3>(create_vertex_buffer)</h3>
