@@ -3631,7 +3631,7 @@ static bool modelfunc_draw_vertex_buffer(Program *prg, const std::vector<Token> 
 	}
 
 	gfx::Vertex_Cache::instance()->start();
-	gfx::Vertex_Cache::instance()->cache_3d_immediate(vb->v, vb->num_triangles);
+	gfx::Vertex_Cache::instance()->cache_3d_immediate(vb->v, 0, vb->num_triangles);
 	gfx::Vertex_Cache::instance()->end();
 
 	if (vb->has_vbo) {
@@ -3669,7 +3669,7 @@ static bool modelfunc_draw_vertex_buffer_textured(Program *prg, const std::vecto
 	}
 
 	gfx::Vertex_Cache::instance()->start(image);
-	gfx::Vertex_Cache::instance()->cache_3d_immediate(vb->v, vb->num_triangles);
+	gfx::Vertex_Cache::instance()->cache_3d_immediate(vb->v, 0, vb->num_triangles);
 	gfx::Vertex_Cache::instance()->end();
 
 	if (vb->has_vbo) {
@@ -3928,7 +3928,7 @@ static bool billboardfunc_draw(Program *prg, const std::vector<Token> &v)
 	gfx::update_projection();
 	
 	gfx::Vertex_Cache::instance()->start(img);
-	gfx::Vertex_Cache::instance()->cache_3d_immediate(vec, 2);
+	gfx::Vertex_Cache::instance()->cache_3d_immediate(vec, 0, 2);
 	gfx::Vertex_Cache::instance()->end();
 	
 	gfx::set_matrices(mv, proj);
