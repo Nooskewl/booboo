@@ -951,7 +951,8 @@ Sections:
 	You can access devsettings by running with +debug and pressing F9
 	A "game&gt;" prefix is added automatically. The optional callback is
 	called with the key's name when the value is changed in devsettings
-	e.g. json_register_number n "foo&gt;baz" readonly ^ callback
+	callback_data is optional and must be a variable or fish, not a constant.
+	e.g. json_register_number n "foo&gt;baz" readonly ^ callback callback_data
 </pre>
 
 <h3>json_register_string</h3>
@@ -960,6 +961,7 @@ Sections:
 	You can access devsettings by running with +debug and pressing F9
 	A "game&gt;" prefix is added automatically. The optional callback is
 	called with the key's name when the value is changed in devsettings
+	callback_data is optional and must be a variable or fish, not a constant.
 	e.g. json_register_string s "foo&gt;baz" readonly ^ callback
 </pre>
 
@@ -1050,8 +1052,9 @@ Sections:
 <h3>(mml_play)</h3>
 <pre>
 	play a sound. Returns an instance that can be adjusted
-	The callback can be called when the MML finishes (it is called at most once, the first loop)
-	e.g. = inst (mml_play blast ^ volume loop pan callback)
+	The callback can be called when the MML finishes
+	The optional callback_data cannot be a constant
+	e.g. = inst (mml_play blast ^ volume loop pan callback callback_data)
 </pre>
 
 <h3>mml_stop</h3>
@@ -1141,8 +1144,9 @@ Sections:
 	play a sample. Returns a sample instance that can be adjusted
 	An optional duration can be used otherwise it will playback
 	at normal speed
-	A callback can be called when the sample finishes. Looping samples don't get callbacks.
-	e.g. = inst (sample_play s ^ volume loop pan playtime_millis callback)
+	A callback can be called when the sample finishes
+	The optional callback_data cannot be a constant
+	e.g. = inst (sample_play s ^ volume loop pan playtime_millis callback callback_data)
 </pre>
 
 <h3>sample_stop</h3>

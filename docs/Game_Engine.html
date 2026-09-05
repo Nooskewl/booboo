@@ -775,7 +775,8 @@ of animation names.</p>
 	will be called when the animation is finished. The callback takes
 	1 parameter which will be the sprite (number) that set_animation
 	was called on.
-	e.g. sprite_set_animation sprite "punch" ^ my_function
+	callback_data is optional and must be a variable or fish, not a constant.
+	e.g. sprite_set_animation sprite "punch" ^ my_function my_callback_data
 </pre>
 
 <h3>sprite_set_animation_lazy</h3>
@@ -1170,7 +1171,8 @@ the first load.</p>
 	Set the animation to the one named. You can optionally pass a BooBoo
 	function that takes a number as parameter (model id) that will be
 	called when the animation finishes.
-	e.g. model_set_animation model "attack" ^ done_anim_callback
+	callback_data is optional and must be a variable or fish, not a constant.
+	e.g. model_set_animation model "attack" ^ done_anim_callback done_callback_data
 </pre>
 
 <h3>model_stop</h3>

@@ -2203,6 +2203,7 @@ struct Sprite_Callback_Data
 	Program *prg;
 	int function;
 	int id;
+	int var;
 };
 
 static void sprite_callback(void *data)
@@ -2214,6 +2215,12 @@ static void sprite_callback(void *data)
 	t.n = d->id;
 	t.dereference = 0;
 	v.push_back(t);
+	if (d->var >= 0) {
+		t.type = Token::SYMBOL;
+		t.i = d->var;
+		t.dereference = 0;
+		v.push_back(t);
+	}
 	if (booboo::callbacks_enabled) {
 		call_function(d->prg, d->function, v, 0);
 	}
@@ -2238,10 +2245,45 @@ static bool spritefunc_set_animation(Program *prg, const std::vector<Token> &v)
 		d->prg = prg;
 		d->function = as_function(prg, v, 2);
 		d->id = id;
+		if (v.size() > 3) {
+			d->var = v[3].i;
+		}
+		else {
+			d->var = -1;
+		}
 		sprite->set_animation(anim, sprite_callback, d);
 	}
 	else {
 		sprite->set_animation(anim);
+	}
+
+	return true;
+}
+
+static bool spritefunc_set_finished_callback(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	int id = as_number(prg, v, 0);
+	
+	Sprite_Info *info = sprite_info(prg);
+	
+	INFO_EXISTS(info->sprites, id)
+
+	gfx::Sprite *sprite = info->sprites[id];
+
+	if (v.size() > 1) {
+		Sprite_Callback_Data *d = new Sprite_Callback_Data;
+		d->prg = prg;
+		d->function = as_function(prg, v, 1);
+		d->id = id;
+		if (v.size() > 2) {
+			d->var = v[2].i;
+		}
+		else {
+			d->var = -1;
+		}
+		sprite->set_animation_finished_callback(sprite_callback, d);
 	}
 
 	return true;
@@ -3309,6 +3351,7 @@ struct Model_Callback_Data
 	Program *prg;
 	int function;
 	int id;
+	int var;
 };
 
 static void model_callback(void *data)
@@ -3320,6 +3363,12 @@ static void model_callback(void *data)
 	t.n = d->id;
 	t.dereference = 0;
 	v.push_back(t);
+	if (d->var >= 0) {
+		t.type = Token::SYMBOL;
+		t.i = d->var;
+		t.dereference = 0;
+		v.push_back(t);
+	}
 	if (booboo::callbacks_enabled) {
 		call_function(d->prg, d->function, v, 0);
 	}
@@ -3342,6 +3391,12 @@ static bool modelfunc_set_animation(Program *prg, const std::vector<Token> &v)
 		d->prg = prg;
 		d->function = as_function(prg, v, 2);
 		d->id = id;
+		if (v.size() > 3) {
+			d->var = v[3].i;
+		}
+		else {
+			d->var = -1;
+		}
 		model->model->set_animation(anim, model_callback, d);
 	}
 	else {
@@ -3349,6 +3404,33 @@ static bool modelfunc_set_animation(Program *prg, const std::vector<Token> &v)
 	}
 
 	model->model->start();
+
+	return true;
+}
+
+static bool modelfunc_set_finished_callback(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	int id = as_number(prg, v, 0);
+	
+	Model_Info *info = model_info(prg);
+	INFO_EXISTS(info->models, id)
+	Model *model = info->models[id];
+
+	if (v.size() > 1) {
+		Model_Callback_Data *d = new Model_Callback_Data;
+		d->prg = prg;
+		d->function = as_function(prg, v, 1);
+		d->id = id;
+		if (v.size() > 2) {
+			d->var = v[2].i;
+		}
+		else {
+			d->var = -1;
+		}
+		model->model->set_animation_finished_callback(model_callback, d);
+	}
 
 	return true;
 }
@@ -5155,6 +5237,7 @@ void start_lib_game()
 	add_instruction("sprite_destroy", spritefunc_destroy);
 	add_instruction("sprite_set_animation_lazy", spritefunc_set_animation_lazy);
 	add_instruction("sprite_set_animation", spritefunc_set_animation);
+	add_instruction("sprite_set_finished_callback", spritefunc_set_finished_callback);
 	add_expression_handler("sprite_get_animation", exprfunc_sprite_get_animation);
 	add_expression_handler("sprite_get_previous_animation", exprfunc_sprite_get_previous_animation);
 	add_expression_handler("sprite_length", exprfunc_sprite_length);
@@ -5202,6 +5285,7 @@ void start_lib_game()
 	add_instruction("rotate_3d", modelfunc_rotate_3d);
 	add_instruction("translate_3d", modelfunc_translate_3d);
 	add_instruction("model_set_animation", modelfunc_set_animation);
+	add_instruction("model_set_finished_callback", modelfunc_set_finished_callback);
 	add_instruction("model_stop", modelfunc_stop);
 	add_instruction("model_reset", modelfunc_reset);
 	add_expression_handler("model_size", exprfunc_model_size);

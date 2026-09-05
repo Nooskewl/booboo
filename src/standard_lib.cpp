@@ -2520,6 +2520,7 @@ struct MML_Callback_Data
 	Program *prg;
 	int function;
 	int id;
+	int var;
 };
 
 static void mml_callback(void *data)
@@ -2531,6 +2532,12 @@ static void mml_callback(void *data)
 	t.n = d->id;
 	t.dereference = 0;
 	v.push_back(t);
+	if (d->var >= 0) {
+		t.type = Token::SYMBOL;
+		t.i = d->var;
+		t.dereference = 0;
+		v.push_back(t);
+	}
 	if (booboo::callbacks_enabled) {
 		call_function(d->prg, d->function, v, 0);
 	}
@@ -2585,6 +2592,12 @@ static void exprfunc_mml_play(Program *prg, const std::vector<Token> &v)
 		d->prg = prg;
 		d->function = as_function(prg, v, 4);
 		d->id = iinfo->instance_id;
+		if (v.size() > 5) {
+			d->var = v[5].i;
+		}
+		else {
+			d->var = -1;
+		}
 		callback_data = d;
 		callback = mml_callback;
 	}
@@ -2610,6 +2623,41 @@ static void exprfunc_mml_play(Program *prg, const std::vector<Token> &v)
 
 	prg->result.set_type(Variable::NUMBER);
 	prg->result.n = inst;
+}
+
+static bool mmlfunc_set_finished_callback(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	int id = as_number(prg, v, 0);
+
+	MML_Instance_Info *iinfo = mml_instance_info(prg);
+	
+	MML_Instance *i = iinfo->instances[id];
+	
+	audio::MML *mml = i->mml;
+
+	util::Callback callback = nullptr;
+	void *callback_data = nullptr;
+
+	if (v.size() > 1) {
+		MML_Callback_Data *d = new MML_Callback_Data;
+		d->prg = prg;
+		d->function = as_function(prg, v, 1);
+		d->id = id;
+		if (v.size() > 2) {
+			d->var = v[2].i;
+		}
+		else {
+			d->var = -1;
+		}
+		callback_data = d;
+		callback = mml_callback;
+	}
+
+	mml->set_finished_callback(i->instance, callback, callback_data);
+
+	return true;
 }
 
 static void exprfunc_mml_num_tracks(Program *prg, const std::vector<Token> &v)
@@ -2913,6 +2961,7 @@ struct Sample_Callback_Data
 	Program *prg;
 	int function;
 	int id;
+	int var;
 };
 
 static void sample_callback(void *data)
@@ -2924,6 +2973,12 @@ static void sample_callback(void *data)
 	t.n = d->id;
 	t.dereference = 0;
 	v.push_back(t);
+	if (d->var >= 0) {
+		t.type = Token::SYMBOL;
+		t.i = d->var;
+		t.dereference = 0;
+		v.push_back(t);
+	}
 	if (booboo::callbacks_enabled) {
 		call_function(d->prg, d->function, v, 0);
 	}
@@ -3001,6 +3056,12 @@ static void exprfunc_sample_play(Program *prg, const std::vector<Token> &v)
 		d->prg = prg;
 		d->function = as_function(prg, v, 5);
 		d->id = iinfo->instance_id;
+		if (v.size() > 6) {
+			d->var = v[6].i;
+		}
+		else {
+			d->var = -1;
+		}
 		callback_data = d;
 		callback = sample_callback;
 	}
@@ -3033,6 +3094,41 @@ static void exprfunc_sample_play(Program *prg, const std::vector<Token> &v)
 		}
 	}
 	audio::unlock_mutex();
+}
+
+static bool samplefunc_set_finished_callback(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	int id = as_number(prg, v, 0);
+
+	Sample_Instance_Info *iinfo = sample_instance_info(prg);
+
+	audio::Sample_Instance *inst = iinfo->instances[id];
+
+	audio::Sample *sample = inst->sample;
+
+	util::Callback callback = nullptr;
+	void *callback_data = nullptr;
+
+	if (v.size() > 1) {
+		Sample_Callback_Data *d = new Sample_Callback_Data;
+		d->prg = prg;
+		d->function = as_function(prg, v, 1);
+		d->id = id;
+		if (v.size() > 2) {
+			d->var = v[2].i;
+		}
+		else {
+			d->var = -1;
+		}
+		callback_data = d;
+		callback = sample_callback;
+	}
+
+	sample->set_finished_callback(inst, callback, callback_data);
+
+	return true;
 }
 
 static bool samplefunc_seek(Program *prg, const std::vector<Token> &v)
@@ -3547,6 +3643,7 @@ void start_lib_standard()
 	add_expression_handler("mml_length", exprfunc_mml_length);
 	add_instruction("mml_destroy", mmlfunc_destroy);
 	add_expression_handler("mml_play", exprfunc_mml_play);
+	add_instruction("mml_set_finished_callback", mmlfunc_set_finished_callback);
 	add_expression_handler("mml_num_tracks", exprfunc_mml_num_tracks);
 	add_instruction("mml_set_sample", mmlfunc_set_sample);
 	add_instruction("mml_stop", mmlfunc_stop);
@@ -3561,6 +3658,7 @@ void start_lib_standard()
 	add_expression_handler("sample_create", exprfunc_sample_create);
 	add_instruction("sample_destroy", samplefunc_destroy);
 	add_expression_handler("sample_play", exprfunc_sample_play);
+	add_instruction("sample_set_finished_callback", samplefunc_set_finished_callback);
 	add_instruction("sample_stop", samplefunc_stop);
 	add_instruction("sample_set_volume", samplefunc_set_volume);
 	add_instruction("sample_set_pan", samplefunc_set_pan);
