@@ -502,7 +502,8 @@ The following sections describe the API:
 	cache could need to be resized frequently on the next frame drawn, so you can
 	use this to reserve a larger amount. This is in addition to whatever
 	has already been reserved. NOTE: IT'S ONE FRAME THAT'S TAKES LONGER, DO NOT
-	CALL THIS IN YOUR GAME LOOP
+	CALL THIS IN YOUR GAME LOOP. FIGURE OUT THE MAXIMUM AMOUNT OF VERTICES YOU
+	NEED AND CALL THIS ONCE AT THE BEGINNING OF YOUR GAME
 	e.g. resize_vertex_cache (* 1024 256)
 </pre>
 
