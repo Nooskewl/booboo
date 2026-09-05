@@ -1050,6 +1050,7 @@ Sections:
 <h3>(mml_play)</h3>
 <pre>
 	play a sound. Returns an instance that can be adjusted
+	The callback can be called when the MML finishes (it is called at most once, the first loop)
 	e.g. = inst (mml_play blast ^ volume loop pan callback)
 </pre>
 
@@ -1140,6 +1141,7 @@ Sections:
 	play a sample. Returns a sample instance that can be adjusted
 	An optional duration can be used otherwise it will playback
 	at normal speed
+	A callback can be called when the sample finishes. Looping samples don't get callbacks.
 	e.g. = inst (sample_play s ^ volume loop pan playtime_millis callback)
 </pre>
 
