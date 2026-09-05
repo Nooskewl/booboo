@@ -86,7 +86,6 @@ struct Vertex_Buffer_Info {
 struct Model {
 	glm::mat4 mat;
 	gfx::Model *model;
-	bool is_clone;
 };
 
 struct Model_Info {

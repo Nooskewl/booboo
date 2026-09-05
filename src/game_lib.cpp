@@ -3048,7 +3048,6 @@ static void exprfunc_model_load(Program *prg, const std::vector<Token> &v)
 		Model *m = new Model;
 		m->mat = glm::mat4();
 		m->model = model;
-		m->is_clone = false;
 
 		info->models[info->model_id++] = m;
 	}
@@ -3064,9 +3063,7 @@ static bool modelfunc_destroy(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v, 0);
 	Model_Info *info = model_info(prg);
 	INFO_EXISTS(info->models, id)
-	if (info->models[id]->is_clone == false) {
-		delete info->models[id]->model;
-	}
+	delete info->models[id]->model;
 	delete info->models[id];
 	info->models.erase(info->models.find(id));
 
@@ -3686,24 +3683,6 @@ static bool modelfunc_draw_vertex_buffer_textured(Program *prg, const std::vecto
 	PRINT_GL_ERROR("glTexParameteri\n");
 
 	return true;
-}
-
-static void exprfunc_model_clone(Program *prg, const std::vector<Token> &v)
-{
-	COUNT_ARGS(1)
-
-	int id = as_number(prg, v, 0);
-	prg->result.set_type(Variable::NUMBER);
-
-	Model_Info *info = model_info(prg);
-	INFO_EXISTS(info->models, id)
-	Model *model = new Model;
-	Model *orig = info->models[id];
-	model->model = orig->model;
-	model->mat = orig->mat;
-	model->is_clone = true;
-	prg->result.n = info->model_id;
-	info->models[info->model_id++] = model;
 }
 
 static void exprfunc_billboard_create(Program *prg, const std::vector<Token> &v)
@@ -5230,7 +5209,6 @@ void start_lib_game()
 	add_instruction("destroy_vertex_buffer", modelfunc_destroy_vertex_buffer);
 	add_instruction("draw_vertex_buffer", modelfunc_draw_vertex_buffer);
 	add_instruction("draw_vertex_buffer_textured", modelfunc_draw_vertex_buffer_textured);
-	add_expression_handler("model_clone", exprfunc_model_clone);
 	add_expression_handler("billboard_create", exprfunc_billboard_create);
 	add_expression_handler("billboard_from_sprite", exprfunc_billboard_from_sprite);
 	add_expression_handler("billboard_size", exprfunc_billboard_size);
@@ -5312,9 +5290,7 @@ void game_lib_destroy_program(Program *prg)
 	}
 	Model_Info *model_i = model_info(prg);
 	for (std::map<int, Model *>::iterator i = model_i->models.begin(); i != model_i->models.end(); i++) {
-		if (model_i->models[(*i).first]->is_clone == false) {
-			delete model_i->models[(*i).first]->model;
-		}
+		delete model_i->models[(*i).first]->model;
 		delete model_i->models[(*i).first];
 	}
 	Billboard_Info *billboard_i = billboard_info(prg);

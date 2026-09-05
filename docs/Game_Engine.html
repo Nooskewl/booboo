@@ -617,6 +617,9 @@ The following sections describe the API:
 
 <p>Supported formats are png and tga. There is a JPEG mod in the SDK.</p>
 
+<p>Image and sprites that are loaded use the same image if it's loaded more than once to
+save memory.</p>
+
 <h3>set_target</h3>
 <pre>
 	Set the render target. This only works with images created with
@@ -1108,6 +1111,10 @@ tiles1.png, etc (or tga.)</p>
 <p>Models can be in either ascii .x (DirectX model) or .nsm (binary Nooskewl
 model) using convert_model in tools to convert.</p>
 
+<p>model_load will cache models like sprites and images to conserve memory. So if you load the
+same model 10 times it really only loads once then sets up a minimal model that is backed by
+the first load.</p>
+
 <h3>set_2d</h3>
 <pre>
 	Revert to the default 2d projection
@@ -1126,14 +1133,6 @@ model) using convert_model in tools to convert.</p>
 	Each model has its own transform set with model_* transform functions
 	e.g. = model (model_load "filename.x" ^ lffs)
 	Returns -1 on fail
-</pre>
-
-<h3>(model_clone)</h3>
-<pre>
-	Clone a model
-	This is a clone of an existing model with its own transform. Any
-	animations will repeat over clones
-	e.g. = clone (model_clone model)
 </pre>
 
 <h3>model_draw</h3>
