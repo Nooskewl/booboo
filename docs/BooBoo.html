@@ -1057,6 +1057,12 @@ Sections:
 	e.g. = inst (mml_play blast ^ volume loop pan callback callback_data)
 </pre>
 
+<h3>mml_set_finished_callback</h3>
+<pre>
+	This can be called from the callback to get looping finished callbacks
+	e.g. mml_set_finished_callback inst callback callback_data
+</pre>
+
 <h3>mml_stop</h3>
 <pre>
 	stop an MML instance
@@ -1147,6 +1153,12 @@ Sections:
 	A callback can be called when the sample finishes
 	The optional callback_data cannot be a constant
 	e.g. = inst (sample_play s ^ volume loop pan playtime_millis callback callback_data)
+</pre>
+
+<h3>sample_set_finished_callback</h3>
+<pre>
+	This can be called from the callback to get looping finished callbacks
+	e.g. sample_set_finished_callback inst callback callback_data
 </pre>
 
 <h3>sample_stop</h3>
