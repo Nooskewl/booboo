@@ -2593,6 +2593,9 @@ static void exprfunc_mml_play(Program *prg, const std::vector<Token> &v)
 		d->function = as_function(prg, v, 4);
 		d->id = iinfo->instance_id;
 		if (v.size() > 5) {
+			if (v[5].type != Token::SYMBOL) {
+				throw Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg));
+			}
 			d->var = v[5].i;
 		}
 		else {
@@ -2646,6 +2649,9 @@ static bool mmlfunc_set_finished_callback(Program *prg, const std::vector<Token>
 		d->function = as_function(prg, v, 1);
 		d->id = id;
 		if (v.size() > 2) {
+			if (v[2].type != Token::SYMBOL) {
+				throw Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg));
+			}
 			d->var = v[2].i;
 		}
 		else {
@@ -3057,6 +3063,9 @@ static void exprfunc_sample_play(Program *prg, const std::vector<Token> &v)
 		d->function = as_function(prg, v, 5);
 		d->id = iinfo->instance_id;
 		if (v.size() > 6) {
+			if (v[6].type != Token::SYMBOL) {
+				throw Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg));
+			}
 			d->var = v[6].i;
 		}
 		else {
@@ -3117,6 +3126,9 @@ static bool samplefunc_set_finished_callback(Program *prg, const std::vector<Tok
 		d->function = as_function(prg, v, 1);
 		d->id = id;
 		if (v.size() > 2) {
+			if (v[2].type != Token::SYMBOL) {
+				throw Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg));
+			}
 			d->var = v[2].i;
 		}
 		else {
