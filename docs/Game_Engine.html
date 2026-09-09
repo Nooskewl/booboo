@@ -1138,7 +1138,8 @@ the first load.</p>
 <pre>
 	Load a model with an optional armature an animations from .x file
 	Each model has its own transform set with model_* transform functions
-	e.g. = model (model_load "filename.x" ^ lffs)
+	VBOs are used by default
+	e.g. = model (model_load "filename.x" ^ use_vbo lffs)
 	Returns -1 on fail
 </pre>
 
