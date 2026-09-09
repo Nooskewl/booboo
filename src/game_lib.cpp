@@ -2246,7 +2246,7 @@ static bool spritefunc_set_animation(Program *prg, const std::vector<Token> &v)
 		d->function = as_function(prg, v, 2);
 		d->id = id;
 		if (v.size() > 3) {
-			if (v[3].type != Token::SYMBOL) {
+			if (v[3].type != Token::SYMBOL || prg->variables[v[3].i].type == Variable::EXPRESSION) {
 				throw Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg));
 			}
 			d->var = v[3].i;
@@ -2281,7 +2281,7 @@ static bool spritefunc_set_finished_callback(Program *prg, const std::vector<Tok
 		d->function = as_function(prg, v, 1);
 		d->id = id;
 		if (v.size() > 2) {
-			if (v[2].type != Token::SYMBOL) {
+			if (v[2].type != Token::SYMBOL || prg->variables[v[2].i].type == Variable::EXPRESSION) {
 				throw Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg));
 			}
 			d->var = v[2].i;
@@ -3403,7 +3403,7 @@ static bool modelfunc_set_animation(Program *prg, const std::vector<Token> &v)
 		d->function = as_function(prg, v, 2);
 		d->id = id;
 		if (v.size() > 3) {
-			if (v[3].type != Token::SYMBOL) {
+			if (v[3].type != Token::SYMBOL || prg->variables[v[3].i].type == Variable::EXPRESSION) {
 				throw Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg));
 			}
 			d->var = v[3].i;
@@ -3438,7 +3438,7 @@ static bool modelfunc_set_finished_callback(Program *prg, const std::vector<Toke
 		d->function = as_function(prg, v, 1);
 		d->id = id;
 		if (v.size() > 2) {
-			if (v[2].type != Token::SYMBOL) {
+			if (v[2].type != Token::SYMBOL || prg->variables[v[2].i].type == Variable::EXPRESSION) {
 				throw Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg));
 			}
 			d->var = v[2].i;
