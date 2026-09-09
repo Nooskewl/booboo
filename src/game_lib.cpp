@@ -3090,13 +3090,18 @@ static void exprfunc_model_load(Program *prg, const std::vector<Token> &v)
 		use_vbo = as_number(prg, v, 1);
 	}
 
-	bool load_from_filesystem = false;
+	int fps = 30;
 	if (v.size() > 2) {
-		load_from_filesystem = as_number(prg, v, 2);
+		fps = as_number(prg, v, 2);
+	}
+
+	bool load_from_filesystem = false;
+	if (v.size() > 3) {
+		load_from_filesystem = as_number(prg, v, 3);
 	}
 
 	try {
-		gfx::Model *model = new gfx::Model(name, use_vbo, load_from_filesystem);
+		gfx::Model *model = new gfx::Model(name, use_vbo, fps, load_from_filesystem);
 
 		Model *m = new Model;
 		m->mat = glm::mat4();
