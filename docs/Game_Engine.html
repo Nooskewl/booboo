@@ -774,7 +774,7 @@ of animation names.</p>
 	Set the current animation. You can optionally add a callback which
 	will be called when the animation is finished. The callback takes
 	1 parameter which will be the sprite (number) that set_animation
-	was called on.
+	was called on (and then callback data)
 	callback_data is optional and must be a variable or fish, not a constant.
 	e.g. sprite_set_animation sprite "punch" ^ my_function my_callback_data
 </pre>
@@ -1182,7 +1182,8 @@ Only the armature named "Armature" is used.</p>
 <pre>
 	Set the animation to the one named. You can optionally pass a BooBoo
 	function that takes a number as parameter (model id) that will be
-	called when the animation finishes.
+	called when the animation finishes. It will also receive callback data
+	as 2nd parameter if specified.
 	callback_data is optional and must be a variable or fish, not a constant.
 	e.g. model_set_animation model "attack" ^ done_anim_callback done_callback_data
 </pre>
