@@ -3607,7 +3607,7 @@ void start_lib_standard()
 	add_expression_handler("file_tell", exprfunc_file_tell);
 	add_expression_handler("file_seek", exprfunc_file_seek);
 	
-	add_instruction("print_coloured_text", twinklefunc_print_coloured_text);
+	add_instruction("printc", twinklefunc_print_coloured_text);
 	add_instruction("text_fore", twinklefunc_text_fore);
 	add_instruction("text_back", twinklefunc_text_back);
 	add_instruction("text_reset", twinklefunc_reset);

@@ -3111,6 +3111,7 @@ static void exprfunc_model_load(Program *prg, const std::vector<Token> &v)
 	}
 	catch (util::Error &e) {
 		prg->result.n = -1;
+		printf("error='%s'\n", e.error_message.c_str());
 	}
 }
 
