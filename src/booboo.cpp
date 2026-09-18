@@ -45,6 +45,7 @@ bool quit;
 bool callbacks_enabled;
 std::string (*load_text)(std::string filename);
 std::vector<booboo::library_func> library;
+std::vector<Timer_Callback> timer_callbacks;
 
 std::vector<std::string> cli_args;
 

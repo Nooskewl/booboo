@@ -431,6 +431,21 @@ void draw_all()
 	gfx::flip();
 }
 
+static void call_timer_callbacks(Program *prg)
+{
+	std::vector<Timer_Callback>::iterator it;
+	for (it = timer_callbacks.begin(); it != timer_callbacks.end();) {
+		if (it->time <= SDL_GetTicks()) {
+			Timer_Callback t = *it;
+			call_function(prg, t.func, t.tokens, 0);
+			it = timer_callbacks.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
+}
+
 static void loop()
 {
 	// These keep the logic running at 60Hz and drawing at refresh rate is possible
@@ -528,6 +543,8 @@ static void loop()
 			if (quit) {
 				break;
 			}
+
+			call_timer_callbacks(prg);
 
 			std::vector<Token> tmp;
 			call_function(prg, "run", tmp);

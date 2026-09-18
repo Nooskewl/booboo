@@ -5019,6 +5019,26 @@ static bool miscfunc_end_text_input(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static bool miscfunc_timer_callback(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(1)
+
+	int millis = as_number(prg, v, 0);
+	int func = as_function(prg, v, 1);
+
+	Timer_Callback t;
+	t.func = func;
+	t.time = SDL_GetTicks() + millis;
+	
+	if (v.size() > 2) {
+		t.tokens.push_back(v[2]);
+	}
+
+	timer_callbacks.push_back(t);
+
+	return true;
+}
+
 static void letterbox_callback(gfx::Letterbox_Type type, int x, int y, int w, int h)
 {
 	if (prg == nullptr) {
@@ -5360,6 +5380,7 @@ void start_lib_game()
 	add_instruction("gui_set_transition_types", widgetfunc_gui_set_transition_types);
 	add_instruction("start_text_input", miscfunc_start_text_input);
 	add_instruction("end_text_input", miscfunc_end_text_input);
+	add_instruction("timer_callback", miscfunc_timer_callback);
 }
 
 void end_lib_game()
