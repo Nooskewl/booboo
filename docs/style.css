@@ -50,3 +50,6 @@ hr {
 	border: 0;
 	border-top: 1px solid #fed;
 }
+img {
+	max-width: 100%;
+}
