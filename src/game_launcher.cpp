@@ -41,6 +41,7 @@ static int mouse_dy;
 static bool delta_got;
 
 static int exit_key = TGUIK_F12;
+static int exit_button = TGUI_B_GUIDE;
 
 static bool mouse_relative = false;
 
@@ -237,6 +238,7 @@ bool start()
 	
 	util::JSON::Node *root = shim::shim_json->get_root();
 	exit_key = root->get_nested_int("booboo>input>exit_key", &exit_key, TGUIK_F12);
+	exit_button = root->get_nested_int("booboo>input>exit_button", &exit_button, TGUI_B_GUIDE);
 
 	return true;
 }
@@ -348,7 +350,7 @@ void handle_event(TGUI_Event *event)
 		}
 	}
 	else if (event->type == TGUI_JOY_DOWN) {
-		if (event->joystick.button == TGUI_B_GUIDE) {
+		if (event->joystick.button == exit_button) {
 			SDL_SetWindowRelativeMouseMode(gfx::internal::gfx_context.window, false);
 			int result = gui::popup("Really quit?", "Are you sure?", gui::YESNO);
 			SDL_SetWindowRelativeMouseMode(gfx::internal::gfx_context.window, mouse_relative);

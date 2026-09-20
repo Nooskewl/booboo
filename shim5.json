@@ -76,7 +76,8 @@
 	},
 	"booboo": {
 		"input": {
-			"exit_key": 1073741893
+			"exit_key": 1073741893,
+			"exit_button": 5
 		}
 	}
 }
