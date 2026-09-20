@@ -5,7 +5,7 @@ namespace booboo {
 
 struct Timer_Callback {
 	int func;
-	Uint32 time;
+	float time;
 	std::vector<Token> tokens;
 };
 

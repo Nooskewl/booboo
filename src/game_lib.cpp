@@ -5021,14 +5021,14 @@ static bool miscfunc_end_text_input(Program *prg, const std::vector<Token> &v)
 
 static bool miscfunc_timer_callback(Program *prg, const std::vector<Token> &v)
 {
-	MIN_ARGS(1)
+	MIN_ARGS(2)
 
 	int millis = as_number(prg, v, 0);
 	int func = as_function(prg, v, 1);
 
 	Timer_Callback t;
 	t.func = func;
-	t.time = SDL_GetTicks() + millis;
+	t.time = millis;
 	
 	if (v.size() > 2) {
 		t.tokens.push_back(v[2]);

@@ -433,9 +433,11 @@ void draw_all()
 
 static void call_timer_callbacks(Program *prg)
 {
+	float ticks = 1000.0f / shim::logic_rate;
 	std::vector<Timer_Callback>::iterator it;
 	for (it = timer_callbacks.begin(); it != timer_callbacks.end();) {
-		if (it->time <= SDL_GetTicks()) {
+		it->time -= ticks;
+		if (it->time <= 0.0f) {
 			Timer_Callback t = *it;
 			call_function(prg, t.func, t.tokens, 0);
 			it = timer_callbacks.erase(it);
