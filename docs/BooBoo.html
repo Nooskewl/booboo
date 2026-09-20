@@ -952,7 +952,7 @@ Sections:
 	A "game&gt;" prefix is added automatically. The optional callback is
 	called with the key's name when the value is changed in devsettings
 	callback_data is optional and must be a variable or fish, not a constant.
-	e.g. json_register_number n "foo&gt;baz" readonly ^ callback callback_data
+	e.g. json_register_number n "foo&gt;baz" readonly ^ callback
 </pre>
 
 <h3>json_register_string</h3>
@@ -1061,7 +1061,7 @@ Sections:
 <h3>mml_set_finished_callback</h3>
 <pre>
 	This can be called from the callback to get looping finished callbacks
-	e.g. mml_set_finished_callback inst callback callback_data
+	e.g. mml_set_finished_callback inst callback ^ callback_data
 </pre>
 
 <h3>mml_stop</h3>
@@ -1160,7 +1160,7 @@ Sections:
 <h3>sample_set_finished_callback</h3>
 <pre>
 	This can be called from the callback to get looping finished callbacks
-	e.g. sample_set_finished_callback inst callback callback_data
+	e.g. sample_set_finished_callback inst callback ^ callback_data
 </pre>
 
 <h3>sample_stop</h3>

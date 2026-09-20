@@ -221,7 +221,7 @@ The following sections describe the API:
 <pre>
 	Call a callback in X milliseconds
 	callback_data must be a variable or a fish
-	e.g. timer_callback X callback callback_data
+	e.g. timer_callback X callback ^ callback_data
 </pre>
 
 <a id="Graphics"></a>
@@ -792,7 +792,7 @@ of animation names.</p>
 <h3>sprite_set_finished_callback</h3>
 <pre>
 	This can be called from the callback to get looping finished callbacks
-	e.g. sprite_set_finished_callback sprite callback callback_data
+	e.g. sprite_set_finished_callback sprite callback ^ callback_data
 </pre>
 
 <h3>sprite_set_animation_lazy</h3>
@@ -1201,7 +1201,7 @@ Only the armature named "Armature" is used.</p>
 <h3>model_set_finished_callback</h3>
 <pre>
 	This can be called from the callback to get looping finished callbacks
-	e.g. model_set_finished_callback model callback callback_data
+	e.g. model_set_finished_callback model callback ^ callback_data
 </pre>
 
 <h3>model_stop</h3>
