@@ -3688,6 +3688,7 @@ void start_lib_standard()
 
 void end_lib_standard()
 {
+	timer_callbacks.clear();
 }
 
 void standard_lib_destroy_program(Program *prg)
