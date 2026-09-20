@@ -194,6 +194,11 @@ struct Program {
 	std::vector<std::string> real_file_names;
 };
 
+enum F12 {
+	F12_START,
+	F12_END
+};
+
 typedef bool (*library_func)(Program *prg, const std::vector<Token> &v);
 typedef std::string (*token_func)(Program *);
 typedef void (*expression_func)(Program *prg, const std::vector<Token> &v);

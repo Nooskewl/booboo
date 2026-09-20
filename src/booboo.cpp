@@ -1720,6 +1720,8 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "STDIN", 0, pass, var_i);
 	insert_constant(prg, "STDOUT", 1, pass, var_i);
 	insert_constant(prg, "STDERR", 2, pass, var_i);
+	insert_constant(prg, "F12_START", F12_START, pass, var_i);
+	insert_constant(prg, "F12_END", F12_END, pass, var_i);
 
 	for (int i = 0; i < 100; i++) {
 		std::string name = "__tmp" + util::itos(i);

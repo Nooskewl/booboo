@@ -255,6 +255,12 @@ void handle_event(TGUI_Event *event)
 		return;
 	}
 	else if (event->type == TGUI_KEY_DOWN && event->keyboard.code == exit_key) {
+		std::vector<Token> tmp;
+		Token t;
+		t.type = Token::NUMBER;
+		t.n = F12_START;
+		tmp.push_back(t);
+		call_function(prg, "f12", tmp);
 		SDL_SetWindowRelativeMouseMode(gfx::internal::gfx_context.window, false);
 		int result = gui::popup("Really quit?", "Are you sure?", gui::YESNO);
 		SDL_SetWindowRelativeMouseMode(gfx::internal::gfx_context.window, mouse_relative);
@@ -262,6 +268,10 @@ void handle_event(TGUI_Event *event)
 			quit = true;
 			return;
 		}
+		tmp.clear();
+		t.n = F12_END;
+		tmp.push_back(t);
+		call_function(prg, "f12", tmp);
 	}
 	else if (event->type == TGUI_MOUSE_AXIS) {
 		if (event->mouse.normalised) {
