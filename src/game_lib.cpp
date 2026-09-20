@@ -2247,7 +2247,7 @@ static bool spritefunc_set_animation(Program *prg, const std::vector<Token> &v)
 		d->id = id;
 		if (v.size() > 3) {
 			if (v[3].type != Token::SYMBOL || prg->variables[v[3].i].type == Variable::EXPRESSION) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg));
+				throw Error(std::string(__FUNCTION__) + ": " + "Variable expected at " + get_error_info(prg));
 			}
 			d->var = v[3].i;
 		}
@@ -3410,7 +3410,7 @@ static bool modelfunc_set_animation(Program *prg, const std::vector<Token> &v)
 		d->id = id;
 		if (v.size() > 3) {
 			if (v[3].type != Token::SYMBOL || prg->variables[v[3].i].type == Variable::EXPRESSION) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg));
+				throw Error(std::string(__FUNCTION__) + ": " + "Variable expected at " + get_error_info(prg));
 			}
 			d->var = v[3].i;
 		}
@@ -5031,6 +5031,9 @@ static bool miscfunc_timer_callback(Program *prg, const std::vector<Token> &v)
 	t.time = millis;
 	
 	if (v.size() > 2) {
+		if (v[2].type != Token::SYMBOL || prg->variables[v[2].i].type == Variable::EXPRESSION) {
+			throw Error(std::string(__FUNCTION__) + ": " + "Variable expected at " + get_error_info(prg));
+		}
 		t.tokens.push_back(v[2]);
 	}
 

@@ -2594,7 +2594,7 @@ static void exprfunc_mml_play(Program *prg, const std::vector<Token> &v)
 		d->id = iinfo->instance_id;
 		if (v.size() > 5) {
 			if (v[5].type != Token::SYMBOL || prg->variables[v[5].i].type == Variable::EXPRESSION) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg));
+				throw Error(std::string(__FUNCTION__) + ": " + "Variable expected at " + get_error_info(prg));
 			}
 			d->var = v[5].i;
 		}
@@ -3064,7 +3064,7 @@ static void exprfunc_sample_play(Program *prg, const std::vector<Token> &v)
 		d->id = iinfo->instance_id;
 		if (v.size() > 6) {
 			if (v[6].type != Token::SYMBOL || prg->variables[v[6].i].type == Variable::EXPRESSION) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg));
+				throw Error(std::string(__FUNCTION__) + ": " + "Variable expected at " + get_error_info(prg));
 			}
 			d->var = v[6].i;
 		}
