@@ -4422,6 +4422,7 @@ void end()
 	while (num_var_args_args.size() > 0) {
 		num_var_args_args.pop();
 	}
+	timer_callbacks.clear();
 }
 
 Program *create_program(std::string code)
