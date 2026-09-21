@@ -25,7 +25,7 @@ those by placing one in:
 Windows:
 	%USERPROFILE%\Saved Games\BooBoo
 
-io_scene_x_goobliata is a model import/export for blender 2.78 which
+io_scene_x_goobliata is a model import/export for blender (2.79b latest) which
 supports armatures/animations. Unfortunately I don't have one for recent
 Blender yet.
 
