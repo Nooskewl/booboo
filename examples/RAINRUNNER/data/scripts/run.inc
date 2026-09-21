@@ -131,7 +131,7 @@ function run
 	= old_joy_a joy_a
 	? joy_a 0
 	je no_jump
-	? jumps 2
+	? jumps 5
 	jge no_jump
 	= jumping 1
 	= jumps (+ jumps 1)
