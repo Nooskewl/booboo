@@ -5037,7 +5037,6 @@ void my_throw(Error e)
 		booboo::debug("Debugging program. Type 'help' for help...");
 	}
 	else {
-		prg->s->pc++;
 	}
 }
 
