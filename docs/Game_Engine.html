@@ -108,6 +108,9 @@ shim5.json contains all the defaults.
 All colours use premultiplied alpha.
 </p>
 
+<p>0, 0 refers to the centre of pixel 0,0, so primitives drawn at integers with thickness
+will grow out from the centre, so a 1 px line fills the pixel if drawn at integers.</p>
+
 <p>
 Most load function can take an optional boolean parameter at the end, which
 Tells BooBoo to load it from the filesystem rather than from the data/
