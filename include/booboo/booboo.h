@@ -215,7 +215,7 @@ void BOOBOO_EXPORT end();
 // These are the how you create, destroy and run programs
 Program BOOBOO_EXPORT *create_program(std::string code);
 void BOOBOO_EXPORT destroy_program(Program *prg);
-bool BOOBOO_EXPORT interpret(Program *prg);
+bool BOOBOO_EXPORT interpret(Program *prg, bool trigger_breakpoints = true);
 
 // Functions calling
 void BOOBOO_EXPORT call_function(Program *prg, int function, const std::vector<Token> &params, int ignore_params = 0);

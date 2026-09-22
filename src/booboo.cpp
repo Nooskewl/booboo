@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 
 #include <shim5/shim5.h>
+#include <shim5/internal/gfx.h>
 
 using namespace noo;
 
@@ -50,6 +51,7 @@ std::vector<booboo::library_func> library;
 std::vector<Timer_Callback> timer_callbacks;
 std::vector<std::string> function_breakpoints;
 std::vector<std::string> file_breakpoints;
+std::map<std::string, std::string> src_code;
 
 std::vector<std::string> cli_args;
 
@@ -2493,7 +2495,7 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 
 	for (size_t i = 0; i < function_breakpoints.size(); i++) {
 		if (function_breakpoints[i] == prg->s->name) {
-			debug("Breakpoint (" + prg->s->name + ") hit...\n");
+			debug("Breakpoint (" + prg->s->name + ") hit...");
 			break;
 		}
 	}
@@ -2563,18 +2565,20 @@ void call_function(Program *prg, std::string function_name, const std::vector<To
 	call_function(prg, (*it).second, params, ignore_params);
 }
 
-bool interpret(Program *prg)
+bool interpret(Program *prg, bool trigger_breakpoints)
 {
-	std::string inf = get_error_info(prg);
-	for (size_t i = 0; i < file_breakpoints.size(); i++) {
-		if (file_breakpoints[i] == inf) {
-			debug("Breakpoint " + inf + " hit...\n");
-			break;
-		}
-	}
-
 	if (prg->s->pc >= prg->s->program.size()) {
 		return false;
+	}
+
+	if (trigger_breakpoints) {
+		std::string inf = get_error_info(prg);
+		for (size_t i = 0; i < file_breakpoints.size(); i++) {
+			if (file_breakpoints[i] == inf) {
+				debug("Breakpoint " + inf + " hit...");
+				break;
+			}
+		}
 	}
 
 	Statement &s = prg->s->program[prg->s->pc];
@@ -2586,6 +2590,10 @@ bool interpret(Program *prg)
 
 	if (pc_bak == prg->s->pc) {
 		prg->s->pc++;
+	}
+
+	if (prg->s->pc >= prg->s->program.size()) {
+		return false;
 	}
 
 	return ret;
@@ -5028,7 +5036,13 @@ static booboo::Variable *get_var(std::string id)
 	else if (id[0] == '[') {
 		booboo::Variable::Fish f = booboo::parse_fish(booboo::prg, booboo::prg_func, id, booboo::PASS1);
 		f = booboo::parse_fish(booboo::prg, booboo::prg_func, id, booboo::PASS2);
+		std::vector<std::string> file_bak = file_breakpoints;
+		std::vector<std::string> func_bak = function_breakpoints;
+		file_breakpoints.clear();
+		function_breakpoints.clear();
 		return &booboo::go_fish(booboo::prg, f);
+		file_breakpoints = file_bak;
+		function_breakpoints = func_bak;
 	}
 	else {
 		printf("Don't know how to print that. Try a variable or fish...\n");
@@ -5036,11 +5050,61 @@ static booboo::Variable *get_var(std::string id)
 	}
 }
 
+static void print_lines(std::string fn, int start, int end, int curr)
+{
+	printf("-- %s\n", fn.c_str());
+
+	std::string &s = src_code[fn];
+
+	size_t pos = 0;
+
+	for (int i = 1; i < start; i++) {
+		while (pos < s.length() && s[pos] != '\n') {
+			pos++;
+		}
+		pos++;
+	}
+
+	for (int i = 0; i <= end-start; i++) {
+		std::string l;
+		while (pos < s.length() && s[pos] != '\n') {
+			char buf[2];
+			buf[0] = s[pos];
+			buf[1] = 0;
+			l += buf;
+			pos++;
+		}
+		pos++;
+		if (i+start == curr) {
+			twinkle::set_fore(twinkle::YELLOW, true);
+		}
+		printf("%d:%s\n", i+start, l.c_str());
+		if (i+start == curr) {
+			twinkle::reset();
+		}
+	}
+}
+
 void debug(std::string text)
 {
 	printf("%s\n", text.c_str());
-	printf("Type help for help...\n");
 	while (true) {
+		std::string fn = get_file_name(prg);
+
+		if (src_code.find(fn) == src_code.end()) {
+			if (gfx::internal::gfx_context.inited == true) {
+				src_code[fn] = booboo::load_text("scripts/" + fn);
+			}
+			else {
+				src_code[fn] = booboo::load_text(fn);
+			}
+		}
+
+		int l = get_line_num(prg);
+		int start = MAX(1, l - 2);
+		int end = l + 2;
+		print_lines(fn, start, end, l);
+
 		printf("> ");
 		fflush(stdout);
 		std::string line;
@@ -5048,6 +5112,7 @@ void debug(std::string text)
 		line = util::trim(line);
 		if (line == "help") {
 			printf("run           start or continue program execution\n");
+			printf("step          run one instruction\n");
 			printf("break <bp>    set a breakpoint. use break delete <bp> to delete\n");
 			printf("print <v>     print the value of a variable or fish\n");
 			printf("set <d> <s>   set the value of d to s\n");
@@ -5186,6 +5251,11 @@ void debug(std::string text)
 					file_breakpoints.push_back(line);
 					printf("Breakpoint added...\n");
 				}
+			}
+		}
+		else if (line == "step") {
+			if (booboo::interpret(prg, false) == false) {
+				return;
 			}
 		}
 		else {
