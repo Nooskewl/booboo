@@ -9,6 +9,13 @@ struct Timer_Callback {
 	std::vector<Token> tokens;
 };
 
+struct Watchpoint {
+	booboo::Variable::Expression e;
+	booboo::Variable *p;
+	std::string var;
+	std::string expr;
+};
+
 glm::mat4 BOOBOO_EXPORT to_glm_mat4(Variable &v);
 Variable BOOBOO_EXPORT from_glm_mat4(glm::mat4 m);
 

@@ -27,6 +27,7 @@ static std::stack< std::vector<booboo::Token> > var_args;
 static std::stack<int> num_var_args_args;
 static bool break_on_interpret = false;
 static std::vector<std::string> backtrace;
+static std::vector<booboo::Watchpoint> watchpoints;
 
 static void skip_whitespace(booboo::Program *prg)
 {
@@ -5070,11 +5071,14 @@ static booboo::Variable *get_var(std::string id, bool allow_expressions = true)
 		f = booboo::parse_fish(booboo::prg, booboo::prg_func, id, booboo::PASS2);
 		std::vector<std::string> file_bak = file_breakpoints;
 		std::vector<std::string> func_bak = function_breakpoints;
+		std::vector<Watchpoint> watch_bak = watchpoints;
 		file_breakpoints.clear();
 		function_breakpoints.clear();
+		watchpoints.clear();
 		booboo::Variable *vptr = &booboo::go_fish(booboo::prg, f);
 		file_breakpoints = file_bak;
 		function_breakpoints = func_bak;
+		watchpoints = watch_bak;
 		return vptr;
 	}
 	else if (allow_expressions && id[0] == '(') {
@@ -5082,13 +5086,16 @@ static booboo::Variable *get_var(std::string id, bool allow_expressions = true)
 		f = booboo::parse_expression(booboo::prg, booboo::prg_func, id, booboo::PASS2);
 		std::vector<std::string> file_bak = file_breakpoints;
 		std::vector<std::string> func_bak = function_breakpoints;
+		std::vector<Watchpoint> watch_bak = watchpoints;
 		file_breakpoints.clear();
 		function_breakpoints.clear();
+		watchpoints.clear();
 		booboo::evaluate_expression(booboo::prg, f);
 		static booboo::Variable var;
 		var = prg->result;
 		file_breakpoints = file_bak;
 		function_breakpoints = func_bak;
+		watchpoints = watch_bak;
 		return &var;
 	}
 	else {
@@ -5302,6 +5309,25 @@ void debug(std::string text)
 				}
 			}
 		}
+		if (line.substr(0, 4) == "list") {
+			printf("File breakpoints:\n");
+			for (size_t i = 0; i < file_breakpoints.size(); i++) {
+				printf("%s\n", file_breakpoints[i].c_str());
+			}
+			printf("--\n");
+			printf("Function breakpoints:\n");
+			for (size_t i = 0; i < function_breakpoints.size(); i++) {
+				printf("%s\n", function_breakpoints[i].c_str());
+			}
+			printf("--\n");
+			printf("Watchpoints:\n");
+			for (size_t i = 0; i < watchpoints.size(); i++) {
+				Watchpoint &w = watchpoints[i];
+				int digits = log10(watchpoints.size())+1;
+				std::string fmt = std::string("%") + util::itos(digits) + "d %s\n";
+				printf(fmt.c_str(), i, (w.var + " " + w.expr).c_str());
+			}
+		}
 		else if (line.substr(0, 5) == "break") {
 			printed_lines = true;
 			line = line.substr(5);
@@ -5329,7 +5355,7 @@ void debug(std::string text)
 					}
 				}
 				if (del) {
-					printf("Breakpoint deleted...\n");
+					printf("Breakpoint deleted!\n");
 				}
 				else {
 					printf("Nothing deleted...\n");
@@ -5342,12 +5368,12 @@ void debug(std::string text)
 					}
 					else {
 						booboo::function_breakpoints.push_back(line);
-						printf("Breakpoint added...\n");
+						printf("Breakpoint added!\n");
 					}
 				}
 				else {
 					file_breakpoints.push_back(line);
-					printf("Breakpoint added...\n");
+					printf("Breakpoint added!\n");
 				}
 			}
 		}
@@ -5392,6 +5418,72 @@ void debug(std::string text)
 		}
 		else if (line == "skip") {
 			prg->s->pc++;
+		}
+		else if (line.substr(0, 5) == "watch") {
+			line = line.substr(5);
+			line = util::trim(line);
+			if (line.substr(0, 6) == "delete") {
+				line = line.substr(6);
+				line = util::trim(line);
+				int index = atoi(line.c_str());
+				if (index >= 0 && index < watchpoints.size()) {
+					watchpoints.erase(watchpoints.begin()+index);
+					printf("Watch deleted!\n");
+				}
+				else {
+					printf("No such watchpoint...\n");
+				}
+			}
+			else {
+				std::string dest, src;
+				int i = 0;
+				if (line[0] == '[') {
+					int open = 0;
+					while (i < (int)line.length()) {
+						if (line[i] == '[') {
+							open++;
+						}
+						else if (line[i] == ']') {
+							open--;
+						}
+						i++;
+						if (open == 0) {
+							break;
+						}
+					}
+					dest = line.substr(0, i);
+					dest = util::trim(dest);
+				}
+				else {
+					while (i < (int)line.length()) {
+						char buf[2];
+						buf[0] = line[i];
+						buf[1] = 0;
+						dest += buf;
+						if (isspace(line[i])) {
+							break;
+						}
+						i++;
+					}
+					dest = util::trim(dest);
+				}
+				src = line.substr(i);
+				src = util::trim(src);
+				if (src[0] != '(') {
+					printf("Invalid watchpoint...\n");
+				}
+				else {
+					booboo::Variable::Expression f = booboo::parse_expression(booboo::prg, booboo::prg_func, src, booboo::PASS1);
+					f = booboo::parse_expression(booboo::prg, booboo::prg_func, src, booboo::PASS2);
+					Watchpoint w;
+					w.p = get_var(dest, false);
+					w.e = f;
+					w.var = dest;
+					w.expr = src;
+					watchpoints.push_back(w);
+					printf("Watchpoint added!\n");
+				}
+			}
 		}
 		else {
 			printf("Unknown command...\n");
