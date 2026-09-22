@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 #include <sys/stat.h>
 
@@ -37,6 +38,7 @@ static void skip_whitespace(booboo::Program *prg)
 namespace booboo {
 
 Program *prg;
+Program *prg_func;
 std::map<std::string, void *> black_box;
 std::string reset_game_name;
 std::string main_program_name;
@@ -46,6 +48,8 @@ bool callbacks_enabled;
 std::string (*load_text)(std::string filename);
 std::vector<booboo::library_func> library;
 std::vector<Timer_Callback> timer_callbacks;
+std::vector<std::string> function_breakpoints;
+std::vector<std::string> file_breakpoints;
 
 std::vector<std::string> cli_args;
 
@@ -629,9 +633,7 @@ static void restore(Program *prg, int func)
 	}
 }
 
-static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, int &var_i, int &expression_i, int &fish_i, Pass pass);
-
-static Variable::Expression parse_expression(Program *prg, Program *func, std::string expr, int &var_i, int &expression_i, int &fish_i, Pass pass)
+static Variable::Expression parse_expression(Program *prg, Program *func, std::string expr, Pass pass)
 {
 	int p = 0;
 
@@ -683,10 +685,10 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 
 	if (name.length() > 0 && name[0] == '(') {
 		Variable v1;
-		v1.name = "__e" + util::itos(expression_i++);
+		v1.name = "__e" + util::itos(prg->expression_i++);
 		v1.type = Variable::EXPRESSION;
 
-		int i = var_i++;
+		int i = prg->var_i++;
 
 		if (pass == PASS1) {
 			prg->variables.push_back(v1);
@@ -695,17 +697,17 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			prg->variables_map[v1.name] = i;
 		}
 
-		prg->variables[i].e = parse_expression(prg, func, e.name, var_i, expression_i, fish_i, pass);
+		prg->variables[i].e = parse_expression(prg, func, e.name, pass);
 
 		e.name = " ex ";
 		e.i = i;
 	}
 	else if (name.length() > 0 && name[0] == '[') {
 		Variable v1;
-		v1.name = "__f" + util::itos(fish_i++);
+		v1.name = "__f" + util::itos(prg->fish_i++);
 		v1.type = Variable::FISH;
 
-		int i = var_i++;
+		int i = prg->var_i++;
 
 		if (pass == PASS1) {
 			prg->variables.push_back(v1);
@@ -714,7 +716,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			prg->variables_map[v1.name] = i;
 		}
 
-		prg->variables[i].f = parse_fish(prg, func, e.name, var_i, expression_i, fish_i, pass);
+		prg->variables[i].f = parse_fish(prg, func, e.name, pass);
 
 		e.name = " fi ";
 		e.i = i;
@@ -778,12 +780,12 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 					break;
 				}
 			}
-			tok.i = var_i++;
+			tok.i = prg->var_i++;
 			tok.dereference = deref;
 			deref = 0;
 
 			Variable v1;
-			v1.name = "__e" + util::itos(expression_i++);
+			v1.name = "__e" + util::itos(prg->expression_i++);
 			v1.type = Variable::EXPRESSION;
 
 			if (pass == PASS1) {
@@ -793,7 +795,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 				prg->variables_map[v1.name] = tok.i;
 			}
 			
-			prg->variables[tok.i].e = parse_expression(prg, func, new_expr, var_i, expression_i, fish_i, pass);
+			prg->variables[tok.i].e = parse_expression(prg, func, new_expr, pass);
 		}
 		else if (c == ')') {
 			done = true;
@@ -820,12 +822,12 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 					break;
 				}
 			}
-			tok.i = var_i++;
+			tok.i = prg->var_i++;
 			tok.dereference = deref;
 			deref = 0;
 
 			Variable v1;
-			v1.name = "__f" + util::itos(fish_i++);
+			v1.name = "__f" + util::itos(prg->fish_i++);
 			v1.type = Variable::FISH;
 
 			if (pass == PASS1) {
@@ -835,7 +837,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 				prg->variables_map[v1.name] = tok.i;
 			}
 
-			prg->variables[tok.i].f = parse_fish(prg, func, new_expr, var_i, expression_i, fish_i, pass);
+			prg->variables[tok.i].f = parse_fish(prg, func, new_expr, pass);
 		}
 		else if (isdigit(c) || c == '-' || c == '.') {
 			tok.type = Token::NUMBER;
@@ -962,7 +964,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 	return e;
 }
 
-static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, int &var_i, int &expression_i, int &fish_i, Pass pass)
+Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, Pass pass)
 {
 	int p = 0;
 	Variable::Fish e;
@@ -1008,20 +1010,20 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 		}
 
 		Variable v;
-		v.name = "__f" + util::itos(fish_i++);
+		v.name = "__f" + util::itos(prg->fish_i++);
 		v.type = Variable::FISH;
 
 		if (pass == PASS1) {
 			prg->variables.push_back(v);
 		}
 		else if (pass == PASS2) {
-			prg->variables_map[v.name] = var_i;
+			prg->variables_map[v.name] = prg->var_i;
 		}
-		e.c_i = var_i;
-		var_i++;
+		e.c_i = prg->var_i;
+		prg->var_i++;
 
 		std::string s = expr.substr(start, p-start);
-		prg->variables[e.c_i].f = parse_fish(prg, func, s, var_i, expression_i, fish_i, pass);
+		prg->variables[e.c_i].f = parse_fish(prg, func, s, pass);
 	}
 	else {
 		std::string name;
@@ -1044,20 +1046,20 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			}
 
 			Variable v;
-			v.name = "__e" + util::itos(expression_i++);
+			v.name = "__e" + util::itos(prg->expression_i++);
 			v.type = Variable::EXPRESSION;
 
 			if (pass == PASS1) {
 				prg->variables.push_back(v);
 			}
 			else if (pass == PASS2) {
-				prg->variables_map[v.name] = var_i;
+				prg->variables_map[v.name] = prg->var_i;
 			}
-			e.c_i = var_i;
-			var_i++;
+			e.c_i = prg->var_i;
+			prg->var_i++;
 
 			std::string s = expr.substr(start, p-start);
-			prg->variables[e.c_i].e = parse_expression(prg, func, s, var_i, expression_i, fish_i, pass);
+			prg->variables[e.c_i].e = parse_expression(prg, func, s, pass);
 		}
 		else {
 			while (!isspace(expr[p]) && p < (int)expr.length()) {
@@ -1127,12 +1129,12 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 					break;
 				}
 			}
-			tok.i = var_i++;
+			tok.i = prg->var_i++;
 			tok.dereference = deref;
 			deref = 0;
 
 			Variable v1;
-			v1.name = "__e" + util::itos(expression_i++);
+			v1.name = "__e" + util::itos(prg->expression_i++);
 			v1.type = Variable::EXPRESSION;
 
 			if (pass == PASS1) {
@@ -1142,7 +1144,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 				prg->variables_map[v1.name] = tok.i;
 			}
 
-			prg->variables[tok.i].e = parse_expression(prg, func, new_expr, var_i, expression_i, fish_i, pass);
+			prg->variables[tok.i].e = parse_expression(prg, func, new_expr, pass);
 		}
 		else if (c == '[') {
 			tok.type = Token::SYMBOL;
@@ -1164,12 +1166,12 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 					break;
 				}
 			}
-			tok.i = var_i++;
+			tok.i = prg->var_i++;
 			tok.dereference = deref;
 			deref = 0;
 
 			Variable v1;
-			v1.name = "__f" + util::itos(fish_i++);
+			v1.name = "__f" + util::itos(prg->fish_i++);
 			v1.type = Variable::FISH;
 
 			if (pass == PASS1) {
@@ -1179,7 +1181,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 				prg->variables_map[v1.name] = tok.i;
 			}
 
-			prg->variables[tok.i].f = parse_fish(prg, func, new_expr, var_i, expression_i, fish_i, pass);
+			prg->variables[tok.i].f = parse_fish(prg, func, new_expr, pass);
 		}
 		else if (c == ']') {
 			done = true;
@@ -1311,10 +1313,10 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 	return e;
 }
 
-static void insert_constant(Program *prg, std::string name, double value, Pass pass, int &var_i)
+static void insert_constant(Program *prg, std::string name, double value, Pass pass)
 {
-	int var_index = var_i;
-	var_i++;
+	int var_index = prg->var_i;
+	prg->var_i++;
 	if (pass == PASS2) {
 		prg->variables_map[name] = var_index;
 	}
@@ -1330,10 +1332,10 @@ static void insert_constant(Program *prg, std::string name, double value, Pass p
 	}
 }
 
-static void insert_pointer(Program *prg, std::string name, Variable *value, Pass pass, int &var_i)
+static void insert_pointer(Program *prg, std::string name, Variable *value, Pass pass)
 {
-	int var_index = var_i;
-	var_i++;
+	int var_index = prg->var_i;
+	prg->var_i++;
 	if (pass == PASS2) {
 		prg->variables_map[name] = var_index;
 	}
@@ -1349,10 +1351,10 @@ static void insert_pointer(Program *prg, std::string name, Variable *value, Pass
 	}
 }
 
-static void insert_var(Program *prg, std::string name, Pass pass, int &var_i)
+static void insert_var(Program *prg, std::string name, Pass pass)
 {
-	int var_index = var_i;
-	var_i++;
+	int var_index = prg->var_i;
+	prg->var_i++;
 	if (pass == PASS2) {
 		prg->variables_map[name] = var_index;
 	}
@@ -1368,365 +1370,365 @@ static void compile(Program *prg, Pass pass)
 	int p_bak = prg->s->p;
 	int line_bak = prg->s->line;
 
+	prg->var_i = 0;
+	prg->func_i = 0;
+	prg->expression_i = 0;
+	prg->fish_i = 0;
+
 	std::string tok;
 	Token::Token_Type tt;
 
-	int var_i = 0;
-	int func_i = 0;
-	int expression_i = 0;
-	int fish_i = 0;
-
 	// Constants
-	insert_var(prg, "VOID", pass, var_i);
-	insert_constant(prg, "TRUE", 1, pass, var_i);
-	insert_constant(prg, "FALSE", 0, pass, var_i);
-	insert_constant(prg, "PI", M_PI, pass, var_i);
-	insert_constant(prg, "E", M_E, pass, var_i);
-	insert_pointer(prg, "NULL", nullptr, pass, var_i);
-	insert_constant(prg, "BLACK", 0, pass, var_i);
-	insert_constant(prg, "BLUE", 1, pass, var_i);
-	insert_constant(prg, "GREEN", 2, pass, var_i);
-	insert_constant(prg, "CYAN", 3, pass, var_i);
-	insert_constant(prg, "RED", 4, pass, var_i);
-	insert_constant(prg, "PURPLE", 5, pass, var_i);
-	insert_constant(prg, "YELLOW", 6, pass, var_i);
-	insert_constant(prg, "WHITE", 7, pass, var_i);
-	insert_constant(prg, "KEY_UNKNOWN", TGUIK_UNKNOWN, pass, var_i);
-	insert_constant(prg, "KEY_RETURN", TGUIK_RETURN, pass, var_i);
-	insert_constant(prg, "KEY_ESCAPE", TGUIK_ESCAPE, pass, var_i);
-	insert_constant(prg, "KEY_BACKSPACE", TGUIK_BACKSPACE, pass, var_i);
-	insert_constant(prg, "KEY_TAB", TGUIK_TAB, pass, var_i);
-	insert_constant(prg, "KEY_SPACE", TGUIK_SPACE, pass, var_i);
-	insert_constant(prg, "KEY_EXCLAIM", TGUIK_EXCLAIM, pass, var_i);
-	insert_constant(prg, "KEY_DBLAPOSTROPHE", TGUIK_DBLAPOSTROPHE, pass, var_i);
-	insert_constant(prg, "KEY_HASH", TGUIK_HASH, pass, var_i);
-	insert_constant(prg, "KEY_DOLLAR", TGUIK_DOLLAR, pass, var_i);
-	insert_constant(prg, "KEY_PERCENT", TGUIK_PERCENT, pass, var_i);
-	insert_constant(prg, "KEY_AMPERSAND", TGUIK_AMPERSAND, pass, var_i);
-	insert_constant(prg, "KEY_APOSTROPHE", TGUIK_APOSTROPHE, pass, var_i);
-	insert_constant(prg, "KEY_LEFTPAREN", TGUIK_LEFTPAREN, pass, var_i);
-	insert_constant(prg, "KEY_RIGHTPAREN", TGUIK_RIGHTPAREN, pass, var_i);
-	insert_constant(prg, "KEY_ASTERISK", TGUIK_ASTERISK, pass, var_i);
-	insert_constant(prg, "KEY_PLUS", TGUIK_PLUS, pass, var_i);
-	insert_constant(prg, "KEY_COMMA", TGUIK_COMMA, pass, var_i);
-	insert_constant(prg, "KEY_MINUS", TGUIK_MINUS, pass, var_i);
-	insert_constant(prg, "KEY_PERIOD", TGUIK_PERIOD, pass, var_i);
-	insert_constant(prg, "KEY_SLASH", TGUIK_SLASH, pass, var_i);
-	insert_constant(prg, "KEY_0", TGUIK_0, pass, var_i);
-	insert_constant(prg, "KEY_1", TGUIK_1, pass, var_i);
-	insert_constant(prg, "KEY_2", TGUIK_2, pass, var_i);
-	insert_constant(prg, "KEY_3", TGUIK_3, pass, var_i);
-	insert_constant(prg, "KEY_4", TGUIK_4, pass, var_i);
-	insert_constant(prg, "KEY_5", TGUIK_5, pass, var_i);
-	insert_constant(prg, "KEY_6", TGUIK_6, pass, var_i);
-	insert_constant(prg, "KEY_7", TGUIK_7, pass, var_i);
-	insert_constant(prg, "KEY_8", TGUIK_8, pass, var_i);
-	insert_constant(prg, "KEY_9", TGUIK_9, pass, var_i);
-	insert_constant(prg, "KEY_COLON", TGUIK_COLON, pass, var_i);
-	insert_constant(prg, "KEY_SEMICOLON", TGUIK_SEMICOLON, pass, var_i);
-	insert_constant(prg, "KEY_LESS", TGUIK_LESS, pass, var_i);
-	insert_constant(prg, "KEY_EQUALS", TGUIK_EQUALS, pass, var_i);
-	insert_constant(prg, "KEY_GREATER", TGUIK_GREATER, pass, var_i);
-	insert_constant(prg, "KEY_QUESTION", TGUIK_QUESTION, pass, var_i);
-	insert_constant(prg, "KEY_AT", TGUIK_AT, pass, var_i);
-	insert_constant(prg, "KEY_LEFTBRACKET", TGUIK_LEFTBRACKET, pass, var_i);
-	insert_constant(prg, "KEY_BACKSLASH", TGUIK_BACKSLASH, pass, var_i);
-	insert_constant(prg, "KEY_RIGHTBRACKET", TGUIK_RIGHTBRACKET, pass, var_i);
-	insert_constant(prg, "KEY_CARET", TGUIK_CARET, pass, var_i);
-	insert_constant(prg, "KEY_UNDERSCORE", TGUIK_UNDERSCORE, pass, var_i);
-	insert_constant(prg, "KEY_GRAVE", TGUIK_GRAVE, pass, var_i);
-	insert_constant(prg, "KEY_A", TGUIK_A, pass, var_i);
-	insert_constant(prg, "KEY_B", TGUIK_B, pass, var_i);
-	insert_constant(prg, "KEY_C", TGUIK_C, pass, var_i);
-	insert_constant(prg, "KEY_D", TGUIK_D, pass, var_i);
-	insert_constant(prg, "KEY_E", TGUIK_E, pass, var_i);
-	insert_constant(prg, "KEY_F", TGUIK_F, pass, var_i);
-	insert_constant(prg, "KEY_G", TGUIK_G, pass, var_i);
-	insert_constant(prg, "KEY_H", TGUIK_H, pass, var_i);
-	insert_constant(prg, "KEY_I", TGUIK_I, pass, var_i);
-	insert_constant(prg, "KEY_J", TGUIK_J, pass, var_i);
-	insert_constant(prg, "KEY_K", TGUIK_K, pass, var_i);
-	insert_constant(prg, "KEY_L", TGUIK_L, pass, var_i);
-	insert_constant(prg, "KEY_M", TGUIK_M, pass, var_i);
-	insert_constant(prg, "KEY_N", TGUIK_N, pass, var_i);
-	insert_constant(prg, "KEY_O", TGUIK_O, pass, var_i);
-	insert_constant(prg, "KEY_P", TGUIK_P, pass, var_i);
-	insert_constant(prg, "KEY_Q", TGUIK_Q, pass, var_i);
-	insert_constant(prg, "KEY_R", TGUIK_R, pass, var_i);
-	insert_constant(prg, "KEY_S", TGUIK_S, pass, var_i);
-	insert_constant(prg, "KEY_T", TGUIK_T, pass, var_i);
-	insert_constant(prg, "KEY_U", TGUIK_U, pass, var_i);
-	insert_constant(prg, "KEY_V", TGUIK_V, pass, var_i);
-	insert_constant(prg, "KEY_W", TGUIK_W, pass, var_i);
-	insert_constant(prg, "KEY_X", TGUIK_X, pass, var_i);
-	insert_constant(prg, "KEY_Y", TGUIK_Y, pass, var_i);
-	insert_constant(prg, "KEY_Z", TGUIK_Z, pass, var_i);
-	insert_constant(prg, "KEY_LEFTBRACE", TGUIK_LEFTBRACE, pass, var_i);
-	insert_constant(prg, "KEY_PIPE", TGUIK_PIPE, pass, var_i);
-	insert_constant(prg, "KEY_RIGHTBRACE", TGUIK_RIGHTBRACE, pass, var_i);
-	insert_constant(prg, "KEY_TILDE", TGUIK_TILDE, pass, var_i);
-	insert_constant(prg, "KEY_DELETE", TGUIK_DELETE, pass, var_i);
-	insert_constant(prg, "KEY_PLUSMINUS", TGUIK_PLUSMINUS, pass, var_i);
-	insert_constant(prg, "KEY_CAPSLOCK", TGUIK_CAPSLOCK, pass, var_i);
-	insert_constant(prg, "KEY_F1", TGUIK_F1, pass, var_i);
-	insert_constant(prg, "KEY_F2", TGUIK_F2, pass, var_i);
-	insert_constant(prg, "KEY_F3", TGUIK_F3, pass, var_i);
-	insert_constant(prg, "KEY_F4", TGUIK_F4, pass, var_i);
-	insert_constant(prg, "KEY_F5", TGUIK_F5, pass, var_i);
-	insert_constant(prg, "KEY_F6", TGUIK_F6, pass, var_i);
-	insert_constant(prg, "KEY_F7", TGUIK_F7, pass, var_i);
-	insert_constant(prg, "KEY_F8", TGUIK_F8, pass, var_i);
-	insert_constant(prg, "KEY_F9", TGUIK_F9, pass, var_i);
-	insert_constant(prg, "KEY_F10", TGUIK_F10, pass, var_i);
-	insert_constant(prg, "KEY_F11", TGUIK_F11, pass, var_i);
-	insert_constant(prg, "KEY_F12", TGUIK_F12, pass, var_i);
-	insert_constant(prg, "KEY_PRINTSCREEN", TGUIK_PRINTSCREEN, pass, var_i);
-	insert_constant(prg, "KEY_SCROLLLOCK", TGUIK_SCROLLLOCK, pass, var_i);
-	insert_constant(prg, "KEY_PAUSE", TGUIK_PAUSE, pass, var_i);
-	insert_constant(prg, "KEY_INSERT", TGUIK_INSERT, pass, var_i);
-	insert_constant(prg, "KEY_HOME", TGUIK_HOME, pass, var_i);
-	insert_constant(prg, "KEY_PAGEUP", TGUIK_PAGEUP, pass, var_i);
-	insert_constant(prg, "KEY_END", TGUIK_END, pass, var_i);
-	insert_constant(prg, "KEY_PAGEDOWN", TGUIK_PAGEDOWN, pass, var_i);
-	insert_constant(prg, "KEY_RIGHT", TGUIK_RIGHT, pass, var_i);
-	insert_constant(prg, "KEY_LEFT", TGUIK_LEFT, pass, var_i);
-	insert_constant(prg, "KEY_DOWN", TGUIK_DOWN, pass, var_i);
-	insert_constant(prg, "KEY_UP", TGUIK_UP, pass, var_i);
-	insert_constant(prg, "KEY_NUMLOCKCLEAR", TGUIK_NUMLOCKCLEAR, pass, var_i);
-	insert_constant(prg, "KEY_KP_DIVIDE", TGUIK_KP_DIVIDE, pass, var_i);
-	insert_constant(prg, "KEY_KP_MULTIPLY", TGUIK_KP_MULTIPLY, pass, var_i);
-	insert_constant(prg, "KEY_KP_MINUS", TGUIK_KP_MINUS, pass, var_i);
-	insert_constant(prg, "KEY_KP_PLUS", TGUIK_KP_PLUS, pass, var_i);
-	insert_constant(prg, "KEY_KP_ENTER", TGUIK_KP_ENTER, pass, var_i);
-	insert_constant(prg, "KEY_KP_1", TGUIK_KP_1, pass, var_i);
-	insert_constant(prg, "KEY_KP_2", TGUIK_KP_2, pass, var_i);
-	insert_constant(prg, "KEY_KP_3", TGUIK_KP_3, pass, var_i);
-	insert_constant(prg, "KEY_KP_4", TGUIK_KP_4, pass, var_i);
-	insert_constant(prg, "KEY_KP_5", TGUIK_KP_5, pass, var_i);
-	insert_constant(prg, "KEY_KP_6", TGUIK_KP_6, pass, var_i);
-	insert_constant(prg, "KEY_KP_7", TGUIK_KP_7, pass, var_i);
-	insert_constant(prg, "KEY_KP_8", TGUIK_KP_8, pass, var_i);
-	insert_constant(prg, "KEY_KP_9", TGUIK_KP_9, pass, var_i);
-	insert_constant(prg, "KEY_KP_0", TGUIK_KP_0, pass, var_i);
-	insert_constant(prg, "KEY_KP_PERIOD", TGUIK_KP_PERIOD, pass, var_i);
-	insert_constant(prg, "KEY_APPLICATION", TGUIK_APPLICATION, pass, var_i);
-	insert_constant(prg, "KEY_POWER", TGUIK_POWER, pass, var_i);
-	insert_constant(prg, "KEY_KP_EQUALS", TGUIK_KP_EQUALS, pass, var_i);
-	insert_constant(prg, "KEY_F13", TGUIK_F13, pass, var_i);
-	insert_constant(prg, "KEY_F14", TGUIK_F14, pass, var_i);
-	insert_constant(prg, "KEY_F15", TGUIK_F15, pass, var_i);
-	insert_constant(prg, "KEY_F16", TGUIK_F16, pass, var_i);
-	insert_constant(prg, "KEY_F17", TGUIK_F17, pass, var_i);
-	insert_constant(prg, "KEY_F18", TGUIK_F18, pass, var_i);
-	insert_constant(prg, "KEY_F19", TGUIK_F19, pass, var_i);
-	insert_constant(prg, "KEY_F20", TGUIK_F20, pass, var_i);
-	insert_constant(prg, "KEY_F21", TGUIK_F21, pass, var_i);
-	insert_constant(prg, "KEY_F22", TGUIK_F22, pass, var_i);
-	insert_constant(prg, "KEY_F23", TGUIK_F23, pass, var_i);
-	insert_constant(prg, "KEY_F24", TGUIK_F24, pass, var_i);
-	insert_constant(prg, "KEY_EXECUTE", TGUIK_EXECUTE, pass, var_i);
-	insert_constant(prg, "KEY_HELP", TGUIK_HELP, pass, var_i);
-	insert_constant(prg, "KEY_MENU", TGUIK_MENU, pass, var_i);
-	insert_constant(prg, "KEY_SELECT", TGUIK_SELECT, pass, var_i);
-	insert_constant(prg, "KEY_STOP", TGUIK_STOP, pass, var_i);
-	insert_constant(prg, "KEY_AGAIN", TGUIK_AGAIN, pass, var_i);
-	insert_constant(prg, "KEY_UNDO", TGUIK_UNDO, pass, var_i);
-	insert_constant(prg, "KEY_CUT", TGUIK_CUT, pass, var_i);
-	insert_constant(prg, "KEY_COPY", TGUIK_COPY, pass, var_i);
-	insert_constant(prg, "KEY_PASTE", TGUIK_PASTE, pass, var_i);
-	insert_constant(prg, "KEY_FIND", TGUIK_FIND, pass, var_i);
-	insert_constant(prg, "KEY_MUTE", TGUIK_MUTE, pass, var_i);
-	insert_constant(prg, "KEY_VOLUMEUP", TGUIK_VOLUMEUP, pass, var_i);
-	insert_constant(prg, "KEY_VOLUMEDOWN", TGUIK_VOLUMEDOWN, pass, var_i);
-	insert_constant(prg, "KEY_KP_COMMA", TGUIK_KP_COMMA, pass, var_i);
-	insert_constant(prg, "KEY_KP_EQUALSAS400", TGUIK_KP_EQUALSAS400, pass, var_i);
-	insert_constant(prg, "KEY_ALTERASE", TGUIK_ALTERASE, pass, var_i);
-	insert_constant(prg, "KEY_SYSREQ", TGUIK_SYSREQ, pass, var_i);
-	insert_constant(prg, "KEY_CANCEL", TGUIK_CANCEL, pass, var_i);
-	insert_constant(prg, "KEY_CLEAR", TGUIK_CLEAR, pass, var_i);
-	insert_constant(prg, "KEY_PRIOR", TGUIK_PRIOR, pass, var_i);
-	insert_constant(prg, "KEY_RETURN2", TGUIK_RETURN2, pass, var_i);
-	insert_constant(prg, "KEY_SEPARATOR", TGUIK_SEPARATOR, pass, var_i);
-	insert_constant(prg, "KEY_OUT", TGUIK_OUT, pass, var_i);
-	insert_constant(prg, "KEY_OPER", TGUIK_OPER, pass, var_i);
-	insert_constant(prg, "KEY_CLEARAGAIN", TGUIK_CLEARAGAIN, pass, var_i);
-	insert_constant(prg, "KEY_CRSEL", TGUIK_CRSEL, pass, var_i);
-	insert_constant(prg, "KEY_EXSEL", TGUIK_EXSEL, pass, var_i);
-	insert_constant(prg, "KEY_KP_00", TGUIK_KP_00, pass, var_i);
-	insert_constant(prg, "KEY_KP_000", TGUIK_KP_000, pass, var_i);
-	insert_constant(prg, "KEY_THOUSANDSSEPARATOR", TGUIK_THOUSANDSSEPARATOR, pass, var_i);
-	insert_constant(prg, "KEY_DECIMALSEPARATOR", TGUIK_DECIMALSEPARATOR, pass, var_i);
-	insert_constant(prg, "KEY_CURRENCYUNIT", TGUIK_CURRENCYUNIT, pass, var_i);
-	insert_constant(prg, "KEY_CURRENCYSUBUNIT", TGUIK_CURRENCYSUBUNIT, pass, var_i);
-	insert_constant(prg, "KEY_KP_LEFTPAREN", TGUIK_KP_LEFTPAREN, pass, var_i);
-	insert_constant(prg, "KEY_KP_RIGHTPAREN", TGUIK_KP_RIGHTPAREN, pass, var_i);
-	insert_constant(prg, "KEY_KP_LEFTBRACE", TGUIK_KP_LEFTBRACE, pass, var_i);
-	insert_constant(prg, "KEY_KP_RIGHTBRACE", TGUIK_KP_RIGHTBRACE, pass, var_i);
-	insert_constant(prg, "KEY_KP_TAB", TGUIK_KP_TAB, pass, var_i);
-	insert_constant(prg, "KEY_KP_BACKSPACE", TGUIK_KP_BACKSPACE, pass, var_i);
-	insert_constant(prg, "KEY_KP_A", TGUIK_KP_A, pass, var_i);
-	insert_constant(prg, "KEY_KP_B", TGUIK_KP_B, pass, var_i);
-	insert_constant(prg, "KEY_KP_C", TGUIK_KP_C, pass, var_i);
-	insert_constant(prg, "KEY_KP_D", TGUIK_KP_D, pass, var_i);
-	insert_constant(prg, "KEY_KP_E", TGUIK_KP_E, pass, var_i);
-	insert_constant(prg, "KEY_KP_F", TGUIK_KP_F, pass, var_i);
-	insert_constant(prg, "KEY_KP_XOR", TGUIK_KP_XOR, pass, var_i);
-	insert_constant(prg, "KEY_KP_POWER", TGUIK_KP_POWER, pass, var_i);
-	insert_constant(prg, "KEY_KP_PERCENT", TGUIK_KP_PERCENT, pass, var_i);
-	insert_constant(prg, "KEY_KP_LESS", TGUIK_KP_LESS, pass, var_i);
-	insert_constant(prg, "KEY_KP_GREATER", TGUIK_KP_GREATER, pass, var_i);
-	insert_constant(prg, "KEY_KP_AMPERSAND", TGUIK_KP_AMPERSAND, pass, var_i);
-	insert_constant(prg, "KEY_KP_DBLAMPERSAND", TGUIK_KP_DBLAMPERSAND, pass, var_i);
-	insert_constant(prg, "KEY_KP_VERTICALBAR", TGUIK_KP_VERTICALBAR, pass, var_i);
-	insert_constant(prg, "KEY_KP_DBLVERTICALBAR", TGUIK_KP_DBLVERTICALBAR, pass, var_i);
-	insert_constant(prg, "KEY_KP_COLON", TGUIK_KP_COLON, pass, var_i);
-	insert_constant(prg, "KEY_KP_HASH", TGUIK_KP_HASH, pass, var_i);
-	insert_constant(prg, "KEY_KP_SPACE", TGUIK_KP_SPACE, pass, var_i);
-	insert_constant(prg, "KEY_KP_AT", TGUIK_KP_AT, pass, var_i);
-	insert_constant(prg, "KEY_KP_EXCLAM", TGUIK_KP_EXCLAM, pass, var_i);
-	insert_constant(prg, "KEY_KP_MEMSTORE", TGUIK_KP_MEMSTORE, pass, var_i);
-	insert_constant(prg, "KEY_KP_MEMRECALL", TGUIK_KP_MEMRECALL, pass, var_i);
-	insert_constant(prg, "KEY_KP_MEMCLEAR", TGUIK_KP_MEMCLEAR, pass, var_i);
-	insert_constant(prg, "KEY_KP_MEMADD", TGUIK_KP_MEMADD, pass, var_i);
-	insert_constant(prg, "KEY_KP_MEMSUBTRACT", TGUIK_KP_MEMSUBTRACT, pass, var_i);
-	insert_constant(prg, "KEY_KP_MEMMULTIPLY", TGUIK_KP_MEMMULTIPLY, pass, var_i);
-	insert_constant(prg, "KEY_KP_MEMDIVIDE", TGUIK_KP_MEMDIVIDE, pass, var_i);
-	insert_constant(prg, "KEY_KP_PLUSMINUS", TGUIK_KP_PLUSMINUS, pass, var_i);
-	insert_constant(prg, "KEY_KP_CLEAR", TGUIK_KP_CLEAR, pass, var_i);
-	insert_constant(prg, "KEY_KP_CLEARENTRY", TGUIK_KP_CLEARENTRY, pass, var_i);
-	insert_constant(prg, "KEY_KP_BINARY", TGUIK_KP_BINARY, pass, var_i);
-	insert_constant(prg, "KEY_KP_OCTAL", TGUIK_KP_OCTAL, pass, var_i);
-	insert_constant(prg, "KEY_KP_DECIMAL", TGUIK_KP_DECIMAL, pass, var_i);
-	insert_constant(prg, "KEY_KP_HEXADECIMAL", TGUIK_KP_HEXADECIMAL, pass, var_i);
-	insert_constant(prg, "KEY_LCTRL", TGUIK_LCTRL, pass, var_i);
-	insert_constant(prg, "KEY_LSHIFT", TGUIK_LSHIFT, pass, var_i);
-	insert_constant(prg, "KEY_LALT", TGUIK_LALT, pass, var_i);
-	insert_constant(prg, "KEY_LGUI", TGUIK_LGUI, pass, var_i);
-	insert_constant(prg, "KEY_RCTRL", TGUIK_RCTRL, pass, var_i);
-	insert_constant(prg, "KEY_RSHIFT", TGUIK_RSHIFT, pass, var_i);
-	insert_constant(prg, "KEY_RALT", TGUIK_RALT, pass, var_i);
-	insert_constant(prg, "KEY_RGUI", TGUIK_RGUI, pass, var_i);
-	insert_constant(prg, "KEY_MODE", TGUIK_MODE, pass, var_i);
-	insert_constant(prg, "KEY_SLEEP", TGUIK_SLEEP, pass, var_i);
-	insert_constant(prg, "KEY_WAKE", TGUIK_WAKE, pass, var_i);
-	insert_constant(prg, "KEY_CHANNEL_INCREMENT", TGUIK_CHANNEL_INCREMENT, pass, var_i);
-	insert_constant(prg, "KEY_CHANNEL_DECREMENT", TGUIK_CHANNEL_DECREMENT, pass, var_i);
-	insert_constant(prg, "KEY_MEDIA_PLAY", TGUIK_MEDIA_PLAY, pass, var_i);
-	insert_constant(prg, "KEY_MEDIA_PAUSE", TGUIK_MEDIA_PAUSE, pass, var_i);
-	insert_constant(prg, "KEY_MEDIA_RECORD", TGUIK_MEDIA_RECORD, pass, var_i);
-	insert_constant(prg, "KEY_MEDIA_FAST_FORWARD", TGUIK_MEDIA_FAST_FORWARD, pass, var_i);
-	insert_constant(prg, "KEY_MEDIA_REWIND", TGUIK_MEDIA_REWIND, pass, var_i);
-	insert_constant(prg, "KEY_MEDIA_NEXT_TRACK", TGUIK_MEDIA_NEXT_TRACK, pass, var_i);
-	insert_constant(prg, "KEY_MEDIA_PREVIOUS_TRACK", TGUIK_MEDIA_PREVIOUS_TRACK, pass, var_i);
-	insert_constant(prg, "KEY_MEDIA_STOP", TGUIK_MEDIA_STOP, pass, var_i);
-	insert_constant(prg, "KEY_MEDIA_EJECT", TGUIK_MEDIA_EJECT, pass, var_i);
-	insert_constant(prg, "KEY_MEDIA_PLAY_PAUSE", TGUIK_MEDIA_PLAY_PAUSE, pass, var_i);
-	insert_constant(prg, "KEY_MEDIA_SELECT", TGUIK_MEDIA_SELECT, pass, var_i);
-	insert_constant(prg, "KEY_AC_NEW", TGUIK_AC_NEW, pass, var_i);
-	insert_constant(prg, "KEY_AC_OPEN", TGUIK_AC_OPEN, pass, var_i);
-	insert_constant(prg, "KEY_AC_CLOSE", TGUIK_AC_CLOSE, pass, var_i);
-	insert_constant(prg, "KEY_AC_EXIT", TGUIK_AC_EXIT, pass, var_i);
-	insert_constant(prg, "KEY_AC_SAVE", TGUIK_AC_SAVE, pass, var_i);
-	insert_constant(prg, "KEY_AC_PRINT", TGUIK_AC_PRINT, pass, var_i);
-	insert_constant(prg, "KEY_AC_PROPERTIES", TGUIK_AC_PROPERTIES, pass, var_i);
-	insert_constant(prg, "KEY_AC_SEARCH", TGUIK_AC_SEARCH, pass, var_i);
-	insert_constant(prg, "KEY_AC_HOME", TGUIK_AC_HOME, pass, var_i);
-	insert_constant(prg, "KEY_AC_BACK", TGUIK_AC_BACK, pass, var_i);
-	insert_constant(prg, "KEY_AC_FORWARD", TGUIK_AC_FORWARD, pass, var_i);
-	insert_constant(prg, "KEY_AC_STOP", TGUIK_AC_STOP, pass, var_i);
-	insert_constant(prg, "KEY_AC_REFRESH", TGUIK_AC_REFRESH, pass, var_i);
-	insert_constant(prg, "KEY_AC_BOOKMARKS", TGUIK_AC_BOOKMARKS, pass, var_i);
-	insert_constant(prg, "KEY_SOFTLEFT", TGUIK_SOFTLEFT, pass, var_i);
-	insert_constant(prg, "KEY_SOFTRIGHT", TGUIK_SOFTRIGHT, pass, var_i);
-	insert_constant(prg, "KEY_CALL", TGUIK_CALL, pass, var_i);
-	insert_constant(prg, "KEY_ENDCALL", TGUIK_ENDCALL, pass, var_i);
-	insert_constant(prg, "KEY_LEFT_TAB", TGUIK_LEFT_TAB, pass, var_i);
-	insert_constant(prg, "KEY_LEVEL5_SHIFT", TGUIK_LEVEL5_SHIFT, pass, var_i);
-	insert_constant(prg, "KEY_MULTI_KEY_COMPOSE", TGUIK_MULTI_KEY_COMPOSE, pass, var_i);
-	insert_constant(prg, "KEY_LMETA", TGUIK_LMETA, pass, var_i);
-	insert_constant(prg, "KEY_RMETA", TGUIK_RMETA, pass, var_i);
-	insert_constant(prg, "KEY_LHYPER", TGUIK_LHYPER, pass, var_i);
-	insert_constant(prg, "KEY_RHYPER", TGUIK_RHYPER, pass, var_i);
-	insert_constant(prg, "EVENT_KEY_DOWN", TGUI_KEY_DOWN, pass, var_i);
-	insert_constant(prg, "EVENT_KEY_UP", TGUI_KEY_UP, pass, var_i);
-	insert_constant(prg, "EVENT_JOY_DOWN", TGUI_JOY_DOWN, pass, var_i);
-	insert_constant(prg, "EVENT_JOY_UP", TGUI_JOY_UP, pass, var_i);
-	insert_constant(prg, "EVENT_JOY_AXIS", TGUI_JOY_AXIS, pass, var_i);
-	insert_constant(prg, "EVENT_MOUSE_DOWN", TGUI_MOUSE_DOWN, pass, var_i);
-	insert_constant(prg, "EVENT_MOUSE_UP", TGUI_MOUSE_UP, pass, var_i);
-	insert_constant(prg, "EVENT_MOUSE_AXIS", TGUI_MOUSE_AXIS, pass, var_i);
-	insert_constant(prg, "EVENT_MOUSE_WHEEL", TGUI_MOUSE_WHEEL, pass, var_i);
-	insert_constant(prg, "EVENT_TEXT", TGUI_TEXT, pass, var_i);
-	insert_constant(prg, "JOY_A", TGUI_B_A, pass, var_i);
-	insert_constant(prg, "JOY_B", TGUI_B_B, pass, var_i);
-	insert_constant(prg, "JOY_X", TGUI_B_X, pass, var_i);
-	insert_constant(prg, "JOY_Y", TGUI_B_Y, pass, var_i);
-	insert_constant(prg, "JOY_BACK", TGUI_B_BACK, pass, var_i);
-	insert_constant(prg, "JOY_GUIDE", TGUI_B_GUIDE, pass, var_i);
-	insert_constant(prg, "JOY_START", TGUI_B_START, pass, var_i);
-	insert_constant(prg, "JOY_LS", TGUI_B_LS, pass, var_i);
-	insert_constant(prg, "JOY_RS", TGUI_B_RS, pass, var_i);
-	insert_constant(prg, "JOY_LB", TGUI_B_LB, pass, var_i);
-	insert_constant(prg, "JOY_RB", TGUI_B_RB, pass, var_i);
-	insert_constant(prg, "JOY_U", TGUI_B_U, pass, var_i);
-	insert_constant(prg, "JOY_D", TGUI_B_D, pass, var_i);
-	insert_constant(prg, "JOY_L", TGUI_B_L, pass, var_i);
-	insert_constant(prg, "JOY_R", TGUI_B_R, pass, var_i);
-	insert_constant(prg, "JOY_LEFTX", SDL_GAMEPAD_AXIS_LEFTX, pass, var_i);
-	insert_constant(prg, "JOY_LEFTY", SDL_GAMEPAD_AXIS_LEFTY, pass, var_i);
-	insert_constant(prg, "JOY_RIGHTX", SDL_GAMEPAD_AXIS_RIGHTX, pass, var_i);
-	insert_constant(prg, "JOY_RIGHTY", SDL_GAMEPAD_AXIS_RIGHTY, pass, var_i);
-	insert_constant(prg, "JOY_TRIGGERLEFT", SDL_GAMEPAD_AXIS_LEFT_TRIGGER, pass, var_i);
-	insert_constant(prg, "JOY_TRIGGERRIGHT", SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, pass, var_i);
-	insert_constant(prg, "TRANSITION_NONE", TRANSITION_NONE, pass, var_i);
-	insert_constant(prg, "TRANSITION_ENLARGE", TRANSITION_ENLARGE, pass, var_i);
-	insert_constant(prg, "TRANSITION_SHRINK", TRANSITION_SHRINK, pass, var_i);
-	insert_constant(prg, "TRANSITION_SLIDE", TRANSITION_SLIDE, pass, var_i);
-	insert_constant(prg, "TRANSITION_SLIDE_VERTICAL", TRANSITION_SLIDE_VERTICAL, pass, var_i);
-	insert_constant(prg, "LETTERBOX_TOP", gfx::LETTERBOX_TOP, pass, var_i);
-	insert_constant(prg, "LETTERBOX_BOTTOM", gfx::LETTERBOX_BOTTOM, pass, var_i);
-	insert_constant(prg, "LETTERBOX_LEFT", gfx::LETTERBOX_LEFT, pass, var_i);
-	insert_constant(prg, "LETTERBOX_RIGHT", gfx::LETTERBOX_RIGHT, pass, var_i);
-	insert_constant(prg, "BLEND_ZERO", gfx::BLEND_ZERO, pass, var_i);
-	insert_constant(prg, "BLEND_ONE", gfx::BLEND_ONE, pass, var_i);
-	insert_constant(prg, "BLEND_SRCCOLOR", gfx::BLEND_SRCCOLOR, pass, var_i);
-	insert_constant(prg, "BLEND_INVSRCCOLOR", gfx::BLEND_INVSRCCOLOR, pass, var_i);
-	insert_constant(prg, "BLEND_SRCALPHA", gfx::BLEND_SRCALPHA, pass, var_i);
-	insert_constant(prg, "BLEND_INVSRCALPHA", gfx::BLEND_INVSRCALPHA, pass, var_i);
-	insert_constant(prg, "COMPARE_NEVER", gfx::COMPARE_NEVER, pass, var_i);
-	insert_constant(prg, "COMPARE_LESS", gfx::COMPARE_LESS, pass, var_i);
-	insert_constant(prg, "COMPARE_EQUAL", gfx::COMPARE_EQUAL, pass, var_i);
-	insert_constant(prg, "COMPARE_LESSEQUAL", gfx::COMPARE_LESSEQUAL, pass, var_i);
-	insert_constant(prg, "COMPARE_GREATER", gfx::COMPARE_GREATER, pass, var_i);
-	insert_constant(prg, "COMPARE_NOTEQUAL", gfx::COMPARE_NOTEQUAL, pass, var_i);
-	insert_constant(prg, "COMPARE_GREATEREQUAL", gfx::COMPARE_GREATEREQUAL, pass, var_i);
-	insert_constant(prg, "COMPARE_ALWAYS", gfx::COMPARE_ALWAYS, pass, var_i);
-	insert_constant(prg, "STENCILOP_KEEP", gfx::STENCILOP_KEEP, pass, var_i);
-	insert_constant(prg, "STENCILOP_ZERO", gfx::STENCILOP_ZERO, pass, var_i);
-	insert_constant(prg, "STENCILOP_REPLACE", gfx::STENCILOP_REPLACE, pass, var_i);
-	insert_constant(prg, "STENCILOP_INCRSAT", gfx::STENCILOP_INCRSAT, pass, var_i);
-	insert_constant(prg, "STENCILOP_DECRSAT", gfx::STENCILOP_DECRSAT, pass, var_i);
-	insert_constant(prg, "STENCILOP_INVERT", gfx::STENCILOP_INVERT, pass, var_i);
-	insert_constant(prg, "STENCILOP_INCR", gfx::STENCILOP_INCR, pass, var_i);
-	insert_constant(prg, "STENCILOP_DECR", gfx::STENCILOP_DECR, pass, var_i);
-	insert_constant(prg, "NO_FACE", gfx::NO_FACE, pass, var_i);
-	insert_constant(prg, "FRONT_FACE", gfx::FRONT_FACE, pass, var_i);
-	insert_constant(prg, "BACK_FACE", gfx::BACK_FACE, pass, var_i);
-	insert_constant(prg, "FACE_CW", gfx::FACE_CW, pass, var_i);
-	insert_constant(prg, "FACE_CCW", gfx::FACE_CCW, pass, var_i);
-	insert_constant(prg, "SEEK_SET", SDL_IO_SEEK_SET, pass, var_i);
-	insert_constant(prg, "SEEK_CUR", SDL_IO_SEEK_CUR, pass, var_i);
-	insert_constant(prg, "SEEK_END", SDL_IO_SEEK_END, pass, var_i);
-	insert_constant(prg, "STDIN", 0, pass, var_i);
-	insert_constant(prg, "STDOUT", 1, pass, var_i);
-	insert_constant(prg, "STDERR", 2, pass, var_i);
-	insert_constant(prg, "F12_START", F12_START, pass, var_i);
-	insert_constant(prg, "F12_END", F12_END, pass, var_i);
+	insert_var(prg, "VOID", pass);
+	insert_constant(prg, "TRUE", 1, pass);
+	insert_constant(prg, "FALSE", 0, pass);
+	insert_constant(prg, "PI", M_PI, pass);
+	insert_constant(prg, "E", M_E, pass);
+	insert_pointer(prg, "NULL", nullptr, pass);
+	insert_constant(prg, "BLACK", 0, pass);
+	insert_constant(prg, "BLUE", 1, pass);
+	insert_constant(prg, "GREEN", 2, pass);
+	insert_constant(prg, "CYAN", 3, pass);
+	insert_constant(prg, "RED", 4, pass);
+	insert_constant(prg, "PURPLE", 5, pass);
+	insert_constant(prg, "YELLOW", 6, pass);
+	insert_constant(prg, "WHITE", 7, pass);
+	insert_constant(prg, "KEY_UNKNOWN", TGUIK_UNKNOWN, pass);
+	insert_constant(prg, "KEY_RETURN", TGUIK_RETURN, pass);
+	insert_constant(prg, "KEY_ESCAPE", TGUIK_ESCAPE, pass);
+	insert_constant(prg, "KEY_BACKSPACE", TGUIK_BACKSPACE, pass);
+	insert_constant(prg, "KEY_TAB", TGUIK_TAB, pass);
+	insert_constant(prg, "KEY_SPACE", TGUIK_SPACE, pass);
+	insert_constant(prg, "KEY_EXCLAIM", TGUIK_EXCLAIM, pass);
+	insert_constant(prg, "KEY_DBLAPOSTROPHE", TGUIK_DBLAPOSTROPHE, pass);
+	insert_constant(prg, "KEY_HASH", TGUIK_HASH, pass);
+	insert_constant(prg, "KEY_DOLLAR", TGUIK_DOLLAR, pass);
+	insert_constant(prg, "KEY_PERCENT", TGUIK_PERCENT, pass);
+	insert_constant(prg, "KEY_AMPERSAND", TGUIK_AMPERSAND, pass);
+	insert_constant(prg, "KEY_APOSTROPHE", TGUIK_APOSTROPHE, pass);
+	insert_constant(prg, "KEY_LEFTPAREN", TGUIK_LEFTPAREN, pass);
+	insert_constant(prg, "KEY_RIGHTPAREN", TGUIK_RIGHTPAREN, pass);
+	insert_constant(prg, "KEY_ASTERISK", TGUIK_ASTERISK, pass);
+	insert_constant(prg, "KEY_PLUS", TGUIK_PLUS, pass);
+	insert_constant(prg, "KEY_COMMA", TGUIK_COMMA, pass);
+	insert_constant(prg, "KEY_MINUS", TGUIK_MINUS, pass);
+	insert_constant(prg, "KEY_PERIOD", TGUIK_PERIOD, pass);
+	insert_constant(prg, "KEY_SLASH", TGUIK_SLASH, pass);
+	insert_constant(prg, "KEY_0", TGUIK_0, pass);
+	insert_constant(prg, "KEY_1", TGUIK_1, pass);
+	insert_constant(prg, "KEY_2", TGUIK_2, pass);
+	insert_constant(prg, "KEY_3", TGUIK_3, pass);
+	insert_constant(prg, "KEY_4", TGUIK_4, pass);
+	insert_constant(prg, "KEY_5", TGUIK_5, pass);
+	insert_constant(prg, "KEY_6", TGUIK_6, pass);
+	insert_constant(prg, "KEY_7", TGUIK_7, pass);
+	insert_constant(prg, "KEY_8", TGUIK_8, pass);
+	insert_constant(prg, "KEY_9", TGUIK_9, pass);
+	insert_constant(prg, "KEY_COLON", TGUIK_COLON, pass);
+	insert_constant(prg, "KEY_SEMICOLON", TGUIK_SEMICOLON, pass);
+	insert_constant(prg, "KEY_LESS", TGUIK_LESS, pass);
+	insert_constant(prg, "KEY_EQUALS", TGUIK_EQUALS, pass);
+	insert_constant(prg, "KEY_GREATER", TGUIK_GREATER, pass);
+	insert_constant(prg, "KEY_QUESTION", TGUIK_QUESTION, pass);
+	insert_constant(prg, "KEY_AT", TGUIK_AT, pass);
+	insert_constant(prg, "KEY_LEFTBRACKET", TGUIK_LEFTBRACKET, pass);
+	insert_constant(prg, "KEY_BACKSLASH", TGUIK_BACKSLASH, pass);
+	insert_constant(prg, "KEY_RIGHTBRACKET", TGUIK_RIGHTBRACKET, pass);
+	insert_constant(prg, "KEY_CARET", TGUIK_CARET, pass);
+	insert_constant(prg, "KEY_UNDERSCORE", TGUIK_UNDERSCORE, pass);
+	insert_constant(prg, "KEY_GRAVE", TGUIK_GRAVE, pass);
+	insert_constant(prg, "KEY_A", TGUIK_A, pass);
+	insert_constant(prg, "KEY_B", TGUIK_B, pass);
+	insert_constant(prg, "KEY_C", TGUIK_C, pass);
+	insert_constant(prg, "KEY_D", TGUIK_D, pass);
+	insert_constant(prg, "KEY_E", TGUIK_E, pass);
+	insert_constant(prg, "KEY_F", TGUIK_F, pass);
+	insert_constant(prg, "KEY_G", TGUIK_G, pass);
+	insert_constant(prg, "KEY_H", TGUIK_H, pass);
+	insert_constant(prg, "KEY_I", TGUIK_I, pass);
+	insert_constant(prg, "KEY_J", TGUIK_J, pass);
+	insert_constant(prg, "KEY_K", TGUIK_K, pass);
+	insert_constant(prg, "KEY_L", TGUIK_L, pass);
+	insert_constant(prg, "KEY_M", TGUIK_M, pass);
+	insert_constant(prg, "KEY_N", TGUIK_N, pass);
+	insert_constant(prg, "KEY_O", TGUIK_O, pass);
+	insert_constant(prg, "KEY_P", TGUIK_P, pass);
+	insert_constant(prg, "KEY_Q", TGUIK_Q, pass);
+	insert_constant(prg, "KEY_R", TGUIK_R, pass);
+	insert_constant(prg, "KEY_S", TGUIK_S, pass);
+	insert_constant(prg, "KEY_T", TGUIK_T, pass);
+	insert_constant(prg, "KEY_U", TGUIK_U, pass);
+	insert_constant(prg, "KEY_V", TGUIK_V, pass);
+	insert_constant(prg, "KEY_W", TGUIK_W, pass);
+	insert_constant(prg, "KEY_X", TGUIK_X, pass);
+	insert_constant(prg, "KEY_Y", TGUIK_Y, pass);
+	insert_constant(prg, "KEY_Z", TGUIK_Z, pass);
+	insert_constant(prg, "KEY_LEFTBRACE", TGUIK_LEFTBRACE, pass);
+	insert_constant(prg, "KEY_PIPE", TGUIK_PIPE, pass);
+	insert_constant(prg, "KEY_RIGHTBRACE", TGUIK_RIGHTBRACE, pass);
+	insert_constant(prg, "KEY_TILDE", TGUIK_TILDE, pass);
+	insert_constant(prg, "KEY_DELETE", TGUIK_DELETE, pass);
+	insert_constant(prg, "KEY_PLUSMINUS", TGUIK_PLUSMINUS, pass);
+	insert_constant(prg, "KEY_CAPSLOCK", TGUIK_CAPSLOCK, pass);
+	insert_constant(prg, "KEY_F1", TGUIK_F1, pass);
+	insert_constant(prg, "KEY_F2", TGUIK_F2, pass);
+	insert_constant(prg, "KEY_F3", TGUIK_F3, pass);
+	insert_constant(prg, "KEY_F4", TGUIK_F4, pass);
+	insert_constant(prg, "KEY_F5", TGUIK_F5, pass);
+	insert_constant(prg, "KEY_F6", TGUIK_F6, pass);
+	insert_constant(prg, "KEY_F7", TGUIK_F7, pass);
+	insert_constant(prg, "KEY_F8", TGUIK_F8, pass);
+	insert_constant(prg, "KEY_F9", TGUIK_F9, pass);
+	insert_constant(prg, "KEY_F10", TGUIK_F10, pass);
+	insert_constant(prg, "KEY_F11", TGUIK_F11, pass);
+	insert_constant(prg, "KEY_F12", TGUIK_F12, pass);
+	insert_constant(prg, "KEY_PRINTSCREEN", TGUIK_PRINTSCREEN, pass);
+	insert_constant(prg, "KEY_SCROLLLOCK", TGUIK_SCROLLLOCK, pass);
+	insert_constant(prg, "KEY_PAUSE", TGUIK_PAUSE, pass);
+	insert_constant(prg, "KEY_INSERT", TGUIK_INSERT, pass);
+	insert_constant(prg, "KEY_HOME", TGUIK_HOME, pass);
+	insert_constant(prg, "KEY_PAGEUP", TGUIK_PAGEUP, pass);
+	insert_constant(prg, "KEY_END", TGUIK_END, pass);
+	insert_constant(prg, "KEY_PAGEDOWN", TGUIK_PAGEDOWN, pass);
+	insert_constant(prg, "KEY_RIGHT", TGUIK_RIGHT, pass);
+	insert_constant(prg, "KEY_LEFT", TGUIK_LEFT, pass);
+	insert_constant(prg, "KEY_DOWN", TGUIK_DOWN, pass);
+	insert_constant(prg, "KEY_UP", TGUIK_UP, pass);
+	insert_constant(prg, "KEY_NUMLOCKCLEAR", TGUIK_NUMLOCKCLEAR, pass);
+	insert_constant(prg, "KEY_KP_DIVIDE", TGUIK_KP_DIVIDE, pass);
+	insert_constant(prg, "KEY_KP_MULTIPLY", TGUIK_KP_MULTIPLY, pass);
+	insert_constant(prg, "KEY_KP_MINUS", TGUIK_KP_MINUS, pass);
+	insert_constant(prg, "KEY_KP_PLUS", TGUIK_KP_PLUS, pass);
+	insert_constant(prg, "KEY_KP_ENTER", TGUIK_KP_ENTER, pass);
+	insert_constant(prg, "KEY_KP_1", TGUIK_KP_1, pass);
+	insert_constant(prg, "KEY_KP_2", TGUIK_KP_2, pass);
+	insert_constant(prg, "KEY_KP_3", TGUIK_KP_3, pass);
+	insert_constant(prg, "KEY_KP_4", TGUIK_KP_4, pass);
+	insert_constant(prg, "KEY_KP_5", TGUIK_KP_5, pass);
+	insert_constant(prg, "KEY_KP_6", TGUIK_KP_6, pass);
+	insert_constant(prg, "KEY_KP_7", TGUIK_KP_7, pass);
+	insert_constant(prg, "KEY_KP_8", TGUIK_KP_8, pass);
+	insert_constant(prg, "KEY_KP_9", TGUIK_KP_9, pass);
+	insert_constant(prg, "KEY_KP_0", TGUIK_KP_0, pass);
+	insert_constant(prg, "KEY_KP_PERIOD", TGUIK_KP_PERIOD, pass);
+	insert_constant(prg, "KEY_APPLICATION", TGUIK_APPLICATION, pass);
+	insert_constant(prg, "KEY_POWER", TGUIK_POWER, pass);
+	insert_constant(prg, "KEY_KP_EQUALS", TGUIK_KP_EQUALS, pass);
+	insert_constant(prg, "KEY_F13", TGUIK_F13, pass);
+	insert_constant(prg, "KEY_F14", TGUIK_F14, pass);
+	insert_constant(prg, "KEY_F15", TGUIK_F15, pass);
+	insert_constant(prg, "KEY_F16", TGUIK_F16, pass);
+	insert_constant(prg, "KEY_F17", TGUIK_F17, pass);
+	insert_constant(prg, "KEY_F18", TGUIK_F18, pass);
+	insert_constant(prg, "KEY_F19", TGUIK_F19, pass);
+	insert_constant(prg, "KEY_F20", TGUIK_F20, pass);
+	insert_constant(prg, "KEY_F21", TGUIK_F21, pass);
+	insert_constant(prg, "KEY_F22", TGUIK_F22, pass);
+	insert_constant(prg, "KEY_F23", TGUIK_F23, pass);
+	insert_constant(prg, "KEY_F24", TGUIK_F24, pass);
+	insert_constant(prg, "KEY_EXECUTE", TGUIK_EXECUTE, pass);
+	insert_constant(prg, "KEY_HELP", TGUIK_HELP, pass);
+	insert_constant(prg, "KEY_MENU", TGUIK_MENU, pass);
+	insert_constant(prg, "KEY_SELECT", TGUIK_SELECT, pass);
+	insert_constant(prg, "KEY_STOP", TGUIK_STOP, pass);
+	insert_constant(prg, "KEY_AGAIN", TGUIK_AGAIN, pass);
+	insert_constant(prg, "KEY_UNDO", TGUIK_UNDO, pass);
+	insert_constant(prg, "KEY_CUT", TGUIK_CUT, pass);
+	insert_constant(prg, "KEY_COPY", TGUIK_COPY, pass);
+	insert_constant(prg, "KEY_PASTE", TGUIK_PASTE, pass);
+	insert_constant(prg, "KEY_FIND", TGUIK_FIND, pass);
+	insert_constant(prg, "KEY_MUTE", TGUIK_MUTE, pass);
+	insert_constant(prg, "KEY_VOLUMEUP", TGUIK_VOLUMEUP, pass);
+	insert_constant(prg, "KEY_VOLUMEDOWN", TGUIK_VOLUMEDOWN, pass);
+	insert_constant(prg, "KEY_KP_COMMA", TGUIK_KP_COMMA, pass);
+	insert_constant(prg, "KEY_KP_EQUALSAS400", TGUIK_KP_EQUALSAS400, pass);
+	insert_constant(prg, "KEY_ALTERASE", TGUIK_ALTERASE, pass);
+	insert_constant(prg, "KEY_SYSREQ", TGUIK_SYSREQ, pass);
+	insert_constant(prg, "KEY_CANCEL", TGUIK_CANCEL, pass);
+	insert_constant(prg, "KEY_CLEAR", TGUIK_CLEAR, pass);
+	insert_constant(prg, "KEY_PRIOR", TGUIK_PRIOR, pass);
+	insert_constant(prg, "KEY_RETURN2", TGUIK_RETURN2, pass);
+	insert_constant(prg, "KEY_SEPARATOR", TGUIK_SEPARATOR, pass);
+	insert_constant(prg, "KEY_OUT", TGUIK_OUT, pass);
+	insert_constant(prg, "KEY_OPER", TGUIK_OPER, pass);
+	insert_constant(prg, "KEY_CLEARAGAIN", TGUIK_CLEARAGAIN, pass);
+	insert_constant(prg, "KEY_CRSEL", TGUIK_CRSEL, pass);
+	insert_constant(prg, "KEY_EXSEL", TGUIK_EXSEL, pass);
+	insert_constant(prg, "KEY_KP_00", TGUIK_KP_00, pass);
+	insert_constant(prg, "KEY_KP_000", TGUIK_KP_000, pass);
+	insert_constant(prg, "KEY_THOUSANDSSEPARATOR", TGUIK_THOUSANDSSEPARATOR, pass);
+	insert_constant(prg, "KEY_DECIMALSEPARATOR", TGUIK_DECIMALSEPARATOR, pass);
+	insert_constant(prg, "KEY_CURRENCYUNIT", TGUIK_CURRENCYUNIT, pass);
+	insert_constant(prg, "KEY_CURRENCYSUBUNIT", TGUIK_CURRENCYSUBUNIT, pass);
+	insert_constant(prg, "KEY_KP_LEFTPAREN", TGUIK_KP_LEFTPAREN, pass);
+	insert_constant(prg, "KEY_KP_RIGHTPAREN", TGUIK_KP_RIGHTPAREN, pass);
+	insert_constant(prg, "KEY_KP_LEFTBRACE", TGUIK_KP_LEFTBRACE, pass);
+	insert_constant(prg, "KEY_KP_RIGHTBRACE", TGUIK_KP_RIGHTBRACE, pass);
+	insert_constant(prg, "KEY_KP_TAB", TGUIK_KP_TAB, pass);
+	insert_constant(prg, "KEY_KP_BACKSPACE", TGUIK_KP_BACKSPACE, pass);
+	insert_constant(prg, "KEY_KP_A", TGUIK_KP_A, pass);
+	insert_constant(prg, "KEY_KP_B", TGUIK_KP_B, pass);
+	insert_constant(prg, "KEY_KP_C", TGUIK_KP_C, pass);
+	insert_constant(prg, "KEY_KP_D", TGUIK_KP_D, pass);
+	insert_constant(prg, "KEY_KP_E", TGUIK_KP_E, pass);
+	insert_constant(prg, "KEY_KP_F", TGUIK_KP_F, pass);
+	insert_constant(prg, "KEY_KP_XOR", TGUIK_KP_XOR, pass);
+	insert_constant(prg, "KEY_KP_POWER", TGUIK_KP_POWER, pass);
+	insert_constant(prg, "KEY_KP_PERCENT", TGUIK_KP_PERCENT, pass);
+	insert_constant(prg, "KEY_KP_LESS", TGUIK_KP_LESS, pass);
+	insert_constant(prg, "KEY_KP_GREATER", TGUIK_KP_GREATER, pass);
+	insert_constant(prg, "KEY_KP_AMPERSAND", TGUIK_KP_AMPERSAND, pass);
+	insert_constant(prg, "KEY_KP_DBLAMPERSAND", TGUIK_KP_DBLAMPERSAND, pass);
+	insert_constant(prg, "KEY_KP_VERTICALBAR", TGUIK_KP_VERTICALBAR, pass);
+	insert_constant(prg, "KEY_KP_DBLVERTICALBAR", TGUIK_KP_DBLVERTICALBAR, pass);
+	insert_constant(prg, "KEY_KP_COLON", TGUIK_KP_COLON, pass);
+	insert_constant(prg, "KEY_KP_HASH", TGUIK_KP_HASH, pass);
+	insert_constant(prg, "KEY_KP_SPACE", TGUIK_KP_SPACE, pass);
+	insert_constant(prg, "KEY_KP_AT", TGUIK_KP_AT, pass);
+	insert_constant(prg, "KEY_KP_EXCLAM", TGUIK_KP_EXCLAM, pass);
+	insert_constant(prg, "KEY_KP_MEMSTORE", TGUIK_KP_MEMSTORE, pass);
+	insert_constant(prg, "KEY_KP_MEMRECALL", TGUIK_KP_MEMRECALL, pass);
+	insert_constant(prg, "KEY_KP_MEMCLEAR", TGUIK_KP_MEMCLEAR, pass);
+	insert_constant(prg, "KEY_KP_MEMADD", TGUIK_KP_MEMADD, pass);
+	insert_constant(prg, "KEY_KP_MEMSUBTRACT", TGUIK_KP_MEMSUBTRACT, pass);
+	insert_constant(prg, "KEY_KP_MEMMULTIPLY", TGUIK_KP_MEMMULTIPLY, pass);
+	insert_constant(prg, "KEY_KP_MEMDIVIDE", TGUIK_KP_MEMDIVIDE, pass);
+	insert_constant(prg, "KEY_KP_PLUSMINUS", TGUIK_KP_PLUSMINUS, pass);
+	insert_constant(prg, "KEY_KP_CLEAR", TGUIK_KP_CLEAR, pass);
+	insert_constant(prg, "KEY_KP_CLEARENTRY", TGUIK_KP_CLEARENTRY, pass);
+	insert_constant(prg, "KEY_KP_BINARY", TGUIK_KP_BINARY, pass);
+	insert_constant(prg, "KEY_KP_OCTAL", TGUIK_KP_OCTAL, pass);
+	insert_constant(prg, "KEY_KP_DECIMAL", TGUIK_KP_DECIMAL, pass);
+	insert_constant(prg, "KEY_KP_HEXADECIMAL", TGUIK_KP_HEXADECIMAL, pass);
+	insert_constant(prg, "KEY_LCTRL", TGUIK_LCTRL, pass);
+	insert_constant(prg, "KEY_LSHIFT", TGUIK_LSHIFT, pass);
+	insert_constant(prg, "KEY_LALT", TGUIK_LALT, pass);
+	insert_constant(prg, "KEY_LGUI", TGUIK_LGUI, pass);
+	insert_constant(prg, "KEY_RCTRL", TGUIK_RCTRL, pass);
+	insert_constant(prg, "KEY_RSHIFT", TGUIK_RSHIFT, pass);
+	insert_constant(prg, "KEY_RALT", TGUIK_RALT, pass);
+	insert_constant(prg, "KEY_RGUI", TGUIK_RGUI, pass);
+	insert_constant(prg, "KEY_MODE", TGUIK_MODE, pass);
+	insert_constant(prg, "KEY_SLEEP", TGUIK_SLEEP, pass);
+	insert_constant(prg, "KEY_WAKE", TGUIK_WAKE, pass);
+	insert_constant(prg, "KEY_CHANNEL_INCREMENT", TGUIK_CHANNEL_INCREMENT, pass);
+	insert_constant(prg, "KEY_CHANNEL_DECREMENT", TGUIK_CHANNEL_DECREMENT, pass);
+	insert_constant(prg, "KEY_MEDIA_PLAY", TGUIK_MEDIA_PLAY, pass);
+	insert_constant(prg, "KEY_MEDIA_PAUSE", TGUIK_MEDIA_PAUSE, pass);
+	insert_constant(prg, "KEY_MEDIA_RECORD", TGUIK_MEDIA_RECORD, pass);
+	insert_constant(prg, "KEY_MEDIA_FAST_FORWARD", TGUIK_MEDIA_FAST_FORWARD, pass);
+	insert_constant(prg, "KEY_MEDIA_REWIND", TGUIK_MEDIA_REWIND, pass);
+	insert_constant(prg, "KEY_MEDIA_NEXT_TRACK", TGUIK_MEDIA_NEXT_TRACK, pass);
+	insert_constant(prg, "KEY_MEDIA_PREVIOUS_TRACK", TGUIK_MEDIA_PREVIOUS_TRACK, pass);
+	insert_constant(prg, "KEY_MEDIA_STOP", TGUIK_MEDIA_STOP, pass);
+	insert_constant(prg, "KEY_MEDIA_EJECT", TGUIK_MEDIA_EJECT, pass);
+	insert_constant(prg, "KEY_MEDIA_PLAY_PAUSE", TGUIK_MEDIA_PLAY_PAUSE, pass);
+	insert_constant(prg, "KEY_MEDIA_SELECT", TGUIK_MEDIA_SELECT, pass);
+	insert_constant(prg, "KEY_AC_NEW", TGUIK_AC_NEW, pass);
+	insert_constant(prg, "KEY_AC_OPEN", TGUIK_AC_OPEN, pass);
+	insert_constant(prg, "KEY_AC_CLOSE", TGUIK_AC_CLOSE, pass);
+	insert_constant(prg, "KEY_AC_EXIT", TGUIK_AC_EXIT, pass);
+	insert_constant(prg, "KEY_AC_SAVE", TGUIK_AC_SAVE, pass);
+	insert_constant(prg, "KEY_AC_PRINT", TGUIK_AC_PRINT, pass);
+	insert_constant(prg, "KEY_AC_PROPERTIES", TGUIK_AC_PROPERTIES, pass);
+	insert_constant(prg, "KEY_AC_SEARCH", TGUIK_AC_SEARCH, pass);
+	insert_constant(prg, "KEY_AC_HOME", TGUIK_AC_HOME, pass);
+	insert_constant(prg, "KEY_AC_BACK", TGUIK_AC_BACK, pass);
+	insert_constant(prg, "KEY_AC_FORWARD", TGUIK_AC_FORWARD, pass);
+	insert_constant(prg, "KEY_AC_STOP", TGUIK_AC_STOP, pass);
+	insert_constant(prg, "KEY_AC_REFRESH", TGUIK_AC_REFRESH, pass);
+	insert_constant(prg, "KEY_AC_BOOKMARKS", TGUIK_AC_BOOKMARKS, pass);
+	insert_constant(prg, "KEY_SOFTLEFT", TGUIK_SOFTLEFT, pass);
+	insert_constant(prg, "KEY_SOFTRIGHT", TGUIK_SOFTRIGHT, pass);
+	insert_constant(prg, "KEY_CALL", TGUIK_CALL, pass);
+	insert_constant(prg, "KEY_ENDCALL", TGUIK_ENDCALL, pass);
+	insert_constant(prg, "KEY_LEFT_TAB", TGUIK_LEFT_TAB, pass);
+	insert_constant(prg, "KEY_LEVEL5_SHIFT", TGUIK_LEVEL5_SHIFT, pass);
+	insert_constant(prg, "KEY_MULTI_KEY_COMPOSE", TGUIK_MULTI_KEY_COMPOSE, pass);
+	insert_constant(prg, "KEY_LMETA", TGUIK_LMETA, pass);
+	insert_constant(prg, "KEY_RMETA", TGUIK_RMETA, pass);
+	insert_constant(prg, "KEY_LHYPER", TGUIK_LHYPER, pass);
+	insert_constant(prg, "KEY_RHYPER", TGUIK_RHYPER, pass);
+	insert_constant(prg, "EVENT_KEY_DOWN", TGUI_KEY_DOWN, pass);
+	insert_constant(prg, "EVENT_KEY_UP", TGUI_KEY_UP, pass);
+	insert_constant(prg, "EVENT_JOY_DOWN", TGUI_JOY_DOWN, pass);
+	insert_constant(prg, "EVENT_JOY_UP", TGUI_JOY_UP, pass);
+	insert_constant(prg, "EVENT_JOY_AXIS", TGUI_JOY_AXIS, pass);
+	insert_constant(prg, "EVENT_MOUSE_DOWN", TGUI_MOUSE_DOWN, pass);
+	insert_constant(prg, "EVENT_MOUSE_UP", TGUI_MOUSE_UP, pass);
+	insert_constant(prg, "EVENT_MOUSE_AXIS", TGUI_MOUSE_AXIS, pass);
+	insert_constant(prg, "EVENT_MOUSE_WHEEL", TGUI_MOUSE_WHEEL, pass);
+	insert_constant(prg, "EVENT_TEXT", TGUI_TEXT, pass);
+	insert_constant(prg, "JOY_A", TGUI_B_A, pass);
+	insert_constant(prg, "JOY_B", TGUI_B_B, pass);
+	insert_constant(prg, "JOY_X", TGUI_B_X, pass);
+	insert_constant(prg, "JOY_Y", TGUI_B_Y, pass);
+	insert_constant(prg, "JOY_BACK", TGUI_B_BACK, pass);
+	insert_constant(prg, "JOY_GUIDE", TGUI_B_GUIDE, pass);
+	insert_constant(prg, "JOY_START", TGUI_B_START, pass);
+	insert_constant(prg, "JOY_LS", TGUI_B_LS, pass);
+	insert_constant(prg, "JOY_RS", TGUI_B_RS, pass);
+	insert_constant(prg, "JOY_LB", TGUI_B_LB, pass);
+	insert_constant(prg, "JOY_RB", TGUI_B_RB, pass);
+	insert_constant(prg, "JOY_U", TGUI_B_U, pass);
+	insert_constant(prg, "JOY_D", TGUI_B_D, pass);
+	insert_constant(prg, "JOY_L", TGUI_B_L, pass);
+	insert_constant(prg, "JOY_R", TGUI_B_R, pass);
+	insert_constant(prg, "JOY_LEFTX", SDL_GAMEPAD_AXIS_LEFTX, pass);
+	insert_constant(prg, "JOY_LEFTY", SDL_GAMEPAD_AXIS_LEFTY, pass);
+	insert_constant(prg, "JOY_RIGHTX", SDL_GAMEPAD_AXIS_RIGHTX, pass);
+	insert_constant(prg, "JOY_RIGHTY", SDL_GAMEPAD_AXIS_RIGHTY, pass);
+	insert_constant(prg, "JOY_TRIGGERLEFT", SDL_GAMEPAD_AXIS_LEFT_TRIGGER, pass);
+	insert_constant(prg, "JOY_TRIGGERRIGHT", SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, pass);
+	insert_constant(prg, "TRANSITION_NONE", TRANSITION_NONE, pass);
+	insert_constant(prg, "TRANSITION_ENLARGE", TRANSITION_ENLARGE, pass);
+	insert_constant(prg, "TRANSITION_SHRINK", TRANSITION_SHRINK, pass);
+	insert_constant(prg, "TRANSITION_SLIDE", TRANSITION_SLIDE, pass);
+	insert_constant(prg, "TRANSITION_SLIDE_VERTICAL", TRANSITION_SLIDE_VERTICAL, pass);
+	insert_constant(prg, "LETTERBOX_TOP", gfx::LETTERBOX_TOP, pass);
+	insert_constant(prg, "LETTERBOX_BOTTOM", gfx::LETTERBOX_BOTTOM, pass);
+	insert_constant(prg, "LETTERBOX_LEFT", gfx::LETTERBOX_LEFT, pass);
+	insert_constant(prg, "LETTERBOX_RIGHT", gfx::LETTERBOX_RIGHT, pass);
+	insert_constant(prg, "BLEND_ZERO", gfx::BLEND_ZERO, pass);
+	insert_constant(prg, "BLEND_ONE", gfx::BLEND_ONE, pass);
+	insert_constant(prg, "BLEND_SRCCOLOR", gfx::BLEND_SRCCOLOR, pass);
+	insert_constant(prg, "BLEND_INVSRCCOLOR", gfx::BLEND_INVSRCCOLOR, pass);
+	insert_constant(prg, "BLEND_SRCALPHA", gfx::BLEND_SRCALPHA, pass);
+	insert_constant(prg, "BLEND_INVSRCALPHA", gfx::BLEND_INVSRCALPHA, pass);
+	insert_constant(prg, "COMPARE_NEVER", gfx::COMPARE_NEVER, pass);
+	insert_constant(prg, "COMPARE_LESS", gfx::COMPARE_LESS, pass);
+	insert_constant(prg, "COMPARE_EQUAL", gfx::COMPARE_EQUAL, pass);
+	insert_constant(prg, "COMPARE_LESSEQUAL", gfx::COMPARE_LESSEQUAL, pass);
+	insert_constant(prg, "COMPARE_GREATER", gfx::COMPARE_GREATER, pass);
+	insert_constant(prg, "COMPARE_NOTEQUAL", gfx::COMPARE_NOTEQUAL, pass);
+	insert_constant(prg, "COMPARE_GREATEREQUAL", gfx::COMPARE_GREATEREQUAL, pass);
+	insert_constant(prg, "COMPARE_ALWAYS", gfx::COMPARE_ALWAYS, pass);
+	insert_constant(prg, "STENCILOP_KEEP", gfx::STENCILOP_KEEP, pass);
+	insert_constant(prg, "STENCILOP_ZERO", gfx::STENCILOP_ZERO, pass);
+	insert_constant(prg, "STENCILOP_REPLACE", gfx::STENCILOP_REPLACE, pass);
+	insert_constant(prg, "STENCILOP_INCRSAT", gfx::STENCILOP_INCRSAT, pass);
+	insert_constant(prg, "STENCILOP_DECRSAT", gfx::STENCILOP_DECRSAT, pass);
+	insert_constant(prg, "STENCILOP_INVERT", gfx::STENCILOP_INVERT, pass);
+	insert_constant(prg, "STENCILOP_INCR", gfx::STENCILOP_INCR, pass);
+	insert_constant(prg, "STENCILOP_DECR", gfx::STENCILOP_DECR, pass);
+	insert_constant(prg, "NO_FACE", gfx::NO_FACE, pass);
+	insert_constant(prg, "FRONT_FACE", gfx::FRONT_FACE, pass);
+	insert_constant(prg, "BACK_FACE", gfx::BACK_FACE, pass);
+	insert_constant(prg, "FACE_CW", gfx::FACE_CW, pass);
+	insert_constant(prg, "FACE_CCW", gfx::FACE_CCW, pass);
+	insert_constant(prg, "SEEK_SET", SDL_IO_SEEK_SET, pass);
+	insert_constant(prg, "SEEK_CUR", SDL_IO_SEEK_CUR, pass);
+	insert_constant(prg, "SEEK_END", SDL_IO_SEEK_END, pass);
+	insert_constant(prg, "STDIN", 0, pass);
+	insert_constant(prg, "STDOUT", 1, pass);
+	insert_constant(prg, "STDERR", 2, pass);
+	insert_constant(prg, "F12_START", F12_START, pass);
+	insert_constant(prg, "F12_END", F12_END, pass);
 
 	for (int i = 0; i < 100; i++) {
 		std::string name = "__tmp" + util::itos(i);
-		int var_index = var_i;
-		var_i++;
+		int var_index = prg->var_i;
+		prg->var_i++;
 		if (pass == PASS2) {
 			prg->variables_map[name] = var_index;
 		}
@@ -1748,7 +1750,7 @@ top:
 		else if (tok == "function") {
 			std::string func_name = token(prg, tt);
 
-			int func_index = func_i;
+			int func_index = prg->func_i;
 			if (pass == PASS2) {
 				backup(prg, func_index, false);
 			}
@@ -1762,11 +1764,11 @@ top:
 			Variable v;
 			v.name = func_name;
 			v.type = Variable::FUNCTION;
-			v.n = func_i++;
+			v.n = prg->func_i++;
 			v.constant = true;
 			std::map<std::string, int> tmp;
 			prg->locals.push_back(tmp);
-			prg->variables_map[func_name] = var_i++;
+			prg->variables_map[func_name] = prg->var_i++;
 			if (pass == PASS1) {
 				prg->variables.push_back(v);
 			}
@@ -1812,7 +1814,7 @@ func_top:
 					func.s->line_numbers.push_back(prg->s->line);
 					Token t;
 					t.type = Token::SYMBOL;
-					t.i = var_i;
+					t.i = prg->var_i;
 					t.s = tok2;
 					t.dereference = 0;
 					is_deref = 0;
@@ -1822,13 +1824,13 @@ func_top:
 						if (prg->locals[func_index].find(tok2) != prg->locals[func_index].end()) {
 							my_throw(Error(std::string(__FUNCTION__) + ": " + "Duplicate label " + tok2 + " at " + get_error_info(&func)));
 						}
-						prg->locals[func_index][tok2] = var_i;
+						prg->locals[func_index][tok2] = prg->var_i;
 					}
 					prg->variables.push_back(v);
 					if (pass == PASS2) {
 						prg->variables_map[tok2] = prg->locals[func_index][tok2];
 					}
-					var_i++;
+					prg->var_i++;
 				}
 				else if (tok == "const") {
 					Statement s;
@@ -1847,11 +1849,11 @@ func_top:
 						}
 						count++;
 						if (pass == PASS1) {
-							prg->locals[func_index][tok2] = var_i++;
+							prg->locals[func_index][tok2] = prg->var_i++;
 						}
 						else {
 							prg->variables_map[tok2] = prg->locals[func_index][tok2];
-							var_i++;
+							prg->var_i++;
 						}
 						Variable v;
 						v.name = tok2;
@@ -1880,11 +1882,11 @@ func_top:
 						std::string valtok = token(prg, tt);
 						if (valtok[0] == '(') {
 							Variable v;
-							v.name = "__e" + util::itos(expression_i++);
+							v.name = "__e" + util::itos(prg->expression_i++);
 							v.type = Variable::EXPRESSION;
 
-							int var_index = var_i;
-							var_i++;
+							int var_index = prg->var_i;
+							prg->var_i++;
 
 							if (pass == PASS1) {
 								prg->locals[func_index][v.name] = var_index;
@@ -1894,7 +1896,7 @@ func_top:
 								prg->variables_map[v.name] = prg->locals[func_index][v.name];
 							}
 
-							prg->variables[var_index].e = parse_expression(prg, &func, valtok, var_i, expression_i, fish_i, pass);
+							prg->variables[var_index].e = parse_expression(prg, &func, valtok, pass);
 
 							Token t;
 							t.type = Token::SYMBOL;
@@ -1909,11 +1911,11 @@ func_top:
 						}
 						else if (valtok[0] == '[') {
 							Variable v;
-							v.name = "__f" + util::itos(fish_i++);
+							v.name = "__f" + util::itos(prg->fish_i++);
 							v.type = Variable::FISH;
 
-							int var_index = var_i;
-							var_i++;
+							int var_index = prg->var_i;
+							prg->var_i++;
 
 							if (pass == PASS1) {
 								prg->locals[func_index][v.name] = var_index;
@@ -1923,7 +1925,7 @@ func_top:
 								prg->variables_map[v.name] = prg->locals[func_index][v.name];
 							}
 
-							prg->variables[var_index].f = parse_fish(prg, &func, valtok, var_i, expression_i, fish_i, pass);
+							prg->variables[var_index].f = parse_fish(prg, &func, valtok, pass);
 
 							Token t;
 							t.type = Token::SYMBOL;
@@ -1973,11 +1975,11 @@ func_top:
 						}
 						count++;
 						if (pass == PASS1) {
-							prg->locals[func_index][tok2] = var_i++;
+							prg->locals[func_index][tok2] = prg->var_i++;
 						}
 						else {
 							prg->variables_map[tok2] = prg->locals[func_index][tok2];
-							var_i++;
+							prg->var_i++;
 						}
 						Variable v;
 						v.name = tok2;
@@ -2006,11 +2008,11 @@ func_top:
 				}
 				else if (tok[0] == '(') {
 					Variable v;
-					v.name = "__e" + util::itos(expression_i++);
+					v.name = "__e" + util::itos(prg->expression_i++);
 					v.type = Variable::EXPRESSION;
 
-					int var_index = var_i;
-					var_i++;
+					int var_index = prg->var_i;
+					prg->var_i++;
 
 					if (pass == PASS1) {
 						prg->locals[func_index][v.name] = var_index;
@@ -2020,7 +2022,7 @@ func_top:
 						prg->variables_map[v.name] = prg->locals[func_index][v.name];
 					}
 
-					prg->variables[var_index].e = parse_expression(prg, &func, tok, var_i, expression_i, fish_i, pass);
+					prg->variables[var_index].e = parse_expression(prg, &func, tok, pass);
 
 					Token t;
 					t.type = Token::SYMBOL;
@@ -2035,11 +2037,11 @@ func_top:
 				}
 				else if (tok[0] == '[') {
 					Variable v;
-					v.name = "__f" + util::itos(fish_i++);
+					v.name = "__f" + util::itos(prg->fish_i++);
 					v.type = Variable::FISH;
 
-					int var_index = var_i;
-					var_i++;
+					int var_index = prg->var_i;
+					prg->var_i++;
 
 					if (pass == PASS1) {
 						prg->locals[func_index][v.name] = var_index;
@@ -2049,7 +2051,7 @@ func_top:
 						prg->variables_map[v.name] = prg->locals[func_index][v.name];
 					}
 
-					prg->variables[var_index].f = parse_fish(prg, &func, tok, var_i, expression_i, fish_i, pass);
+					prg->variables[var_index].f = parse_fish(prg, &func, tok, pass);
 
 					Token t;
 					t.type = Token::SYMBOL;
@@ -2074,7 +2076,7 @@ func_top:
 						param_is_ref = true;
 					}
 					else {
-						int param_i = var_i++;
+						int param_i = prg->var_i++;
 						if (pass == PASS1) {
 							prg->locals[func_index][tok] = param_i;
 						}
@@ -2159,7 +2161,7 @@ func_top:
 
 			Token t;
 			t.type = Token::SYMBOL;
-			t.i = var_i;
+			t.i = prg->var_i;
 			t.s = tok2;
 			t.dereference = 0;
 			_is_deref = 0;
@@ -2171,8 +2173,8 @@ func_top:
 
 			prg->s->line_numbers.push_back(prg->s->line);
 			prg->variables.push_back(v);
-			prg->variables_map[tok2] = var_i;
-			var_i++;
+			prg->variables_map[tok2] = prg->var_i;
+			prg->var_i++;
 		}
 		else if (tok == "const") {
 			Statement s;
@@ -2190,8 +2192,8 @@ func_top:
 					my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok2 + " at " + get_error_info(prg)));
 				}
 				count++;
-				int var_index = var_i;
-				var_i++;
+				int var_index = prg->var_i;
+				prg->var_i++;
 				if (pass == PASS2) {
 					prg->variables_map[tok2] = var_index;
 				}
@@ -2214,11 +2216,11 @@ func_top:
 				std::string valtok = token(prg, tt);
 				if (valtok[0] == '(') {
 					Variable v;
-					v.name = "__e" + util::itos(expression_i++);
+					v.name = "__e" + util::itos(prg->expression_i++);
 					v.type = Variable::EXPRESSION;
 
-					int var_index = var_i;
-					var_i++;
+					int var_index = prg->var_i;
+					prg->var_i++;
 
 					if (pass == PASS1) {
 						prg->variables.push_back(v);
@@ -2226,7 +2228,7 @@ func_top:
 					else if (pass == PASS2) {
 						prg->variables_map[v.name] = var_index;
 					}
-					prg->variables[var_index].e = parse_expression(prg, prg, valtok, var_i, expression_i, fish_i, pass);
+					prg->variables[var_index].e = parse_expression(prg, prg, valtok, pass);
 
 					Token t;
 					t.type = Token::SYMBOL;
@@ -2241,11 +2243,11 @@ func_top:
 				}
 				else if (valtok[0] == '[') {
 					Variable v;
-					v.name = "__f" + util::itos(fish_i++);
+					v.name = "__f" + util::itos(prg->fish_i++);
 					v.type = Variable::FISH;
 
-					int var_index = var_i;
-					var_i++;
+					int var_index = prg->var_i;
+					prg->var_i++;
 
 					if (pass == PASS1) {
 						prg->variables.push_back(v);
@@ -2253,7 +2255,7 @@ func_top:
 					else if (pass == PASS2) {
 						prg->variables_map[v.name] = var_index;
 					}
-					prg->variables[var_index].f = parse_fish(prg, prg, valtok, var_i, expression_i, fish_i, pass);
+					prg->variables[var_index].f = parse_fish(prg, prg, valtok, pass);
 
 					Token t;
 					t.type = Token::SYMBOL;
@@ -2299,8 +2301,8 @@ func_top:
 					my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok2 + " at " + get_error_info(prg)));
 				}
 				count++;
-				int var_index = var_i;
-				var_i++;
+				int var_index = prg->var_i;
+				prg->var_i++;
 				if (pass == PASS2) {
 					prg->variables_map[tok2] = var_index;
 				}
@@ -2323,11 +2325,11 @@ func_top:
 		}
 		else if (tok[0] == '(') {
 			Variable v;
-			v.name = "__e" + util::itos(expression_i++);
+			v.name = "__e" + util::itos(prg->expression_i++);
 			v.type = Variable::EXPRESSION;
 
-			int var_index = var_i;
-			var_i++;
+			int var_index = prg->var_i;
+			prg->var_i++;
 
 			if (pass == PASS1) {
 				prg->variables.push_back(v);
@@ -2335,7 +2337,7 @@ func_top:
 			else if (pass == PASS2) {
 				prg->variables_map[v.name] = var_index;
 			}
-			prg->variables[var_index].e = parse_expression(prg, prg, tok, var_i, expression_i, fish_i, pass);
+			prg->variables[var_index].e = parse_expression(prg, prg, tok, pass);
 
 			Token t;
 			t.type = Token::SYMBOL;
@@ -2350,11 +2352,11 @@ func_top:
 		}
 		else if (tok[0] == '[') {
 			Variable v;
-			v.name = "__f" + util::itos(fish_i++);
+			v.name = "__f" + util::itos(prg->fish_i++);
 			v.type = Variable::FISH;
 
-			int var_index = var_i;
-			var_i++;
+			int var_index = prg->var_i;
+			prg->var_i++;
 
 			if (pass == PASS1) {
 				prg->variables.push_back(v);
@@ -2362,7 +2364,7 @@ func_top:
 			else if (pass == PASS2) {
 				prg->variables_map[v.name] = var_index;
 			}
-			prg->variables[var_index].f = parse_fish(prg, prg, tok, var_i, expression_i, fish_i, pass);
+			prg->variables[var_index].f = parse_fish(prg, prg, tok, pass);
 
 			Token t;
 			t.type = Token::SYMBOL;
@@ -2439,6 +2441,8 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 	}
 
 	Program &func = prg->functions[function];
+	Program *prg_bak = prg_func;
+	prg_func = &func;
 
 	var_args.push(params);
 	num_var_args_args.push(func.params.size()+ignore_params);
@@ -2486,6 +2490,13 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 
 	Function_Swap *bak2 = prg->s;
 	prg->s = func.s;
+
+	for (size_t i = 0; i < function_breakpoints.size(); i++) {
+		if (function_breakpoints[i] == prg->s->name) {
+			debug("Breakpoint (" + prg->s->name + ") hit...\n");
+			break;
+		}
+	}
 
 	int pc_bak = prg->s->pc; // To handle recursive calls
 	int c_bak = prg->compare_flag;
@@ -2539,6 +2550,8 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 	}
 
 	prg->s = bak2;
+
+	prg_func = prg_bak;
 }
 
 void call_function(Program *prg, std::string function_name, const std::vector<Token> &params, int ignore_params)
@@ -2552,6 +2565,14 @@ void call_function(Program *prg, std::string function_name, const std::vector<To
 
 bool interpret(Program *prg)
 {
+	std::string inf = get_error_info(prg);
+	for (size_t i = 0; i < file_breakpoints.size(); i++) {
+		if (file_breakpoints[i] == inf) {
+			debug("Breakpoint " + inf + " hit...\n");
+			break;
+		}
+	}
+
 	if (prg->s->pc >= prg->s->program.size()) {
 		return false;
 	}
@@ -2913,7 +2934,7 @@ static bool corefunc_call_result(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
-static std::string typeof_var(Variable *v1)
+std::string typeof_var(Variable *v1)
 {
 	std::string res;
 	if (v1->type == Variable::NUMBER) {
@@ -4429,6 +4450,7 @@ void end()
 Program *create_program(std::string code)
 {
 	Program *prg = new Program;
+	prg_func = prg;
 
 	prg->break_flag = false;
 	prg->continue_flag = false;
@@ -4962,6 +4984,187 @@ void my_throw(Error e)
 	int result = gui::popup("ERROR!", e.error_message, gui::YESNO, "Abort", "Continue");
 	if (result == 1) {
 		throw e;
+	}
+}
+
+static booboo::Variable *get_var(std::string id)
+{
+	id = util::trim(id);
+	if (isalpha(id[0]) || id[0] == '_') {
+		if (booboo::prg->variables_map.find(id) == booboo::prg->variables_map.end()) {
+			printf("Unknown variable '%s'...\n", id.c_str());
+			return nullptr;
+		}
+		else {
+			return &booboo::prg->variables[booboo::prg->variables_map[id]];
+		}
+	}
+	else if (id[0] == '[') {
+		booboo::Variable::Fish f = booboo::parse_fish(booboo::prg, booboo::prg_func, id, booboo::PASS1);
+		f = booboo::parse_fish(booboo::prg, booboo::prg_func, id, booboo::PASS2);
+		return &booboo::go_fish(booboo::prg, f);
+	}
+	else {
+		printf("Don't know how to print that. Try a variable or fish...\n");
+		return nullptr;
+	}
+}
+
+void debug(std::string text)
+{
+	printf("%s\n", text.c_str());
+	printf("Type help for help...\n");
+	while (true) {
+		printf("> ");
+		fflush(stdout);
+		std::string line;
+		std::getline(std::cin, line);
+		line = util::trim(line);
+		if (line == "help") {
+			printf("run           start or continue program execution\n");
+			printf("break <bp>    set a breakpoint. use break delete <bp> to delete\n");
+			printf("print <v>     print the value of a variable or fish\n");
+			printf("set <d> <s>   set the value of d to s\n");
+			printf("quit          exit the program\n");
+		}
+		else if (line == "quit") {
+			exit(0);
+		}
+		else if (line == "run") {
+			break;
+		}
+		else if (line.substr(0, 5) == "print") {
+			line = line.substr(5);
+			line = util::trim(line);
+			booboo::Variable *var = get_var(line);
+			if (var) {
+				printf("Type: %s\n", typeof_var(var).c_str());
+				switch (var->type) {
+					case booboo::Variable::NUMBER:
+						printf("Value: %g\n", var->n);
+						break;
+					case booboo::Variable::STRING:
+						printf("Value: %s\n", var->s.c_str());
+						break;
+					case booboo::Variable::POINTER:
+						printf("Value: %p\n", var->p);
+						break;
+					default:
+						break;
+				}
+			}
+		}
+		else if (line.substr(0, 3) == "set") {
+			line = line.substr(3);
+			line = util::trim(line);
+			std::string dest, src;
+			int i = 0;
+			if (line[0] == '[') {
+				int open = 0;
+				while (i < (int)line.length()) {
+					if (line[i] == '[') {
+						open++;
+					}
+					else if (line[i] == ']') {
+						open--;
+					}
+					i++;
+					if (open == 0) {
+						break;
+					}
+				}
+				dest = line.substr(0, i);
+				dest = util::trim(dest);
+			}
+			else {
+				while (i < (int)line.length()) {
+					char buf[2];
+					buf[0] = line[i];
+					buf[1] = 0;
+					dest += buf;
+					if (isspace(line[i])) {
+						break;
+					}
+					i++;
+				}
+				dest = util::trim(dest);
+			}
+			src = line.substr(i);
+			src = util::trim(src);
+			if (!(isalpha(dest[0]) || dest[0] == '_' || dest[0] == '[') || !(src[0] == '-' || isdigit(src[0]) || isalpha(src[0]) || src[0] == '_' || src[0] == '[' || src[0] == '"')) {
+				printf("Can't do that...\n");
+			}
+			else {
+				booboo::Variable *var = get_var(dest);
+				if (isdigit(src[0]) || src[0] == '-') {
+					var->set_type(booboo::Variable::NUMBER);
+					var->n = atof(src.c_str());
+				}
+				else if (src[0] == '"') {
+					var->set_type(booboo::Variable::STRING);
+					var->s = util::remove_quotes(src);
+				}
+				else {
+					booboo::Variable *var2 = get_var(src);
+					std::string n = var->name;
+					bool c = var->constant;
+					*var = *var2;
+					var->name = n;
+					var->constant = c;
+				}
+			}
+		}
+		else if (line.substr(0, 5) == "break") {
+			line = line.substr(5);
+			line = util::trim(line);
+			if (line.substr(0, 6) == "delete") {
+				line = line.substr(6);
+				line = util::trim(line);
+				bool del = false;
+				if (line.find(':') == std::string::npos) {
+					for (std::vector<std::string>::iterator it = booboo::function_breakpoints.begin(); it != booboo::function_breakpoints.end(); it++) {
+						if (*it == line) {
+							it = booboo::function_breakpoints.erase(it);
+							del = true;
+							break;
+						}
+					}
+				}
+				else {
+					for (std::vector<std::string>::iterator it = booboo::file_breakpoints.begin(); it != booboo::file_breakpoints.end(); it++) {
+						if (*it == line) {
+							it = booboo::file_breakpoints.erase(it);
+							del = true;
+							break;
+						}
+					}
+				}
+				if (del) {
+					printf("Breakpoint deleted...\n");
+				}
+				else {
+					printf("Nothing deleted...\n");
+				}
+			}
+			else {
+				if (line.find(':') == std::string::npos) {
+					if (booboo::prg->variables_map.find(line) == booboo::prg->variables_map.end()) {
+						printf("No such function %s...\n", line.c_str());
+					}
+					else {
+						booboo::function_breakpoints.push_back(line);
+						printf("Breakpoint added...\n");
+					}
+				}
+				else {
+					file_breakpoints.push_back(line);
+					printf("Breakpoint added...\n");
+				}
+			}
+		}
+		else {
+			printf("Unknown command...\n");
+		}
 	}
 }
 

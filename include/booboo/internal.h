@@ -18,7 +18,16 @@ extern BOOBOO_EXPORT std::vector<std::string> cli_args;
 
 extern BOOBOO_EXPORT std::vector<Timer_Callback> timer_callbacks;
 		
+extern BOOBOO_EXPORT std::vector<std::string> function_breakpoints;
+extern BOOBOO_EXPORT std::vector<std::string> file_breakpoints;
+
 void BOOBOO_EXPORT my_throw(Error e);
+
+Variable::Fish BOOBOO_EXPORT parse_fish(Program *prg, Program *func, std::string expr, Pass pass);
+
+std::string BOOBOO_EXPORT typeof_var(Variable *v1);
+
+void BOOBOO_EXPORT debug(std::string text);
 
 } // End namespace booboo
 

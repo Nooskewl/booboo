@@ -179,6 +179,11 @@ struct Program {
 	Pass complete_pass;
 	Variable result;
 
+	int var_i;
+	int func_i;
+	int expression_i;
+	int fish_i;
+
 	std::vector<Variable> variables;
 	std::map<std::string, int> variables_map;
 	std::map<std::string, int> function_name_map;
@@ -269,6 +274,7 @@ extern BOOBOO_EXPORT bool quit;
 extern BOOBOO_EXPORT bool callbacks_enabled;
 extern BOOBOO_EXPORT std::string (*load_text)(std::string filename); // must be set
 extern BOOBOO_EXPORT Program *prg;
+extern BOOBOO_EXPORT Program *prg_func;
 extern BOOBOO_EXPORT std::map<std::string, void *> black_box;
 
 } // End namespace booboo

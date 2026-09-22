@@ -140,6 +140,10 @@ again:
 
 	booboo::prg = booboo::create_program(code);
 
+	if (util::bool_arg(false, argc, argv, "debug")) {
+		booboo::debug("Debugging '" + booboo::main_program_name + "'...");
+	}
+
 	while (booboo::interpret(booboo::prg)) {
 		audio::lock_mutex();
 		int sz = audio::internal::audio_callbacks.size();
