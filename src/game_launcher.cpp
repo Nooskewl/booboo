@@ -192,7 +192,7 @@ bool start()
 	const int min_supp_h = 720;
 
 	if (desktop_resolution.w < min_supp_w || desktop_resolution.h < min_supp_h) {
-		gui::popup("Unsupported System", "The minimum resolution supported by this game is 1280x720, which this system does not meet. Exiting.", gui::OK);
+		gui::popup("Unsupported System", "The minimum resolution supported by this game is 1280x720, which this system does not meet. Exiting.");
 		exit(1);
 	}
 #endif
@@ -210,7 +210,7 @@ bool start()
 	}
 
 	if (shim::start_all(640, 360, false, win_w, win_h) == false) {
-		gui::fatalerror("ERROR", "Initialization failed", gui::OK, true);
+		gui::fatalerror("ERROR", "Initialization failed", true);
 		return false;
 	}
 
@@ -431,7 +431,7 @@ void draw_all()
 		t.n = F12_START;
 		tmp.push_back(t);
 		call_function(prg, "f12", tmp);
-		int result = gui::popup("Really quit?", "Are you sure?", gui::YESNO);
+		int result = gui::popup("Really quit?", "Are you sure?", "Yes", "No");
 		if (result != 0) {
 			quit = true;
 		}
@@ -888,7 +888,7 @@ again:
 			code = util::load_text("scripts/" + fn);
 		}
 		catch (util::Error &e) {
-			gui::fatalerror("ERROR", "Program is missing or corrupt!", gui::OK, true);
+			gui::fatalerror("ERROR", "Program is missing or corrupt!", true);
 		}
 
 		main_program_name = fn;
@@ -899,7 +899,7 @@ again:
 				code = util::load_text("scripts/" + fn);
 			}
 			catch (util::Error &e) {
-				gui::fatalerror("ERROR", "Program is missing or corrupt!", gui::OK, true);
+				gui::fatalerror("ERROR", "Program is missing or corrupt!", true);
 			}
 
 			main_program_name = fn;
@@ -909,7 +909,7 @@ again:
 				code = util::load_text("scripts/main.boo");
 			}
 			catch (util::Error &e) {
-				gui::fatalerror("ERROR", "Program is missing or corrupt!", gui::OK, true);
+				gui::fatalerror("ERROR", "Program is missing or corrupt!", true);
 			}
 			
 			main_program_name = "main.boo";
@@ -977,17 +977,15 @@ again:
 
 	}
 	catch (util::Error &e) {
-		gui::fatalerror("ERROR", e.error_message.c_str(), gui::OK, true);
+		gui::fatalerror("ERROR", e.error_message.c_str(), true);
 	}
 	/*
 	catch (Error &e) {
-		gui::fatalerror("ERROR", e.error_message.c_str(), gui::OK, true);
+		gui::fatalerror("ERROR", e.error_message.c_str(), true);
 	}
 	*/
 
-	if (shim::debug) {
-		FreeConsole();
-	}
+	FreeConsole();
 
 	_chdir(start_cwd.c_str());
 

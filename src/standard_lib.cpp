@@ -3360,7 +3360,7 @@ static bool miscfunc_inspect(Program *prg, const std::vector<Token> &v)
 		strcpy_s(buf, 1000, "Unknown");
 	}
 
-	gui::popup("INSPECTOR", buf, gui::OK);
+	gui::popup("INSPECTOR", buf);
 
 	return true;
 }
@@ -3395,7 +3395,7 @@ static bool miscfunc_die(Program *prg, const std::vector<Token> &v)
 
 	if (prg->result.n == 0) {
 	Variable &expr = prg->variables[v[2].i];
-		gui::popup("Error", msg, gui::OK);
+		gui::popup("Error", msg);
 		exit(1);
 	}
 

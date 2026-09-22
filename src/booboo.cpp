@@ -26,6 +26,7 @@ static std::vector<booboo::expression_func> expression_handlers;
 static std::stack< std::vector<booboo::Token> > var_args;
 static std::stack<int> num_var_args_args;
 static bool break_on_interpret = false;
+static std::vector<std::string> backtrace;
 
 static void skip_whitespace(booboo::Program *prg)
 {
@@ -2424,6 +2425,14 @@ func_top:
 
 void call_function(Program *prg, int function, const std::vector<Token> &params, int ignore_params)
 {
+	bool bt = true;
+	if (get_file_name(prg) == "UNKNOWN") {
+		bt = false;
+	}
+	if (bt) {
+		backtrace.push_back(get_file_name(prg) + ":" + prg->s->name + ":" + util::itos(get_line_num(prg)));
+	}
+
 	// locals backup supports recursion, and only gets done if this is recursion
 	bool backup_locals = false;
 	std::vector<Variable> locals_backup;
@@ -2507,6 +2516,10 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 	}
 
 	while (interpret(prg)) {
+	}
+
+	if (bt) {
+		backtrace.pop_back();
 	}
 
 	prg->s->pc = pc_bak;
@@ -4461,7 +4474,7 @@ void start()
 	std::vector<Token> tmp;
 	var_args.push(tmp);
 	num_var_args_args.push(0);
-	
+
 	return_code = 0;
 }
 
@@ -4500,7 +4513,7 @@ Program *create_program(std::string code)
 	}
 
 	prg->s->code = code;
-	prg->s->name = "main";
+	prg->s->name = "__main";
 	prg->s->line = 0;
 	prg->s->line_numbers.clear();
 	prg->s->start_line = 0;
@@ -5011,9 +5024,17 @@ Variable *dereference(Program *prg, const std::vector<Token> &v, int index)
 
 void my_throw(Error e)
 {
-	int result = gui::popup("ERROR!", e.error_message, gui::YESNO, "Abort", "Continue");
-	if (result == 1) {
+	int result = gui::popup("ERROR!", e.error_message, "Abort", "Debug", "Continue");
+	if (result == 0) {
 		throw e;
+	}
+	else if (result == 1) {
+		AllocConsole();
+		FILE* fp;
+		freopen_s(&fp, "CONIN$", "r", stdin);
+		freopen_s(&fp, "CONOUT$", "w", stdout);
+		freopen_s(&fp, "CONOUT$", "w", stderr);
+		booboo::debug("Debugging program. Type 'help' for help...");
 	}
 }
 
@@ -5124,7 +5145,7 @@ static void print_lines(std::string fn, int curr, int side)
 			pos++;
 		}
 		pos++;
-		std::string fmt = std::string("%") + util::itos(log10(end)+1) + "d:%s\n";
+		std::string fmt = std::string(i+start == curr ? "*" : " ") + std::string("%") + util::itos(log10(end)+1) + "d %s\n";
 		if (i+start == curr) {
 			twinkle::set_fore(twinkle::YELLOW, false);
 		}
@@ -5176,9 +5197,11 @@ void debug(std::string text)
 			printf("step          run one instruction\n");
 			printf("stepin        run one instruction and step into functions/loops\n");
 			printf("break <bp>    set a breakpoint. use break delete <bp> to delete\n");
+			printf("bt [all]      print a backtrace\n");
 			printf("print         print more code context\n");
 			printf("print <v>     print the value of a variable or fish\n");
 			printf("set <d> <s>   set the value of d to s\n");
+			printf("skip          skip this statement\n");
 			printf("quit          exit the program\n");
 			printed_lines = true;
 		}
@@ -5345,6 +5368,28 @@ void debug(std::string text)
 				return;
 			}
 			break_on_interpret = false;
+		}
+		else if (line == "bt") {
+			line = line.substr(2);
+			line = util::trim(line);
+			printed_lines = true;
+			int start = backtrace.size() - 23;
+			start = MAX(0, start);
+			if (line == "all") {
+				start = 0;
+			}
+			printf("Backtrace:\n");
+			if (start > 0) {
+				printf("... %d more\n", start);
+			}
+			int digits = log10(backtrace.size()) + 1;
+			for (size_t i = start; i < backtrace.size(); i++) {
+				std::string fmt = std::string("%") + util::itos(digits) + "d %s\n";
+				printf(fmt.c_str(), i-start, backtrace[i].c_str());
+			}
+		}
+		else if (line == "skip") {
+			prg->s->pc++;
 		}
 		else {
 			printf("Unknown command...\n");
