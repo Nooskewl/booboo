@@ -3329,6 +3329,9 @@ static bool miscfunc_inspect(Program *prg, const std::vector<Token> &v)
 	if (v[0].type == Token::NUMBER) {
 		snprintf(buf, 1000, "%g", v[0].n);
 	}
+	if (v[0].type == Token::STRING) {
+		snprintf(buf, 1000, "%s", v[0].s.c_str());
+	}
 	else if (v[0].type == Token::SYMBOL) {
 		Variable &var = get_variable(prg, v[0].i);
 		if (IS_NUMBER(var)) {
