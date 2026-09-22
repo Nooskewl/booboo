@@ -4249,13 +4249,26 @@ static void exprfunc_toptr(Program *prg, const std::vector<Token> &v)
 
 	std::string s = as_string(prg, v, 0);
 
-	Variable *p;
+	Variable *p = nullptr;
 
-	if (prg->variables_map.find(s) == prg->variables_map.end()) {
-		p = nullptr;
+	if (prg != prg_func) {
+		size_t f = 0;
+		for (f = 0; f < prg->function_names.size(); f++) {
+			if (prg->function_names[f] == prg_func->s->name) {
+				break;
+			}
+		}
+		if (f < prg->function_names.size()) {
+			if (prg->locals[f].find(s) != prg->locals[f].end()) {
+				p = &prg->variables[prg->locals[f][s]];
+			}
+		}
 	}
-	else {
-		p = &prg->variables[prg->variables_map[s]];
+
+	if (p == nullptr) {
+		if (prg->variables_map.find(s) != prg->variables_map.end()) {
+			p = &prg->variables[prg->variables_map[s]];
+		}
 	}
 
 	prg->result.set_type(Variable::POINTER);
@@ -4991,6 +5004,19 @@ static booboo::Variable *get_var(std::string id)
 {
 	id = util::trim(id);
 	if (isalpha(id[0]) || id[0] == '_') {
+		if (prg != prg_func) {
+			size_t f = 0;
+			for (f = 0; f < prg->function_names.size(); f++) {
+				if (prg->function_names[f] == prg_func->s->name) {
+					break;
+				}
+			}
+			if (f < prg->function_names.size()) {
+				if (prg->locals[f].find(id) != prg->locals[f].end()) {
+					return &prg->variables[prg->locals[f][id]];
+				}
+			}
+		}
 		if (booboo::prg->variables_map.find(id) == booboo::prg->variables_map.end()) {
 			printf("Unknown variable '%s'...\n", id.c_str());
 			return nullptr;
