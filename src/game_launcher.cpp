@@ -543,6 +543,15 @@ static void loop()
 		bool skip_drawing = false;
 		int logic_reps = diff / ms_per_logic_frame;
 
+		// Relax giant stutters/pauses
+		if (logic_reps > 25) {
+			curr_logic_rate = shim::logic_rate;
+			logic_frames = 0;
+			drawing_frames = 0;
+			start = SDL_GetTicks();
+			logic_reps = 1;
+		}
+
 		if (logic_reps > 0) {
 			start += ms_per_logic_frame * logic_reps;
 		}
