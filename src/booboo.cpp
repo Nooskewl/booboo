@@ -5059,7 +5059,7 @@ static booboo::Variable *get_var(std::string id)
 	}
 }
 
-static void print_lines(std::string fn, int start, int end, int curr)
+static void print_lines(std::string fn, int curr, int side)
 {
 	printf("-- %s\n", fn.c_str());
 
@@ -5069,6 +5069,26 @@ static void print_lines(std::string fn, int start, int end, int curr)
 	}
 
 	std::string &s = src_code[fn];
+
+	int start = curr - side;
+	int end = curr + side;
+	if (start <= 0) {
+		end += (-start)+1;
+		start = 1;
+	}
+	int count = 0;
+	for (size_t i = 0; i < s.length(); i++) {
+		if (s[i] == '\n') {
+			count++;
+		}
+	}
+	if (end > count) {
+		start -= end - count;
+		if (start < 1) {
+			start = 1;
+		}
+		end = count;
+	}
 
 	size_t pos = 0;
 
@@ -5089,15 +5109,15 @@ static void print_lines(std::string fn, int start, int end, int curr)
 			pos++;
 		}
 		pos++;
-		if (i+start == curr) {
-			printf("*");
-		}
-		printf("%d:%s\n", i+start, l.c_str());
+		std::string fmt = std::string(i+start == curr ? "*" : " ") + "%" + util::itos(log10(end)+1) + "d:%s\n";
+		printf(fmt.c_str(), i+start, l.c_str());
 	}
 }
 
 void debug(std::string text)
 {
+	bool printed_lines = false;
+
 	printf("%s\n", text.c_str());
 	while (true) {
 		std::string fn = get_file_name(prg);
@@ -5117,10 +5137,13 @@ void debug(std::string text)
 			}
 		}
 
-		int l = get_line_num(prg);
-		int start = MAX(1, l - 2);
-		int end = l + 2;
-		print_lines(fn, start, end, l);
+		if (printed_lines == false) {
+			int l = get_line_num(prg);
+			print_lines(fn, l, 2);
+		}
+		else {
+			printed_lines = false;
+		}
 
 		printf("> ");
 		fflush(stdout);
@@ -5145,21 +5168,28 @@ void debug(std::string text)
 		else if (line.substr(0, 5) == "print") {
 			line = line.substr(5);
 			line = util::trim(line);
-			booboo::Variable *var = get_var(line);
-			if (var) {
-				printf("Type: %s\n", typeof_var(var).c_str());
-				switch (var->type) {
-					case booboo::Variable::NUMBER:
-						printf("Value: %g\n", var->n);
-						break;
-					case booboo::Variable::STRING:
-						printf("Value: %s\n", var->s.c_str());
-						break;
-					case booboo::Variable::POINTER:
-						printf("Value: %p\n", var->p);
-						break;
-					default:
-						break;
+			if (line == "") {
+				int l = get_line_num(prg);
+				print_lines(fn, l, 11);
+				printed_lines = true;
+			}
+			else {
+				booboo::Variable *var = get_var(line);
+				if (var) {
+					printf("Type: %s\n", typeof_var(var).c_str());
+					switch (var->type) {
+						case booboo::Variable::NUMBER:
+							printf("Value: %g\n", var->n);
+							break;
+						case booboo::Variable::STRING:
+							printf("Value: %s\n", var->s.c_str());
+							break;
+						case booboo::Variable::POINTER:
+							printf("Value: %p\n", var->p);
+							break;
+						default:
+							break;
+					}
 				}
 			}
 		}
