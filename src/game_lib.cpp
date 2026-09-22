@@ -24,7 +24,7 @@ namespace booboo {
 } // End namespace booboo
 
 #define INFO_EXISTS(m, i) if (m.find(i) == m.end()) { \
-	throw Error(std::string(__FUNCTION__) + ": " + "Invalid handle at " + get_error_info(prg)); \
+	my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid handle at " + get_error_info(prg))); \
 }
 
 Image_Info *image_info(Program *prg)
@@ -141,7 +141,7 @@ static bool miscfunc_set_logic_rate(Program *prg, const std::vector<Token> &v)
 	int rate = as_number(prg, v, 0);
 
 	if (rate < 1 || rate > 1000) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Logic rate must be between 1 and 1000 at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Logic rate must be between 1 and 1000 at " + get_error_info(prg)));
 	}
 
 	shim::logic_rate = rate;
@@ -2247,7 +2247,7 @@ static bool spritefunc_set_animation(Program *prg, const std::vector<Token> &v)
 		d->id = id;
 		if (v.size() > 3) {
 			if (v[3].type != Token::SYMBOL || prg->variables[v[3].i].type == Variable::EXPRESSION) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Variable expected at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Variable expected at " + get_error_info(prg)));
 			}
 			d->var = v[3].i;
 		}
@@ -2282,7 +2282,7 @@ static bool spritefunc_set_finished_callback(Program *prg, const std::vector<Tok
 		d->id = id;
 		if (v.size() > 2) {
 			if (v[2].type != Token::SYMBOL || prg->variables[v[2].i].type == Variable::EXPRESSION) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg)));
 			}
 			d->var = v[2].i;
 		}
@@ -3410,7 +3410,7 @@ static bool modelfunc_set_animation(Program *prg, const std::vector<Token> &v)
 		d->id = id;
 		if (v.size() > 3) {
 			if (v[3].type != Token::SYMBOL || prg->variables[v[3].i].type == Variable::EXPRESSION) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Variable expected at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Variable expected at " + get_error_info(prg)));
 			}
 			d->var = v[3].i;
 		}
@@ -3445,7 +3445,7 @@ static bool modelfunc_set_finished_callback(Program *prg, const std::vector<Toke
 		d->id = id;
 		if (v.size() > 2) {
 			if (v[2].type != Token::SYMBOL || prg->variables[v[2].i].type == Variable::EXPRESSION) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg)));
 			}
 			d->var = v[2].i;
 		}
@@ -3552,7 +3552,7 @@ static void exprfunc_model_create_vertex_buffer(Program *prg, const std::vector<
 		}
 	}
 	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg)));
 	}
 	Variable *faces;
        	if (v[1].type == Token::SYMBOL) {
@@ -3569,7 +3569,7 @@ static void exprfunc_model_create_vertex_buffer(Program *prg, const std::vector<
 		}
 	}
 	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg)));
 	}
 	Variable *colours;
        	if (v[2].type == Token::SYMBOL) {
@@ -3586,7 +3586,7 @@ static void exprfunc_model_create_vertex_buffer(Program *prg, const std::vector<
 		}
 	}
 	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg)));
 	}
 	Variable *normals;
        	if (v[3].type == Token::SYMBOL) {
@@ -3603,7 +3603,7 @@ static void exprfunc_model_create_vertex_buffer(Program *prg, const std::vector<
 		}
 	}
 	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg)));
 	}
 	Variable *texcoords;
        	if (v[4].type == Token::SYMBOL) {
@@ -3620,7 +3620,7 @@ static void exprfunc_model_create_vertex_buffer(Program *prg, const std::vector<
 		}
 	}
 	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg)));
 	}
 	int num_triangles = as_number(prg, v, 5);
 
@@ -5032,7 +5032,7 @@ static bool miscfunc_timer_callback(Program *prg, const std::vector<Token> &v)
 	
 	if (v.size() > 2) {
 		if (v[2].type != Token::SYMBOL || prg->variables[v[2].i].type == Variable::EXPRESSION) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Variable expected at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Variable expected at " + get_error_info(prg)));
 		}
 		t.tokens.push_back(v[2]);
 	}

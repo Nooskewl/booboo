@@ -955,9 +955,11 @@ again:
 	catch (util::Error &e) {
 		gui::fatalerror("ERROR", e.error_message.c_str(), gui::OK, true);
 	}
+	/*
 	catch (Error &e) {
 		gui::fatalerror("ERROR", e.error_message.c_str(), gui::OK, true);
 	}
+	*/
 
 	_chdir(start_cwd.c_str());
 

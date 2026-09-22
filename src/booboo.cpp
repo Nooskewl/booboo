@@ -500,7 +500,7 @@ static std::string token(Program *prg, Token::Token_Type &ret_type)
 		return tok;
 	}
 
-	throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg));
+	my_throw(Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg)));
 
 	return "";
 }
@@ -531,11 +531,11 @@ bool process_includes(Program *prg)
 			std::string name = token(prg, tt);
 
 			if (name == "") {
-				throw Error(std::string(__FUNCTION__) + ": " + "Expected include parameters at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Expected include parameters at " + get_error_info(prg)));
 			}
 
 			if (name[0] != '"') {
-				throw Error(std::string(__FUNCTION__) + ": " + "Invalid include name at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid include name at " + get_error_info(prg)));
 			}
 
 			name = util::remove_quotes(util::unescape_string(name));
@@ -641,7 +641,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 		p++;
 	}
 	if (p >= (int)expr.length()-1) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid expression at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid expression at " + get_error_info(prg)));
 	}
 	p++; // skip (
 	while (isspace(expr[p]) && p < (int)expr.length()) {
@@ -736,7 +736,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			p++;
 		}
 		if (p >= (int)expr.length()) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid expression at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid expression at " + get_error_info(prg)));
 		}
 		char c = expr[p];
 		Token tok;
@@ -942,7 +942,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 
 			if (pass == PASS2) {
 				if (prg->variables_map.find(sym) == prg->variables_map.end()) {
-					throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(prg));
+					my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(prg)));
 				}
 				tok.i = prg->variables_map[sym];
 			}
@@ -953,7 +953,7 @@ static Variable::Expression parse_expression(Program *prg, Program *func, std::s
 			continue;
 		}
 		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg)));
 		}
 
 		e.v.push_back(tok);
@@ -971,7 +971,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 		p++;
 	}
 	if (p >= (int)expr.length()-1) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid fish at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid fish at " + get_error_info(prg)));
 	}
 	p++; // skip [
 	while (isspace(expr[p]) && p < (int)expr.length()) {
@@ -1069,7 +1069,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			}
 			if (pass == PASS2) {
 				if (prg->variables_map.find(name) == prg->variables_map.end()) {
-					throw Error(std::string(__FUNCTION__) + ": " + "Unknown variable at " + get_error_info(prg));
+					my_throw(Error(std::string(__FUNCTION__) + ": " + "Unknown variable at " + get_error_info(prg)));
 				}
 				e.c_i = prg->variables_map[name];
 			}
@@ -1085,7 +1085,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			p++;
 		}
 		if (p >= (int)expr.length()) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid fish at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid fish at " + get_error_info(prg)));
 		}
 		char c = expr[p];
 		Token tok;
@@ -1291,7 +1291,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 
 			if (pass == PASS2) {
 				if (prg->variables_map.find(sym) == prg->variables_map.end()) {
-					throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(prg));
+					my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(prg)));
 				}
 				tok.i = prg->variables_map[sym];
 			}
@@ -1302,7 +1302,7 @@ static Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, 
 			continue;
 		}
 		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Parse error at " + get_error_info(prg)));
 		}
 
 		e.v.push_back(tok);
@@ -1820,7 +1820,7 @@ func_top:
 
 					if (pass == PASS1) {
 						if (prg->locals[func_index].find(tok2) != prg->locals[func_index].end()) {
-							throw Error(std::string(__FUNCTION__) + ": " + "Duplicate label " + tok2 + " at " + get_error_info(&func));
+							my_throw(Error(std::string(__FUNCTION__) + ": " + "Duplicate label " + tok2 + " at " + get_error_info(&func)));
 						}
 						prg->locals[func_index][tok2] = var_i;
 					}
@@ -1843,7 +1843,7 @@ func_top:
 							goto func_top;
 						}
 						if (tok2[0] != '_' && !isalpha(tok2[0])) {
-							throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok2 + " at " + get_error_info(&func));
+							my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok2 + " at " + get_error_info(&func)));
 						}
 						count++;
 						if (pass == PASS1) {
@@ -1862,7 +1862,7 @@ func_top:
 						if (it != prg->variables_map.end()) {
 							Variable &var = prg->variables[(*it).second];
 							if (var.type != v.type) {
-								throw Error("Type for " + tok2 + " changed at " + get_error_info(&func));
+								my_throw(Error("Type for " + tok2 + " changed at " + get_error_info(&func)));
 							}
 						}
 						if (pass == PASS1) {
@@ -1969,7 +1969,7 @@ func_top:
 							goto func_top;
 						}
 						if (tok2[0] != '_' && !isalpha(tok2[0])) {
-							throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok2 + " at " + get_error_info(&func));
+							my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok2 + " at " + get_error_info(&func)));
 						}
 						count++;
 						if (pass == PASS1) {
@@ -1987,7 +1987,7 @@ func_top:
 						if (it != prg->variables_map.end()) {
 							Variable &var = prg->variables[(*it).second];
 							if (var.type != v.type) {
-								throw Error("Type for " + tok2 + " changed at " + get_error_info(&func));
+								my_throw(Error("Type for " + tok2 + " changed at " + get_error_info(&func)));
 							}
 						}
 						if (pass == PASS1) {
@@ -2096,7 +2096,7 @@ func_top:
 				}
 				else {
 					if (func.s->program.size() == 0) {
-						throw Error("Expected keyword at " + get_error_info(&func));
+						my_throw(Error("Expected keyword at " + get_error_info(&func)));
 					}
 					Token t;
 					t.type = tt;
@@ -2107,7 +2107,7 @@ func_top:
 						case Token::SYMBOL:
 							t.s = util::remove_quotes(util::unescape_string(tok));
 							if (pass == PASS2 && prg->variables_map.find(t.s) == prg->variables_map.end()) {
-								throw Error(std::string(__FUNCTION__) + ": " + "Invalid symbol name " + tok + " at " + get_error_info(&func));
+								my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid symbol name " + tok + " at " + get_error_info(&func)));
 							}
 							if (pass == PASS2) {
 								t.i = prg->variables_map[t.s];
@@ -2124,11 +2124,11 @@ func_top:
 			}
 
 			if (is_param == true) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Missing { at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Missing { at " + get_error_info(prg)));
 			}
 
 			if (finished == false) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Missing } at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Missing } at " + get_error_info(prg)));
 			}
 
 			prg->function_name_map[func.s->name] = prg->functions.size();
@@ -2166,7 +2166,7 @@ func_top:
 			prg->s->program[prg->s->program.size()-1].data.push_back(t);
 
 			if (pass == PASS1 && prg->variables_map.find(tok2) != prg->variables_map.end()) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Duplicate label " + tok2 + " at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Duplicate label " + tok2 + " at " + get_error_info(prg)));
 			}
 
 			prg->s->line_numbers.push_back(prg->s->line);
@@ -2187,7 +2187,7 @@ func_top:
 					goto top;
 				}
 				if (tok2[0] != '_' && !isalpha(tok2[0])) {
-					throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok2 + " at " + get_error_info(prg));
+					my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok2 + " at " + get_error_info(prg)));
 				}
 				count++;
 				int var_index = var_i;
@@ -2296,7 +2296,7 @@ func_top:
 					goto top;
 				}
 				if (tok2[0] != '_' && !isalpha(tok2[0])) {
-					throw Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok2 + " at " + get_error_info(prg));
+					my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + tok2 + " at " + get_error_info(prg)));
 				}
 				count++;
 				int var_index = var_i;
@@ -2383,7 +2383,7 @@ func_top:
 			_is_deref = 0;
 		}
 		else if (prg->s->program.size() == 0) {
-			throw Error("Expected keyword at " + get_error_info(prg));
+			my_throw(Error("Expected keyword at " + get_error_info(prg)));
 		}
 		else {
 			Token t;
@@ -2395,7 +2395,7 @@ func_top:
 				case Token::SYMBOL:
 					t.s = util::remove_quotes(util::unescape_string(tok));
 					if (pass == PASS2 && prg->variables_map.find(t.s) == prg->variables_map.end()) {
-						throw Error(std::string(__FUNCTION__) + ": " + "Invalid symbol name " + tok + " at " + get_error_info(prg));
+						my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid symbol name " + tok + " at " + get_error_info(prg)));
 					}
 					if (pass == PASS2) {
 						t.i = prg->variables_map[t.s];
@@ -2646,7 +2646,7 @@ static bool do_set(Program *prg, const std::vector<Token> &v, bool const_ok)
 	Variable *v1 = as_variable_pointer(prg, v, 0);
 
 	if (const_ok == false && v1->constant == true) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to set constant at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Attempt to set constant at " + get_error_info(prg)));
 	}
 
 	if (v[1].type == Token::NUMBER) {
@@ -2712,7 +2712,7 @@ static bool corefunc_const(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(2)
 	if (v.size() % 2 != 0) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Incorrect number of arguments to const at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Incorrect number of arguments to const at " + get_error_info(prg)));
 	}
 	for (size_t i = 0; i < v.size(); i+=2) {
 		prg->variables[v[i].i].v.clear();
@@ -2809,7 +2809,7 @@ static bool corefunc_compare(Program *prg, const std::vector<Token> &v)
 			prg->compare_flag = strcmp(s1.c_str(), s2.c_str());
 		}
 		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 		}
 	}
 
@@ -3354,7 +3354,7 @@ static void exprfunc_add(Program *prg, const std::vector<Token> &v)
 			return;
 		}
 		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 		}
 	}
 	else if (v[0].type == Token::NUMBER) {
@@ -3762,11 +3762,11 @@ static Variable matmul(Program *prg, Variable ret, Variable vec2)
 		}
 
 		if (is_mat1 == false && is_mat2 == false) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Vector-vector multiplication is undefined at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Vector-vector multiplication is undefined at " + get_error_info(prg)));
 		}
 
 		if (ret.v.size() != vec2.v[0].v.size()) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Matrices cannot be multiplied at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Matrices cannot be multiplied at " + get_error_info(prg)));
 		}
 
 		unsigned int w = vec2.v.size();
@@ -4007,7 +4007,7 @@ static void exprfunc_length(Program *prg, const std::vector<Token> &v)
 	CHECK_VECTOR(vec)
 	
 	if (vec.v.size() != 2 && vec.v.size() != 3) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Vector size not supported in length at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Vector size not supported in length at " + get_error_info(prg)));
 	}
 
 	prg->result.set_type(Variable::NUMBER);
@@ -4030,7 +4030,7 @@ static void exprfunc_dot(Program *prg, const std::vector<Token> &v)
 	CHECK_VECTOR(vec2)
 
 	if (vec1.v.size() < 3 || vec2.v.size() < 3) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Vector with < 3 components not supported at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Vector with < 3 components not supported at " + get_error_info(prg)));
 	}
 
 	prg->result.set_type(Variable::NUMBER);
@@ -4068,7 +4068,7 @@ static void exprfunc_angle(Program *prg, const std::vector<Token> &v)
 	}
 	
 	if (vec1.v.size() < 3 || vec2.v.size() < 3) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Vector with < 3 components not supported at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Vector with < 3 components not supported at " + get_error_info(prg)));
 	}
 
 	Variable len;
@@ -4091,7 +4091,7 @@ static void exprfunc_cross(Program *prg, const std::vector<Token> &v)
 		Variable vec2 = as_variable_resolve(prg, v, i);
 		CHECK_VECTOR(vec2)
 		if (var.v.size() < 3 || vec2.v.size() < 3) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Vector with < 3 components not supported at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Vector with < 3 components not supported at " + get_error_info(prg)));
 		}
 		var = veccross(var, vec2);
 	}
@@ -4126,7 +4126,7 @@ static void exprfunc_vadd(Program *prg, const std::vector<Token> &v)
 		Variable vec2 = as_variable_resolve(prg, v, i);
 		CHECK_VECTOR(vec2)
 		if (vec.v.size() != vec2.v.size()) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Can't add different sized vectors at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Can't add different sized vectors at " + get_error_info(prg)));
 		}
 		if (IS_NUMBER(vec.v[0]) && IS_NUMBER(vec2.v[0])) {
 			for (size_t j = 0; j < vec.v.size(); j++) {
@@ -4135,7 +4135,7 @@ static void exprfunc_vadd(Program *prg, const std::vector<Token> &v)
 		}
 		else if (IS_VECTOR(vec.v[0]) && IS_VECTOR(vec2.v[0])) {
 			if (vec.v[0].v.size() != vec2.v[0].v.size()) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Can't add different sized matrices at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Can't add different sized matrices at " + get_error_info(prg)));
 			}
 			for (size_t j = 0; j < vec.v.size(); j++) {
 				for (size_t i = 0; i < vec.v[j].v.size(); i++) {
@@ -4144,7 +4144,7 @@ static void exprfunc_vadd(Program *prg, const std::vector<Token> &v)
 			}
 		}
 		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Add not supported on types at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Add not supported on types at " + get_error_info(prg)));
 		}
 	}
 
@@ -4163,7 +4163,7 @@ static void exprfunc_vsub(Program *prg, const std::vector<Token> &v)
 		Variable vec2 = as_variable_resolve(prg, v, i);
 		CHECK_VECTOR(vec2)
 		if (vec.v.size() != vec2.v.size()) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Can't subtract different sized vectors at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Can't subtract different sized vectors at " + get_error_info(prg)));
 		}
 		if (IS_NUMBER(vec.v[0]) && IS_NUMBER(vec2.v[0])) {
 			for (size_t j = 0; j < vec.v.size(); j++) {
@@ -4172,7 +4172,7 @@ static void exprfunc_vsub(Program *prg, const std::vector<Token> &v)
 		}
 		else if (IS_VECTOR(vec.v[0]) && IS_VECTOR(vec2.v[0])) {
 			if (vec.v[0].v.size() != vec2.v[0].v.size()) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Can't subtract different sized matrices at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Can't subtract different sized matrices at " + get_error_info(prg)));
 			}
 			for (size_t j = 0; j < vec.v.size(); j++) {
 				for (size_t i = 0; i < vec.v[j].v.size(); i++) {
@@ -4181,7 +4181,7 @@ static void exprfunc_vsub(Program *prg, const std::vector<Token> &v)
 			}
 		}
 		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Subtract not supported on types at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Subtract not supported on types at " + get_error_info(prg)));
 		}
 	}
 
@@ -4276,7 +4276,7 @@ static void exprfunc_get_var_arg(Program *prg, const std::vector<Token> &v)
 	int num_hard_params = num_var_args_args.top();
 
 	if (i+num_hard_params >= params.size() || i+num_hard_params < 0) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Parameter out of range at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Parameter out of range at " + get_error_info(prg)));
 	}
 
 	if (params[i+num_hard_params].type == Token::NUMBER) {
@@ -4557,7 +4557,7 @@ Variable &get_variable(Program *prg, int index)
 Variable &as_variable(Program *prg, const std::vector<Token> &v, int index)
 {
 	if (v[index].type != Token::SYMBOL) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 	}
 	if (prg->variables[v[index].i].type == Variable::FISH) {
 		return go_fish(prg, prg->variables[v[index].i].f);
@@ -4644,7 +4644,7 @@ double as_number(Program *prg, const std::vector<Token> &v, int index)
 				return atof(v2.s.c_str());
 			}
 			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Fished out the wrong type at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Fished out the wrong type at " + get_error_info(prg)));
 			}
 		}
 		else if (var->type == Variable::EXPRESSION) {
@@ -4656,22 +4656,23 @@ double as_number(Program *prg, const std::vector<Token> &v, int index)
 				return atof(prg->result.s.c_str());
 			}
 			else {
-				throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 			}
 		}
 		else if (var->type == Variable::STRING) {
 			return atof(var->s.c_str());
 		}
 		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 		}
 	}
 	else if (v[index].type == Token::STRING) {
 		return atof(v[index].s.c_str());
 	}
 	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 	}
+	return 0.0f;
 }
 
 std::string as_string(Program *prg, const std::vector<Token> &v, int index)
@@ -4697,41 +4698,42 @@ std::string as_string(Program *prg, const std::vector<Token> &v, int index)
 		else if (var->type == Variable::EXPRESSION) {
 			evaluate_expression(prg, var->e);
 			if (prg->result.type != Variable::STRING) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 			}
 			return prg->result.s;
 		}
 		else if (var->type == Variable::FISH) {
 			Variable &v2 = go_fish(prg, var->f);
 			if (v2.type != Variable::STRING) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Fished out the wrong type at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Fished out the wrong type at " + get_error_info(prg)));
 			}
 			return v2.s;
 		}
 		else {
-			throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 		}
 	}
 	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 	}
+	return "";
 }
 
 int as_label(Program *prg, const std::vector<Token> &v, int index)
 {
 	if (v[index].type != Token::SYMBOL) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 	}
 	Variable *var = as_variable_pointer(prg, v, index);
 	if (var->type == Variable::FISH) {
 		Variable &v2 = go_fish(prg, var->f);
 		if (v2.type != Variable::LABEL) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Fished out the wrong type at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Fished out the wrong type at " + get_error_info(prg)));
 		}
 		return v2.n;
 	}
 	else if (var->type != Variable::LABEL) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 	}
 	return var->n;
 }
@@ -4739,18 +4741,18 @@ int as_label(Program *prg, const std::vector<Token> &v, int index)
 int as_function(Program *prg, const std::vector<Token> &v, int index)
 {
 	if (v[index].type != Token::SYMBOL) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 	}
 	Variable *var = as_variable_pointer(prg, v, index);
 	if (var->type == Variable::FISH) {
 		Variable &v2 = go_fish(prg, var->f);
 		if (v2.type != Variable::FUNCTION) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Fished out the wrong type (" + util::itos(v2.type) + ") at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Fished out the wrong type (" + util::itos(v2.type) + ") at " + get_error_info(prg)));
 		}
 		return v2.n;
 	}
 	else if (var->type != Variable::FUNCTION) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 	}
 	return var->n;
 }
@@ -4758,7 +4760,7 @@ int as_function(Program *prg, const std::vector<Token> &v, int index)
 Variable as_pointer(Program *prg, const std::vector<Token> &v, int index)
 {
 	if (v[index].type != Token::SYMBOL) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 	}
 	if (prg->variables[v[index].i].type == Variable::FISH) {
 		return go_fish(prg, prg->variables[v[index].i].f);
@@ -4802,7 +4804,7 @@ void evaluate_expression(Program *prg, const Variable::Expression &e)
 		}
 
 		if (i >= (int)prg->function_names.size()) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Unknown expression function '" + e.name + "' at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Unknown expression function '" + e.name + "' at " + get_error_info(prg)));
 		}
 
 		call_function(prg, i, e.v);
@@ -4953,6 +4955,14 @@ Variable *dereference(Program *prg, const std::vector<Token> &v, int index)
 		var = var->p;
 	}
 	return var;
+}
+
+void my_throw(Error e)
+{
+	int result = gui::popup("ERROR!", e.error_message, gui::YESNO, "Abort", "Continue");
+	if (result == 1) {
+		throw e;
+	}
 }
 
 } // end namespace booboo

@@ -20,7 +20,7 @@ using namespace noo;
 using namespace booboo;
 
 #define INFO_EXISTS(m, i) if (m.find(i) == m.end()) { \
-	throw Error(std::string(__FUNCTION__) + ": " + "Invalid handle at " + get_error_info(prg)); \
+	my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid handle at " + get_error_info(prg))); \
 }
 
 template <typename T> T sign(T v) { return (T(0) < v) - (v < T(0)); }
@@ -228,13 +228,13 @@ static std::string sformat(Program *prg, const std::vector<Token> &v, int skip)
 						int l = 2;
 						int st = c+l;
 						if (c+l >= (int)fmt.length()) {
-							throw Error(std::string(__FUNCTION__) + ": " + "Invalid format specifier at " + get_error_info(prg));
+							my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid format specifier at " + get_error_info(prg)));
 						}
 						while (fmt[c+l] != ')' && c+l < (int)fmt.length()) {
 							l++;
 						}
 						if (c+l >= (int)fmt.length()) {
-							throw Error(std::string(__FUNCTION__) + ": " + "Invalid format specifier at " + get_error_info(prg));
+							my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid format specifier at " + get_error_info(prg)));
 						}
 						format = fmt.substr(st, l-2);
 						fmt_len = l + 1;
@@ -631,7 +631,7 @@ static bool corefunc_sort(Program *prg, const std::vector<Token> &v)
 		}
 	}
 	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg)));
 	}
 	int func = as_function(prg, v, 1);
 
@@ -661,7 +661,7 @@ static bool corefunc_unique(Program *prg, const std::vector<Token> &v)
 		}
 	}
 	else {
-		throw Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Expected symbol at " + get_error_info(prg)));
 	}
 
 	auto last = std::unique(vec->v.begin(), vec->v.end());
@@ -1167,7 +1167,7 @@ static bool vectorfunc_init(Program *prg, const std::vector<Token> &v)
 	Variable &vec = as_variable(prg, v, 0);
 	
 	if (vec.constant) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg)));
 	}
 
 	vec.type = Variable::VECTOR;
@@ -1203,7 +1203,7 @@ static bool vectorfunc_add(Program *prg, const std::vector<Token> &v)
 	Variable &id = as_variable(prg, v, 0);
 	
 	if (id.constant) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg)));
 	}
 
 	id.type = Variable::VECTOR;
@@ -1236,7 +1236,7 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 	Variable &id = as_variable(prg, v, 0);
 	
 	if (id.constant) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg)));
 	}
 
 	double index = as_number(prg, v, 1);
@@ -1244,7 +1244,7 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 	id.type = Variable::VECTOR;
 
 	if (index < 0 || index > id.v.size()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg)));
 	}
 
 	Variable var;
@@ -1275,7 +1275,7 @@ static bool vectorfunc_erase(Program *prg, const std::vector<Token> &v)
 	Variable &id = as_variable(prg, v, 0);
 	
 	if (id.constant) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg)));
 	}
 
 	double index = as_number(prg, v, 1);
@@ -1283,7 +1283,7 @@ static bool vectorfunc_erase(Program *prg, const std::vector<Token> &v)
 	CHECK_VECTOR(id)
 
 	if (index < 0 || index >= id.v.size()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg)));
 	}
 
 	id.v.erase(id.v.begin() + int(index));
@@ -1299,7 +1299,7 @@ static bool vectorfunc_clear(Program *prg, const std::vector<Token> &v)
 		Variable &id = as_variable(prg, v, i);
 
 		if (id.constant) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg)));
 		}
 
 		id.type = Variable::VECTOR;
@@ -1318,7 +1318,7 @@ static bool vectorfunc_reserve(Program *prg, const std::vector<Token> &v)
 	Variable &id = as_variable(prg, v, 0);
 	
 	if (id.constant) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg)));
 	}
 
 	int n = as_number(prg, v, 1);
@@ -1385,7 +1385,7 @@ static bool mapfunc_clear(Program *prg, const std::vector<Token> &v)
 		Variable &id = as_variable(prg, v, i);
 
 		if (id.constant) {
-			throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant map at " + get_error_info(prg));
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant map at " + get_error_info(prg)));
 		}
 
 		id.type = Variable::MAP;
@@ -1403,7 +1403,7 @@ static bool mapfunc_erase(Program *prg, const std::vector<Token> &v)
 	Variable &id = as_variable(prg, v, 0);
 	
 	if (id.constant) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant map at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant map at " + get_error_info(prg)));
 	}
 
 	std::string key = as_string(prg, v, 1);
@@ -1413,7 +1413,7 @@ static bool mapfunc_erase(Program *prg, const std::vector<Token> &v)
 	std::map<std::string, Variable>::iterator it = id.m.find(key);
 
 	if (it == id.m.end()) {
-		throw Error(std::string(__FUNCTION__) + ": " + "Invalid map key at " + get_error_info(prg));
+		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid map key at " + get_error_info(prg)));
 	}
 
 	id.m.erase(it);
@@ -2594,7 +2594,7 @@ static void exprfunc_mml_play(Program *prg, const std::vector<Token> &v)
 		d->id = iinfo->instance_id;
 		if (v.size() > 5) {
 			if (v[5].type != Token::SYMBOL || prg->variables[v[5].i].type == Variable::EXPRESSION) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Variable expected at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Variable expected at " + get_error_info(prg)));
 			}
 			d->var = v[5].i;
 		}
@@ -2650,7 +2650,7 @@ static bool mmlfunc_set_finished_callback(Program *prg, const std::vector<Token>
 		d->id = id;
 		if (v.size() > 2) {
 			if (v[2].type != Token::SYMBOL || prg->variables[v[2].i].type == Variable::EXPRESSION) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg)));
 			}
 			d->var = v[2].i;
 		}
@@ -3064,7 +3064,7 @@ static void exprfunc_sample_play(Program *prg, const std::vector<Token> &v)
 		d->id = iinfo->instance_id;
 		if (v.size() > 6) {
 			if (v[6].type != Token::SYMBOL || prg->variables[v[6].i].type == Variable::EXPRESSION) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Variable expected at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Variable expected at " + get_error_info(prg)));
 			}
 			d->var = v[6].i;
 		}
@@ -3127,7 +3127,7 @@ static bool samplefunc_set_finished_callback(Program *prg, const std::vector<Tok
 		d->id = id;
 		if (v.size() > 2) {
 			if (v[2].type != Token::SYMBOL || prg->variables[v[2].i].type == Variable::EXPRESSION) {
-				throw Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg));
+				my_throw(Error(std::string(__FUNCTION__) + ": " + "Symbol expected at " + get_error_info(prg)));
 			}
 			d->var = v[2].i;
 		}

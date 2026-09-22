@@ -17,6 +17,8 @@ extern std::vector<booboo::library_func> library;
 extern BOOBOO_EXPORT std::vector<std::string> cli_args;
 
 extern BOOBOO_EXPORT std::vector<Timer_Callback> timer_callbacks;
+		
+void BOOBOO_EXPORT my_throw(Error e);
 
 } // End namespace booboo
 
