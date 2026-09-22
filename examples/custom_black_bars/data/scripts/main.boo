@@ -1,4 +1,4 @@
-resize 100 100
+resize 256 256
 
 var iv ih it
 = iv (image_load "vert.png")
