@@ -258,6 +258,9 @@ void handle_event(TGUI_Event *event)
 		quit = true;
 		return;
 	}
+	else if (shim::debug && event->type == TGUI_KEY_DOWN && event->keyboard.code == TGUIK_PAUSE) {
+		booboo::debug("Running '" + booboo::main_program_name + "'... Break pressed...");
+	}
 	else if (event->type == TGUI_KEY_DOWN && event->keyboard.code == exit_key) {
 		exit_popup = true;
 	}
@@ -795,6 +798,14 @@ int main(int argc, char **argv)
 	gfx::Image::create_stencil_buffer = true;
 
 	::start();
+	
+	if (shim::debug) {
+		AllocConsole();
+		FILE* fp;
+		freopen_s(&fp, "CONIN$", "r", stdin);
+		freopen_s(&fp, "CONOUT$", "w", stdout);
+		freopen_s(&fp, "CONOUT$", "w", stderr);
+	}
 
 	try {
 		std::string path = save_dir();
@@ -900,6 +911,10 @@ again:
 
 	register_game_callbacks();
 
+	if (shim::debug) {
+		booboo::debug("Debugging '" + booboo::main_program_name + "'... Type 'help' for help...");
+	}
+
 	while (interpret(prg)) {
 	}
 
@@ -960,6 +975,10 @@ again:
 		gui::fatalerror("ERROR", e.error_message.c_str(), gui::OK, true);
 	}
 	*/
+
+	if (shim::debug) {
+		FreeConsole();
+	}
 
 	_chdir(start_cwd.c_str());
 

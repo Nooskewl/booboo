@@ -37,4 +37,8 @@ load separated by a newline.
 
 --
 
+You can access a debugger with +debug command line switch
+
+--
+
 The portrait example uses a screenshot from the game Broken Pearl

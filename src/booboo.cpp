@@ -2493,17 +2493,17 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 	Function_Swap *bak2 = prg->s;
 	prg->s = func.s;
 
+	int pc_bak = prg->s->pc; // To handle recursive calls
+	int c_bak = prg->compare_flag;
+
+	prg->s->pc = 0;
+
 	for (size_t i = 0; i < function_breakpoints.size(); i++) {
 		if (function_breakpoints[i] == prg->s->name) {
 			debug("Breakpoint (" + prg->s->name + ") hit...");
 			break;
 		}
 	}
-
-	int pc_bak = prg->s->pc; // To handle recursive calls
-	int c_bak = prg->compare_flag;
-
-	prg->s->pc = 0;
 
 	while (interpret(prg)) {
 	}
@@ -5054,6 +5054,11 @@ static void print_lines(std::string fn, int start, int end, int curr)
 {
 	printf("-- %s\n", fn.c_str());
 
+	if (src_code.find(fn) == src_code.end()) {
+		printf("No source found...\n");
+		return;
+	}
+
 	std::string &s = src_code[fn];
 
 	size_t pos = 0;
@@ -5076,12 +5081,9 @@ static void print_lines(std::string fn, int start, int end, int curr)
 		}
 		pos++;
 		if (i+start == curr) {
-			twinkle::set_fore(twinkle::YELLOW, true);
+			printf("*");
 		}
 		printf("%d:%s\n", i+start, l.c_str());
-		if (i+start == curr) {
-			twinkle::reset();
-		}
 	}
 }
 
@@ -5092,11 +5094,17 @@ void debug(std::string text)
 		std::string fn = get_file_name(prg);
 
 		if (src_code.find(fn) == src_code.end()) {
-			if (gfx::internal::gfx_context.inited == true) {
-				src_code[fn] = booboo::load_text("scripts/" + fn);
+			try {
+				std::string text;
+				if (gfx::internal::gfx_context.inited == true) {
+					text = booboo::load_text("scripts/" + fn);
+				}
+				else {
+					text = booboo::load_text(fn);
+				}
+				src_code[fn] = text;
 			}
-			else {
-				src_code[fn] = booboo::load_text(fn);
+			catch (util::Error &e) {
 			}
 		}
 
@@ -5255,6 +5263,9 @@ void debug(std::string text)
 		}
 		else if (line == "step") {
 			if (booboo::interpret(prg, false) == false) {
+				return;
+			}
+			if (prg->s->pc >= prg->s->program.size()) {
 				return;
 			}
 		}
