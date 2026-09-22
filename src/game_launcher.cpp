@@ -432,7 +432,7 @@ void draw_all()
 		tmp.push_back(t);
 		call_function(prg, "f12", tmp);
 		int result = gui::popup("Really quit?", "Are you sure?", "Yes", "No");
-		if (result != 0) {
+		if (result == 0) {
 			quit = true;
 		}
 		tmp.clear();

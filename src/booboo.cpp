@@ -5036,6 +5036,9 @@ void my_throw(Error e)
 		freopen_s(&fp, "CONOUT$", "w", stderr);
 		booboo::debug("Debugging program. Type 'help' for help...");
 	}
+	else {
+		prg->s->pc++;
+	}
 }
 
 static booboo::Variable *get_var(std::string id, bool allow_expressions = true)
