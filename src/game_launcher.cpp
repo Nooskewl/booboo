@@ -544,7 +544,7 @@ static void loop()
 		int logic_reps = diff / ms_per_logic_frame;
 
 		// Relax giant stutters/pauses
-		if (logic_reps > 25) {
+		if (logic_reps > 50) {
 			curr_logic_rate = shim::logic_rate;
 			logic_frames = 0;
 			drawing_frames = 0;
