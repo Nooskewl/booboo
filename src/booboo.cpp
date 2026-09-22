@@ -636,7 +636,7 @@ static void restore(Program *prg, int func)
 	}
 }
 
-static Variable::Expression parse_expression(Program *prg, Program *func, std::string expr, Pass pass)
+Variable::Expression parse_expression(Program *prg, Program *func, std::string expr, Pass pass)
 {
 	int p = 0;
 
@@ -5017,7 +5017,7 @@ void my_throw(Error e)
 	}
 }
 
-static booboo::Variable *get_var(std::string id)
+static booboo::Variable *get_var(std::string id, bool allow_expressions = true)
 {
 	id = util::trim(id);
 	if (isalpha(id[0]) || id[0] == '_') {
@@ -5049,12 +5049,27 @@ static booboo::Variable *get_var(std::string id)
 		std::vector<std::string> func_bak = function_breakpoints;
 		file_breakpoints.clear();
 		function_breakpoints.clear();
-		return &booboo::go_fish(booboo::prg, f);
+		booboo::Variable *vptr = &booboo::go_fish(booboo::prg, f);
 		file_breakpoints = file_bak;
 		function_breakpoints = func_bak;
+		return vptr;
+	}
+	else if (allow_expressions && id[0] == '(') {
+		booboo::Variable::Expression f = booboo::parse_expression(booboo::prg, booboo::prg_func, id, booboo::PASS1);
+		f = booboo::parse_expression(booboo::prg, booboo::prg_func, id, booboo::PASS2);
+		std::vector<std::string> file_bak = file_breakpoints;
+		std::vector<std::string> func_bak = function_breakpoints;
+		file_breakpoints.clear();
+		function_breakpoints.clear();
+		booboo::evaluate_expression(booboo::prg, f);
+		static booboo::Variable var;
+		var = prg->result;
+		file_breakpoints = file_bak;
+		function_breakpoints = func_bak;
+		return &var;
 	}
 	else {
-		printf("Don't know how to print that. Try a variable or fish...\n");
+		printf("Don't know how to handle that. Try a variable or fish...\n");
 		return nullptr;
 	}
 }
@@ -5155,9 +5170,11 @@ void debug(std::string text)
 			printf("step          run one instruction\n");
 			printf("stepin        run one instruction and step into functions/loops\n");
 			printf("break <bp>    set a breakpoint. use break delete <bp> to delete\n");
+			printf("print         print more code context\n");
 			printf("print <v>     print the value of a variable or fish\n");
 			printf("set <d> <s>   set the value of d to s\n");
 			printf("quit          exit the program\n");
+			printed_lines = true;
 		}
 		else if (line == "quit") {
 			exit(0);
@@ -5166,12 +5183,12 @@ void debug(std::string text)
 			break;
 		}
 		else if (line.substr(0, 5) == "print") {
+			printed_lines = true;
 			line = line.substr(5);
 			line = util::trim(line);
 			if (line == "") {
 				int l = get_line_num(prg);
 				print_lines(fn, l, 11);
-				printed_lines = true;
 			}
 			else {
 				booboo::Variable *var = get_var(line);
@@ -5194,6 +5211,7 @@ void debug(std::string text)
 			}
 		}
 		else if (line.substr(0, 3) == "set") {
+			printed_lines = true;
 			line = line.substr(3);
 			line = util::trim(line);
 			std::string dest, src;
@@ -5230,11 +5248,11 @@ void debug(std::string text)
 			}
 			src = line.substr(i);
 			src = util::trim(src);
-			if (!(isalpha(dest[0]) || dest[0] == '_' || dest[0] == '[') || !(src[0] == '-' || isdigit(src[0]) || isalpha(src[0]) || src[0] == '_' || src[0] == '[' || src[0] == '"')) {
+			if (!(isalpha(dest[0]) || dest[0] == '_' || dest[0] == '[') || !(src[0] == '-' || isdigit(src[0]) || isalpha(src[0]) || src[0] == '_' || src[0] == '[' || src[0] == '"' || src[0] == '(')) {
 				printf("Can't do that...\n");
 			}
 			else {
-				booboo::Variable *var = get_var(dest);
+				booboo::Variable *var = get_var(dest, false);
 				if (isdigit(src[0]) || src[0] == '-') {
 					var->set_type(booboo::Variable::NUMBER);
 					var->n = atof(src.c_str());
@@ -5254,6 +5272,7 @@ void debug(std::string text)
 			}
 		}
 		else if (line.substr(0, 5) == "break") {
+			printed_lines = true;
 			line = line.substr(5);
 			line = util::trim(line);
 			if (line.substr(0, 6) == "delete") {

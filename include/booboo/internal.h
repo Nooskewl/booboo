@@ -24,6 +24,7 @@ extern BOOBOO_EXPORT std::vector<std::string> file_breakpoints;
 void BOOBOO_EXPORT my_throw(Error e);
 
 Variable::Fish BOOBOO_EXPORT parse_fish(Program *prg, Program *func, std::string expr, Pass pass);
+Variable::Expression BOOBOO_EXPORT parse_expression(Program *prg, Program *func, std::string expr, Pass pass);
 
 std::string BOOBOO_EXPORT typeof_var(Variable *v1);
 
