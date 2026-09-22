@@ -5124,8 +5124,14 @@ static void print_lines(std::string fn, int curr, int side)
 			pos++;
 		}
 		pos++;
-		std::string fmt = std::string(i+start == curr ? "*" : " ") + "%" + util::itos(log10(end)+1) + "d:%s\n";
+		std::string fmt = std::string("%") + util::itos(log10(end)+1) + "d:%s\n";
+		if (i+start == curr) {
+			twinkle::set_fore(twinkle::YELLOW, false);
+		}
 		printf(fmt.c_str(), i+start, l.c_str());
+		if (i+start == curr) {
+			twinkle::reset();
+		}
 	}
 }
 
