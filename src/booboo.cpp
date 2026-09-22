@@ -5153,7 +5153,7 @@ void debug(std::string text)
 		if (line == "help") {
 			printf("run           start or continue program execution\n");
 			printf("step          run one instruction\n");
-			printf("stepin        run one instruction and step into functions\n");
+			printf("stepin        run one instruction and step into functions/loops\n");
 			printf("break <bp>    set a breakpoint. use break delete <bp> to delete\n");
 			printf("print <v>     print the value of a variable or fish\n");
 			printf("set <d> <s>   set the value of d to s\n");
