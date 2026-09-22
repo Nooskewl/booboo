@@ -25,6 +25,7 @@ static std::map<std::string, int> expression_map;
 static std::vector<booboo::expression_func> expression_handlers;
 static std::stack< std::vector<booboo::Token> > var_args;
 static std::stack<int> num_var_args_args;
+static bool break_on_interpret = false;
 
 static void skip_whitespace(booboo::Program *prg)
 {
@@ -2581,6 +2582,14 @@ bool interpret(Program *prg, bool trigger_breakpoints)
 		}
 	}
 
+	if (trigger_breakpoints && break_on_interpret) {
+		debug("Stepping into " + prg->s->name + "...\n");
+	}
+
+	if (prg->s->pc >= prg->s->program.size()) {
+		return false;
+	}
+
 	Statement &s = prg->s->program[prg->s->pc];
 
 	unsigned int pc_bak = prg->s->pc;
@@ -2592,7 +2601,7 @@ bool interpret(Program *prg, bool trigger_breakpoints)
 		prg->s->pc++;
 	}
 
-	if (prg->s->pc >= prg->s->program.size()) {
+	if (prg->s->pc >= prg->s->program.size()) { // this is actually needed in 3 places
 		return false;
 	}
 
@@ -5121,6 +5130,7 @@ void debug(std::string text)
 		if (line == "help") {
 			printf("run           start or continue program execution\n");
 			printf("step          run one instruction\n");
+			printf("stepin        run one instruction and step into functions\n");
 			printf("break <bp>    set a breakpoint. use break delete <bp> to delete\n");
 			printf("print <v>     print the value of a variable or fish\n");
 			printf("set <d> <s>   set the value of d to s\n");
@@ -5268,6 +5278,18 @@ void debug(std::string text)
 			if (prg->s->pc >= prg->s->program.size()) {
 				return;
 			}
+		}
+		else if (line == "stepin") {
+			break_on_interpret = true;
+			if (booboo::interpret(prg, false) == false) {
+				break_on_interpret = false;
+				return;
+			}
+			if (prg->s->pc >= prg->s->program.size()) {
+				break_on_interpret = false;
+				return;
+			}
+			break_on_interpret = false;
 		}
 		else {
 			printf("Unknown command...\n");
