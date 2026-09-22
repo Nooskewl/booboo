@@ -37,7 +37,8 @@ load separated by a newline.
 
 --
 
-You can access a debugger with +debug command line switch
+You can access a debugger with +debug command line switch. The PAUSE key
+will break a BooBoo app in debug mode.
 
 --
 
