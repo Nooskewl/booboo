@@ -2426,7 +2426,7 @@ func_top:
 void call_function(Program *prg, int function, const std::vector<Token> &params, int ignore_params)
 {
 	bool bt = true;
-	if (get_file_name(prg) == "UNKNOWN") {
+	if (shim::debug == false || get_file_name(prg) == "UNKNOWN") {
 		bt = false;
 	}
 	if (bt) {
@@ -5371,11 +5371,11 @@ void debug(std::string text)
 			}
 			break_on_interpret = false;
 		}
-		else if (line == "bt") {
+		else if (line.substr(0, 2) == "bt") {
 			line = line.substr(2);
 			line = util::trim(line);
 			printed_lines = true;
-			int start = backtrace.size() - 23;
+			int start = (int)backtrace.size() - 23;
 			start = MAX(0, start);
 			if (line == "all") {
 				start = 0;

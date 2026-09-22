@@ -141,6 +141,7 @@ again:
 	booboo::prg = booboo::create_program(code);
 
 	if (util::bool_arg(false, argc, argv, "debug")) {
+		shim::debug = true;
 		booboo::debug("Debugging '" + booboo::main_program_name + "'... Type 'help' for help...");
 	}
 
