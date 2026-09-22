@@ -1,5 +1,5 @@
 var model
-= model (model_load "zeus.x")
+= model (model_load "zeus.x" TRUE 60)
 model_set_animation model "ArmatureAction"
 
 var shader
