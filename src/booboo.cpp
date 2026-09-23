@@ -5239,6 +5239,7 @@ void debug(std::string text)
 			printf("run                  start or continue program execution\n");
 			printf("step                 run one instruction\n");
 			printf("stepin               run one instruction and step into functions/loops\n");
+			printf("skip                 skip this statement\n");
 			printf("break <bp>           set a breakpoint. use break delete <bp> to delete\n");
 			printf("watch <var> <expr>   set a watchpoint\n");
 			printf("list                 list watchpoints and breakpoints\n");
@@ -5246,7 +5247,6 @@ void debug(std::string text)
 			printf("print                print more code context\n");
 			printf("print <v>            print the value of a variable or fish\n");
 			printf("set <d> <s>          set the value of d to s\n");
-			printf("skip                 skip this statement\n");
 			printf("quit                 exit the program\n");
 			printed_lines = true;
 		}
