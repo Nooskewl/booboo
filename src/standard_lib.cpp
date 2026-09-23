@@ -1208,7 +1208,7 @@ static bool vectorfunc_add(Program *prg, const std::vector<Token> &v)
 		my_throw(Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg)));
 	}
 
-	id.set_type(Variable::VECTOR);
+	id.set_type(Variable::VECTOR, false);
 
 	for (size_t i  = 1; i < v.size(); i++) {
 		Variable var = as_variable_resolve(prg, v, i);
@@ -1243,7 +1243,7 @@ static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
 
 	double index = as_number(prg, v, 1);
 
-	id.set_type(Variable::VECTOR);
+	id.set_type(Variable::VECTOR, false);
 
 	if (index < 0 || index > id.v.size()) {
 		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid index at " + get_error_info(prg)));
@@ -1304,7 +1304,7 @@ static bool vectorfunc_clear(Program *prg, const std::vector<Token> &v)
 			my_throw(Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant vector at " + get_error_info(prg)));
 		}
 
-		id.set_type(Variable::VECTOR);
+		id.set_type(Variable::VECTOR, false);
 
 		id.v.clear();
 		id.v = std::vector<Variable>(); // set capacity to 0 (free memory)
@@ -1325,7 +1325,7 @@ static bool vectorfunc_reserve(Program *prg, const std::vector<Token> &v)
 
 	int n = as_number(prg, v, 1);
 
-	id.set_type(Variable::VECTOR);
+	id.set_type(Variable::VECTOR, false);
 
 	id.v.reserve(n);
 
@@ -1390,7 +1390,7 @@ static bool mapfunc_clear(Program *prg, const std::vector<Token> &v)
 			my_throw(Error(std::string(__FUNCTION__) + ": " + "Attempt to change a constant map at " + get_error_info(prg)));
 		}
 
-		id.set_type(Variable::MAP);
+		id.set_type(Variable::MAP, false);
 
 		id.m.clear();
 	}

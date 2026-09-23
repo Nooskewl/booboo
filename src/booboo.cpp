@@ -148,10 +148,12 @@ void Variable::clear()
 	p = nullptr;
 }
 
-void Variable::set_type(Variable_Type type)
+void Variable::set_type(Variable_Type type, bool clear_values)
 {
 	this->type = type;
-	//clear();
+	if (clear_values) {
+		clear();
+	}
 	changed();
 }
 
@@ -5031,7 +5033,10 @@ Variable &go_fish(Program *prg, const Variable::Fish &f)
 		}
 	}
 
-	v->set_type((Variable::Variable_Type)type);
+	if (v->get_type() != (Variable::Variable_Type)type) {
+		v->set_type((Variable::Variable_Type)type, false);
+	}
+	//v->set_type((Variable::Variable_Type)type);
 	if (type == Variable::VECTOR) {
 		v->v[index].constant = constant;
 		return v->v[index];
