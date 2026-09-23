@@ -1787,6 +1787,10 @@ static void compile(Program *prg, Pass pass)
 		}
 	}
 
+	if (prg->num_consts == -1) {
+		prg->num_consts = prg->variables.size();
+	}
+
 	int _is_deref = 0;
 
 	while ((tok = token(prg, tt)) != "") {
@@ -4533,6 +4537,93 @@ void end()
 	}
 }
 
+static bool is_special(std::string s)
+{
+	return s == "draw_letterbox" || s == "gui_event" || s == "gui_draw" || s == "end" || s == "f12" || s == "draw" || s == "event" || s == "run";
+}
+
+static void obfuscate_expression(Program *prg, Variable::Expression e);
+static void obfuscate_fish(Program *prg, Variable::Fish f);
+static void obfuscate_token(Program *prg, Token t);
+
+static void print_derefs(Program *prg, int n)
+{
+	for (size_t i = 0; i < n; i++) {
+		printf("`");
+	}
+}
+
+static void obfuscate_expression(Program *prg, Variable::Expression e)
+{
+	printf("(");
+	print_derefs(prg, e.dereference);
+	if (e.i == -1) {
+		printf("%s ", e.name.c_str());
+	}
+	else if (e.name == " ex ") {
+		obfuscate_expression(prg, prg->variables[e.i].e);
+	}
+	else if (e.name == " fi ") {
+		obfuscate_fish(prg, prg->variables[e.i].f);
+	}
+	else {
+		std::map<std::string, int>::iterator it;
+		for (it = expression_map.begin(); it != expression_map.end(); it++) {
+			if (it->second == e.i) {
+				printf("%s ", it->first.c_str());
+				break;
+			}
+		}
+	}
+	for (size_t i = 0; i < e.v.size(); i++) {
+		obfuscate_token(prg, e.v[i]);
+	}
+	printf(") ");
+}
+
+static void obfuscate_fish(Program *prg, Variable::Fish f)
+{
+	printf("[");
+	print_derefs(prg, f.dereference);
+	Variable *v = &prg->variables[f.c_i];
+	if (v->get_type() == Variable::EXPRESSION) {
+		obfuscate_expression(prg, v->e);
+	}
+	else if (v->get_type() == Variable::FISH) {
+		obfuscate_fish(prg, v->f);
+	}
+	else {
+		printf("%s ", v->name.c_str());
+	}
+	for (size_t i = 0; i < f.v.size(); i++) {
+		obfuscate_token(prg, f.v[i]);
+	}
+	printf("] ");
+}
+
+static void obfuscate_token(Program *prg, Token t)
+{
+	if (t.type == Token::NUMBER) {
+		printf("%g ", t.n);
+	}
+	else if (t.type == Token::STRING) {
+		printf("\"%s\" ", escape_string(t.s).c_str());
+	}
+	else {
+		Variable *v = &prg->variables[t.i];
+		print_derefs(prg, t.dereference);
+		if (v->get_type() == Variable::EXPRESSION) {
+			obfuscate_expression(prg, v->e);
+		}
+		else if (v->get_type() == Variable::FISH) {
+			obfuscate_fish(prg, v->f);
+		}
+		else {
+			printf("%s ", v->name.c_str());
+		}
+	}
+}
+
 Program *create_program(std::string code)
 {
 	Program *prg = new Program;
@@ -4540,6 +4631,8 @@ Program *create_program(std::string code)
 
 	prg->break_flag = false;
 	prg->continue_flag = false;
+
+	prg->num_consts = -1;
 
 	prg->s = new Function_Swap;
 
@@ -4607,6 +4700,72 @@ Program *create_program(std::string code)
 	prg->num_vars = prg->variables.size();
 
 	prg->result.name = "result";
+	
+	if (util::bool_arg(false, shim::argc, shim::argv, "obfuscate")) {
+		int count = 0;
+		for (size_t i = prg->num_consts; i < prg->variables.size(); i++) {
+			std::string old = prg->variables[i].name;
+			prg->variables[i].name = std::string("__") + util::itos(count++);
+			if (prg->variables[i].get_type() == Variable::FUNCTION) {
+				for (size_t j = prg->num_consts; j < prg->variables.size(); j++) {
+					if (prg->variables[j].get_type() == Variable::EXPRESSION && prg->variables[j].e.i == -1 && prg->variables[j].e.name == old) {
+						prg->variables[j].e.name = prg->variables[i].name;
+					}
+				}
+			}
+			if (prg->variables[i].get_type() == Variable::FUNCTION) {
+				if (is_special(prg->function_names[prg->variables[i].get_n()]) == false) {
+					prg->function_names[prg->variables[i].get_n()] = prg->variables[i].name;
+				}
+			}
+		}
+		for (size_t i = 0; i < prg->s->program.size(); i++) {
+			Statement &s = prg->s->program[i];
+			std::map<std::string, int>::iterator it;
+			std::string name;
+			for (it = library_map.begin(); it != library_map.end(); it++) {
+				if (it->second == s.method) {
+					name = it->first;
+					break;
+				}
+			}
+			printf("%s%s", name.c_str(), name == ":" ? "" : " ");
+			for (size_t j = 0; j < s.data.size(); j++) {
+				obfuscate_token(prg, s.data[j]);
+			}
+		}
+		printf("\n");
+		for (size_t j = 0; j < prg->functions.size(); j++) {
+			Program &p = prg->functions[j];
+			if (is_special(p.s->name)) {
+				printf("function %s ", p.s->name.c_str());
+			}
+			else {
+				printf("function %s ", prg->function_names[j].c_str());
+			}
+			for (size_t k = 0; k < p.param_names.size(); k++) {
+				printf("%s%s ", p.ref[k] ? "~" : "", prg->variables[p.params[k]].name.c_str());
+			}
+			printf("{ ");
+			for (size_t i = 0; i < p.s->program.size(); i++) {
+				Statement &s = p.s->program[i];
+				std::map<std::string, int>::iterator it;
+				std::string name;
+				for (it = library_map.begin(); it != library_map.end(); it++) {
+					if (it->second == s.method) {
+						name = it->first;
+						break;
+					}
+				}
+				printf("%s ", name.c_str());
+				for (size_t j = 0; j < s.data.size(); j++) {
+					obfuscate_token(prg, s.data[j]);
+				}
+			}
+			printf("}\n");
+		}
+		exit(0);
+	}
 
 	return prg;
 }

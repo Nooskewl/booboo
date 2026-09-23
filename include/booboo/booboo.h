@@ -204,6 +204,7 @@ struct Program {
 	int fish_i;
 
 	int num_vars;
+	int num_consts;
 
 	std::vector<Variable> variables;
 	std::map<std::string, int> variables_map;

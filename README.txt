@@ -42,4 +42,9 @@ will break a BooBoo app in debug mode.
 
 --
 
+You can obfuscate your code with +obfuscate. All includes files get bundled into
+one output file.
+
+--
+
 The portrait example uses a screenshot from the game Broken Pearl
