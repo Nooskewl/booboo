@@ -5241,7 +5241,7 @@ void debug(std::string text)
 			printf("stepin               run one instruction and step into functions/loops\n");
 			printf("skip                 skip this statement\n");
 			printf("break <bp>           set a breakpoint. use break delete <bp> to delete\n");
-			printf("watch <var> <expr>   set a watchpoint\n");
+			printf("watch <var> <expr>   set a watchpoint. use watch delete <num> to delete\n");
 			printf("list                 list watchpoints and breakpoints\n");
 			printf("bt [all]             print a backtrace\n");
 			printf("print                print more code context\n");
@@ -5346,6 +5346,7 @@ void debug(std::string text)
 			}
 		}
 		else if (line.substr(0, 4) == "list") {
+			printed_lines = true;
 			printf("File breakpoints:\n");
 			for (size_t i = 0; i < file_breakpoints.size(); i++) {
 				printf("%s\n", file_breakpoints[i].c_str());
