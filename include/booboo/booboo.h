@@ -56,8 +56,14 @@ struct Token {
 	int dereference;
 };
 
+bool BOOBOO_EXPORT jsonfunc_register_number(Program *prg, const std::vector<Token> &v);
+bool BOOBOO_EXPORT jsonfunc_register_string(Program *prg, const std::vector<Token> &v);
+
 struct BOOBOO_EXPORT Variable
 {
+	friend bool BOOBOO_EXPORT booboo::jsonfunc_register_number(Program *prg, const std::vector<Token> &v);
+	friend bool BOOBOO_EXPORT booboo::jsonfunc_register_string(Program *prg, const std::vector<Token> &v);
+
 	enum Variable_Type {
 		NUMBER = 0,
 		STRING,
@@ -70,7 +76,7 @@ struct BOOBOO_EXPORT Variable
 		POINTER,
 		USER,
 		UNTYPED
-	} type;
+	};
 
 	struct Expression
 	{
@@ -116,14 +122,6 @@ struct BOOBOO_EXPORT Variable
 
 	std::string name;
 
-	double n;
-	Variable *p;
-	std::string s;
-	std::vector<Variable> v;
-	std::map<std::string, Variable> m;
-	Expression e;
-	Fish f;
-
 	bool constant;
 
 	bool operator==(const Variable &var) const;
@@ -137,7 +135,28 @@ struct BOOBOO_EXPORT Variable
 	// This sets type and clears memory (vector/map), should be used when setting
 	// type of prg->result to avoid copying that memory
 	void set_type(Variable_Type type);
+	Variable_Type get_type();
+
 	void clear();
+
+	void set_n(double n);
+	double get_n();
+
+	void set_s(std::string s);
+	std::string get_s();
+
+	Variable *p;
+	std::vector<Variable> v;
+	std::map<std::string, Variable> m;
+	Expression e;
+	Fish f;
+
+protected:
+	Variable_Type type;
+	double n;
+	std::string s;
+
+	void changed();
 };
 
 struct Statement {
@@ -279,16 +298,16 @@ extern BOOBOO_EXPORT std::map<std::string, void *> black_box;
 
 } // End namespace booboo
 
-#define IS_NUMBER(v) ((v).type == Variable::NUMBER)
-#define IS_STRING(v) ((v).type == Variable::STRING)
-#define IS_VECTOR(v) ((v).type == Variable::VECTOR)
-#define IS_MAP(v) ((v).type == Variable::MAP)
-#define IS_LABEL(v) ((v).type == Variable::LABEL)
-#define IS_FUNCTION(v) ((v).type == Variable::FUNCTION)
-#define IS_EXPRESSION(v) ((v).type == Variable::EXPRESSION)
-#define IS_FISH(v) ((v).type == Variable::FISH)
-#define IS_POINTER(v) ((v).type == Variable::POINTER)
-#define IS_USER(v) ((v).type == Variable::USER)
+#define IS_NUMBER(v) ((v).get_type() == Variable::NUMBER)
+#define IS_STRING(v) ((v).get_type() == Variable::STRING)
+#define IS_VECTOR(v) ((v).get_type() == Variable::VECTOR)
+#define IS_MAP(v) ((v).get_type() == Variable::MAP)
+#define IS_LABEL(v) ((v).get_type() == Variable::LABEL)
+#define IS_FUNCTION(v) ((v).get_type() == Variable::FUNCTION)
+#define IS_EXPRESSION(v) ((v).get_type() == Variable::EXPRESSION)
+#define IS_FISH(v) ((v).get_type() == Variable::FISH)
+#define IS_POINTER(v) ((v).get_type() == Variable::POINTER)
+#define IS_USER(v) ((v).get_type() == Variable::USER)
 
 #if 1
 // You can use this at the start of your library functions to ensure correct number of arguments

@@ -66,8 +66,8 @@ static void exprfunc_mouse_get_delta(Program *prg, const std::vector<Token> &v)
 
 	Variable v1;
 	Variable v2;
-	v1.type = Variable::NUMBER;
-	v2.type = Variable::NUMBER;
+	v1.set_type(Variable::NUMBER);
+	v2.set_type(Variable::NUMBER);
 
 	if (delta_got == false) {
 		mouse_dx = 0;
@@ -75,13 +75,13 @@ static void exprfunc_mouse_get_delta(Program *prg, const std::vector<Token> &v)
 		delta_got = true;
 	}
 
-	v1.n = mouse_dx;
-	v2.n = mouse_dy;
+	v1.set_n(mouse_dx);
+	v2.set_n(mouse_dy);
 
 	mouse_dx = 0;
 	mouse_dy = 0;
 
-	prg->result.type = Variable::VECTOR;
+	prg->result.set_type(Variable::VECTOR);
 	prg->result.v.clear();
 	prg->result.v.push_back(v1);
 	prg->result.v.push_back(v2);
@@ -93,13 +93,13 @@ static void exprfunc_mouse_get_position(Program *prg, const std::vector<Token> &
 
 	Variable v1;
 	Variable v2;
-	v1.type = Variable::NUMBER;
-	v2.type = Variable::NUMBER;
+	v1.set_type(Variable::NUMBER);
+	v2.set_type(Variable::NUMBER);
 	
-	v1.n = mouse_pos.x;
-	v2.n = mouse_pos.y;
+	v1.set_n(mouse_pos.x);
+	v2.set_n(mouse_pos.y);
 
-	prg->result.type = Variable::VECTOR;
+	prg->result.set_type(Variable::VECTOR);
 	prg->result.v.clear();
 	prg->result.v.push_back(v1);
 	prg->result.v.push_back(v2);
@@ -113,17 +113,17 @@ static void exprfunc_mouse_get_buttons(Program *prg, const std::vector<Token> &v
 	Variable v2;
 	Variable v3;
 	Variable v4;
-	v1.type = Variable::NUMBER;
-	v2.type = Variable::NUMBER;
-	v3.type = Variable::NUMBER;
-	v4.type = Variable::NUMBER;
+	v1.set_type(Variable::NUMBER);
+	v2.set_type(Variable::NUMBER);
+	v3.set_type(Variable::NUMBER);
+	v4.set_type(Variable::NUMBER);
 	
-	v1.n = mouse_b1;
-	v2.n = mouse_b2;
-	v3.n = mouse_b3;
-	v4.n = mouse_wheel_y;
+	v1.set_n(mouse_b1);
+	v2.set_n(mouse_b2);
+	v3.set_n(mouse_b3);
+	v4.set_n(mouse_wheel_y);
 
-	prg->result.type = Variable::VECTOR;
+	prg->result.set_type(Variable::VECTOR);
 	prg->result.v.clear();
 	prg->result.v.push_back(v1);
 	prg->result.v.push_back(v2);
@@ -148,8 +148,8 @@ static void exprfunc_key_get(Program *prg, const std::vector<Token> &v)
 		}
 	}
 
-	prg->result.type = Variable::NUMBER;
-	prg->result.n = pressed;
+	prg->result.set_type(Variable::NUMBER);
+	prg->result.set_n(pressed);
 }
 
 bool start()

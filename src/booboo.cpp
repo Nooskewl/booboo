@@ -151,7 +151,47 @@ void Variable::clear()
 void Variable::set_type(Variable_Type type)
 {
 	this->type = type;
-	clear();
+	//clear();
+	changed();
+}
+
+Variable::Variable_Type Variable::get_type()
+{
+	return type;
+}
+
+void Variable::set_n(double n)
+{
+	this->n = n;
+	changed();
+}
+
+double Variable::get_n()
+{
+	return n;
+}
+
+void Variable::set_s(std::string s)
+{
+	this->s = s;
+	changed();
+}
+
+std::string Variable::get_s()
+{
+	return s;
+}
+
+void Variable::changed()
+{
+	for (size_t i = 0; i < watchpoints.size(); i++) {
+		if (watchpoints[i].p == this) {
+			evaluate_expression(prg, watchpoints[i].e);
+			if (prg->result.get_n() != 0) {
+				debug("Watchpoint " + util::itos(i) + " (" + watchpoints[i].var + ":" +  watchpoints[i].expr + ") hit...");
+			}
+		}
+	}
 }
 
 static std::string escape_string(std::string s)
@@ -691,7 +731,7 @@ Variable::Expression parse_expression(Program *prg, Program *func, std::string e
 	if (name.length() > 0 && name[0] == '(') {
 		Variable v1;
 		v1.name = "__e" + util::itos(prg->expression_i++);
-		v1.type = Variable::EXPRESSION;
+		v1.set_type(Variable::EXPRESSION);
 
 		int i = prg->var_i++;
 
@@ -710,7 +750,7 @@ Variable::Expression parse_expression(Program *prg, Program *func, std::string e
 	else if (name.length() > 0 && name[0] == '[') {
 		Variable v1;
 		v1.name = "__f" + util::itos(prg->fish_i++);
-		v1.type = Variable::FISH;
+		v1.set_type(Variable::FISH);
 
 		int i = prg->var_i++;
 
@@ -791,7 +831,7 @@ Variable::Expression parse_expression(Program *prg, Program *func, std::string e
 
 			Variable v1;
 			v1.name = "__e" + util::itos(prg->expression_i++);
-			v1.type = Variable::EXPRESSION;
+			v1.set_type(Variable::EXPRESSION);
 
 			if (pass == PASS1) {
 				prg->variables.push_back(v1);
@@ -833,7 +873,7 @@ Variable::Expression parse_expression(Program *prg, Program *func, std::string e
 
 			Variable v1;
 			v1.name = "__f" + util::itos(prg->fish_i++);
-			v1.type = Variable::FISH;
+			v1.set_type(Variable::FISH);
 
 			if (pass == PASS1) {
 				prg->variables.push_back(v1);
@@ -1016,7 +1056,7 @@ Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, Pass pa
 
 		Variable v;
 		v.name = "__f" + util::itos(prg->fish_i++);
-		v.type = Variable::FISH;
+		v.set_type(Variable::FISH);
 
 		if (pass == PASS1) {
 			prg->variables.push_back(v);
@@ -1052,7 +1092,7 @@ Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, Pass pa
 
 			Variable v;
 			v.name = "__e" + util::itos(prg->expression_i++);
-			v.type = Variable::EXPRESSION;
+			v.set_type(Variable::EXPRESSION);
 
 			if (pass == PASS1) {
 				prg->variables.push_back(v);
@@ -1140,7 +1180,7 @@ Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, Pass pa
 
 			Variable v1;
 			v1.name = "__e" + util::itos(prg->expression_i++);
-			v1.type = Variable::EXPRESSION;
+			v1.set_type(Variable::EXPRESSION);
 
 			if (pass == PASS1) {
 				prg->variables.push_back(v1);
@@ -1177,7 +1217,7 @@ Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, Pass pa
 
 			Variable v1;
 			v1.name = "__f" + util::itos(prg->fish_i++);
-			v1.type = Variable::FISH;
+			v1.set_type(Variable::FISH);
 
 			if (pass == PASS1) {
 				prg->variables.push_back(v1);
@@ -1327,8 +1367,8 @@ static void insert_constant(Program *prg, std::string name, double value, Pass p
 	}
 	Variable v;
 	v.name = name;
-	v.type = Variable::NUMBER;
-	v.n = value;
+	v.set_type(Variable::NUMBER);
+	v.set_n(value);
 	v.constant = true;
 	char buf[1000];
 	snprintf(buf, 1000, "%f", value);
@@ -1346,7 +1386,7 @@ static void insert_pointer(Program *prg, std::string name, Variable *value, Pass
 	}
 	Variable v;
 	v.name = name;
-	v.type = Variable::POINTER;
+	v.set_type(Variable::POINTER);
 	v.p = value;
 	v.constant = true;
 	char buf[1000];
@@ -1739,7 +1779,7 @@ static void compile(Program *prg, Pass pass)
 		}
 		Variable v;
 		v.name = name;
-		v.type = Variable::UNTYPED;
+		v.set_type(Variable::UNTYPED);
 		if (pass == PASS1) {
 			prg->variables.push_back(v);
 		}
@@ -1768,8 +1808,8 @@ top:
 
 			Variable v;
 			v.name = func_name;
-			v.type = Variable::FUNCTION;
-			v.n = prg->func_i++;
+			v.set_type(Variable::FUNCTION);
+			v.set_n(prg->func_i++);
 			v.constant = true;
 			std::map<std::string, int> tmp;
 			prg->locals.push_back(tmp);
@@ -1809,8 +1849,8 @@ func_top:
 
 					Variable v;
 					v.name = tok2;
-					v.type = Variable::LABEL;
-					v.n = func.s->program.size();
+					v.set_type(Variable::LABEL);
+					v.set_n(func.s->program.size());
 					v.constant = true;
 
 					Statement s;
@@ -1862,13 +1902,13 @@ func_top:
 						}
 						Variable v;
 						v.name = tok2;
-						v.type = Variable::UNTYPED;
+						v.set_type(Variable::UNTYPED);
 						v.constant = true;
 						std::map<std::string, int>::iterator it;
 						it = prg->variables_map.find(tok2);
 						if (it != prg->variables_map.end()) {
 							Variable &var = prg->variables[(*it).second];
-							if (var.type != v.type) {
+							if (var.get_type() != v.get_type()) {
 								my_throw(Error("Type for " + tok2 + " changed at " + get_error_info(&func)));
 							}
 						}
@@ -1888,7 +1928,7 @@ func_top:
 						if (valtok[0] == '(') {
 							Variable v;
 							v.name = "__e" + util::itos(prg->expression_i++);
-							v.type = Variable::EXPRESSION;
+							v.set_type(Variable::EXPRESSION);
 
 							int var_index = prg->var_i;
 							prg->var_i++;
@@ -1917,7 +1957,7 @@ func_top:
 						else if (valtok[0] == '[') {
 							Variable v;
 							v.name = "__f" + util::itos(prg->fish_i++);
-							v.type = Variable::FISH;
+							v.set_type(Variable::FISH);
 
 							int var_index = prg->var_i;
 							prg->var_i++;
@@ -1988,12 +2028,12 @@ func_top:
 						}
 						Variable v;
 						v.name = tok2;
-						v.type = Variable::UNTYPED;
+						v.set_type(Variable::UNTYPED);
 						std::map<std::string, int>::iterator it;
 						it = prg->variables_map.find(tok2);
 						if (it != prg->variables_map.end()) {
 							Variable &var = prg->variables[(*it).second];
-							if (var.type != v.type) {
+							if (var.get_type() != v.get_type()) {
 								my_throw(Error("Type for " + tok2 + " changed at " + get_error_info(&func)));
 							}
 						}
@@ -2014,7 +2054,7 @@ func_top:
 				else if (tok[0] == '(') {
 					Variable v;
 					v.name = "__e" + util::itos(prg->expression_i++);
-					v.type = Variable::EXPRESSION;
+					v.set_type(Variable::EXPRESSION);
 
 					int var_index = prg->var_i;
 					prg->var_i++;
@@ -2043,7 +2083,7 @@ func_top:
 				else if (tok[0] == '[') {
 					Variable v;
 					v.name = "__f" + util::itos(prg->fish_i++);
-					v.type = Variable::FISH;
+					v.set_type(Variable::FISH);
 
 					int var_index = prg->var_i;
 					prg->var_i++;
@@ -2156,8 +2196,8 @@ func_top:
 
 			Variable v;
 			v.name = tok2;
-			v.type = Variable::LABEL;
-			v.n = prg->s->program.size();
+			v.set_type(Variable::LABEL);
+			v.set_n(prg->s->program.size());
 			v.constant = true;
 
 			Statement s;
@@ -2204,7 +2244,7 @@ func_top:
 				}
 				Variable v;
 				v.name = tok2;
-				v.type = Variable::UNTYPED;
+				v.set_type(Variable::UNTYPED);
 				v.constant = true;
 				if (pass == PASS1) {
 					prg->variables.push_back(v);
@@ -2222,7 +2262,7 @@ func_top:
 				if (valtok[0] == '(') {
 					Variable v;
 					v.name = "__e" + util::itos(prg->expression_i++);
-					v.type = Variable::EXPRESSION;
+					v.set_type(Variable::EXPRESSION);
 
 					int var_index = prg->var_i;
 					prg->var_i++;
@@ -2249,7 +2289,7 @@ func_top:
 				else if (valtok[0] == '[') {
 					Variable v;
 					v.name = "__f" + util::itos(prg->fish_i++);
-					v.type = Variable::FISH;
+					v.set_type(Variable::FISH);
 
 					int var_index = prg->var_i;
 					prg->var_i++;
@@ -2313,7 +2353,7 @@ func_top:
 				}
 				Variable v;
 				v.name = tok2;
-				v.type = Variable::UNTYPED;
+				v.set_type(Variable::UNTYPED);
 				if (pass == PASS1) {
 					prg->variables.push_back(v);
 				}
@@ -2331,7 +2371,7 @@ func_top:
 		else if (tok[0] == '(') {
 			Variable v;
 			v.name = "__e" + util::itos(prg->expression_i++);
-			v.type = Variable::EXPRESSION;
+			v.set_type(Variable::EXPRESSION);
 
 			int var_index = prg->var_i;
 			prg->var_i++;
@@ -2358,7 +2398,7 @@ func_top:
 		else if (tok[0] == '[') {
 			Variable v;
 			v.name = "__f" + util::itos(prg->fish_i++);
-			v.type = Variable::FISH;
+			v.set_type(Variable::FISH);
 
 			int var_index = prg->var_i;
 			prg->var_i++;
@@ -2466,14 +2506,14 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 		Variable &var = prg->variables[func.params[j]];
 
 		if (param.type == Token::NUMBER) {
-			var.type = Variable::NUMBER;
-			var.n = param.n;
+			var.set_type(Variable::NUMBER);
+			var.set_n(param.n);
 		}
 		else if (param.type == Token::STRING) {
-			var.type = Variable::STRING;
-			var.s = param.s;
+			var.set_type(Variable::STRING);
+			var.set_s(param.s);
 		}
-		else if (prg->variables[param.i].type == Variable::EXPRESSION) {
+		else if (prg->variables[param.i].get_type() == Variable::EXPRESSION) {
 			evaluate_expression(prg, prg->variables[param.i].e);
 			//std::string name = var.name;
 			//bool constant = var.constant;
@@ -2483,7 +2523,7 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 			//var.name = name;
 			//var.constant = constant;
 		}
-		else if (prg->variables[param.i].type == Variable::FISH) {
+		else if (prg->variables[param.i].get_type() == Variable::FISH) {
 			//std::string name = var.name;
 			//bool constant = var.constant;
 			var = go_fish(prg, prg->variables[param.i].f);
@@ -2537,8 +2577,8 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 		
 		Variable &var = prg->variables[func.params[j]];
 
-		if (func.ref[j] && param.type != Token::NUMBER && param.type != Token::STRING && prg->variables[param.i].type != Variable::EXPRESSION) {
-			if (prg->variables[param.i].type == Variable::FISH) {
+		if (func.ref[j] && param.type != Token::NUMBER && param.type != Token::STRING && prg->variables[param.i].get_type() != Variable::EXPRESSION) {
+			if (prg->variables[param.i].get_type() == Variable::FISH) {
 				Variable &v2 = go_fish(prg, prg->variables[param.i].f);
 				std::string name = v2.name;
 				bool constant = v2.constant;
@@ -2597,7 +2637,7 @@ bool interpret(Program *prg, bool trigger_breakpoints)
 	}
 
 	if (trigger_breakpoints && break_on_interpret) {
-		debug("Stepping into " + prg->s->name + "...\n");
+		debug("Stepping into " + prg->s->name + "...");
 	}
 
 	if (prg->s->pc >= prg->s->program.size()) {
@@ -2677,11 +2717,11 @@ static bool breaker_return(Program *prg, const std::vector<Token> &v)
 	if (v.size() > 0) {
 		if (v[0].type == Token::NUMBER) {
 			prg->result.set_type(Variable::NUMBER);
-			prg->result.n = v[0].n;
+			prg->result.set_n(v[0].n);
 		}
 		else if (v[0].type == Token::STRING) {
 			prg->result.set_type(Variable::STRING);
-			prg->result.s = v[0].s;
+			prg->result.set_s(v[0].s);
 		}
 		else {
 			prg->result = as_variable_resolve(prg, v, 0);
@@ -2702,12 +2742,12 @@ static bool do_set(Program *prg, const std::vector<Token> &v, bool const_ok)
 	}
 
 	if (v[1].type == Token::NUMBER) {
-		v1->type = Variable::NUMBER;
-		v1->n = as_number(prg, v, 1);
+		v1->set_type(Variable::NUMBER);
+		v1->set_n(as_number(prg, v, 1));
 	}
 	else if (v[1].type == Token::STRING) {
-		v1->type = Variable::STRING;
-		v1->s = as_string(prg, v, 1);
+		v1->set_type(Variable::STRING);
+		v1->set_s(as_string(prg, v, 1));
 	}
 	else {
 		Variable *v2 = as_variable_pointer(prg, v, 1, true);
@@ -2807,7 +2847,7 @@ static bool corefunc_compare(Program *prg, const std::vector<Token> &v)
 		Variable var = as_variable_resolve(prg, v, 0);
 		if (IS_NUMBER(var)) {
 			is_num = true;
-			n = var.n;
+			n = var.get_n();
 		}
 	}
 	else if (v[0].type == Token::NUMBER) {
@@ -2841,7 +2881,7 @@ static bool corefunc_compare(Program *prg, const std::vector<Token> &v)
 			Variable var = as_variable_resolve(prg, v, 0);
 			if (IS_STRING(var)) {
 				a_string = true;
-				s1 = var.s;
+				s1 = var.get_s();
 			}
 		}
 		
@@ -2853,7 +2893,7 @@ static bool corefunc_compare(Program *prg, const std::vector<Token> &v)
 			Variable var = as_variable_resolve(prg, v, 1);
 			if (IS_STRING(var)) {
 				b_string = true;
-				s2 = var.s;
+				s2 = var.get_s();
 			}
 		}
 		
@@ -2968,34 +3008,34 @@ static bool corefunc_call_result(Program *prg, const std::vector<Token> &v)
 std::string typeof_var(Variable *v1)
 {
 	std::string res;
-	if (v1->type == Variable::NUMBER) {
+	if (v1->get_type() == Variable::NUMBER) {
 		res = "number";
 	}
-	else if (v1->type == Variable::STRING) {
+	else if (v1->get_type() == Variable::STRING) {
 		res = "string";
 	}
-	else if (v1->type == Variable::VECTOR) {
+	else if (v1->get_type() == Variable::VECTOR) {
 		res = "vector";
 	}
-	else if (v1->type == Variable::MAP) {
+	else if (v1->get_type() == Variable::MAP) {
 		res = "map";
 	}
-	else if (v1->type == Variable::FUNCTION) {
+	else if (v1->get_type() == Variable::FUNCTION) {
 		res = "function";
 	}
-	else if (v1->type == Variable::LABEL) {
+	else if (v1->get_type() == Variable::LABEL) {
 		res = "label";
 	}
-	else if (v1->type == Variable::POINTER) {
+	else if (v1->get_type() == Variable::POINTER) {
 		res = "pointer";
 	}
-	else if (v1->type == Variable::EXPRESSION) {
+	else if (v1->get_type() == Variable::EXPRESSION) {
 		res = "expression";
 	}
-	else if (v1->type == Variable::FISH) {
+	else if (v1->get_type() == Variable::FISH) {
 		res = "fish";
 	}
-	else if (v1->type == Variable::USER) {
+	else if (v1->get_type() == Variable::USER) {
 		res = "user";
 	}
 	else {
@@ -3012,7 +3052,7 @@ static void exprfunc_number(Program *prg, const std::vector<Token> &v)
 	double n = as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = n;
+	prg->result.set_n(n);
 }
 
 static void exprfunc_string(Program *prg, const std::vector<Token> &v)
@@ -3022,7 +3062,7 @@ static void exprfunc_string(Program *prg, const std::vector<Token> &v)
 	std::string s = as_string(prg, v, 0);
 
 	prg->result.set_type(Variable::STRING);
-	prg->result.s = s;
+	prg->result.set_s(s);
 }
 
 static void exprfunc_vector(Program *prg, const std::vector<Token> &v)
@@ -3052,7 +3092,7 @@ static void exprfunc_function(Program *prg, const std::vector<Token> &v)
 	int n = as_function(prg, v, 0);
 
 	prg->result.set_type(Variable::FUNCTION);
-	prg->result.n = n;
+	prg->result.set_n(n);
 }
 
 static void exprfunc_label(Program *prg, const std::vector<Token> &v)
@@ -3062,7 +3102,7 @@ static void exprfunc_label(Program *prg, const std::vector<Token> &v)
 	int n = as_label(prg, v, 0);
 
 	prg->result.set_type(Variable::LABEL);
-	prg->result.n = n;
+	prg->result.set_n(n);
 }
 
 static void exprfunc_pointer(Program *prg, const std::vector<Token> &v)
@@ -3082,20 +3122,20 @@ static void exprfunc_typeof(Program *prg, const std::vector<Token> &v)
 	if (v[0].type != Token::SYMBOL) {
 		prg->result.set_type(Variable::STRING);
 		if (v[0].type == Token::NUMBER) {
-			prg->result.s = "number";
+			prg->result.set_s("number");
 		}
 		else if (v[0].type == Token::STRING) {
-			prg->result.s = "string";
+			prg->result.set_s("string");
 		}
 		else {
-			prg->result.s = "unknown";
+			prg->result.set_s("unknown");
 		}
 	}
 	else {
 		Variable *v1 = as_variable_pointer(prg, v, 0);
 
 		prg->result.set_type(Variable::STRING);
-		prg->result.s = typeof_var(v1);
+		prg->result.set_s(typeof_var(v1));
 	}
 }
 
@@ -3104,9 +3144,9 @@ static bool corefunc_for(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(5)
 
 	Variable &count = as_variable(prg, v, 0);
-	count.type = Variable::NUMBER;
+	count.set_type(Variable::NUMBER);
 
-	count.n = as_number(prg, v, 1);
+	count.set_n(as_number(prg, v, 1));
 	Variable &expr = prg->variables[v[2].i];
 	double increment = as_number(prg, v, 3);
 	unsigned int end_label = as_label(prg, v, 4);
@@ -3115,7 +3155,7 @@ static bool corefunc_for(Program *prg, const std::vector<Token> &v)
 
 	evaluate_expression(prg, expr.e);
 
-	if (prg->result.n == 0) {
+	if (prg->result.get_n() == 0) {
 		prg->s->pc = end_label;
 		return true;
 	}
@@ -3144,9 +3184,9 @@ static bool corefunc_for(Program *prg, const std::vector<Token> &v)
 			prg->s->pc = end_label;
 		}
 		if (prg->s->pc == end_label) {
-			count.n += increment;
+			count.set_n(count.get_n()+increment);
 			evaluate_expression(prg, expr.e);
-			if (prg->result.n == 0) {
+			if (prg->result.get_n() == 0) {
 				prg->s->pc++;
 				break;
 			}
@@ -3168,7 +3208,7 @@ static bool corefunc_while(Program *prg, const std::vector<Token> &v)
 
 	evaluate_expression(prg, expr.e);
 
-	if (prg->result.n == 0) {
+	if (prg->result.get_n() == 0) {
 		prg->s->pc = end_label;
 		return true;
 	}
@@ -3198,7 +3238,7 @@ static bool corefunc_while(Program *prg, const std::vector<Token> &v)
 		}
 		if (prg->s->pc == end_label) {
 			evaluate_expression(prg, expr.e);
-			if (prg->result.n == 0) {
+			if (prg->result.get_n() == 0) {
 				prg->s->pc++;
 				break;
 			}
@@ -3243,7 +3283,7 @@ static bool corefunc_do_while(Program *prg, const std::vector<Token> &v)
 		}
 		if (prg->s->pc == end_label) {
 			evaluate_expression(prg, expr.e);
-			if (prg->result.n == 0) {
+			if (prg->result.get_n() == 0) {
 				prg->s->pc++;
 				break;
 			}
@@ -3313,7 +3353,7 @@ static void exprfunc_time(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = (double)time(NULL);
+	prg->result.set_n((double)time(NULL));
 }
 
 static bool corefunc_srand(Program *prg, const std::vector<Token> &v)
@@ -3335,7 +3375,7 @@ static void exprfunc_rand(Program *prg, const std::vector<Token> &v)
 	int max_incl = as_number(prg, v, 1);
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = util::rand(min_incl, max_incl);
+	prg->result.set_n(util::rand(min_incl, max_incl));
 }
 
 static bool corefunc_explode(Program *prg, const std::vector<Token> &v)
@@ -3365,7 +3405,7 @@ static void exprfunc_core_get_savedgames_path(Program *prg, const std::vector<To
 	COUNT_ARGS(0)
 
 	prg->result.set_type(Variable::STRING);
-	prg->result.s = util::get_savegames_dir();
+	prg->result.set_s(util::get_savegames_dir());
 }
 
 static void exprfunc_add(Program *prg, const std::vector<Token> &v)
@@ -3373,36 +3413,36 @@ static void exprfunc_add(Program *prg, const std::vector<Token> &v)
 	if (v[0].type == Token::SYMBOL) {
 		Variable *var = &prg->variables[v[0].i];
 
-		if (var->type == Variable::EXPRESSION) {
+		if (var->get_type() == Variable::EXPRESSION) {
 			static Variable var2;
 			evaluate_expression(prg, var->e);
 			var2 = prg->result;
 			var = &var2;
 		}
-		else if (var->type == Variable::FISH) {
+		else if (var->get_type() == Variable::FISH) {
 			var = &go_fish(prg, var->f);
 		}
 
-		if (var->type == Variable::NUMBER) {
-			double n = var->n;
+		if (var->get_type() == Variable::NUMBER) {
+			double n = var->get_n();
 
 			for (size_t i = 1; i < v.size(); i++) {
 				n += as_number(prg, v, i);
 			}
 
 			prg->result.set_type(Variable::NUMBER);
-			prg->result.n = n;
+			prg->result.set_n(n);
 			return;
 		}
-		else if (var->type == Variable::STRING) {
-			std::string s = var->s;
+		else if (var->get_type() == Variable::STRING) {
+			std::string s = var->get_s();
 
 			for (size_t i = 1; i < v.size(); i++) {
 				s += as_string(prg, v, i);
 			}
 
 			prg->result.set_type(Variable::STRING);
-			prg->result.s = s;
+			prg->result.set_s(s);
 			return;
 		}
 		else {
@@ -3417,7 +3457,7 @@ static void exprfunc_add(Program *prg, const std::vector<Token> &v)
 		}
 
 		prg->result.set_type(Variable::NUMBER);
-		prg->result.n = n;
+		prg->result.set_n(n);
 		return;
 	}
 	else if (v[0].type == Token::STRING) {
@@ -3428,7 +3468,7 @@ static void exprfunc_add(Program *prg, const std::vector<Token> &v)
 		}
 
 		prg->result.set_type(Variable::STRING);
-		prg->result.s = s;
+		prg->result.set_s(s);
 		return;
 	}
 }
@@ -3442,7 +3482,7 @@ static void exprfunc_subtract(Program *prg, const std::vector<Token> &v)
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = n;
+	prg->result.set_n(n);
 }
 
 static void exprfunc_multiply(Program *prg, const std::vector<Token> &v)
@@ -3454,7 +3494,7 @@ static void exprfunc_multiply(Program *prg, const std::vector<Token> &v)
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = n;
+	prg->result.set_n(n);
 }
 
 static void exprfunc_divide(Program *prg, const std::vector<Token> &v)
@@ -3466,7 +3506,7 @@ static void exprfunc_divide(Program *prg, const std::vector<Token> &v)
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = n;
+	prg->result.set_n(n);
 }
 
 static void exprfunc_modulus(Program *prg, const std::vector<Token> &v)
@@ -3477,7 +3517,7 @@ static void exprfunc_modulus(Program *prg, const std::vector<Token> &v)
 	int n2 = as_number(prg, v, 1);
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = n % n2;
+	prg->result.set_n(n % n2);
 }
 
 static void exprfunc_and(Program *prg, const std::vector<Token> &v)
@@ -3489,7 +3529,7 @@ static void exprfunc_and(Program *prg, const std::vector<Token> &v)
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = b;
+	prg->result.set_n(b);
 }
 
 static void exprfunc_or(Program *prg, const std::vector<Token> &v)
@@ -3501,7 +3541,7 @@ static void exprfunc_or(Program *prg, const std::vector<Token> &v)
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = b;
+	prg->result.set_n(b);
 }
 
 static void exprfunc_not(Program *prg, const std::vector<Token> &v)
@@ -3509,7 +3549,7 @@ static void exprfunc_not(Program *prg, const std::vector<Token> &v)
 	bool b = !(bool)as_number(prg, v, 0);
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = b;
+	prg->result.set_n(b);
 }
 
 static void exprfunc_greater(Program *prg, const std::vector<Token> &v)
@@ -3521,7 +3561,7 @@ static void exprfunc_greater(Program *prg, const std::vector<Token> &v)
 
 	bool b = true;
 
-	if (v[0].type == Token::NUMBER || p->type == Variable::NUMBER) {
+	if (v[0].type == Token::NUMBER || p->get_type() == Variable::NUMBER) {
 		double n = as_number(prg, v, 0);
 
 		for (size_t i = 1; i < v.size(); i++) {
@@ -3537,7 +3577,7 @@ static void exprfunc_greater(Program *prg, const std::vector<Token> &v)
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = b;
+	prg->result.set_n(b);
 }
 
 static void exprfunc_less(Program *prg, const std::vector<Token> &v)
@@ -3549,7 +3589,7 @@ static void exprfunc_less(Program *prg, const std::vector<Token> &v)
 
 	bool b = true;
 
-	if (v[0].type == Token::NUMBER || p->type == Variable::NUMBER) {
+	if (v[0].type == Token::NUMBER || p->get_type() == Variable::NUMBER) {
 		double n = as_number(prg, v, 0);
 
 		for (size_t i = 1; i < v.size(); i++) {
@@ -3565,7 +3605,7 @@ static void exprfunc_less(Program *prg, const std::vector<Token> &v)
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = b;
+	prg->result.set_n(b);
 }
 
 static void exprfunc_greaterequal(Program *prg, const std::vector<Token> &v)
@@ -3577,7 +3617,7 @@ static void exprfunc_greaterequal(Program *prg, const std::vector<Token> &v)
 
 	bool b = true;
 
-	if (v[0].type == Token::NUMBER || p->type == Variable::NUMBER) {
+	if (v[0].type == Token::NUMBER || p->get_type() == Variable::NUMBER) {
 		double n = as_number(prg, v, 0);
 
 		for (size_t i = 1; i < v.size(); i++) {
@@ -3593,7 +3633,7 @@ static void exprfunc_greaterequal(Program *prg, const std::vector<Token> &v)
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = b;
+	prg->result.set_n(b);
 }
 
 static void exprfunc_lessequal(Program *prg, const std::vector<Token> &v)
@@ -3605,7 +3645,7 @@ static void exprfunc_lessequal(Program *prg, const std::vector<Token> &v)
 
 	bool b = true;
 
-	if (v[0].type == Token::NUMBER || p->type == Variable::NUMBER) {
+	if (v[0].type == Token::NUMBER || p->get_type() == Variable::NUMBER) {
 		double n = as_number(prg, v, 0);
 
 		for (size_t i = 1; i < v.size(); i++) {
@@ -3621,7 +3661,7 @@ static void exprfunc_lessequal(Program *prg, const std::vector<Token> &v)
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = b;
+	prg->result.set_n(b);
 }
 
 static void exprfunc_equal(Program *prg, const std::vector<Token> &v)
@@ -3633,29 +3673,29 @@ static void exprfunc_equal(Program *prg, const std::vector<Token> &v)
 
 	bool b = true;
 
-	if (v[0].type == Token::NUMBER || p->type == Variable::NUMBER) {
+	if (v[0].type == Token::NUMBER || p->get_type() == Variable::NUMBER) {
 		double n = as_number(prg, v, 0);
 
 		for (size_t i = 1; i < v.size(); i++) {
 			b = b && n == as_number(prg, v, i);
 		}
 	}
-	else if (v[0].type == Token::STRING || p->type == Variable::STRING) {
+	else if (v[0].type == Token::STRING || p->get_type() == Variable::STRING) {
 		std::string s = as_string(prg, v, 0);
 
 		for (size_t i = 1; i < v.size(); i++) {
 			b = b && s == as_string(prg, v, i);
 		}
 	}
-	else if  (p->type == Variable::USER) {
+	else if  (p->get_type() == Variable::USER) {
 		for (size_t i = 1; i < v.size(); i++) {
 			Variable *p2 = as_variable_pointer(prg, v, i);
-			b = b && (p->type == p2->type && p->n == p2->n && p->s == p2->s && p->p == p2->p && p->v == p2->v && p->m == p2->m);
+			b = b && (p->get_type() == p2->get_type() && p->get_n() == p2->get_n() && p->get_s() == p2->get_s() && p->p == p2->p && p->v == p2->v && p->m == p2->m);
 		}
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = b;
+	prg->result.set_n(b);
 }
 
 static void exprfunc_notequal(Program *prg, const std::vector<Token> &v)
@@ -3667,29 +3707,29 @@ static void exprfunc_notequal(Program *prg, const std::vector<Token> &v)
 
 	bool b = true;
 
-	if (v[0].type == Token::NUMBER || p->type == Variable::NUMBER) {
+	if (v[0].type == Token::NUMBER || p->get_type() == Variable::NUMBER) {
 		double n = as_number(prg, v, 0);
 
 		for (size_t i = 1; i < v.size(); i++) {
 			b = b && n != as_number(prg, v, i);
 		}
 	}
-	else if (v[0].type == Token::STRING || p->type == Variable::STRING) {
+	else if (v[0].type == Token::STRING || p->get_type() == Variable::STRING) {
 		std::string s = as_string(prg, v, 0);
 
 		for (size_t i = 1; i < v.size(); i++) {
 			b = b && s != as_string(prg, v, i);
 		}
 	}
-	else if  (p->type == Variable::USER) {
+	else if  (p->get_type() == Variable::USER) {
 		for (size_t i = 1; i < v.size(); i++) {
 			Variable *p2 = as_variable_pointer(prg, v, i);
-			b = b && (p->type != p2->type || p->n != p2->n || p->s != p2->s || p->p != p2->p || p->v != p2->v || p->m != p2->m);
+			b = b && (p->get_type() != p2->get_type() || p->get_n() != p2->get_n() || p->get_s() != p2->get_s() || p->p != p2->p || p->v != p2->v || p->m != p2->m);
 		}
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = b;
+	prg->result.set_n(b);
 }
 
 static void exprfunc_bitor(Program *prg, const std::vector<Token> &v)
@@ -3701,7 +3741,7 @@ static void exprfunc_bitor(Program *prg, const std::vector<Token> &v)
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = n;
+	prg->result.set_n(n);
 }
 
 static void exprfunc_xor(Program *prg, const std::vector<Token> &v)
@@ -3713,7 +3753,7 @@ static void exprfunc_xor(Program *prg, const std::vector<Token> &v)
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = n;
+	prg->result.set_n(n);
 }
 
 static void exprfunc_bitand(Program *prg, const std::vector<Token> &v)
@@ -3725,7 +3765,7 @@ static void exprfunc_bitand(Program *prg, const std::vector<Token> &v)
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = n;
+	prg->result.set_n(n);
 }
 
 static void exprfunc_leftshift(Program *prg, const std::vector<Token> &v)
@@ -3737,7 +3777,7 @@ static void exprfunc_leftshift(Program *prg, const std::vector<Token> &v)
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = n;
+	prg->result.set_n(n);
 }
 
 static void exprfunc_rightshift(Program *prg, const std::vector<Token> &v)
@@ -3749,15 +3789,15 @@ static void exprfunc_rightshift(Program *prg, const std::vector<Token> &v)
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = n;
+	prg->result.set_n(n);
 }
 
 static Variable matmul(Program *prg, Variable ret, Variable vec2)
 {
 	if (IS_NUMBER(ret) && IS_NUMBER(vec2)) {
 		Variable var;
-		var.type = Variable::NUMBER;
-		var.n = ret.n * vec2.n;
+		var.set_type(Variable::NUMBER);
+		var.set_n(ret.get_n() * vec2.get_n());
 		return var;
 	}
 	if (IS_NUMBER(ret)) {
@@ -3769,14 +3809,14 @@ static Variable matmul(Program *prg, Variable ret, Variable vec2)
 		// it's a vector
 		if (IS_NUMBER(ret.v[0])) {
 			for (size_t i = 0; i < ret.v.size(); i++) {
-				ret.v[i].n *= vec2.n;
+				ret.v[i].set_n(ret.v[i].get_n()*vec2.get_n());
 			}
 		}
 		// it's a matrix
 		else {
 			for (size_t i = 0; i < ret.v.size(); i++) {
 				for (size_t j = 0; j < ret.v[0].v.size(); j++) {
-					ret.v[i].v[j].n *= vec2.n;
+					ret.v[i].v[j].set_n(ret.v[i].v[j].get_n()*vec2.get_n());
 				}
 			}
 		}
@@ -3797,7 +3837,7 @@ static Variable matmul(Program *prg, Variable ret, Variable vec2)
 			ret.v.clear();
 			for (size_t i = 0; i < tmp.v.size(); i++) {
 				Variable var;
-				var.type = Variable::VECTOR;
+				var.set_type(Variable::VECTOR);
 				var.v.push_back(tmp.v[i]);
 				ret.v.push_back(var);
 			}
@@ -3838,11 +3878,11 @@ static Variable matmul(Program *prg, Variable ret, Variable vec2)
 		if (ret.v.size() != w || ret.v[0].v.size() != h) {
 			for (unsigned int c = 0; c < w; c++) {
 				Variable var;
-				var.type = Variable::VECTOR;
+				var.set_type(Variable::VECTOR);
 				for (unsigned int r = 0; r < h; r++) {
 					Variable var2;
-					var2.type = Variable::NUMBER;
-					var2.n = 0;
+					var2.set_type(Variable::NUMBER);
+					var2.set_n(0);
 					var.v.push_back(var2);
 				}
 				ret.v.push_back(var);
@@ -3858,9 +3898,9 @@ static Variable matmul(Program *prg, Variable ret, Variable vec2)
 			for (size_t c = 0; c < w; c++) {
 				double sum = 0;
 				for (size_t r2 = 0; r2 < vec2.v[c].v.size(); r2++) {
-					sum += ret.v[r2].v[r].n * vec2.v[c].v[r2].n;
+					sum += ret.v[r2].v[r].get_n() * vec2.v[c].v[r2].get_n();
 				}
-				tmp.v[cc].v[rr].n = sum;
+				tmp.v[cc].v[rr].set_n(sum);
 				cc++;
 			}
 			rr++;
@@ -3904,7 +3944,7 @@ glm::mat4 to_glm_mat4(Variable &v)
 	glm::mat4 m = glm::mat4(1.0f);
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
-			m[i][j] = (float)v.v[i].v[j].n;
+			m[i][j] = (float)v.v[i].v[j].get_n();
 		}
 	}
 	return m;
@@ -3913,14 +3953,14 @@ glm::mat4 to_glm_mat4(Variable &v)
 Variable from_glm_mat4(glm::mat4 m)
 {
 	Variable var;
-	var.type = Variable::VECTOR;
+	var.set_type(Variable::VECTOR);
 	for (int i = 0; i < 4; i++) {
 		Variable v2;
-		v2.type = Variable::VECTOR;
+		v2.set_type(Variable::VECTOR);
 		for (int j = 0; j < 4; j++) {
 			Variable v3;
-			v3.type = Variable::NUMBER;
-			v3.n = m[i][j];
+			v3.set_type(Variable::NUMBER);
+			v3.set_n(m[i][j]);
 			v2.v.push_back(v3);
 		}
 		var.v.push_back(v2);
@@ -3996,9 +4036,9 @@ static void exprfunc_scale(Program *prg, const std::vector<Token> &v)
 
 	prg->result = identity(4);
 
-	prg->result.v[0].v[0].n = sx;
-	prg->result.v[1].v[1].n = sy;
-	prg->result.v[2].v[2].n = sz;
+	prg->result.v[0].v[0].set_n(sx);
+	prg->result.v[1].v[1].set_n(sy);
+	prg->result.v[2].v[2].set_n(sz);
 }
 
 static void exprfunc_rotate(Program *prg, const std::vector<Token> &v)
@@ -4016,15 +4056,15 @@ static void exprfunc_rotate(Program *prg, const std::vector<Token> &v)
 
 	prg->result = identity(4);
 
-	prg->result.v[0].v[0].n = (invc * x * x) + c;
-	prg->result.v[0].v[1].n = (invc * x * y) + (z * s);
-	prg->result.v[0].v[2].n = (invc * x * z) - (y * s);
-	prg->result.v[1].v[0].n = (invc * x * y) - (z * s);
-	prg->result.v[1].v[1].n = (invc * y * y) + c;
-	prg->result.v[1].v[2].n = (invc * z * y) + (x * s);
-	prg->result.v[2].v[0].n = (invc * x * z) + (y * s);
-	prg->result.v[2].v[1].n = (invc * y * z) - (x * s);
-	prg->result.v[2].v[2].n = (invc * z * z) + c;
+	prg->result.v[0].v[0].set_n((invc * x * x) + c);
+	prg->result.v[0].v[1].set_n((invc * x * y) + (z * s));
+	prg->result.v[0].v[2].set_n((invc * x * z) - (y * s));
+	prg->result.v[1].v[0].set_n((invc * x * y) - (z * s));
+	prg->result.v[1].v[1].set_n((invc * y * y) + c);
+	prg->result.v[1].v[2].set_n((invc * z * y) + (x * s));
+	prg->result.v[2].v[0].set_n((invc * x * z) + (y * s));
+	prg->result.v[2].v[1].set_n((invc * y * z) - (x * s));
+	prg->result.v[2].v[2].set_n((invc * z * z) + c);
 }
 
 static void exprfunc_translate(Program *prg, const std::vector<Token> &v)
@@ -4037,17 +4077,17 @@ static void exprfunc_translate(Program *prg, const std::vector<Token> &v)
 
 	prg->result = identity(4);
 
-	prg->result.v[3].v[0].n = tx;
-	prg->result.v[3].v[1].n = ty;
-	prg->result.v[3].v[2].n = tz;
+	prg->result.v[3].v[0].set_n(tx);
+	prg->result.v[3].v[1].set_n(ty);
+	prg->result.v[3].v[2].set_n(tz);
 }
 
-static double veclen(const Variable &vec)
+static double veclen(Variable vec)
 {
 	if (vec.v.size() == 2) {
-		return sqrt(pow(vec.v[0].n, 2) + pow(vec.v[1].n, 2));
+		return sqrt(pow(vec.v[0].get_n(), 2) + pow(vec.v[1].get_n(), 2));
 	}
-	return sqrt(pow(vec.v[0].n, 2) + pow(vec.v[1].n, 2) + pow(vec.v[2].n, 2));
+	return sqrt(pow(vec.v[0].get_n(), 2) + pow(vec.v[1].get_n(), 2) + pow(vec.v[2].get_n(), 2));
 }
 
 static void exprfunc_length(Program *prg, const std::vector<Token> &v)
@@ -4063,20 +4103,20 @@ static void exprfunc_length(Program *prg, const std::vector<Token> &v)
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = veclen(vec);
+	prg->result.set_n(veclen(vec));
 }
 
-static double vecdot(const Variable &vec1, const Variable &vec2)
+static double vecdot(Variable vec1, Variable vec2)
 {
-	return vec1.v[0].n * vec2.v[0].n + vec1.v[1].n * vec2.v[1].n + vec1.v[2].n * vec2.v[2].n;
+	return vec1.v[0].get_n() * vec2.v[0].get_n() + vec1.v[1].get_n() * vec2.v[1].get_n() + vec1.v[2].get_n() * vec2.v[2].get_n();
 }
 
 static void exprfunc_dot(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	const Variable vec1 = as_variable_resolve(prg, v, 0);
-	const Variable vec2 = as_variable_resolve(prg, v, 1);
+	Variable vec1 = as_variable_resolve(prg, v, 0);
+	Variable vec2 = as_variable_resolve(prg, v, 1);
 
 	CHECK_VECTOR(vec1)
 	CHECK_VECTOR(vec2)
@@ -4086,15 +4126,15 @@ static void exprfunc_dot(Program *prg, const std::vector<Token> &v)
 	}
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = vecdot(vec1, vec2);
+	prg->result.set_n(vecdot(vec1, vec2));
 }
 
 static Variable veccross(Variable vec, Variable vec2)
 {
 	Variable tmp = vec;
-	vec.v[0].n = tmp.v[0].n * vec2.v[2].n - tmp.v[2].n * vec2.v[1].n;
-	vec.v[1].n = tmp.v[2].n * vec2.v[0].n - tmp.v[0].n * vec2.v[2].n;
-	vec.v[2].n = tmp.v[0].n * vec2.v[1].n - tmp.v[1].n * vec2.v[0].n;
+	vec.v[0].set_n(tmp.v[0].get_n() * vec2.v[2].get_n() - tmp.v[2].get_n() * vec2.v[1].get_n());
+	vec.v[1].set_n(tmp.v[2].get_n() * vec2.v[0].get_n() - tmp.v[0].get_n() * vec2.v[2].get_n());
+	vec.v[2].set_n(tmp.v[0].get_n() * vec2.v[1].get_n() - tmp.v[1].get_n() * vec2.v[0].get_n());
 	return vec;
 }
 
@@ -4109,12 +4149,12 @@ static void exprfunc_angle(Program *prg, const std::vector<Token> &v)
 	CHECK_VECTOR(vec2)
 
 	if (vec1.v.size() == 2) {
-		double a1 = atan2(vec1.v[1].n, vec1.v[0].n);
-		double a2 = atan2(vec2.v[1].n, vec2.v[0].n);
+		double a1 = atan2(vec1.v[1].get_n(), vec1.v[0].get_n());
+		double a2 = atan2(vec2.v[1].get_n(), vec2.v[0].get_n());
 		prg->result.set_type(Variable::NUMBER);
-		prg->result.n = a2 - a1;
-		if (prg->result.n < 0) {
-			prg->result.n += M_PI * 2;
+		prg->result.set_n(a2 - a1);
+		if (prg->result.get_n() < 0) {
+			prg->result.set_n(prg->result.get_n()+(M_PI * 2));
 		}
 		return;
 	}
@@ -4124,11 +4164,11 @@ static void exprfunc_angle(Program *prg, const std::vector<Token> &v)
 	}
 
 	Variable len;
-	len.type = Variable::NUMBER;
-	len.n = veclen(vec2);
+	len.set_type(Variable::NUMBER);
+	len.set_n(veclen(vec2));
 	
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = acosf(vecdot(vec1, vec2) / veclen(matmul(prg, vec1, len)));
+	prg->result.set_n(acosf(vecdot(vec1, vec2) / veclen(matmul(prg, vec1, len))));
 }
 
 static void exprfunc_cross(Program *prg, const std::vector<Token> &v)
@@ -4160,8 +4200,8 @@ static void exprfunc_normalize(Program *prg, const std::vector<Token> &v)
 	CHECK_VECTOR(vec)
 
 	Variable len;
-	len.type = Variable::NUMBER;
-	len.n = 1.0 / veclen(vec);
+	len.set_type(Variable::NUMBER);
+	len.set_n(1.0 / veclen(vec));
 
 	prg->result = matmul(prg, vec, len);
 }
@@ -4182,7 +4222,7 @@ static void exprfunc_vadd(Program *prg, const std::vector<Token> &v)
 		}
 		if (IS_NUMBER(vec.v[0]) && IS_NUMBER(vec2.v[0])) {
 			for (size_t j = 0; j < vec.v.size(); j++) {
-				vec.v[j].n += vec2.v[j].n;
+				vec.v[j].set_n(vec.v[j].get_n()+vec2.v[j].get_n());
 			}
 		}
 		else if (IS_VECTOR(vec.v[0]) && IS_VECTOR(vec2.v[0])) {
@@ -4191,7 +4231,7 @@ static void exprfunc_vadd(Program *prg, const std::vector<Token> &v)
 			}
 			for (size_t j = 0; j < vec.v.size(); j++) {
 				for (size_t i = 0; i < vec.v[j].v.size(); i++) {
-					vec.v[j].v[i].n += vec2.v[j].v[i].n;
+					vec.v[j].v[i].set_n(vec.v[j].v[i].get_n()+vec2.v[j].v[i].get_n());
 				}
 			}
 		}
@@ -4219,7 +4259,7 @@ static void exprfunc_vsub(Program *prg, const std::vector<Token> &v)
 		}
 		if (IS_NUMBER(vec.v[0]) && IS_NUMBER(vec2.v[0])) {
 			for (size_t j = 0; j < vec.v.size(); j++) {
-				vec.v[j].n -= vec2.v[j].n;
+				vec.v[j].set_n(vec.v[j].get_n()-vec2.v[j].get_n());
 			}
 		}
 		else if (IS_VECTOR(vec.v[0]) && IS_VECTOR(vec2.v[0])) {
@@ -4228,7 +4268,7 @@ static void exprfunc_vsub(Program *prg, const std::vector<Token> &v)
 			}
 			for (size_t j = 0; j < vec.v.size(); j++) {
 				for (size_t i = 0; i < vec.v[j].v.size(); i++) {
-					vec.v[j].v[i].n -= vec2.v[j].v[i].n;
+					vec.v[j].v[i].set_n(vec.v[j].v[i].get_n()-vec2.v[j].v[i].get_n());
 				}
 			}
 		}
@@ -4314,8 +4354,8 @@ static void exprfunc_get_args(Program *prg, const std::vector<Token> &v)
 
 	for (int i = 0; i < shim::argc; i++) {
 		Variable var;
-		var.type = Variable::STRING;
-		var.s = shim::argv[i];
+		var.set_type(Variable::STRING);
+		var.set_s(shim::argv[i]);
 		prg->result.v.push_back(var);
 	}
 }
@@ -4328,7 +4368,7 @@ static void exprfunc_num_var_args(Program *prg, const std::vector<Token> &v)
 	int num_hard_params = num_var_args_args.top();
 
 	prg->result.set_type(Variable::NUMBER);
-	prg->result.n = params.size()-num_hard_params;
+	prg->result.set_n(params.size()-num_hard_params);
 }
 
 static void exprfunc_get_var_arg(Program *prg, const std::vector<Token> &v)
@@ -4346,11 +4386,11 @@ static void exprfunc_get_var_arg(Program *prg, const std::vector<Token> &v)
 
 	if (params[i+num_hard_params].type == Token::NUMBER) {
 		prg->result.set_type(Variable::NUMBER);
-		prg->result.n = params[i+num_hard_params].n;
+		prg->result.set_n(params[i+num_hard_params].n);
 	}
 	else if (params[i+num_hard_params].type == Token::STRING) {
 		prg->result.set_type(Variable::STRING);
-		prg->result.s = params[i+num_hard_params].s;
+		prg->result.set_s(params[i+num_hard_params].s);
 	}
 	else {
 		prg->result = *as_variable_pointer(prg, params, i+num_hard_params);
@@ -4589,12 +4629,12 @@ Token token_string(std::string token, std::string s)
 
 double get_number(Variable &v)
 {
-	return v.n;
+	return v.get_n();
 }
 
 std::string get_string(Variable &v)
 {
-	return v.s;
+	return v.get_s();
 }
 
 std::vector<Variable> get_vector(Variable &v)
@@ -4625,7 +4665,7 @@ Variable &as_variable(Program *prg, const std::vector<Token> &v, int index)
 	if (v[index].type != Token::SYMBOL) {
 		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 	}
-	if (prg->variables[v[index].i].type == Variable::FISH) {
+	if (prg->variables[v[index].i].get_type() == Variable::FISH) {
 		return go_fish(prg, prg->variables[v[index].i].f);
 	}
 	return prg->variables[v[index].i];
@@ -4644,11 +4684,11 @@ Variable *as_variable_pointer(Program *prg, const std::vector<Token> &v, int ind
 	Variable *var;
 	var = &v2;
 
-	if (v2.type == Variable::POINTER) {
+	if (v2.get_type() == Variable::POINTER) {
 		var = dereference(prg, v, index);
 	}
 	
-	if (var->type == Variable::EXPRESSION) {
+	if (var->get_type() == Variable::EXPRESSION) {
 		evaluate_expression(prg, var->e);
 		if (use_result) {
 			var = &prg->result;
@@ -4666,20 +4706,20 @@ Variable as_variable_resolve(Program *prg, const std::vector<Token> &v, int inde
 {
 	if (v[index].type == Token::NUMBER) {
 		Variable var;
-		var.type = Variable::NUMBER;
-		var.n = v[index].n;
+		var.set_type(Variable::NUMBER);
+		var.set_n(v[index].n);
 		return var;
 	}
 	else if (v[index].type == Token::STRING) {
 		Variable var;
-		var.type = Variable::STRING;
-		var.s = v[index].s;
+		var.set_type(Variable::STRING);
+		var.set_s(v[index].s);
 		return var;
 	}
-	else if (prg->variables[v[index].i].type == Variable::FISH) {
+	else if (prg->variables[v[index].i].get_type() == Variable::FISH) {
 		return go_fish(prg, prg->variables[v[index].i].f);
 	}
-	else if (prg->variables[v[index].i].type == Variable::EXPRESSION) {
+	else if (prg->variables[v[index].i].get_type() == Variable::EXPRESSION) {
 		evaluate_expression(prg, prg->variables[v[index].i].e);
 		return prg->result;
 	}
@@ -4698,35 +4738,35 @@ double as_number(Program *prg, const std::vector<Token> &v, int index)
 	}
 	else if (v[index].type == Token::SYMBOL) {
 		Variable *var = as_variable_pointer(prg, v, index);
-		if (var->type == Variable::NUMBER) {
-			return var->n;
+		if (var->get_type() == Variable::NUMBER) {
+			return var->get_n();
 		}
-		else if (var->type == Variable::FISH) {
+		else if (var->get_type() == Variable::FISH) {
 			Variable &v2 = go_fish(prg, var->f);
-			if (v2.type == Variable::NUMBER) {
-				return v2.n;
+			if (v2.get_type() == Variable::NUMBER) {
+				return v2.get_n();
 			}
-			else if (v2.type == Variable::STRING) {
-				return atof(v2.s.c_str());
+			else if (v2.get_type() == Variable::STRING) {
+				return atof(v2.get_s().c_str());
 			}
 			else {
 				my_throw(Error(std::string(__FUNCTION__) + ": " + "Fished out the wrong type at " + get_error_info(prg)));
 			}
 		}
-		else if (var->type == Variable::EXPRESSION) {
+		else if (var->get_type() == Variable::EXPRESSION) {
 			evaluate_expression(prg, var->e);
-			if (prg->result.type == Variable::NUMBER) {
-				return prg->result.n;
+			if (prg->result.get_type() == Variable::NUMBER) {
+				return prg->result.get_n();
 			}
-			else if (prg->result.type == Variable::STRING) {
-				return atof(prg->result.s.c_str());
+			else if (prg->result.get_type() == Variable::STRING) {
+				return atof(prg->result.get_s().c_str());
 			}
 			else {
 				my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 			}
 		}
-		else if (var->type == Variable::STRING) {
-			return atof(var->s.c_str());
+		else if (var->get_type() == Variable::STRING) {
+			return atof(var->get_s().c_str());
 		}
 		else {
 			my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
@@ -4753,27 +4793,27 @@ std::string as_string(Program *prg, const std::vector<Token> &v, int index)
 	}
 	else if (v[index].type == Token::SYMBOL) {
 		Variable *var = as_variable_pointer(prg, v, index);
-		if (var->type == Variable::STRING) {
-			return var->s;
+		if (var->get_type() == Variable::STRING) {
+			return var->get_s();
 		}
-		else if (var->type == Variable::NUMBER) {
+		else if (var->get_type() == Variable::NUMBER) {
 			char buf[1000];
-			snprintf(buf, 1000, "%f", var->n);
+			snprintf(buf, 1000, "%f", var->get_n());
 			return buf;
 		}
-		else if (var->type == Variable::EXPRESSION) {
+		else if (var->get_type() == Variable::EXPRESSION) {
 			evaluate_expression(prg, var->e);
-			if (prg->result.type != Variable::STRING) {
+			if (prg->result.get_type() != Variable::STRING) {
 				my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 			}
-			return prg->result.s;
+			return prg->result.get_s();
 		}
-		else if (var->type == Variable::FISH) {
+		else if (var->get_type() == Variable::FISH) {
 			Variable &v2 = go_fish(prg, var->f);
-			if (v2.type != Variable::STRING) {
+			if (v2.get_type() != Variable::STRING) {
 				my_throw(Error(std::string(__FUNCTION__) + ": " + "Fished out the wrong type at " + get_error_info(prg)));
 			}
-			return v2.s;
+			return v2.get_s();
 		}
 		else {
 			my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
@@ -4791,17 +4831,17 @@ int as_label(Program *prg, const std::vector<Token> &v, int index)
 		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 	}
 	Variable *var = as_variable_pointer(prg, v, index);
-	if (var->type == Variable::FISH) {
+	if (var->get_type() == Variable::FISH) {
 		Variable &v2 = go_fish(prg, var->f);
-		if (v2.type != Variable::LABEL) {
+		if (v2.get_type() != Variable::LABEL) {
 			my_throw(Error(std::string(__FUNCTION__) + ": " + "Fished out the wrong type at " + get_error_info(prg)));
 		}
-		return v2.n;
+		return v2.get_n();
 	}
-	else if (var->type != Variable::LABEL) {
+	else if (var->get_type() != Variable::LABEL) {
 		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 	}
-	return var->n;
+	return var->get_n();
 }
 
 int as_function(Program *prg, const std::vector<Token> &v, int index)
@@ -4810,17 +4850,17 @@ int as_function(Program *prg, const std::vector<Token> &v, int index)
 		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 	}
 	Variable *var = as_variable_pointer(prg, v, index);
-	if (var->type == Variable::FISH) {
+	if (var->get_type() == Variable::FISH) {
 		Variable &v2 = go_fish(prg, var->f);
-		if (v2.type != Variable::FUNCTION) {
-			my_throw(Error(std::string(__FUNCTION__) + ": " + "Fished out the wrong type (" + util::itos(v2.type) + ") at " + get_error_info(prg)));
+		if (v2.get_type() != Variable::FUNCTION) {
+			my_throw(Error(std::string(__FUNCTION__) + ": " + "Fished out the wrong type (" + util::itos(v2.get_type()) + ") at " + get_error_info(prg)));
 		}
-		return v2.n;
+		return v2.get_n();
 	}
-	else if (var->type != Variable::FUNCTION) {
+	else if (var->get_type() != Variable::FUNCTION) {
 		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 	}
-	return var->n;
+	return var->get_n();
 }
 
 Variable as_pointer(Program *prg, const std::vector<Token> &v, int index)
@@ -4828,10 +4868,10 @@ Variable as_pointer(Program *prg, const std::vector<Token> &v, int index)
 	if (v[index].type != Token::SYMBOL) {
 		my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid type at " + get_error_info(prg)));
 	}
-	if (prg->variables[v[index].i].type == Variable::FISH) {
+	if (prg->variables[v[index].i].get_type() == Variable::FISH) {
 		return go_fish(prg, prg->variables[v[index].i].f);
 	}
-	else if (prg->variables[v[index].i].type == Variable::EXPRESSION) {
+	else if (prg->variables[v[index].i].get_type() == Variable::EXPRESSION) {
 		evaluate_expression(prg, prg->variables[v[index].i].e);
 		return prg->result;
 	}
@@ -4880,14 +4920,14 @@ void evaluate_expression(Program *prg, const Variable::Expression &e)
 	else if (e.name == " ex ") {
 		evaluate_expression(prg, prg->variables[e.i].e);
 
-		call_function(prg, e.dereference ? prg->result.p->n : prg->result.n, e.v);
+		call_function(prg, e.dereference ? prg->result.p->get_n() : prg->result.get_n(), e.v);
 
 		return;
 	}
 	else if (e.name == " fi ") {
 		Variable &var = go_fish(prg, prg->variables[e.i].f);
 
-		call_function(prg, var.n, e.v);
+		call_function(prg, var.get_n(), e.v);
 
 		return;
 	}
@@ -4898,10 +4938,10 @@ void evaluate_expression(Program *prg, const Variable::Expression &e)
 Variable &go_fish(Program *prg, const Variable::Fish &f)
 {
 	Variable *v = &prg->variables[f.c_i];
-	if (v->type == Variable::POINTER) {
+	if (v->get_type() == Variable::POINTER) {
 		v = v->p;
 	}
-	int type = v->type;
+	int type = v->get_type();
 	bool constant = v->constant;
 	static Variable tmp;
 
@@ -4912,7 +4952,7 @@ Variable &go_fish(Program *prg, const Variable::Fish &f)
 			v = &go_fish(prg, v->f);
 			//v->name = name;
 			//v->constant = constant;
-			type = v->type;
+			type = v->get_type();
 			constant = v->constant;
 		}
 		else {
@@ -4925,7 +4965,7 @@ Variable &go_fish(Program *prg, const Variable::Fish &f)
 			v = &_v;
 			//v->name = name;
 			//v->constant = constant;
-			type = v->type;
+			type = v->get_type();
 			constant = v->constant;
 		}
 	}
@@ -4950,29 +4990,29 @@ Variable &go_fish(Program *prg, const Variable::Fish &f)
 			else {
 				var = &prg->variables[f.v[i].i];
 			}
-			if (var->type == Variable::EXPRESSION) {
+			if (var->get_type() == Variable::EXPRESSION) {
 				evaluate_expression(prg, var->e);
-				if (prg->result.type == Variable::NUMBER) {
-					index = prg->result.n;
+				if (prg->result.get_type() == Variable::NUMBER) {
+					index = prg->result.get_n();
 					type = Variable::VECTOR;
 				}
 				else {
-					key = prg->result.s;
+					key = prg->result.get_s();
 					type = Variable::MAP;
 				}
 			}
-			else if (var->type == Variable::FISH) {
+			else if (var->get_type() == Variable::FISH) {
 				Variable &v2 = go_fish(prg, var->f);
-				if (v2.type == Variable::NUMBER) {
-					index = v2.n;
+				if (v2.get_type() == Variable::NUMBER) {
+					index = v2.get_n();
 					type = Variable::VECTOR;
 				}
 				else {
-					key = v2.s;
+					key = v2.get_s();
 					type = Variable::MAP;
 				}
 			}
-			else if (var->type == Variable::NUMBER) {
+			else if (var->get_type() == Variable::NUMBER) {
 				index = as_number(prg, f.v, i);
 				type = Variable::VECTOR;
 			}
@@ -4991,7 +5031,7 @@ Variable &go_fish(Program *prg, const Variable::Fish &f)
 		}
 	}
 
-	v->type = (Variable::Variable_Type)type;
+	v->set_type((Variable::Variable_Type)type);
 	if (type == Variable::VECTOR) {
 		v->v[index].constant = constant;
 		return v->v[index];
@@ -5005,11 +5045,11 @@ Variable &go_fish(Program *prg, const Variable::Fish &f)
 Variable *dereference(Program *prg, const std::vector<Token> &v, int index)
 {
 	Variable *var = &prg->variables[v[index].i];
-	if (var->type == Variable::EXPRESSION) {
+	if (var->get_type() == Variable::EXPRESSION) {
 		evaluate_expression(prg, prg->variables[v[index].i].e);
 		var = &prg->result;
 	}
-	else if (var->type == Variable::FISH) {
+	else if (var->get_type() == Variable::FISH) {
 		var = &go_fish(prg, prg->variables[v[index].i].f);
 		//std::string name = var->name;
 		//bool constant = var->constant;
@@ -5106,7 +5146,7 @@ static booboo::Variable *get_var(std::string id, bool allow_expressions = true)
 
 static void print_lines(std::string fn, int curr, int side)
 {
-	printf("-- %s\n", fn.c_str());
+	printf("-- %s:%s:%d\n", fn.c_str(), prg->s->name.c_str(), get_line_num(prg));
 
 	if (src_code.find(fn) == src_code.end()) {
 		printf("No source found...\n");
@@ -5155,13 +5195,7 @@ static void print_lines(std::string fn, int curr, int side)
 		}
 		pos++;
 		std::string fmt = std::string(i+start == curr ? "*" : " ") + std::string("%") + util::itos(log10(end)+1) + "d %s\n";
-		if (i+start == curr) {
-			twinkle::set_fore(twinkle::YELLOW, false);
-		}
 		printf(fmt.c_str(), i+start, l.c_str());
-		if (i+start == curr) {
-			twinkle::reset();
-		}
 	}
 }
 
@@ -5202,16 +5236,18 @@ void debug(std::string text)
 		std::getline(std::cin, line);
 		line = util::trim(line);
 		if (line == "help") {
-			printf("run           start or continue program execution\n");
-			printf("step          run one instruction\n");
-			printf("stepin        run one instruction and step into functions/loops\n");
-			printf("break <bp>    set a breakpoint. use break delete <bp> to delete\n");
-			printf("bt [all]      print a backtrace\n");
-			printf("print         print more code context\n");
-			printf("print <v>     print the value of a variable or fish\n");
-			printf("set <d> <s>   set the value of d to s\n");
-			printf("skip          skip this statement\n");
-			printf("quit          exit the program\n");
+			printf("run                  start or continue program execution\n");
+			printf("step                 run one instruction\n");
+			printf("stepin               run one instruction and step into functions/loops\n");
+			printf("break <bp>           set a breakpoint. use break delete <bp> to delete\n");
+			printf("watch <var> <expr>   set a watchpoint\n");
+			printf("list                 list watchpoints and breakpoints\n");
+			printf("bt [all]             print a backtrace\n");
+			printf("print                print more code context\n");
+			printf("print <v>            print the value of a variable or fish\n");
+			printf("set <d> <s>          set the value of d to s\n");
+			printf("skip                 skip this statement\n");
+			printf("quit                 exit the program\n");
 			printed_lines = true;
 		}
 		else if (line == "quit") {
@@ -5232,12 +5268,12 @@ void debug(std::string text)
 				booboo::Variable *var = get_var(line);
 				if (var) {
 					printf("Type: %s\n", typeof_var(var).c_str());
-					switch (var->type) {
+					switch (var->get_type()) {
 						case booboo::Variable::NUMBER:
-							printf("Value: %g\n", var->n);
+							printf("Value: %g\n", var->get_n());
 							break;
 						case booboo::Variable::STRING:
-							printf("Value: %s\n", var->s.c_str());
+							printf("Value: %s\n", var->get_s().c_str());
 							break;
 						case booboo::Variable::POINTER:
 							printf("Value: %p\n", var->p);
@@ -5293,11 +5329,11 @@ void debug(std::string text)
 				booboo::Variable *var = get_var(dest, false);
 				if (isdigit(src[0]) || src[0] == '-') {
 					var->set_type(booboo::Variable::NUMBER);
-					var->n = atof(src.c_str());
+					var->set_n(atof(src.c_str()));
 				}
 				else if (src[0] == '"') {
 					var->set_type(booboo::Variable::STRING);
-					var->s = util::remove_quotes(src);
+					var->set_s(util::remove_quotes(src));
 				}
 				else {
 					booboo::Variable *var2 = get_var(src);
@@ -5309,7 +5345,7 @@ void debug(std::string text)
 				}
 			}
 		}
-		if (line.substr(0, 4) == "list") {
+		else if (line.substr(0, 4) == "list") {
 			printf("File breakpoints:\n");
 			for (size_t i = 0; i < file_breakpoints.size(); i++) {
 				printf("%s\n", file_breakpoints[i].c_str());
@@ -5420,6 +5456,7 @@ void debug(std::string text)
 			prg->s->pc++;
 		}
 		else if (line.substr(0, 5) == "watch") {
+			printed_lines = true;
 			line = line.substr(5);
 			line = util::trim(line);
 			if (line.substr(0, 6) == "delete") {
