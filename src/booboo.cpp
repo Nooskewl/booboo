@@ -5065,19 +5065,28 @@ Variable *dereference(Program *prg, const std::vector<Token> &v, int index)
 
 void my_throw(Error e)
 {
-	int result = gui::popup("ERROR!", e.error_message, "Abort", "Debug", "Continue");
-	if (result == 0) {
-		throw e;
+	int result;
+	if (gfx::internal::gfx_context.inited == true) {
+		result = gui::popup("ERROR!", e.error_message, "Abort", "Debug", "Continue");
+		if (result == 0) {
+			throw e;
+		}
+		else if (result == 1) {
+			AllocConsole();
+			FILE* fp;
+			freopen_s(&fp, "CONIN$", "r", stdin);
+			freopen_s(&fp, "CONOUT$", "w", stdout);
+			freopen_s(&fp, "CONOUT$", "w", stderr);
+			booboo::debug("Debugging program. Type 'help' for help...");
+		}
+		else {
+		}
 	}
-	else if (result == 1) {
-		AllocConsole();
-		FILE* fp;
-		freopen_s(&fp, "CONIN$", "r", stdin);
-		freopen_s(&fp, "CONOUT$", "w", stdout);
-		freopen_s(&fp, "CONOUT$", "w", stderr);
-		booboo::debug("Debugging program. Type 'help' for help...");
+	else if (shim::debug) {
+		booboo::debug("An error occurred: " + e.error_message + "...");
 	}
 	else {
+		throw e;
 	}
 }
 
