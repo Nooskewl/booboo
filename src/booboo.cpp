@@ -4604,6 +4604,8 @@ Program *create_program(std::string code)
 	prg->s->start_line = 0;
 	prg->s->pc = 0;
 
+	prg->num_vars = prg->variables.size();
+
 	prg->result.name = "result";
 
 	return prg;
@@ -5215,6 +5217,9 @@ static void print_lines(std::string fn, int curr, int side)
 
 void debug(std::string text)
 {
+	static int count = 0;
+	count++;
+
 	bool printed_lines = false;
 
 	printf("%s\n", text.c_str());
@@ -5539,6 +5544,13 @@ void debug(std::string text)
 		}
 		else {
 			printf("Unknown command...\n");
+		}
+	}
+
+	count--;
+	if (count == 0) {
+		while (prg->variables.size() > prg->num_vars) {
+			prg->variables.pop_back();
 		}
 	}
 }

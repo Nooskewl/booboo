@@ -203,6 +203,8 @@ struct Program {
 	int expression_i;
 	int fish_i;
 
+	int num_vars;
+
 	std::vector<Variable> variables;
 	std::map<std::string, int> variables_map;
 	std::map<std::string, int> function_name_map;
