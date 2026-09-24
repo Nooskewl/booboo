@@ -816,7 +816,12 @@ int main(int argc, char **argv)
 
 	try {
 		std::string path = save_dir();
-		std::string cfg_text = util::load_text_from_filesystem(path + "/com.nooskewl.booboo.launcher.txt");
+		std::string cfg_text = "";
+		try {
+			cfg_text = util::load_text_from_filesystem(path + "/com.nooskewl.booboo.launcher.txt");
+		}
+		catch (util::Error &e) {
+		}
 		util::Tokenizer t(cfg_text, '\n');
 		std::string line;
 		while ((line = t.next()) != "") {
@@ -854,7 +859,12 @@ int main(int argc, char **argv)
 	add_expression_handler("mouse_get_buttons", exprfunc_mouse_get_buttons);
 	add_expression_handler("key_get", exprfunc_key_get);
 
-	std::string dlls = util::load_text_from_filesystem("dll.txt");
+	std::string dlls = "";
+	try {
+		dlls = util::load_text_from_filesystem("dll.txt");
+	}
+	catch (util::Error &e) {
+	}
 	util::Tokenizer tok(dlls, '\n');
 	std::string dll;
 	while ((dll = tok.next()) != "") {
@@ -997,7 +1007,12 @@ again:
 	std::string dir;
 	try {
 		std::string cfg_path = path + "/" + "com.nooskewl.launcher.reload.txt";
-		text = util::load_text_from_filesystem(cfg_path);
+		text = "";
+		try {
+			text = util::load_text_from_filesystem(cfg_path);
+		}
+		catch (util::Error &e) {
+		}
 
 		util::Tokenizer t(text, '=');
 		std::string key = t.next();

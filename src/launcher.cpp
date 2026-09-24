@@ -74,8 +74,13 @@ int main(int argc, char **argv)
 
 	booboo::start();
 	start_lib_standard();
-	
-	std::string dlls = util::load_text_from_filesystem("dll.txt");
+
+	std::string dlls = "";
+	try {
+		dlls = util::load_text_from_filesystem("dll.txt");
+	}
+	catch (util::Error &e) {
+	}
 	util::Tokenizer tok(dlls, '\n');
 	std::string dll;
 	while ((dll = tok.next()) != "") {
@@ -104,7 +109,7 @@ again:
 
 	if (was_reset) {
 		try {
-			code = util::load_text_from_filesystem(fn);
+			code = booboo::load_text(fn);
 		}
 		catch (booboo::Error &e) {
 			printf("Program is missing or corrupt!\n");
@@ -116,9 +121,9 @@ again:
 	else {
 		if (fn != "") {
 			try {
-				code = util::load_text_from_filesystem(fn);
+				code = booboo::load_text(fn);
 			}
-			catch (booboo::Error &e) {
+			catch (util::Error &e) {
 				printf("Program is missing or corrupt!\n");
 				exit(1);
 			}
@@ -127,13 +132,13 @@ again:
 		}
 		else {
 			try {
-				code = util::load_text_from_filesystem("main.boo");
+				code = booboo::load_text("main.boo");
 			}
-			catch (booboo::Error &e) {
-				printf("Program is missing or corrupt!\n");
+			catch (util::Error &e) {
+				printf("Usage: BooBooCLI <script.boo> [options]\n");
 				exit(1);
 			}
-			
+		
 			booboo::main_program_name = "main.boo";
 		}
 	}
