@@ -178,6 +178,9 @@ again:
 	catch (booboo::Error &e) {
 		printf("%s\n", e.error_message.c_str());
 	}
+	catch (util::Error &e) {
+		printf("%s\n", e.error_message.c_str());
+	}
 
 	return booboo::return_code;
 }
