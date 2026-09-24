@@ -126,11 +126,14 @@ struct BOOBOO_EXPORT Variable
 
 	bool operator==(const Variable &var) const;
 
+	Variable& operator=(const Variable &var);
 	Variable(const Variable &var);
 	
 	Variable();
 
 	~Variable();
+
+	void set(const Variable &var);
 
 	// This sets type and clears memory (vector/map), should be used when setting
 	// type of prg->result to avoid copying that memory

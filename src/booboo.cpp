@@ -86,6 +86,98 @@ bool Variable::operator==(const Variable &var) const
 	return false;
 }
 
+void Variable::set(const Variable &var)
+{
+	type = var.type;
+
+	switch (type) {
+		case NUMBER:
+		case FUNCTION:
+		case LABEL:
+			n = var.n;
+			break;
+		case STRING:
+			s = var.s;
+			break;
+		case VECTOR:
+			v = var.v;
+			break;
+		case MAP:
+			m = var.m;
+			break;
+		case EXPRESSION:
+			e = var.e;
+			break;
+		case FISH:
+			f = var.f;
+			break;
+		case POINTER:
+			p = var.p;
+			break;
+		case USER:
+			n = var.n;
+			s = var.s;
+			v = var.v;
+			m = var.m;
+			e = var.e;
+			f = var.f;
+			p = var.p;
+			break;
+		default:
+			break;
+	}
+
+	changed();
+}
+
+Variable& Variable::operator=(const Variable &var)
+{
+	type = var.type;
+	name = var.name;
+	constant = var.constant;
+
+	switch (type) {
+		case NUMBER:
+		case FUNCTION:
+		case LABEL:
+			n = var.n;
+			break;
+		case STRING:
+			s = var.s;
+			break;
+		case VECTOR:
+			v = var.v;
+			break;
+		case MAP:
+			m = var.m;
+			break;
+		case EXPRESSION:
+			e = var.e;
+			break;
+		case FISH:
+			f = var.f;
+			break;
+		case POINTER:
+			p = var.p;
+			break;
+		case USER:
+			n = var.n;
+			s = var.s;
+			v = var.v;
+			m = var.m;
+			e = var.e;
+			f = var.f;
+			p = var.p;
+			break;
+		default:
+			break;
+	}
+
+	changed();
+
+	return *this;
+}
+
 Variable::Variable(const Variable &var) :
 	type(var.type),
 	name(var.name),
@@ -127,6 +219,8 @@ Variable::Variable(const Variable &var) :
 		default:
 			break;
 	}
+
+	changed();
 }
 
 Variable::Variable() :
@@ -989,7 +1083,26 @@ Variable::Expression parse_expression(Program *prg, Program *func, std::string e
 			tok.dereference = deref;
 			deref = 0;
 
-			if (pass == PASS2) {
+			if (prg->complete_pass == PASS2) {
+				size_t f = 0;
+				for (f = 0; f < prg->function_names.size(); f++) {
+					if (prg->function_names[f] == prg_func->s->name) {
+						break;
+					}
+				}
+				if (f < prg->function_names.size()) {
+					if (prg->locals[f].find(sym) != prg->locals[f].end()) {
+						tok.i = prg->locals[f][sym];
+					}
+					else {
+						my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(prg)));
+					}
+				}
+				else {
+					my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(prg)));
+				}
+			}
+			else if (pass == PASS2) {
 				if (prg->variables_map.find(sym) == prg->variables_map.end()) {
 					my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(prg)));
 				}
@@ -1338,7 +1451,26 @@ Variable::Fish parse_fish(Program *prg, Program *func, std::string expr, Pass pa
 			tok.dereference = deref;
 			deref = 0;
 
-			if (pass == PASS2) {
+			if (prg->complete_pass == PASS2) {
+				size_t f = 0;
+				for (f = 0; f < prg->function_names.size(); f++) {
+					if (prg->function_names[f] == prg_func->s->name) {
+						break;
+					}
+				}
+				if (f < prg->function_names.size()) {
+					if (prg->locals[f].find(sym) != prg->locals[f].end()) {
+						tok.i = prg->locals[f][sym];
+					}
+					else {
+						my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(prg)));
+					}
+				}
+				else {
+					my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(prg)));
+				}
+			}
+			else if (pass == PASS2) {
 				if (prg->variables_map.find(sym) == prg->variables_map.end()) {
 					my_throw(Error(std::string(__FUNCTION__) + ": " + "Invalid variable name " + sym + " at " + get_error_info(prg)));
 				}
@@ -2586,19 +2718,11 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 		if (func.ref[j] && param.type != Token::NUMBER && param.type != Token::STRING && prg->variables[param.i].get_type() != Variable::EXPRESSION) {
 			if (prg->variables[param.i].get_type() == Variable::FISH) {
 				Variable &v2 = go_fish(prg, prg->variables[param.i].f);
-				std::string name = v2.name;
-				bool constant = v2.constant;
-			       	v2 = var;
-				v2.name = name;
-				v2.constant = constant;
+			       	v2.set(var);
 			}
 			else {
 				Variable &v2 = prg->variables[param.i];
-				std::string name = v2.name;
-				bool constant = v2.constant;
-				v2 = var;
-				v2.name = name;
-				v2.constant = constant;
+				v2.set(var);
 			}
 			var.m.clear();
 			var.v.clear();
@@ -2760,7 +2884,7 @@ static bool do_set(Program *prg, const std::vector<Token> &v, bool const_ok)
 
 		std::string name = v1->name;
 		bool constant = v1->constant;
-		*v1 = *v2;
+		v1->set(*v2);
 		v1->name = name;
 		v1->constant = constant;
 	}
@@ -3394,13 +3518,9 @@ static bool corefunc_explode(Program *prg, const std::vector<Token> &v)
 
 	for (size_t i = 1; i < v.size() && (i-1) < vec->v.size(); i++) {
 		Variable &v1 = as_variable(prg, v, i);
-		std::string name = v1.name;
-		//bool constant = v1.constant;
-		v1 = vec->v[i-1];
-		v1.name = name;
+		v1.set(vec->v[i-1]);
 		prg->result.v.clear();
 		prg->result.m.clear();
-		//v1.constant = constant;
 	}
 
 	return true;
@@ -5515,11 +5635,7 @@ void debug(std::string text)
 				}
 				else {
 					booboo::Variable *var2 = get_var(src);
-					std::string n = var->name;
-					bool c = var->constant;
-					*var = *var2;
-					var->name = n;
-					var->constant = c;
+					var->set(*var2);
 				}
 			}
 		}
