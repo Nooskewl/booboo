@@ -3,7 +3,7 @@ clear 0 0 0
 var font
 = font (font_load "submergd.ttf" 88 1)
 var small_font
-= small_font (font_load "font.ttf" 32 1)
+= small_font (font_load "c:/windows/fonts/arial.ttf" 32 1 512 TRUE)
 
 var highlight
 = highlight -1

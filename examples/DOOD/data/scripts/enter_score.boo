@@ -1,7 +1,7 @@
 var font
 = font (font_load "Horror.ttf" 88 1)
 var small_font
-= small_font (font_load "font.ttf" 48 1)
+= small_font (font_load "c:/windows/fonts/arial.ttf" 48 1 512 TRUE)
 
 var drip_sfx
 var drop_ground_sfx

@@ -6,7 +6,7 @@ var logo
 = logo (image_load "game_gfx/RAINRUNNER.png")
 
 var small_font
-= small_font (font_load "font.ttf" 32 1)
+= small_font (font_load "c:/windows/fonts/arial.ttf" 32 1 512 TRUE)
 
 var drip_sfx
 = drip_sfx (mml_create "@PO0 = { 0 1000 }\nA o3 @TYPE3 @PO0 g32 @PO0")

@@ -24,7 +24,7 @@ call randballdir
 
 ; Load a font
 var font
-= font (font_load "font.ttf" 24 1)
+= font (font_load "c:/windows/fonts/arial.ttf" 24 1 512 TRUE)
 
 ; This places the ball in the middle and sets it moving randomly up/down/left/right
 function randballdir

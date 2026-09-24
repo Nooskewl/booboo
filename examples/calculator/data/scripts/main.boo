@@ -9,7 +9,7 @@ var button_sfx
 = button_sfx (mml_create "@PO0 = { 0 1000 }\nA @PO0 g32 @PO0")
 
 var font
-= font (font_load "vga.ttf" 48 1)
+= font (font_load "c:/windows/fonts/arial.ttf" 48 1 512 TRUE)
 
 resize 1280 720
 

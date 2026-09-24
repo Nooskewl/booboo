@@ -85,8 +85,8 @@ function rsz destroy_fonts
 	explode (get_screen_size) W H
 	resize W H
 
-	= font (font_load "astron-boy.ttf" (/ H 15) 1)
-	= small_font (font_load "astron-boy.ttf" (/ H 25) 1)
+	= font (font_load "c:/windows/fonts/arial.ttf" (/ H 15) 1 512 TRUE)
+	= small_font (font_load "c:/windows/fonts/arial.ttf" (/ H 25) 1 512 TRUE)
 
 	= fh (font_height font)
 

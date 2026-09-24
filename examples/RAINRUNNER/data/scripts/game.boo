@@ -35,7 +35,7 @@ vector_add numeral_imgs img
 vector_add numeral_imgs img
 
 var font
-= font (font_load "font.ttf" 48 1)
+= font (font_load "c:/windows/fonts/arial.ttf" 48 1 512 TRUE)
 
 var hit_sfx
 var jump_sfx

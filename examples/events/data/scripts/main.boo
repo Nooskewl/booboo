@@ -3,7 +3,7 @@ var cock fire
 = fire (sample_load "pistol.ogg")
 
 var font
-= font (font_load "font.ttf" 32 1)
+= font (font_load "c:/windows/fonts/arial.ttf" 32 1 512 TRUE)
 
 function event type a b c d
 {

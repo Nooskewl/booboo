@@ -6,7 +6,7 @@ vector_add groups TRANSITION_ENLARGE
 vector_add groups TRANSITION_SHRINK
 
 var font
-= font (font_load "vga.ttf" 12 1)
+= font (font_load "c:/windows/fonts/arial.ttf" 12 1 512 TRUE)
 
 var c c_both c_left c_right ll lr l1 l2 l3 l4 l5 l6 r1 r2 r3 r4 r5 r6 bcycle ; widget userdata
 number wc wc_both wc_left wc_right wll wlr wl1 wl2 wl3 wl4 wl5 wl6 wr1 wr2 wr3 wr4 wr5 wr6 wbcycle ; widgets

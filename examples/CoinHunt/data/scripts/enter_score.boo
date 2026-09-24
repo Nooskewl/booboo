@@ -3,7 +3,7 @@ include "bloom.inc"
 var font
 = font (font_load "FragileBombers.ttf" 92 1)
 var small_font
-= small_font (font_load "font.ttf" 32 1)
+= small_font (font_load "c:/windows/fonts/arial.ttf" 32 1 512 TRUE)
 
 var sfx
 var enter_sfx

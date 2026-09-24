@@ -37,8 +37,8 @@ var thrust_inst
 = thrust_inst -1
 var small_font
 var big_font
-= small_font (font_load "font.ttf" 20 TRUE)
-= big_font (font_load "font.ttf" 36 TRUE)
+= small_font (font_load "c:/windows/fonts/arial.ttf" 14 TRUE 512 TRUE)
+= big_font (font_load "c:/windows/fonts/arial.ttf" 36 TRUE 512 TRUE)
 
 var pos_x
 var pos_y

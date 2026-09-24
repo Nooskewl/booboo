@@ -9,7 +9,7 @@ var w h
 explode (image_size img) w h
 
 var font
-= font (font_load "font.ttf" 64 1)
+= font (font_load "c:/windows/fonts/arial.ttf" 64 1 512 TRUE)
 
 var imgs
 

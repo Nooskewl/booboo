@@ -8,7 +8,7 @@ var logo
 = logo (image_load "misc/coinhunt.png")
 
 var small_font
-= small_font (font_load "font.ttf" 32 1)
+= small_font (font_load "c:/windows/fonts/arial.ttf" 32 1 512 TRUE)
 
 var sfx
 = sfx (mml_create "@PO0 = { 0 -100 }\nA @PO0 c32 @PO0")

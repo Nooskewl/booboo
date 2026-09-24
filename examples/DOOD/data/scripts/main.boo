@@ -6,7 +6,7 @@ var logo
 = logo (image_load "dood.png")
 
 var small_font
-= small_font (font_load "font.ttf" 48 1)
+= small_font (font_load "c:/windows/fonts/arial.ttf" 48 1 512 TRUE)
 
 var drip_sfx
 = drip_sfx (mml_create "@PO0 = { 0 1000 0 1000 0 }\nA o3 @TYPE3 @PO0 g32 @PO0")

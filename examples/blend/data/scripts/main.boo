@@ -1,7 +1,7 @@
 resize 1280 720
 
 var font
-= font (font_load "font.ttf" 16 1)
+= font (font_load "c:/windows/fonts/arial.ttf" 16 1 512 TRUE)
 
 var src dest
 = src BLEND_ONE

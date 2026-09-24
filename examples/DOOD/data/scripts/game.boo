@@ -12,7 +12,7 @@ var exit_count
 = exit_count 180
 
 var font
-= font (font_load "font.ttf" 16 1)
+= font (font_load "c:/windows/fonts/arial.ttf" 16 1 512 TRUE)
 
 var eicon
 = eicon (image_load "stand_s.png")
