@@ -756,6 +756,15 @@ int main(int argc, char **argv)
 			_chdir(fn.c_str());
 			fn = "";
 		}
+		else if (fn.find('/') != std::string::npos || fn.find('\\') != std::string::npos) {
+			int p = fn.length()-1;
+			while (p > 0 && fn[p] != '/' && fn[p] != '\\') {
+				p--;
+			}
+			std::string dir = fn.substr(0, p).c_str();
+			_chdir(dir.c_str());
+			fn = fn.substr(p+1);
+		}
 	}
 
 	if (fn != "") {
