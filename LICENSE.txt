@@ -1,0 +1,6 @@
+Never share or distribute BooBoo source code
+
+If you don't have a BooBoo license, never share or redistribute the BooBoo
+EXEs or DLLs
+
+You cannot use this product to build a competing game engine
