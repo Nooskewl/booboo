@@ -304,31 +304,31 @@ static std::string sformat(Program *prg, const std::vector<Token> &v, int skip)
 			}
 			else if (IS_EXPRESSION(*v1)) {
 				evaluate_expression(prg, v1->e);
-				if (IS_NUMBER(prg->result)) {
+				if (prg->result->get_type() == Variable::NUMBER) {
 					format = (format == "") ? "g" : format;
 					char buf[1000];
 					if (format.find('c') != std::string::npos || format.find('d') != std::string::npos || format.find('x') != std::string::npos) {
-						snprintf(buf, 1000, ("%" + format).c_str(), (int)prg->result.get_n());
+						snprintf(buf, 1000, ("%" + format).c_str(), (int)prg->result->get_n());
 					}
 					else {
-						snprintf(buf, 1000, ("%" + format).c_str(), prg->result.get_n());
+						snprintf(buf, 1000, ("%" + format).c_str(), prg->result->get_n());
 					}
 					val = buf;
 				}
 				else {
-					if (IS_STRING(prg->result)) {
-						val = prg->result.get_s();
+					if (IS_STRING(*prg->result)) {
+						val = prg->result->get_s();
 					}
-					else if (IS_VECTOR(prg->result)) {
+					else if (IS_VECTOR(*prg->result)) {
 						val = "-vector-";
 					}
-					else if (IS_MAP(prg->result)) {
+					else if (IS_MAP(*prg->result)) {
 						val = "-map-";
 					}
-					else if (IS_FUNCTION(prg->result)) {
+					else if (IS_FUNCTION(*prg->result)) {
 						val = "-function-";
 					}
-					else if (IS_LABEL(prg->result)) {
+					else if (IS_LABEL(*prg->result)) {
 						val = "-label-";
 					}
 					else {
@@ -438,8 +438,8 @@ static void exprfunc_getenv(Program *prg, const std::vector<Token> &v)
 	_dupenv_s(&ptr, &sz, get.c_str());
 #endif
 
-	prg->result.set_type(Variable::STRING);
-	prg->result.set_s(ptr == nullptr ? "" : ptr);
+	prg->result->set_type(Variable::STRING);
+	prg->result->set_s(ptr == nullptr ? "" : ptr);
 }
 
 static void exprfunc_getcwd(Program *prg, const std::vector<Token> &v)
@@ -449,8 +449,8 @@ static void exprfunc_getcwd(Program *prg, const std::vector<Token> &v)
 	char buf[2048];
 	char *res = getcwd(buf, 2048);
 
-	prg->result.set_type(Variable::STRING);
-	prg->result.set_s(res == nullptr ? "" : buf);
+	prg->result->set_type(Variable::STRING);
+	prg->result->set_s(res == nullptr ? "" : buf);
 }
 
 static bool corefunc_print(Program *prg, const std::vector<Token> &v)
@@ -468,15 +468,15 @@ static void exprfunc_input(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
-	prg->result.set_type(Variable::STRING);
+	prg->result->set_type(Variable::STRING);
 
 	if (std::cin.eof()) {
-		prg->result.set_s("");
+		prg->result->set_s("");
 	}
 	else {
 		std::string s;
 		std::cin >> s;
-		prg->result.set_s(s);
+		prg->result->set_s(s);
 	}
 }
 
@@ -488,16 +488,16 @@ static void exprfunc_mkdir(Program *prg, const std::vector<Token> &v)
 
 	bool success = util::mkdir(path);
 
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(success);
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(success);
 }
 
 static void exprfunc_get_system_language(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
-	prg->result.set_type(Variable::STRING);
-	prg->result.set_s(util::get_system_language());
+	prg->result->set_type(Variable::STRING);
+	prg->result->set_s(util::get_system_language());
 }
 
 static void exprfunc_get_full_path(Program *prg, const std::vector<Token> &v)
@@ -506,18 +506,18 @@ static void exprfunc_get_full_path(Program *prg, const std::vector<Token> &v)
 
 	std::string str = as_string(prg, v, 0);
 
-	prg->result.set_type(Variable::STRING);
+	prg->result->set_type(Variable::STRING);
 
 	char buf[MAX_PATH];
 	GetFullPathNameA(str.c_str(), MAX_PATH, buf, NULL);
-	prg->result.set_s(buf);
+	prg->result->set_s(buf);
 }
 
 static void exprfunc_list_drives(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
-	prg->result.set_type(Variable::VECTOR);
+	prg->result->set_type(Variable::VECTOR);
 	
 	DWORD d = GetLogicalDrives();
 	for (int i = 0; i < 32; i++) {
@@ -528,7 +528,7 @@ static void exprfunc_list_drives(Program *prg, const std::vector<Token> &v)
 			char buf[10];
 			snprintf(buf, 10, "%c", 'A' + i);
 			s.set_s(buf);
-			prg->result.v.push_back(s);
+			prg->result->v.push_back(s);
 		}
 	}
 }
@@ -539,7 +539,7 @@ static void exprfunc_list_directory(Program *prg, const std::vector<Token> &v)
 
 	std::string glob = as_string(prg, v, 0);
 
-	prg->result.set_type(Variable::VECTOR);
+	prg->result->set_type(Variable::VECTOR);
 
 	std::string path_part;
 	int p = glob.length() - 1;
@@ -578,8 +578,8 @@ static void exprfunc_list_directory(Program *prg, const std::vector<Token> &v)
 		is_dir.v.push_back(v);
 	}
 
-	prg->result.v.push_back(filenames);
-	prg->result.v.push_back(is_dir);
+	prg->result->v.push_back(filenames);
+	prg->result->v.push_back(is_dir);
 }
 
 static void quicksort(Program *prg, int func, Variable *vec, int start, int pivot)
@@ -604,7 +604,7 @@ static void quicksort(Program *prg, int func, Variable *vec, int start, int pivo
 		t.i = i2;
 		params.push_back(t);
 		call_function(prg, func, params, 0);
-		if (prg->result.get_n() == false) {
+		if (prg->result->get_n() == false) {
 			Variable v = vec->v[i];
 			vec->v.erase(vec->v.begin()+i);
 			vec->v.insert(vec->v.begin()+pivot, v);
@@ -623,9 +623,11 @@ static bool corefunc_sort(Program *prg, const std::vector<Token> &v)
 	Variable *vec;
        	if (v[0].type == Token::SYMBOL) {
 		if (prg->variables[v[0].i].get_type() == Variable::EXPRESSION) {
-			evaluate_expression(prg, prg->variables[v[0].i].e);
 			static Variable _v;
-			_v = prg->result;
+			Variable *tmp = prg->result;
+			prg->result = &_v;
+			evaluate_expression(prg, prg->variables[v[0].i].e);
+			prg->result = tmp;
 			vec = &_v;
 		}
 		else {
@@ -653,9 +655,11 @@ static bool corefunc_unique(Program *prg, const std::vector<Token> &v)
 	Variable *vec;
        	if (v[0].type == Token::SYMBOL) {
 		if (prg->variables[v[0].i].get_type() == Variable::EXPRESSION) {
-			evaluate_expression(prg, prg->variables[v[0].i].e);
 			static Variable _v;
-			_v = prg->result;
+			Variable *tmp = prg->result;
+			prg->result = &_v;
+			evaluate_expression(prg, prg->variables[v[0].i].e);
+			prg->result = tmp;
 			vec = &_v;
 		}
 		else {
@@ -678,8 +682,8 @@ static void exprfunc_string_format(Program *prg, const std::vector<Token> &v)
 
 	std::string result = sformat(prg, v, 0);
 
-	prg->result.set_type(Variable::STRING);
-	prg->result.set_s(result);
+	prg->result->set_type(Variable::STRING);
+	prg->result->set_s(result);
 }
 
 static void exprfunc_string_char_at(Program *prg, const std::vector<Token> &v)
@@ -689,11 +693,11 @@ static void exprfunc_string_char_at(Program *prg, const std::vector<Token> &v)
 	std::string s = as_string(prg, v, 0);
 	int index = as_number(prg, v, 1);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 	
 	uint32_t value = util::utf8_char(s, index);
 
-	prg->result.set_n(value);
+	prg->result->set_n(value);
 }
 
 static bool stringfunc_set_char_at(Program *prg, const std::vector<Token> &v)
@@ -723,9 +727,9 @@ static void exprfunc_string_length(Program *prg, const std::vector<Token> &v)
 
 	std::string s = as_string(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(util::utf8_len(s));
+	prg->result->set_n(util::utf8_len(s));
 }
 
 static void exprfunc_string_from_number(Program *prg, const std::vector<Token> &v)
@@ -734,9 +738,9 @@ static void exprfunc_string_from_number(Program *prg, const std::vector<Token> &
 
 	uint32_t n = as_number(prg, v, 0);
 
-       	prg->result.set_type(Variable::STRING);
+       	prg->result->set_type(Variable::STRING);
 
-	prg->result.set_s(util::utf8_char_to_string(n));
+	prg->result->set_s(util::utf8_char_to_string(n));
 }
 
 static void exprfunc_string_substr(Program *prg, const std::vector<Token> &v)
@@ -752,9 +756,9 @@ static void exprfunc_string_substr(Program *prg, const std::vector<Token> &v)
 		count = as_number(prg, v, 2);
 	}
 
-	prg->result.set_type(Variable::STRING);
+	prg->result->set_type(Variable::STRING);
 
-	prg->result.set_s(util::utf8_substr(str, start, count));
+	prg->result->set_s(util::utf8_substr(str, start, count));
 }
 
 static void exprfunc_string_uppercase(Program *prg, const std::vector<Token> &v)
@@ -763,9 +767,9 @@ static void exprfunc_string_uppercase(Program *prg, const std::vector<Token> &v)
 
 	std::string str = as_string(prg, v, 0);
 
-	prg->result.set_type(Variable::STRING);
+	prg->result->set_type(Variable::STRING);
 
-	prg->result.set_s(util::uppercase(str));
+	prg->result->set_s(util::uppercase(str));
 }
 
 static void exprfunc_string_lowercase(Program *prg, const std::vector<Token> &v)
@@ -774,9 +778,9 @@ static void exprfunc_string_lowercase(Program *prg, const std::vector<Token> &v)
 
 	std::string str = as_string(prg, v, 0);
 
-	prg->result.set_type(Variable::STRING);
+	prg->result->set_type(Variable::STRING);
 
-	prg->result.set_s(util::lowercase(str));
+	prg->result->set_s(util::lowercase(str));
 }
 
 static void exprfunc_string_trim(Program *prg, const std::vector<Token> &v)
@@ -785,9 +789,9 @@ static void exprfunc_string_trim(Program *prg, const std::vector<Token> &v)
 
 	std::string str = as_string(prg, v, 0);
 
-	prg->result.set_type(Variable::STRING);
+	prg->result->set_type(Variable::STRING);
 
-	prg->result.set_s(util::trim(str));
+	prg->result->set_s(util::trim(str));
 }
 
 static void exprfunc_string_ltrim(Program *prg, const std::vector<Token> &v)
@@ -796,9 +800,9 @@ static void exprfunc_string_ltrim(Program *prg, const std::vector<Token> &v)
 
 	std::string str = as_string(prg, v, 0);
 
-	prg->result.set_type(Variable::STRING);
+	prg->result->set_type(Variable::STRING);
 
-	prg->result.set_s(util::ltrim(str));
+	prg->result->set_s(util::ltrim(str));
 }
 
 static void exprfunc_string_rtrim(Program *prg, const std::vector<Token> &v)
@@ -807,9 +811,9 @@ static void exprfunc_string_rtrim(Program *prg, const std::vector<Token> &v)
 
 	std::string str = as_string(prg, v, 0);
 
-	prg->result.set_type(Variable::STRING);
+	prg->result->set_type(Variable::STRING);
 
-	prg->result.set_s(util::rtrim(str));
+	prg->result->set_s(util::rtrim(str));
 }
 
 static void exprfunc_string_find(Program *prg, const std::vector<Token> &v)
@@ -821,13 +825,13 @@ static void exprfunc_string_find(Program *prg, const std::vector<Token> &v)
 
 	size_t pos = str.find(needle);
        	
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
 	if (pos == std::string::npos) {
-		prg->result.set_n(-1);
+		prg->result->set_n(-1);
 	}
 	else {
-		prg->result.set_n(pos);
+		prg->result->set_n(pos);
 	}
 }
 
@@ -847,11 +851,11 @@ static void exprfunc_string_replace(Program *prg, const std::vector<Token> &v)
 		ignore_case = false;
 	}
 
-	prg->result.set_type(Variable::STRING);
+	prg->result->set_type(Variable::STRING);
 
 	std::regex pattern(regex, ignore_case ? std::regex_constants::ECMAScript | std::regex_constants::icase : std::regex_constants::ECMAScript);
 
-	prg->result.set_s(std::regex_replace(str, pattern, fmt.c_str()));
+	prg->result->set_s(std::regex_replace(str, pattern, fmt.c_str()));
 }
 
 static void exprfunc_string_match(Program *prg, const std::vector<Token> &v)
@@ -869,7 +873,7 @@ static void exprfunc_string_match(Program *prg, const std::vector<Token> &v)
 		ignore_case = false;
 	}
 
-	prg->result.set_type(Variable::VECTOR);
+	prg->result->set_type(Variable::VECTOR);
 
 	std::regex pattern(regex, ignore_case ? std::regex_constants::ECMAScript | std::regex_constants::icase : std::regex_constants::ECMAScript);
 
@@ -881,7 +885,7 @@ static void exprfunc_string_match(Program *prg, const std::vector<Token> &v)
 			Variable v;
 			v.set_type(Variable::STRING);
 			v.set_s(sub.str());
-			prg->result.v.push_back(v);
+			prg->result->v.push_back(v);
 		}
 	}
 }
@@ -901,11 +905,11 @@ static void exprfunc_string_matches(Program *prg, const std::vector<Token> &v)
 		ignore_case = false;
 	}
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 	
 	std::regex pattern(regex, ignore_case ? std::regex_constants::ECMAScript | std::regex_constants::icase : std::regex_constants::ECMAScript);
 
-	prg->result.set_n(std::regex_search(str, pattern));
+	prg->result->set_n(std::regex_search(str, pattern));
 }
 
 static void exprfunc_math_sin(Program *prg, const std::vector<Token> &v)
@@ -914,9 +918,9 @@ static void exprfunc_math_sin(Program *prg, const std::vector<Token> &v)
 
 	double n = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(sin(n));
+	prg->result->set_n(sin(n));
 }
 
 static void exprfunc_math_cos(Program *prg, const std::vector<Token> &v)
@@ -925,9 +929,9 @@ static void exprfunc_math_cos(Program *prg, const std::vector<Token> &v)
 
 	double n = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(cos(n));
+	prg->result->set_n(cos(n));
 }
 
 static void exprfunc_math_tan(Program *prg, const std::vector<Token> &v)
@@ -936,9 +940,9 @@ static void exprfunc_math_tan(Program *prg, const std::vector<Token> &v)
 
 	double n = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(tan(n));
+	prg->result->set_n(tan(n));
 }
 
 static void exprfunc_math_asin(Program *prg, const std::vector<Token> &v)
@@ -947,9 +951,9 @@ static void exprfunc_math_asin(Program *prg, const std::vector<Token> &v)
 
 	double n = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(asin(n));
+	prg->result->set_n(asin(n));
 }
 
 static void exprfunc_math_acos(Program *prg, const std::vector<Token> &v)
@@ -958,9 +962,9 @@ static void exprfunc_math_acos(Program *prg, const std::vector<Token> &v)
 
 	double n = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(acos(n));
+	prg->result->set_n(acos(n));
 }
 
 static void exprfunc_math_atan(Program *prg, const std::vector<Token> &v)
@@ -969,9 +973,9 @@ static void exprfunc_math_atan(Program *prg, const std::vector<Token> &v)
 
 	double n = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(atan(n));
+	prg->result->set_n(atan(n));
 }
 
 static void exprfunc_math_atan2(Program *prg, const std::vector<Token> &v)
@@ -982,9 +986,9 @@ static void exprfunc_math_atan2(Program *prg, const std::vector<Token> &v)
 	double n2 = as_number(prg, v, 1);
 
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(atan2(n, n2));
+	prg->result->set_n(atan2(n, n2));
 }
 
 static void exprfunc_math_abs(Program *prg, const std::vector<Token> &v)
@@ -993,9 +997,9 @@ static void exprfunc_math_abs(Program *prg, const std::vector<Token> &v)
 
 	double n = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 		
-	prg->result.set_n(fabs(n));
+	prg->result->set_n(fabs(n));
 }
 
 static void exprfunc_math_pow(Program *prg, const std::vector<Token> &v)
@@ -1005,9 +1009,9 @@ static void exprfunc_math_pow(Program *prg, const std::vector<Token> &v)
 	double n = as_number(prg, v, 0);
 	double n2 = as_number(prg, v, 1);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(pow(n, n2));
+	prg->result->set_n(pow(n, n2));
 }
 
 static void exprfunc_math_sqrt(Program *prg, const std::vector<Token> &v)
@@ -1016,9 +1020,9 @@ static void exprfunc_math_sqrt(Program *prg, const std::vector<Token> &v)
 
 	double n = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(sqrt(n));
+	prg->result->set_n(sqrt(n));
 }
 
 static void exprfunc_math_floor(Program *prg, const std::vector<Token> &v)
@@ -1027,9 +1031,9 @@ static void exprfunc_math_floor(Program *prg, const std::vector<Token> &v)
 
 	double n = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(floor(n));
+	prg->result->set_n(floor(n));
 }
 
 static void exprfunc_math_ceil(Program *prg, const std::vector<Token> &v)
@@ -1038,9 +1042,9 @@ static void exprfunc_math_ceil(Program *prg, const std::vector<Token> &v)
 
 	double n = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(ceil(n));
+	prg->result->set_n(ceil(n));
 }
 
 static void exprfunc_math_neg(Program *prg, const std::vector<Token> &v)
@@ -1049,9 +1053,9 @@ static void exprfunc_math_neg(Program *prg, const std::vector<Token> &v)
 
 	double n = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(-n);
+	prg->result->set_n(-n);
 }
 
 static void exprfunc_math_intmod(Program *prg, const std::vector<Token> &v)
@@ -1061,9 +1065,9 @@ static void exprfunc_math_intmod(Program *prg, const std::vector<Token> &v)
 	int n1 = (int)as_number(prg, v, 0);
 	int n2 = (int)as_number(prg, v, 1);
 
-       	prg->result.set_type(Variable::NUMBER);
+       	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(n1 % n2);
+	prg->result->set_n(n1 % n2);
 }
 
 static void exprfunc_math_fmod(Program *prg, const std::vector<Token> &v)
@@ -1073,9 +1077,9 @@ static void exprfunc_math_fmod(Program *prg, const std::vector<Token> &v)
 	double n1 = as_number(prg, v, 0);
 	double n2 = as_number(prg, v, 1);
 
-       	prg->result.set_type(Variable::NUMBER);
+       	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(fmod(n1, n2));
+	prg->result->set_n(fmod(n1, n2));
 }
 
 static void exprfunc_math_sign(Program *prg, const std::vector<Token> &v)
@@ -1084,9 +1088,9 @@ static void exprfunc_math_sign(Program *prg, const std::vector<Token> &v)
 
 	double n = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 		
-	prg->result.set_n(sign(n));
+	prg->result->set_n(sign(n));
 }
 
 static void exprfunc_math_exp(Program *prg, const std::vector<Token> &v)
@@ -1095,9 +1099,9 @@ static void exprfunc_math_exp(Program *prg, const std::vector<Token> &v)
 
 	double n = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 		
-	prg->result.set_n(exp(n));
+	prg->result->set_n(exp(n));
 }
 
 static void exprfunc_math_hypot(Program *prg, const std::vector<Token> &v)
@@ -1107,9 +1111,9 @@ static void exprfunc_math_hypot(Program *prg, const std::vector<Token> &v)
 	double n = as_number(prg, v, 0);
 	double n2 = as_number(prg, v, 1);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 		
-	prg->result.set_n(hypot(n, n2));
+	prg->result->set_n(hypot(n, n2));
 }
 
 static void exprfunc_math_log(Program *prg, const std::vector<Token> &v)
@@ -1118,9 +1122,9 @@ static void exprfunc_math_log(Program *prg, const std::vector<Token> &v)
 
 	double n = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 		
-	prg->result.set_n(log(n));
+	prg->result->set_n(log(n));
 }
 
 static void exprfunc_math_log10(Program *prg, const std::vector<Token> &v)
@@ -1129,9 +1133,9 @@ static void exprfunc_math_log10(Program *prg, const std::vector<Token> &v)
 
 	double n = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 		
-	prg->result.set_n(log10(n));
+	prg->result->set_n(log10(n));
 }
 
 static void exprfunc_math_min(Program *prg, const std::vector<Token> &v)
@@ -1144,8 +1148,8 @@ static void exprfunc_math_min(Program *prg, const std::vector<Token> &v)
 		n = MIN(n, as_number(prg, v, i));
 	}
 	
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(n);
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(n);
 }
 
 static void exprfunc_math_max(Program *prg, const std::vector<Token> &v)
@@ -1158,8 +1162,8 @@ static void exprfunc_math_max(Program *prg, const std::vector<Token> &v)
 		n = MAX(n, as_number(prg, v, i));
 	}
 	
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(n);
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(n);
 }
 
 static bool vectorfunc_init(Program *prg, const std::vector<Token> &v)
@@ -1227,8 +1231,8 @@ static void exprfunc_vector_size(Program *prg, const std::vector<Token> &v)
 
 	Variable *var = as_variable_pointer(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(var->v.size());
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(var->v.size());
 }
 
 static bool vectorfunc_insert(Program *prg, const std::vector<Token> &v)
@@ -1336,18 +1340,18 @@ static void exprfunc_vector_it_start(Program *prg, const std::vector<Token> &v)
 {
 	Variable *vec = as_variable_pointer(prg, v, 0);
 
-	prg->result.set_type(Variable::USER);
-	prg->result.set_n(0);
-	prg->result.set_p(vec);
+	prg->result->set_type(Variable::USER);
+	prg->result->set_n(0);
+	prg->result->set_p(vec);
 }
 
 static void exprfunc_vector_it_end(Program *prg, const std::vector<Token> &v)
 {
 	Variable *vec = as_variable_pointer(prg, v, 0);
 
-	prg->result.set_type(Variable::USER);
-	prg->result.set_n(vec->v.size());
-	prg->result.set_p(vec);
+	prg->result->set_type(Variable::USER);
+	prg->result->set_n(vec->v.size());
+	prg->result->set_p(vec);
 }
 
 static void exprfunc_vector_it_inc(Program *prg, const std::vector<Token> &v)
@@ -1355,17 +1359,17 @@ static void exprfunc_vector_it_inc(Program *prg, const std::vector<Token> &v)
 	Variable *it = as_variable_pointer(prg, v, 0);
 	int inc = as_number(prg, v, 1);
 
-	prg->result.set_type(Variable::USER);
-	prg->result.set_n(MIN(it->get_p()->v.size(), it->get_n() + inc));
-	prg->result.set_p(it->get_p());
+	prg->result->set_type(Variable::USER);
+	prg->result->set_n(MIN(it->get_p()->v.size(), it->get_n() + inc));
+	prg->result->set_p(it->get_p());
 }
 
 static void exprfunc_vector_it_get(Program *prg, const std::vector<Token> &v)
 {
 	Variable *it = as_variable_pointer(prg, v, 0);
 
-	prg->result.set_type(Variable::POINTER);
-	prg->result.set_p(&it->get_p()->v[it->get_n()]);
+	prg->result->set_type(Variable::POINTER);
+	prg->result->set_p(&it->get_p()->v[it->get_n()]);
 }
 
 static void exprfunc_vector_it_erase(Program *prg, const std::vector<Token> &v)
@@ -1374,9 +1378,9 @@ static void exprfunc_vector_it_erase(Program *prg, const std::vector<Token> &v)
 
 	it->get_p()->v.erase(it->get_p()->v.begin()+it->get_n());
 	
-	prg->result.set_type(Variable::USER);
-	prg->result.set_n(it->get_n());
-	prg->result.set_p(it->get_p());
+	prg->result->set_type(Variable::USER);
+	prg->result->set_n(it->get_n());
+	prg->result->set_p(it->get_p());
 }
 
 static bool mapfunc_clear(Program *prg, const std::vector<Token> &v)
@@ -1433,14 +1437,14 @@ static void exprfunc_map_keys(Program *prg, const std::vector<Token> &v)
 
 	std::map<std::string, Variable>::iterator it;
 
-	prg->result.set_type(Variable::VECTOR);
+	prg->result->set_type(Variable::VECTOR);
 
 	for (it = m.m.begin(); it != m.m.end(); it++) {
 		std::pair<std::string, Variable> p = *it;
 		Variable var;
 		var.set_type(Variable::STRING);
 		var.set_s(p.first);
-		prg->result.v.push_back(var);
+		prg->result->v.push_back(var);
 	}
 }
 
@@ -1453,13 +1457,13 @@ static void exprfunc_file_open(Program *prg, const std::vector<Token> &v)
 	
 	File_Info *info = file_info(prg);
 
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(info->file_id);
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(info->file_id);
 
 	SDL_IOStream *f = SDL_IOFromFile(filename.c_str(), mode.c_str());
 
 	if (f == nullptr) {
-		prg->result.set_n(-1);
+		prg->result->set_n(-1);
 		return;
 	}
 
@@ -1474,15 +1478,15 @@ static void exprfunc_file_open_cpa(Program *prg, const std::vector<Token> &v)
 	
 	File_Info *info = file_info(prg);
 
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(info->file_id);
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(info->file_id);
 
 	int sz;
 
 	SDL_IOStream *f = util::open_file(filename.c_str(), &sz);
 
 	if (f == nullptr) {
-		prg->result.set_n(-1);
+		prg->result->set_n(-1);
 		return;
 	}
 
@@ -1510,7 +1514,7 @@ static void exprfunc_file_read(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::STRING);
+	prg->result->set_type(Variable::STRING);
 
 	File_Info *info = file_info(prg);
 	INFO_EXISTS(info->files, id)
@@ -1533,7 +1537,7 @@ static void exprfunc_file_read(Program *prg, const std::vector<Token> &v)
 			char buf[2];
 			buf[0] = c;
 			buf[1] = 0;
-			prg->result.set_s(prg->result.get_s() + buf);
+			prg->result->set_s(prg->result->get_s() + buf);
 		}
 		else if (space) {
 			break;
@@ -1547,7 +1551,7 @@ static void exprfunc_file_read_line(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::STRING);
+	prg->result->set_type(Variable::STRING);
 
 	File_Info *info = file_info(prg);
 	INFO_EXISTS(info->files, id)
@@ -1563,7 +1567,7 @@ static void exprfunc_file_read_line(Program *prg, const std::vector<Token> &v)
 		char buf[2];
 		buf[0] = c;
 		buf[1] = 0;
-		prg->result.set_s(prg->result.get_s() + buf);
+		prg->result->set_s(prg->result->get_s() + buf);
 		if (c == '\n') {
 			break;
 		}
@@ -1576,7 +1580,7 @@ static void exprfunc_file_read_byte(Program *prg, const std::vector<Token> &v)
 
 	int id = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
 	File_Info *info = file_info(prg);
 	INFO_EXISTS(info->files, id)
@@ -1584,7 +1588,7 @@ static void exprfunc_file_read_byte(Program *prg, const std::vector<Token> &v)
 	Uint8 c;
 	SDL_ReadU8(info->files[id], &c);
 
-	prg->result.set_n(c);
+	prg->result->set_n(c);
 }
 
 static void exprfunc_file_write_byte(Program *prg, const std::vector<Token> &v)
@@ -1599,8 +1603,8 @@ static void exprfunc_file_write_byte(Program *prg, const std::vector<Token> &v)
 
 	SDL_IOStream *f = info->files[id];
 
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(SDL_WriteU8(f, (Uint8)b));
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(SDL_WriteU8(f, (Uint8)b));
 }
 
 static void exprfunc_file_write(Program *prg, const std::vector<Token> &v)
@@ -1613,8 +1617,8 @@ static void exprfunc_file_write(Program *prg, const std::vector<Token> &v)
 	File_Info *info = file_info(prg);
 	INFO_EXISTS(info->files, id)
 
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(SDL_WriteIO(info->files[id], val.c_str(), val.length()) == val.length());
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(SDL_WriteIO(info->files[id], val.c_str(), val.length()) == val.length());
 }
 
 static void exprfunc_file_print(Program *prg, const std::vector<Token> &v)
@@ -1628,8 +1632,8 @@ static void exprfunc_file_print(Program *prg, const std::vector<Token> &v)
 	File_Info *info = file_info(prg);
 	INFO_EXISTS(info->files, id)
 
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(SDL_WriteIO(info->files[id], val.c_str(), val.length()) == val.length());
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(SDL_WriteIO(info->files[id], val.c_str(), val.length()) == val.length());
 }
 
 static void exprfunc_file_tell(Program *prg, const std::vector<Token> &v)
@@ -1641,9 +1645,9 @@ static void exprfunc_file_tell(Program *prg, const std::vector<Token> &v)
 	File_Info *info = file_info(prg);
 	INFO_EXISTS(info->files, id)
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(SDL_TellIO(info->files[id]));
+	prg->result->set_n(SDL_TellIO(info->files[id]));
 }
 
 static void exprfunc_file_seek(Program *prg, const std::vector<Token> &v)
@@ -1657,8 +1661,8 @@ static void exprfunc_file_seek(Program *prg, const std::vector<Token> &v)
 	File_Info *info = file_info(prg);
 	INFO_EXISTS(info->files, id)
 
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(SDL_SeekIO(info->files[id], o, (SDL_IOWhence)whence) != -1);
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(SDL_SeekIO(info->files[id], o, (SDL_IOWhence)whence) != -1);
 }
 
 static void exprfunc_file_eof(Program *prg, const std::vector<Token> &v)
@@ -1670,9 +1674,9 @@ static void exprfunc_file_eof(Program *prg, const std::vector<Token> &v)
 	File_Info *info = file_info(prg);
 	INFO_EXISTS(info->files, id)
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(SDL_GetIOStatus(info->files[id]) == SDL_IO_STATUS_EOF);
+	prg->result->set_n(SDL_GetIOStatus(info->files[id]) == SDL_IO_STATUS_EOF);
 }
 
 static bool twinklefunc_print_coloured_text(Program *prg, const std::vector<Token> &v)
@@ -1748,18 +1752,18 @@ static void exprfunc_twinkle_getch(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 	
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(twinkle::getch());
+	prg->result->set_n(twinkle::getch());
 }
 
 static void exprfunc_twinkle_kbhit(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 	
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(twinkle::kbhit());
+	prg->result->set_n(twinkle::kbhit());
 }
 
 static void exprfunc_twinkle_get_console_size(Program *prg, const std::vector<Token> &v)
@@ -1769,16 +1773,16 @@ static void exprfunc_twinkle_get_console_size(Program *prg, const std::vector<To
 	int w, h;
 	twinkle::get_console_size(&w, &h);
 	
-	prg->result.set_type(Variable::VECTOR);
+	prg->result->set_type(Variable::VECTOR);
 
 	Variable var;
 	var.set_type(Variable::NUMBER);
 
 	var.set_n(w);
-	prg->result.v.push_back(var);
+	prg->result->v.push_back(var);
 
 	var.set_n(h);
-	prg->result.v.push_back(var);
+	prg->result->v.push_back(var);
 }
 
 static bool twinklefunc_set_cursor_pos(Program *prg, const std::vector<Token> &v)
@@ -1810,11 +1814,11 @@ static void exprfunc_cfg_load(Program *prg, const std::vector<Token> &v)
 
 	CFG_Info *info = cfg_info(prg);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
 	std::map<std::string, Config_Value> val = load_cfg(prg, cfg_name);
 	int id = info->cfg_id++;
-	prg->result.set_n(id);
+	prg->result->set_n(id);
 	info->cfgs[id] = val;
 }
 
@@ -1837,11 +1841,11 @@ static void exprfunc_cfg_save(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v, 0);
 	std::string cfg_name = as_string(prg, v, 1);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
 	bool success = save_cfg(prg, id, cfg_name);
 
-	prg->result.set_n(success);
+	prg->result->set_n(success);
 }
 
 static void exprfunc_cfg_typeof(Program *prg, const std::vector<Token> &v)
@@ -1855,16 +1859,16 @@ static void exprfunc_cfg_typeof(Program *prg, const std::vector<Token> &v)
 	
 	INFO_EXISTS(info->cfgs, id)
 
-	prg->result.set_type(Variable::STRING);
+	prg->result->set_type(Variable::STRING);
 
 	if (info->cfgs[id].find(name) == info->cfgs[id].end()) {
-		prg->result.set_s("unknown");
+		prg->result->set_s("unknown");
 	}
 	else if (info->cfgs[id][name].type == Variable::NUMBER) {
-		prg->result.set_s("number");
+		prg->result->set_s("number");
 	}
 	else {
-		prg->result.set_s("string");
+		prg->result->set_s("string");
 	}
 }
 
@@ -1879,13 +1883,13 @@ static void exprfunc_cfg_get_number(Program *prg, const std::vector<Token> &v)
 	
 	INFO_EXISTS(info->cfgs, id)
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
 	if (info->cfgs[id].find(name) == info->cfgs[id].end()) {
-		prg->result.set_n(0);
+		prg->result->set_n(0);
 	}
 	else {
-		prg->result.set_n(info->cfgs[id][name].n);
+		prg->result->set_n(info->cfgs[id][name].n);
 	}
 }
 
@@ -1900,13 +1904,13 @@ static void exprfunc_cfg_get_string(Program *prg, const std::vector<Token> &v)
 	
 	INFO_EXISTS(info->cfgs, id)
 
-	prg->result.set_type(Variable::STRING);
+	prg->result->set_type(Variable::STRING);
 
 	if (info->cfgs[id].find(name) == info->cfgs[id].end()) {
-		prg->result.set_s("");
+		prg->result->set_s("");
 	}
 	else {
-		prg->result.set_s(info->cfgs[id][name].s);
+		prg->result->set_s(info->cfgs[id][name].s);
 	}
 }
 
@@ -1965,8 +1969,8 @@ static void exprfunc_cfg_exists(Program *prg, const std::vector<Token> &v)
 
 	bool found = info->cfgs[id].find(name) != info->cfgs[id].end();
 
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(found);
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(found);
 }
 
 static bool cfgfunc_erase(Program *prg, const std::vector<Token> &v)
@@ -2019,9 +2023,9 @@ static void exprfunc_json_load(Program *prg, const std::vector<Token> &v)
 		load_from_filesystem = as_number(prg, v, 1);
 	}
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(info->json_id);
+	prg->result->set_n(info->json_id);
 
 	try {
 		util::JSON *json = new util::JSON(name, load_from_filesystem);
@@ -2029,7 +2033,7 @@ static void exprfunc_json_load(Program *prg, const std::vector<Token> &v)
 		info->jsons[info->json_id++] = json;
 	}
 	catch (util::Error &e) {
-		prg->result.set_n(-1);
+		prg->result->set_n(-1);
 	}
 }
 
@@ -2041,9 +2045,9 @@ static void exprfunc_json_create(Program *prg, const std::vector<Token> &v)
 
 	JSON_Info *info = json_info(prg);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(info->json_id);
+	prg->result->set_n(info->json_id);
 
 	try {
 		util::JSON *json = new util::JSON(array);
@@ -2051,7 +2055,7 @@ static void exprfunc_json_create(Program *prg, const std::vector<Token> &v)
 		info->jsons[info->json_id++] = json;
 	}
 	catch (util::Error &e) {
-		prg->result.set_n(-1);
+		prg->result->set_n(-1);
 	}
 }
 
@@ -2075,10 +2079,10 @@ static void exprfunc_json_exists(Program *prg, const std::vector<Token> &v)
 	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
 	util::JSON::Node *n = json->get_root()->find(name);
-	prg->result.set_n(n != nullptr);
+	prg->result->set_n(n != nullptr);
 }
 
 static void exprfunc_json_typeof(Program *prg, const std::vector<Token> &v)
@@ -2088,25 +2092,25 @@ static void exprfunc_json_typeof(Program *prg, const std::vector<Token> &v)
 	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	
-	prg->result.set_type(Variable::STRING);
+	prg->result->set_type(Variable::STRING);
 
 	util::JSON::Node *n = json->get_root()->find(name);
 	util::JSON::Node::Type t = n->get_type();
 
 	switch (t) {
 		case util::JSON::Node::STRING:
-			prg->result.set_s("string");
+			prg->result->set_s("string");
 		case util::JSON::Node::BOOL:
-			prg->result.set_s("bool");
+			prg->result->set_s("bool");
 		case util::JSON::Node::DOUBLE:
-			prg->result.set_s("number");
+			prg->result->set_s("number");
 		default:
 			std::string val = n->get_value();
 			if (val == "[array]") {
-				prg->result.set_s("array");
+				prg->result->set_s("array");
 			}
 			else {
-				prg->result.set_s("hash");
+				prg->result->set_s("hash");
 			}
 	}
 }
@@ -2118,10 +2122,10 @@ static void exprfunc_json_size(Program *prg, const std::vector<Token> &v)
 	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
 	util::JSON::Node *n = json->get_root()->find(name);
-	prg->result.set_n(n->size());
+	prg->result->set_n(n->size());
 }
 
 static void exprfunc_json_get_string(Program *prg, const std::vector<Token> &v)
@@ -2131,10 +2135,10 @@ static void exprfunc_json_get_string(Program *prg, const std::vector<Token> &v)
 	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	
-	prg->result.set_type(Variable::STRING);
+	prg->result->set_type(Variable::STRING);
 
 	util::JSON::Node *n = json->get_root()->find(name);
-	prg->result.set_s(n->as_string());
+	prg->result->set_s(n->as_string());
 }
 
 static void exprfunc_json_get_number(Program *prg, const std::vector<Token> &v)
@@ -2144,10 +2148,10 @@ static void exprfunc_json_get_number(Program *prg, const std::vector<Token> &v)
 	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
 	util::JSON::Node *n = json->get_root()->find(name);
-	prg->result.set_n(n->as_double());
+	prg->result->set_n(n->as_double());
 }
 
 static void exprfunc_json_get_bool(Program *prg, const std::vector<Token> &v)
@@ -2157,10 +2161,10 @@ static void exprfunc_json_get_bool(Program *prg, const std::vector<Token> &v)
 	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string name = as_string(prg, v, 1);
 	
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
 	util::JSON::Node *n = json->get_root()->find(name);
-	prg->result.set_n(n->as_bool());
+	prg->result->set_n(n->as_bool());
 }
 
 static bool jsonfunc_set_string(Program *prg, const std::vector<Token> &v)
@@ -2250,7 +2254,7 @@ static void exprfunc_json_save(Program *prg, const std::vector<Token> &v)
 	util::JSON *json = json_from_arg(prg, v, 0);
 	std::string fn = as_string(prg, v, 1);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
 	util::JSON::Node *n = json->get_root();
 	std::string s = n->to_json();
@@ -2259,18 +2263,18 @@ static void exprfunc_json_save(Program *prg, const std::vector<Token> &v)
 #ifdef __GNUC__
 	f = fopen(fn.c_str(), "w");
 	if (f == nullptr) {
-		prg->result.set_n(0);
+		prg->result->set_n(0);
 	}
 #else
 	errno_t err = fopen_s(&f, fn.c_str(), "w");
 	if (err) {
-		prg->result.set_n(0);
+		prg->result->set_n(0);
 	}
 #endif
 	else {
 		fprintf(f, "%s", s.c_str());
 		fclose(f);
-		prg->result.set_n(1);
+		prg->result->set_n(1);
 	}
 }
 
@@ -2364,9 +2368,9 @@ static void exprfunc_load_cpa(Program *prg, const std::vector<Token> &v)
 		load_from_filesystem = as_number(prg, v, 1);
 	}
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(info->cpa_id);
+	prg->result->set_n(info->cpa_id);
 
 	try {
 		util::CPA *cpa;
@@ -2385,7 +2389,7 @@ static void exprfunc_load_cpa(Program *prg, const std::vector<Token> &v)
 		info->cpas[info->cpa_id++] = c;
 	}
 	catch (util::Error &e) {
-		prg->result.set_n(-1);
+		prg->result->set_n(-1);
 	}
 }
 
@@ -2432,15 +2436,15 @@ static void exprfunc_get_audio_properties(Program *prg, const std::vector<Token>
 {
 	COUNT_ARGS(0)
 
-	prg->result.set_type(Variable::VECTOR);
+	prg->result->set_type(Variable::VECTOR);
 
 	Variable var;
 	var.set_type(Variable::NUMBER);
 
 	var.set_n(audio::internal::audio_context.device_spec.freq);
-	prg->result.v.push_back(var);
+	prg->result->v.push_back(var);
 	var.set_n(audio::internal::audio_context.device_spec.channels);
-	prg->result.v.push_back(var);
+	prg->result->v.push_back(var);
 }
 
 static void exprfunc_mml_create(Program *prg, const std::vector<Token> &v)
@@ -2449,11 +2453,11 @@ static void exprfunc_mml_create(Program *prg, const std::vector<Token> &v)
 
 	std::string str = as_string(prg, v, 0);
 	
-       	prg->result.set_type(Variable::NUMBER);
+       	prg->result->set_type(Variable::NUMBER);
 
 	MML_Info *info = mml_info(prg);
 
-	prg->result.set_n(info->mml_id);
+	prg->result->set_n(info->mml_id);
 
 	Uint8 *bytes = (Uint8 *)str.c_str();
 	SDL_IOStream *file = SDL_IOFromMem(bytes, str.length());
@@ -2463,7 +2467,7 @@ static void exprfunc_mml_create(Program *prg, const std::vector<Token> &v)
 		info->mmls[info->mml_id++] = mml;
 	}
 	catch (util::Error &e) {
-		prg->result.set_n(-1);
+		prg->result->set_n(-1);
 	}
 }
 
@@ -2487,8 +2491,8 @@ static void exprfunc_mml_length(Program *prg, const std::vector<Token> &v)
 	int id = as_number(prg, v, 0);
 	MML_Info *info = mml_info(prg);
 	INFO_EXISTS(info->mmls, id)
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(audio::samples_to_millis(info->mmls[id]->get_length(), audio::internal::audio_context.device_spec.freq));
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(audio::samples_to_millis(info->mmls[id]->get_length(), audio::internal::audio_context.device_spec.freq));
 }
 
 static void exprfunc_mml_load(Program *prg, const std::vector<Token> &v)
@@ -2504,16 +2508,16 @@ static void exprfunc_mml_load(Program *prg, const std::vector<Token> &v)
 		load_from_filesystem = as_number(prg, v, 1);
 	}
 
-       	prg->result.set_type(Variable::NUMBER);
+       	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(info->mml_id);
+	prg->result->set_n(info->mml_id);
 
 	try {
 		audio::MML *mml = new audio::MML(name, load_from_filesystem);
 		info->mmls[info->mml_id++] = mml;
 	}
 	catch (util::Error &e) {
-		prg->result.set_n(-1);
+		prg->result->set_n(-1);
 	}
 }
 
@@ -2626,8 +2630,8 @@ static void exprfunc_mml_play(Program *prg, const std::vector<Token> &v)
 		}
 	}
 
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(inst);
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(inst);
 }
 
 static bool mmlfunc_set_finished_callback(Program *prg, const std::vector<Token> &v)
@@ -2680,8 +2684,8 @@ static void exprfunc_mml_num_tracks(Program *prg, const std::vector<Token> &v)
 
 	audio::MML *mml = info->mmls[id];
 
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(mml->get_num_tracks());
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(mml->get_num_tracks());
 }
 
 static bool mmlfunc_set_sample(Program *prg, const std::vector<Token> &v)
@@ -2822,16 +2826,16 @@ static void exprfunc_mml_get_volume(Program *prg, const std::vector<Token> &v)
 	int inst = as_number(prg, v, 0);
 	int track = as_number(prg, v, 1);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
 	MML_Instance_Info *info = mml_instance_info(prg);
 
 	if (info->instances.find(inst) == info->instances.end()) {
-		prg->result.set_n(1.0f);
+		prg->result->set_n(1.0f);
 	}
 	else {
 		MML_Instance *i = info->instances[inst];
-		prg->result.set_n(i->mml->get_master_volume(i->instance, track));
+		prg->result->set_n(i->mml->get_master_volume(i->instance, track));
 	}
 }
 
@@ -2842,16 +2846,16 @@ static void exprfunc_mml_get_tempo(Program *prg, const std::vector<Token> &v)
 	int inst = as_number(prg, v, 0);
 	int track = as_number(prg, v, 1);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
 	MML_Instance_Info *info = mml_instance_info(prg);
 
 	if (info->instances.find(inst) == info->instances.end()) {
-		prg->result.set_n(120);
+		prg->result->set_n(120);
 	}
 	else {
 		MML_Instance *i = info->instances[inst];
-		prg->result.set_n(i->mml->get_tempo(i->instance, track));
+		prg->result->set_n(i->mml->get_tempo(i->instance, track));
 	}
 }
 
@@ -2862,16 +2866,16 @@ static void exprfunc_mml_get_pan(Program *prg, const std::vector<Token> &v)
 	int inst = as_number(prg, v, 0);
 	int track = as_number(prg, v, 1);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
 	MML_Instance_Info *info = mml_instance_info(prg);
 
 	if (info->instances.find(inst) == info->instances.end()) {
-		prg->result.set_n(0.0f);
+		prg->result->set_n(0.0f);
 	}
 	else {
 		MML_Instance *i = info->instances[inst];
-		prg->result.set_n(i->mml->get_pan(i->instance, track));
+		prg->result->set_n(i->mml->get_pan(i->instance, track));
 	}
 }
 
@@ -2881,16 +2885,16 @@ static void exprfunc_mml_elapsed(Program *prg, const std::vector<Token> &v)
 
 	int inst = as_number(prg, v, 0);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
 	MML_Instance_Info *info = mml_instance_info(prg);
 
 	if (info->instances.find(inst) == info->instances.end()) {
-		prg->result.set_n(0);
+		prg->result->set_n(0);
 	}
 	else {
 		MML_Instance *i = info->instances[inst];
-		prg->result.set_n(audio::samples_to_millis(i->mml->get_elapsed(i->instance), audio::internal::audio_context.device_spec.freq));
+		prg->result->set_n(audio::samples_to_millis(i->mml->get_elapsed(i->instance), audio::internal::audio_context.device_spec.freq));
 	}
 }
 
@@ -2907,16 +2911,16 @@ static void exprfunc_sample_load(Program *prg, const std::vector<Token> &v)
 		load_from_filesystem = as_number(prg, v, 1);
 	}
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(info->sample_id);
+	prg->result->set_n(info->sample_id);
 
 	try {
 		audio::Sample *sample = new audio::Sample(name, load_from_filesystem);
 		info->samples[info->sample_id++] = sample;
 	}
 	catch (util::Error &e) {
-		prg->result.set_n(-1);
+		prg->result->set_n(-1);
 	}
 }
 
@@ -2930,9 +2934,9 @@ static void exprfunc_sample_create(Program *prg, const std::vector<Token> &v)
 
 	Sample_Info *info = sample_info(prg);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
-	prg->result.set_n(info->sample_id);
+	prg->result->set_n(info->sample_id);
 
 	Uint8 *data = new Uint8[2*vec.v.size()];
 	Sint16 *p = (Sint16 *)data;
@@ -2947,7 +2951,7 @@ static void exprfunc_sample_create(Program *prg, const std::vector<Token> &v)
 		info->samples[info->sample_id++] = sample;
 	}
 	catch (util::Error &e) {
-		prg->result.set_n(-1);
+		prg->result->set_n(-1);
 	}
 }
 
@@ -3079,8 +3083,8 @@ static void exprfunc_sample_play(Program *prg, const std::vector<Token> &v)
 
 	audio::Sample_Instance *inst = sample->play_stretched(volume, 0, audio::millis_to_samples(millis), loop, pan, callback, callback_data);
 
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(iinfo->instance_id);
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(iinfo->instance_id);
 
 	iinfo->instances[iinfo->instance_id++] = inst;
 
@@ -3185,8 +3189,8 @@ static void exprfunc_sample_length(Program *prg, const std::vector<Token> &v)
 
 	int millis = audio::samples_to_millis(sample->get_length(), sample->get_frequency());
 
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(millis);
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(millis);
 }
 
 static void exprfunc_sample_elapsed(Program *prg, const std::vector<Token> &v)
@@ -3197,17 +3201,17 @@ static void exprfunc_sample_elapsed(Program *prg, const std::vector<Token> &v)
 
 	Sample_Instance_Info *info = sample_instance_info(prg);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
 	audio::lock_mutex();
 
 	bool found = sample_exists(info->instances[id]);
 
 	if (found) {
-		prg->result.set_n(audio::samples_to_millis(info->instances[id]->offset, audio::internal::audio_context.device_spec.freq));
+		prg->result->set_n(audio::samples_to_millis(info->instances[id]->offset, audio::internal::audio_context.device_spec.freq));
 	}
 	else {
-		prg->result.set_n(0);
+		prg->result->set_n(0);
 	}
 
 	audio::unlock_mutex();
@@ -3221,17 +3225,17 @@ static void exprfunc_sample_get_volume(Program *prg, const std::vector<Token> &v
 
 	Sample_Instance_Info *info = sample_instance_info(prg);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
 	audio::lock_mutex();
 
 	bool found = sample_exists(info->instances[id]);
 
 	if (found) {
-		prg->result.set_n(info->instances[id]->volume);
+		prg->result->set_n(info->instances[id]->volume);
 	}
 	else {
-		prg->result.set_n(1.0f);
+		prg->result->set_n(1.0f);
 	}
 
 	audio::unlock_mutex();
@@ -3245,17 +3249,17 @@ static void exprfunc_sample_get_pan(Program *prg, const std::vector<Token> &v)
 
 	Sample_Instance_Info *info = sample_instance_info(prg);
 
-	prg->result.set_type(Variable::NUMBER);
+	prg->result->set_type(Variable::NUMBER);
 
 	audio::lock_mutex();
 
 	bool found = sample_exists(info->instances[id]);
 
 	if (found) {
-		prg->result.set_n(info->instances[id]->pan);
+		prg->result->set_n(info->instances[id]->pan);
 	}
 	else {
-		prg->result.set_n(0.0f);
+		prg->result->set_n(0.0f);
 	}
 
 	audio::unlock_mutex();
@@ -3380,8 +3384,8 @@ static void exprfunc_misc_get_ticks(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(SDL_GetTicks());
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(SDL_GetTicks());
 }
 
 static bool miscfunc_die(Program *prg, const std::vector<Token> &v)
@@ -3395,7 +3399,7 @@ static bool miscfunc_die(Program *prg, const std::vector<Token> &v)
 
 	evaluate_expression(prg, expr.e);
 
-	if (prg->result.get_n() == 0) {
+	if (prg->result->get_n() == 0) {
 	Variable &expr = prg->variables[v[2].i];
 		gui::popup("Error", msg);
 		exit(1);
@@ -3408,7 +3412,7 @@ static void exprfunc_misc_file_list(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
 
-	prg->result.set_type(Variable::VECTOR);
+	prg->result->set_type(Variable::VECTOR);
 
 	std::vector<std::string> l = shim::cpa->get_all_filenames();
 
@@ -3416,7 +3420,7 @@ static void exprfunc_misc_file_list(Program *prg, const std::vector<Token> &v)
 		Variable var;
 		var.set_type(Variable::STRING);
 		var.set_s(l[i]);
-		prg->result.v.push_back(var);
+		prg->result->v.push_back(var);
 	}
 }
 

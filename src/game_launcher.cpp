@@ -81,10 +81,10 @@ static void exprfunc_mouse_get_delta(Program *prg, const std::vector<Token> &v)
 	mouse_dx = 0;
 	mouse_dy = 0;
 
-	prg->result.set_type(Variable::VECTOR);
-	prg->result.v.clear();
-	prg->result.v.push_back(v1);
-	prg->result.v.push_back(v2);
+	prg->result->set_type(Variable::VECTOR);
+	prg->result->v.clear();
+	prg->result->v.push_back(v1);
+	prg->result->v.push_back(v2);
 }
 
 static void exprfunc_mouse_get_position(Program *prg, const std::vector<Token> &v)
@@ -99,10 +99,10 @@ static void exprfunc_mouse_get_position(Program *prg, const std::vector<Token> &
 	v1.set_n(mouse_pos.x);
 	v2.set_n(mouse_pos.y);
 
-	prg->result.set_type(Variable::VECTOR);
-	prg->result.v.clear();
-	prg->result.v.push_back(v1);
-	prg->result.v.push_back(v2);
+	prg->result->set_type(Variable::VECTOR);
+	prg->result->v.clear();
+	prg->result->v.push_back(v1);
+	prg->result->v.push_back(v2);
 }
 
 static void exprfunc_mouse_get_buttons(Program *prg, const std::vector<Token> &v)
@@ -123,12 +123,12 @@ static void exprfunc_mouse_get_buttons(Program *prg, const std::vector<Token> &v
 	v3.set_n(mouse_b3);
 	v4.set_n(mouse_wheel_y);
 
-	prg->result.set_type(Variable::VECTOR);
-	prg->result.v.clear();
-	prg->result.v.push_back(v1);
-	prg->result.v.push_back(v2);
-	prg->result.v.push_back(v3);
-	prg->result.v.push_back(v4);
+	prg->result->set_type(Variable::VECTOR);
+	prg->result->v.clear();
+	prg->result->v.push_back(v1);
+	prg->result->v.push_back(v2);
+	prg->result->v.push_back(v3);
+	prg->result->v.push_back(v4);
 }
 
 std::list<int> keys_pressed;
@@ -148,8 +148,8 @@ static void exprfunc_key_get(Program *prg, const std::vector<Token> &v)
 		}
 	}
 
-	prg->result.set_type(Variable::NUMBER);
-	prg->result.set_n(pressed);
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(pressed);
 }
 
 bool start()
