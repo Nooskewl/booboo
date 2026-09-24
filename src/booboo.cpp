@@ -2757,8 +2757,6 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 				Variable &v2 = prg->variables[param.i];
 				v2.set(var);
 			}
-			var.m.clear();
-			var.v.clear();
 		}
 	}
 
@@ -3157,8 +3155,6 @@ static bool corefunc_call_result(Program *prg, const std::vector<Token> &v)
 	call_function(prg, function, v, 2);
 
 	result.set(*prg->result);
-	prg->result->v.clear();
-	prg->result->m.clear();
 
 	return true;
 }
@@ -3547,8 +3543,6 @@ static bool corefunc_explode(Program *prg, const std::vector<Token> &v)
 	for (size_t i = 1; i < v.size() && (i-1) < vec->v.size(); i++) {
 		Variable &v1 = as_variable(prg, v, i);
 		v1.set(vec->v[i-1]);
-		prg->result->v.clear();
-		prg->result->m.clear();
 	}
 
 	return true;
