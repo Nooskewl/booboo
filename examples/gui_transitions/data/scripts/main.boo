@@ -45,7 +45,7 @@ function start_gui
 	= wl3 (widget_create 200 30 l3)
 	= wl4 (widget_create 200 30 l4)
 	= wl5 (widget_create 200 30 l5)
-	= wc_left (widget_create 200 210 c_left)
+	= wc_left (widget_create 200 180 c_left)
 	widget_set_accepts_focus wc_left FALSE
 	widget_set_parent wll wc_left
 	widget_set_parent wl1 wc_left
@@ -61,7 +61,7 @@ function start_gui
 	= wr3 (widget_create 200 30 r3)
 	= wr4 (widget_create 200 30 r4)
 	= wr5 (widget_create 200 30 r5)
-	= wc_right (widget_create 200 210 c_right)
+	= wc_right (widget_create 200 180 c_right)
 	widget_set_accepts_focus wc_right FALSE
 	widget_set_parent wlr wc_right
 	widget_set_parent wr1 wc_right
@@ -70,12 +70,12 @@ function start_gui
 	widget_set_parent wr4 wc_right
 	widget_set_parent wr5 wc_right
 
-	= wc_both (widget_create 400 210 c_both)
+	= wc_both (widget_create 400 180 c_both)
 	widget_set_accepts_focus wc_both FALSE
 	widget_set_parent wc_left wc_both
 	widget_set_parent wc_right wc_both
 
-	= wc (widget_create 400 240 c)
+	= wc (widget_create 400 210 c)
 	widget_set_accepts_focus wc FALSE
 	widget_set_parent wc_both wc
 	= wbcycle (widget_create 400 30 bcycle)
