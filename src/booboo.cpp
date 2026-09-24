@@ -2650,7 +2650,7 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 	std::vector<int> locals_backup_i;
 
 	std::map<std::string, int>::iterator it;
-	if ((it = prg->function_name_map.find(prg->s->name)) != prg->function_name_map.end() && (*it).second == function) {
+	if (prg_func == &prg->functions[function]) {
 		backup_locals = true;
 	}
 
