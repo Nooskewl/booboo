@@ -929,12 +929,16 @@ again:
 
 	booboo::callbacks_enabled = true;
 
+	// Make sure run is called before draw
+	std::vector<Token> tmp;
+	call_function(prg, "run", tmp);
+
 	if (reset_game_name == "") {
 		go();
 	}
 
-	std::vector<Token> tmp;
-	call_function(prg, "end", tmp);
+	std::vector<Token> tmp2;
+	call_function(prg, "end", tmp2);
 
 	unregister_game_callbacks();
 
