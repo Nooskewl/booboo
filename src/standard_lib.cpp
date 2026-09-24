@@ -1338,7 +1338,7 @@ static void exprfunc_vector_it_start(Program *prg, const std::vector<Token> &v)
 
 	prg->result.set_type(Variable::USER);
 	prg->result.set_n(0);
-	prg->result.p = vec;
+	prg->result.set_p(vec);
 }
 
 static void exprfunc_vector_it_end(Program *prg, const std::vector<Token> &v)
@@ -1347,7 +1347,7 @@ static void exprfunc_vector_it_end(Program *prg, const std::vector<Token> &v)
 
 	prg->result.set_type(Variable::USER);
 	prg->result.set_n(vec->v.size());
-	prg->result.p = vec;
+	prg->result.set_p(vec);
 }
 
 static void exprfunc_vector_it_inc(Program *prg, const std::vector<Token> &v)
@@ -1356,8 +1356,8 @@ static void exprfunc_vector_it_inc(Program *prg, const std::vector<Token> &v)
 	int inc = as_number(prg, v, 1);
 
 	prg->result.set_type(Variable::USER);
-	prg->result.set_n(MIN(it->p->v.size(), it->get_n() + inc));
-	prg->result.p = it->p;
+	prg->result.set_n(MIN(it->get_p()->v.size(), it->get_n() + inc));
+	prg->result.set_p(it->get_p());
 }
 
 static void exprfunc_vector_it_get(Program *prg, const std::vector<Token> &v)
@@ -1365,18 +1365,18 @@ static void exprfunc_vector_it_get(Program *prg, const std::vector<Token> &v)
 	Variable *it = as_variable_pointer(prg, v, 0);
 
 	prg->result.set_type(Variable::POINTER);
-	prg->result.p = &it->p->v[it->get_n()];
+	prg->result.set_p(&it->get_p()->v[it->get_n()]);
 }
 
 static void exprfunc_vector_it_erase(Program *prg, const std::vector<Token> &v)
 {
 	Variable *it = as_variable_pointer(prg, v, 0);
 
-	it->p->v.erase(it->p->v.begin()+it->get_n());
+	it->get_p()->v.erase(it->get_p()->v.begin()+it->get_n());
 	
 	prg->result.set_type(Variable::USER);
 	prg->result.set_n(it->get_n());
-	prg->result.p = it->p;
+	prg->result.set_p(it->get_p());
 }
 
 static bool mapfunc_clear(Program *prg, const std::vector<Token> &v)

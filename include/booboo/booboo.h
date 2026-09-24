@@ -121,26 +121,19 @@ struct BOOBOO_EXPORT Variable
 	};
 
 	std::string name;
-
 	bool constant;
 
 	bool operator==(const Variable &var) const;
-
 	Variable& operator=(const Variable &var);
 	Variable(const Variable &var);
-	
 	Variable();
-
 	~Variable();
 
 	void set(const Variable &var);
+	void clear();
 
-	// This sets type and clears memory (vector/map), should be used when setting
-	// type of prg->result to avoid copying that memory
 	void set_type(Variable_Type type, bool clear_values = true);
 	Variable_Type get_type();
-
-	void clear();
 
 	void set_n(double n);
 	double get_n();
@@ -148,7 +141,9 @@ struct BOOBOO_EXPORT Variable
 	void set_s(std::string s);
 	std::string get_s();
 
-	Variable *p;
+	void set_p(Variable *p);
+	Variable *get_p();
+
 	std::vector<Variable> v;
 	std::map<std::string, Variable> m;
 	Expression e;
@@ -158,6 +153,7 @@ protected:
 	Variable_Type type;
 	double n;
 	std::string s;
+	Variable *p;
 
 	void changed();
 };
