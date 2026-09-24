@@ -1167,7 +1167,7 @@ static void exprfunc_image_load(Program *prg, const std::vector<Token> &v)
 
 	prg->result->set_n(info->image_id);
 
-	bool load_from_filesystem = false;
+	bool load_from_filesystem = shim::cpa == nullptr;
 	if (v.size() > 1) {
 		load_from_filesystem = as_number(prg, v, 1);
 	}
@@ -1659,7 +1659,7 @@ static void exprfunc_font_load(Program *prg, const std::vector<Token> &v)
 		sheet_size = as_number(prg, v, 3);
 	}
 
-	bool load_from_filesystem = false;
+	bool load_from_filesystem = shim::cpa == nullptr;
 	if (v.size() > 4) {
 		load_from_filesystem = as_number(prg, v, 4);
 	}
@@ -1819,7 +1819,7 @@ static void exprfunc_tilemap_load(Program *prg, const std::vector<Token> &v)
 	
 	Tilemap_Info *info = tilemap_info(prg);
 
-	bool load_from_filesystem = false;
+	bool load_from_filesystem = shim::cpa == nullptr;
 	if (v.size() > 1) {
 		load_from_filesystem = as_number(prg, v, 1);
 	}
@@ -2157,7 +2157,7 @@ static void exprfunc_sprite_load(Program *prg, const std::vector<Token> &v)
 
 	prg->result->set_n(info->sprite_id);
 
-	bool load_from_filesystem = false;
+	bool load_from_filesystem = shim::cpa == nullptr;
 	if (v.size() > 1) {
 		load_from_filesystem = as_number(prg, v, 1);
 	}
@@ -2792,7 +2792,7 @@ static void exprfunc_shader_load(Program *prg, const std::vector<Token> &v)
 
 	gfx::Shader *shader = nullptr;
 
-	bool load_from_filesystem = false;
+	bool load_from_filesystem = shim::cpa == nullptr;
 	if (v.size() > 2) {
 		load_from_filesystem = as_number(prg, v, 2);
 	}
@@ -3099,7 +3099,7 @@ static void exprfunc_model_load(Program *prg, const std::vector<Token> &v)
 		fps = as_number(prg, v, 2);
 	}
 
-	bool load_from_filesystem = false;
+	bool load_from_filesystem = shim::cpa == nullptr;
 	if (v.size() > 3) {
 		load_from_filesystem = as_number(prg, v, 3);
 	}

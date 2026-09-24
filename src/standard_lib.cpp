@@ -2018,7 +2018,7 @@ static void exprfunc_json_load(Program *prg, const std::vector<Token> &v)
 
 	JSON_Info *info = json_info(prg);
 
-	bool load_from_filesystem = false;
+	bool load_from_filesystem = shim::cpa == nullptr;
 	if (v.size() > 1) {
 		load_from_filesystem = as_number(prg, v, 1);
 	}
@@ -2363,7 +2363,7 @@ static void exprfunc_load_cpa(Program *prg, const std::vector<Token> &v)
 
 	CPA_Info *info = cpa_info(prg);
 
-	bool load_from_filesystem = false;
+	bool load_from_filesystem = shim::cpa == nullptr;
 	if (v.size() > 1) {
 		load_from_filesystem = as_number(prg, v, 1);
 	}
@@ -2503,7 +2503,7 @@ static void exprfunc_mml_load(Program *prg, const std::vector<Token> &v)
 
 	MML_Info *info = mml_info(prg);
 
-	bool load_from_filesystem = false;
+	bool load_from_filesystem = shim::cpa == nullptr;
 	if (v.size() > 1) {
 		load_from_filesystem = as_number(prg, v, 1);
 	}
@@ -2906,7 +2906,7 @@ static void exprfunc_sample_load(Program *prg, const std::vector<Token> &v)
 
 	Sample_Info *info = sample_info(prg);
 
-	bool load_from_filesystem = false;
+	bool load_from_filesystem = shim::cpa == nullptr;
 	if (v.size() > 1) {
 		load_from_filesystem = as_number(prg, v, 1);
 	}
