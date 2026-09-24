@@ -3289,6 +3289,9 @@ static bool modelfunc_identity_3d(Program *prg, const std::vector<Token> &v)
 	mv = glm::mat4();
 	gfx::set_matrices(mv, proj);
 	gfx::update_projection();
+	custom_projection_set = true;
+	custom_mv = mv;
+	custom_proj = proj;
 
 	return true;
 }
@@ -3306,6 +3309,9 @@ static bool modelfunc_scale_3d(Program *prg, const std::vector<Token> &v)
 	mv = glm::scale(mv, glm::vec3(sx, sy, sz));
 	gfx::set_matrices(mv, proj);
 	gfx::update_projection();
+	custom_projection_set = true;
+	custom_mv = mv;
+	custom_proj = proj;
 
 	return true;
 }
@@ -3324,6 +3330,9 @@ static bool modelfunc_rotate_3d(Program *prg, const std::vector<Token> &v)
 	mv = glm::rotate(mv, (float)angle, glm::vec3(ax, ay, az));
 	gfx::set_matrices(mv, proj);
 	gfx::update_projection();
+	custom_projection_set = true;
+	custom_mv = mv;
+	custom_proj = proj;
 
 	return true;
 }
@@ -3341,6 +3350,9 @@ static bool modelfunc_translate_3d(Program *prg, const std::vector<Token> &v)
 	mv = glm::translate(mv, glm::vec3(x, y, z));
 	gfx::set_matrices(mv, proj);
 	gfx::update_projection();
+	custom_projection_set = true;
+	custom_mv = mv;
+	custom_proj = proj;
 
 	return true;
 }
