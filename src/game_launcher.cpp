@@ -917,7 +917,13 @@ again:
 				code = booboo::load_text("scripts/main.boo");
 			}
 			catch (util::Error &e) {
-				gui::fatalerror("ERROR", "Program is missing or corrupt!", true);
+				booboo::load_text = util::load_text_from_filesystem;
+				try {
+					code = booboo::load_text("main.boo");
+				}
+				catch (util::Error &e) {
+					gui::fatalerror("ERROR", "Program is missing or corrupt!", true);
+				}
 			}
 			
 			main_program_name = "main.boo";
