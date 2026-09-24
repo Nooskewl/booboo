@@ -1999,20 +1999,51 @@ top:
 			bool is_param = true;
 			bool finished = false;
 			bool param_is_ref = false;
+			bool param_is_const = false;
 			int is_deref = 0;
 			while ((tok = token(prg, tt)) != "") {
 func_top:
 				func.s->line = prg->s->line;
-				if (tok == "`") {
-					is_deref++;
-				}
-				else if (tok == "{") {
+				if (tok == "{") {
 					is_param = false;
 					func.s->start_line = prg->s->line;
 				}
 				else if (tok == "}") {
 					finished = true;
 					break;
+				}
+				else if (is_param) {
+					if (tok == "~") {
+						param_is_ref = true;
+					}
+					else if (tok == "const") {
+						param_is_const = true;
+					}
+					else {
+						int param_i = prg->var_i++;
+						if (pass == PASS1) {
+							prg->locals[func_index][tok] = param_i;
+						}
+						else {
+							prg->variables_map[tok] = prg->locals[func_index][tok];
+						}
+						Variable v;
+						v.name = tok;
+						v.constant = param_is_const;
+						if (pass == PASS1) {
+							prg->variables.push_back(v);
+						}
+
+						func.params.push_back(param_i);
+						func.param_names.push_back(tok);
+						func.ref.push_back(param_is_ref);
+						param_is_ref = false;
+						param_is_const = false;
+						is_deref = 0;
+					}
+				}
+				else if (tok == "`") {
+					is_deref++;
 				}
 				else if (tok == ":") {
 					std::string tok2 = token(prg, tt);
@@ -2285,31 +2316,6 @@ func_top:
 					func.s->program.push_back(s);
 					func.s->line_numbers.push_back(prg->s->line);
 					is_deref = 0;
-				}
-				else if (is_param) {
-					if (tok == "~") {
-						param_is_ref = true;
-					}
-					else {
-						int param_i = prg->var_i++;
-						if (pass == PASS1) {
-							prg->locals[func_index][tok] = param_i;
-						}
-						else {
-							prg->variables_map[tok] = prg->locals[func_index][tok];
-						}
-						Variable v;
-						v.name = tok;
-						if (pass == PASS1) {
-							prg->variables.push_back(v);
-						}
-
-						func.params.push_back(param_i);
-						func.param_names.push_back(tok);
-						func.ref.push_back(param_is_ref);
-						param_is_ref = false;
-						is_deref = 0;
-					}
 				}
 				else {
 					if (func.s->program.size() == 0) {
@@ -2677,6 +2683,9 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 
 		Variable &var = prg->variables[func.params[j]];
 
+		bool constant = var.constant;
+		var.constant = false;
+
 		if (param.type == Token::NUMBER) {
 			var.set_type(Variable::NUMBER);
 			var.set_n(param.n);
@@ -2697,6 +2706,8 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 		else {
 			var.set(prg->variables[param.i]);
 		}
+
+		var.constant = constant;
 	}
 
 	std::string bak = prg->result->name;
