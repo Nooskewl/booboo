@@ -15,5 +15,6 @@ var y
 
 function draw
 {
+	clear 255 255 255
 	image_stretch_region img 255 255 255 255 0 0 w h 0 y bw (* h p)
 }
