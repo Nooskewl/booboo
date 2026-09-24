@@ -85,8 +85,8 @@ function rsz destroy_fonts
 	explode (get_screen_size) W H
 	resize W H
 
-	= font (font_load "c:/windows/fonts/arial.ttf" (/ H 15) 1 512 TRUE)
-	= small_font (font_load "c:/windows/fonts/arial.ttf" (/ H 25) 1 512 TRUE)
+	= font (font_load "c:/windows/fonts/arial.ttf" (/ H 21) 1 512 TRUE)
+	= small_font (font_load "c:/windows/fonts/arial.ttf" (/ H 30) 1 512 TRUE)
 
 	= fh (font_height font)
 
@@ -260,10 +260,10 @@ function draw
 		= found_g 255
 		= found_b 255
 	:not_found
-	font_draw font 255 255 255 255 "Enter Directory: A/Return/LMB" 25 (+ 5 (- H (* fh 3.5)))
+	font_draw font 255 255 255 255 "Enter Directory: A/Return/LMB" 25 (+ 5 (- H (* fh 3.0)))
 	var w
 	= w (font_width font found_text)
-	font_draw font found_r found_g found_b 255 found_text (- (- W w) 26) (+ 5 (- H (* fh 2.5)))
+	font_draw font found_r found_g found_b 255 found_text (- (- W w) 26) (+ 5 (- H (* fh 3.0)))
 
 	var w
 	= w (/ (font_width small_font dir) 2)
