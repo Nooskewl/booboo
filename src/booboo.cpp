@@ -2658,8 +2658,10 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 		std::map<std::string, int>::iterator it;
 		for (it = prg->locals[function].begin(); it != prg->locals[function].end(); it++) {
 			std::pair<std::string, int> pair = *it;
-			locals_backup.push_back(prg->variables[pair.second]);
-			locals_backup_i.push_back(pair.second);
+			if (prg->variables[pair.second].constant == false) {
+				locals_backup.push_back(prg->variables[pair.second]);
+				locals_backup_i.push_back(pair.second);
+			}
 		}
 	}
 
@@ -2685,27 +2687,13 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 		}
 		else if (prg->variables[param.i].get_type() == Variable::EXPRESSION) {
 			evaluate_expression(prg, prg->variables[param.i].e);
-			std::string name = var.name;
-			bool constant = var.constant;
-			var = prg->result;
-			prg->result.v.clear();
-			prg->result.m.clear();
-			var.name = name;
-			var.constant = constant;
+			var.set(prg->result);
 		}
 		else if (prg->variables[param.i].get_type() == Variable::FISH) {
-			std::string name = var.name;
-			bool constant = var.constant;
-			var = go_fish(prg, prg->variables[param.i].f);
-			var.name = name;
-			var.constant = constant;
+			var.set(go_fish(prg, prg->variables[param.i].f));
 		}
 		else {
-			std::string name = var.name;
-			bool constant = var.constant;
-			var = prg->variables[param.i];
-			var.name = name;
-			var.constant = constant;
+			var.set(prg->variables[param.i]);
 		}
 	}
 
@@ -2764,7 +2752,7 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 	if (backup_locals) {
 		int i = 0;
 		for (size_t i = 0; i < locals_backup_i.size(); i++) {
-			prg->variables[locals_backup_i[i]] = locals_backup[i];
+			prg->variables[locals_backup_i[i]].set(locals_backup[i]);
 		}
 	}
 
@@ -2934,8 +2922,8 @@ static void exprfunc_set(Program *prg, const std::vector<Token> &v)
 	COUNT_ARGS(2)
 
 	Variable *dst = as_variable_pointer(prg, v, 0);
-	*dst = as_variable_resolve(prg, v, 1);
-	prg->result = *dst;
+	dst->set(*as_variable_pointer(prg, v, 1));
+	prg->result.set(*dst);
 }
 
 static bool corefunc_break(Program *prg, const std::vector<Token> &v)
@@ -3004,10 +2992,10 @@ static bool corefunc_compare(Program *prg, const std::vector<Token> &v)
 	double n;
 
 	if (v[0].type == Token::SYMBOL) {
-		Variable var = as_variable_resolve(prg, v, 0);
-		if (IS_NUMBER(var)) {
+		Variable *var = as_variable_pointer(prg, v, 0);
+		if (var->get_type() == Variable::NUMBER) {
 			is_num = true;
-			n = var.get_n();
+			n = var->get_n();
 		}
 	}
 	else if (v[0].type == Token::NUMBER) {
@@ -3038,10 +3026,10 @@ static bool corefunc_compare(Program *prg, const std::vector<Token> &v)
 			s1 = v[0].s;
 		}
 		else if (v[0].type == Token::SYMBOL) {
-			Variable var = as_variable_resolve(prg, v, 0);
-			if (IS_STRING(var)) {
+			Variable *var = as_variable_pointer(prg, v, 0);
+			if (var->get_type() == Variable::STRING) {
 				a_string = true;
-				s1 = var.get_s();
+				s1 = var->get_s();
 			}
 		}
 		
@@ -3050,10 +3038,10 @@ static bool corefunc_compare(Program *prg, const std::vector<Token> &v)
 			s2 = v[1].s;
 		}
 		else if (v[1].type == Token::SYMBOL) {
-			Variable var = as_variable_resolve(prg, v, 1);
-			if (IS_STRING(var)) {
+			Variable *var = as_variable_pointer(prg, v, 1);
+			if (var->get_type() == Variable::STRING) {
 				b_string = true;
-				s2 = var.get_s();
+				s2 = var->get_s();
 			}
 		}
 		
@@ -3154,11 +3142,7 @@ static bool corefunc_call_result(Program *prg, const std::vector<Token> &v)
 
 	call_function(prg, function, v, 2);
 
-	std::string name = result.name;
-	bool constant = result.constant;
-	result = prg->result;
-	result.name = name;
-	result.constant = constant;
+	result.set(prg->result);
 	prg->result.v.clear();
 	prg->result.m.clear();
 
@@ -3229,20 +3213,20 @@ static void exprfunc_vector(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable var = as_variable_resolve(prg, v, 0);
+	Variable *var = as_variable_pointer(prg, v, 0);
 
 	prg->result.set_type(Variable::VECTOR);
-	prg->result.v = var.v;
+	prg->result.v = var->v;
 }
 
 static void exprfunc_map(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable var = as_variable_resolve(prg, v, 0);
+	Variable *var = as_variable_pointer(prg, v, 0);
 
 	prg->result.set_type(Variable::MAP);
-	prg->result.m = var.m;
+	prg->result.m = var->m;
 }
 
 static void exprfunc_function(Program *prg, const std::vector<Token> &v)
@@ -3269,10 +3253,10 @@ static void exprfunc_pointer(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
 
-	Variable var = as_variable_resolve(prg, v, 0);
+	Variable *var = as_variable_pointer(prg, v, 0);
 
 	prg->result.set_type(Variable::POINTER);
-	prg->result.set_p(var.get_p());
+	prg->result.set_p(var);
 }
 
 static void exprfunc_typeof(Program *prg, const std::vector<Token> &v)
@@ -4092,7 +4076,7 @@ static void exprfunc_mul(Program *prg, const std::vector<Token> &v)
 		var = matmul(prg, var, var2);
 	}
 
-	prg->result = var;
+	prg->result.set(var);
 }
 
 glm::mat4 to_glm_mat4(Variable &v)
@@ -4142,7 +4126,7 @@ static void exprfunc_frustum(Program *prg, const std::vector<Token> &v)
 
 	glm::mat4 m = glm::frustum(left, right, bottom, top, nearval, farval);
 
-	prg->result = from_glm_mat4(m);
+	prg->result.set(from_glm_mat4(m));
 }
 
 static void exprfunc_perspective(Program *prg, const std::vector<Token> &v)
@@ -4156,7 +4140,7 @@ static void exprfunc_perspective(Program *prg, const std::vector<Token> &v)
 
 	glm::mat4 m = glm::perspective(fovy, aspect, nearval, farval);
 
-	prg->result = from_glm_mat4(m);
+	prg->result.set(from_glm_mat4(m));
 }
 
 static void exprfunc_ortho(Program *prg, const std::vector<Token> &v)
@@ -4170,7 +4154,7 @@ static void exprfunc_ortho(Program *prg, const std::vector<Token> &v)
 
 	glm::mat4 m = glm::ortho(left, right, bottom, top);
 
-	prg->result = from_glm_mat4(m);
+	prg->result.set(from_glm_mat4(m));
 }
 
 static void exprfunc_identity(Program *prg, const std::vector<Token> &v)
@@ -4179,7 +4163,7 @@ static void exprfunc_identity(Program *prg, const std::vector<Token> &v)
 	
 	int sz = as_number(prg, v, 0);
 
-	prg->result = identity(sz);
+	prg->result.set(identity(sz));
 }
 
 static void exprfunc_scale(Program *prg, const std::vector<Token> &v)
@@ -4190,7 +4174,7 @@ static void exprfunc_scale(Program *prg, const std::vector<Token> &v)
 	double sy = as_number(prg, v, 1);
 	double sz = as_number(prg, v, 2);
 
-	prg->result = identity(4);
+	prg->result.set(identity(4));
 
 	prg->result.v[0].v[0].set_n(sx);
 	prg->result.v[1].v[1].set_n(sy);
@@ -4210,7 +4194,7 @@ static void exprfunc_rotate(Program *prg, const std::vector<Token> &v)
 	double c = cos(angle);
 	double invc = 1 - c;
 
-	prg->result = identity(4);
+	prg->result.set(identity(4));
 
 	prg->result.v[0].v[0].set_n((invc * x * x) + c);
 	prg->result.v[0].v[1].set_n((invc * x * y) + (z * s));
@@ -4231,7 +4215,7 @@ static void exprfunc_translate(Program *prg, const std::vector<Token> &v)
 	double ty = as_number(prg, v, 1);
 	double tz = as_number(prg, v, 2);
 
-	prg->result = identity(4);
+	prg->result.set(identity(4));
 
 	prg->result.v[3].v[0].set_n(tx);
 	prg->result.v[3].v[1].set_n(ty);
@@ -4344,7 +4328,7 @@ static void exprfunc_cross(Program *prg, const std::vector<Token> &v)
 		var = veccross(var, vec2);
 	}
 
-	prg->result = var;
+	prg->result.set(var);
 }
 
 static void exprfunc_normalize(Program *prg, const std::vector<Token> &v)
@@ -4359,7 +4343,7 @@ static void exprfunc_normalize(Program *prg, const std::vector<Token> &v)
 	len.set_type(Variable::NUMBER);
 	len.set_n(1.0 / veclen(vec));
 
-	prg->result = matmul(prg, vec, len);
+	prg->result.set(matmul(prg, vec, len));
 }
 
 static void exprfunc_vadd(Program *prg, const std::vector<Token> &v)
@@ -4396,7 +4380,7 @@ static void exprfunc_vadd(Program *prg, const std::vector<Token> &v)
 		}
 	}
 
-	prg->result = vec;
+	prg->result.set(vec);
 }
 
 static void exprfunc_vsub(Program *prg, const std::vector<Token> &v)
@@ -4433,7 +4417,7 @@ static void exprfunc_vsub(Program *prg, const std::vector<Token> &v)
 		}
 	}
 
-	prg->result = vec;
+	prg->result.set(vec);
 }
 
 static void exprfunc_inverse(Program *prg, const std::vector<Token> &v)
@@ -4446,7 +4430,7 @@ static void exprfunc_inverse(Program *prg, const std::vector<Token> &v)
 
 	glm::mat4 m = to_glm_mat4(mat);
 	m = glm::inverse(m);
-	prg->result = from_glm_mat4(m);
+	prg->result.set(from_glm_mat4(m));
 }
 
 static void exprfunc_transpose(Program *prg, const std::vector<Token> &v)
@@ -4459,7 +4443,7 @@ static void exprfunc_transpose(Program *prg, const std::vector<Token> &v)
 
 	glm::mat4 m = to_glm_mat4(mat);
 	m = glm::transpose(m);
-	prg->result = from_glm_mat4(m);
+	prg->result.set(from_glm_mat4(m));
 }
 
 static void exprfunc_address(Program *prg, const std::vector<Token> &v)
@@ -4549,7 +4533,7 @@ static void exprfunc_get_var_arg(Program *prg, const std::vector<Token> &v)
 		prg->result.set_s(params[i+num_hard_params].s);
 	}
 	else {
-		prg->result = *as_variable_pointer(prg, params, i+num_hard_params);
+		prg->result.set(*as_variable_pointer(prg, params, i+num_hard_params));
 	}
 }
 
