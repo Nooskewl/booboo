@@ -758,22 +758,6 @@ int main(int argc, char **argv)
 			_chdir(fn.c_str());
 			fn = "";
 		}
-		else {
-			int pos = fn.length()-1;
-	
-			if (pos >= 0 && fn[pos] != '/' && fn[pos] != '\\') {
-				fn += "/";
-				pos++;
-			}
-
-			while (pos > 0 && (fn[pos] != '/' && fn[pos] != '\\')) {
-				pos--;
-			}
-			if (fn[pos] == '/' || fn[pos] == '\\') {
-				_chdir(fn.substr(0, pos).c_str());
-				fn = fn.substr(pos+1);
-			}
-		}
 	}
 
 	try {
@@ -894,26 +878,14 @@ again:
 		main_program_name = fn;
 	}
 	else {
-		if (fn != "") {
-			try {
-				code = util::load_text("scripts/" + fn);
-			}
-			catch (util::Error &e) {
-				gui::fatalerror("ERROR", "Program is missing or corrupt!", true);
-			}
-
-			main_program_name = fn;
+		try {
+			code = util::load_text("scripts/main.boo");
 		}
-		else {
-			try {
-				code = util::load_text("scripts/main.boo");
-			}
-			catch (util::Error &e) {
-				gui::fatalerror("ERROR", "Program is missing or corrupt!", true);
-			}
-			
-			main_program_name = "main.boo";
+		catch (util::Error &e) {
+			gui::fatalerror("ERROR", "Program is missing or corrupt!", true);
 		}
+		
+		main_program_name = "main.boo";
 	}
 
 	prg = create_program(code);
