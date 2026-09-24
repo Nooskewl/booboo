@@ -735,8 +735,6 @@ int main(int argc, char **argv)
 {
 	booboo::callbacks_enabled = false;
 
-	booboo::load_text = util::load_text;
-
 	char cwd_buf[1000];
 	std::string start_cwd = _getcwd(cwd_buf, 1000);
 
@@ -758,6 +756,13 @@ int main(int argc, char **argv)
 			_chdir(fn.c_str());
 			fn = "";
 		}
+	}
+
+	if (fn != "") {
+		booboo::load_text = util::load_text_from_filesystem;
+	}
+	else {
+		booboo::load_text = util::load_text;
 	}
 
 	try {
@@ -869,7 +874,7 @@ again:
 
 	if (was_reset) {
 		try {
-			code = util::load_text("scripts/" + fn);
+			code = booboo::load_text("scripts/" + fn);
 		}
 		catch (util::Error &e) {
 			gui::fatalerror("ERROR", "Program is missing or corrupt!", true);
@@ -878,14 +883,26 @@ again:
 		main_program_name = fn;
 	}
 	else {
-		try {
-			code = util::load_text("scripts/main.boo");
+		if (fn != "") {
+			try {
+				code = booboo::load_text(fn);
+			}
+			catch (util::Error &e) {
+				gui::fatalerror("ERROR", "Program is missing or corrupt!", true);
+			}
+			
+			main_program_name = fn;
 		}
-		catch (util::Error &e) {
-			gui::fatalerror("ERROR", "Program is missing or corrupt!", true);
+		else {
+			try {
+				code = booboo::load_text("scripts/main.boo");
+			}
+			catch (util::Error &e) {
+				gui::fatalerror("ERROR", "Program is missing or corrupt!", true);
+			}
+			
+			main_program_name = "main.boo";
 		}
-		
-		main_program_name = "main.boo";
 	}
 
 	prg = create_program(code);
