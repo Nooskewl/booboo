@@ -204,6 +204,10 @@ function list_dir name
 			= go_ok 1
 			goto done_list
 		:is_cpa
+		if (== s "main.boo") is_main
+			= go_ok 1
+			goto done_list
+		:is_main
 		if (== s "data") is_data_dir
 			var orig
 			= orig (+ [filenames i] "/scripts/main.boo")
