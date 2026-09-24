@@ -300,52 +300,41 @@ extern BOOBOO_EXPORT std::map<std::string, void *> black_box;
 
 } // End namespace booboo
 
-#define IS_NUMBER(v) ((v).get_type() == Variable::NUMBER)
-#define IS_STRING(v) ((v).get_type() == Variable::STRING)
-#define IS_VECTOR(v) ((v).get_type() == Variable::VECTOR)
-#define IS_MAP(v) ((v).get_type() == Variable::MAP)
-#define IS_LABEL(v) ((v).get_type() == Variable::LABEL)
-#define IS_FUNCTION(v) ((v).get_type() == Variable::FUNCTION)
-#define IS_EXPRESSION(v) ((v).get_type() == Variable::EXPRESSION)
-#define IS_FISH(v) ((v).get_type() == Variable::FISH)
-#define IS_POINTER(v) ((v).get_type() == Variable::POINTER)
-#define IS_USER(v) ((v).get_type() == Variable::USER)
-
 #if 1
 // You can use this at the start of your library functions to ensure correct number of arguments
 #define MIN_ARGS(n) if (v.size() < n) throw Error(std::string(__FUNCTION__) + ": " + "Incorrect number of arguments at " + get_error_info(prg));
 #define COUNT_ARGS(n) if (v.size() != n) throw Error(std::string(__FUNCTION__) + ": " + "Incorrect number of arguments at " + get_error_info(prg));
 		
 #define CHECK_NUMBER(v) \
-	if (!IS_NUMBER(v)) { \
+	if ((v).get_type() != Variable::NUMBER) { \
 		throw Error(std::string(__FUNCTION__) + ": " + "Expected number at " + get_error_info(prg)); \
 	}
 #define CHECK_STRING(v) \
-	if (!IS_STRING(v)) { \
+	if ((v).get_type() != Variable::STRING) { \
 		throw Error(std::string(__FUNCTION__) + ": " + "Expected string at " + get_error_info(prg)); \
 	}
 #define CHECK_VECTOR(v) \
-	if (!IS_VECTOR(v)) { \
+	if ((v).get_type() != Variable::VECTOR) { \
 		throw Error(std::string(__FUNCTION__) + ": " + "Expected vector at " + get_error_info(prg)); \
 	}
 #define CHECK_MAP(v) \
-	if (!IS_MAP(v)) { \
+	if ((v).get_type() != Variable::MAP) { \
 		throw Error(std::string(__FUNCTION__) + ": " + "Expected map at " + get_error_info(prg)); \
 	}
 #define CHECK_LABEL(v) \
-	if (!IS_LABEL(v)) { \
+	if ((v).get_type() != Variable::LABEL) { \
 		throw Error(std::string(__FUNCTION__) + ": " + "Expected label at " + get_error_info(prg)); \
 	}
 #define CHECK_FUNCTION(v) \
-	if (!IS_FUNCTION(v)) { \
+	if ((v).get_type() != Variable::FUNCTION) { \
 		throw Error(std::string(__FUNCTION__) + ": " + "Expected function at " + get_error_info(prg)); \
 	}
 #define CHECK_EXPRESSION(v) \
-	if (!IS_EXPRESSION(v)) { \
+	if ((v).get_type() != Variable::EXPRESSION) { \
 		throw Error(std::string(__FUNCTION__) + ": " + "Expected expression at " + get_error_info(prg)); \
 	}
 #define CHECK_FISH(v) \
-	if (!IS_FISH(v)) { \
+	if ((v).get_type() != Variable::FISH) { \
 		throw Error(std::string(__FUNCTION__) + ": " + "Expected fish at " + get_error_info(prg)); \
 	}
 #endif

@@ -777,7 +777,7 @@ static void backup(Program *prg, int func, bool restore_locals = true)
 		if (prg->variables_map.find(pair.first) != prg->variables_map.end()) {
 			backup[pair.first] = prg->variables_map[pair.first];
 		}
-		if (IS_LABEL(prg->variables[pair.second])) {
+		if (prg->variables[pair.second].get_type() == Variable::LABEL) {
 			prg->variables_map[pair.first] = pair.second;
 		}
 	}
@@ -3950,20 +3950,20 @@ static void exprfunc_rightshift(Program *prg, const std::vector<Token> &v)
 
 static Variable matmul(Program *prg, Variable ret, Variable vec2)
 {
-	if (IS_NUMBER(ret) && IS_NUMBER(vec2)) {
+	if (ret.get_type() == Variable::NUMBER && vec2.get_type() == Variable::NUMBER) {
 		Variable var;
 		var.set_type(Variable::NUMBER);
 		var.set_n(ret.get_n() * vec2.get_n());
 		return var;
 	}
-	if (IS_NUMBER(ret)) {
+	if (ret.get_type() == Variable::NUMBER) {
 		Variable tmp = ret;
 		ret = vec2;
 		vec2 = tmp;
 	}
-	if (IS_NUMBER(vec2)) {
+	if (vec2.get_type() == Variable::NUMBER) {
 		// it's a vector
-		if (IS_NUMBER(ret.v[0])) {
+		if (ret.v[0].get_type() == Variable::NUMBER) {
 			for (size_t i = 0; i < ret.v.size(); i++) {
 				ret.v[i].set_n(ret.v[i].get_n()*vec2.get_n());
 			}
@@ -3984,7 +3984,7 @@ static Variable matmul(Program *prg, Variable ret, Variable vec2)
 
 		Variable tmp;
 
-		if (IS_VECTOR(ret.v[0])) {
+		if (ret.v[0].get_type() == Variable::VECTOR) {
 			is_mat1 = true;
 		}
 		else {
@@ -3999,7 +3999,7 @@ static Variable matmul(Program *prg, Variable ret, Variable vec2)
 			}
 		}
 
-		if (IS_VECTOR(vec2.v[0])) {
+		if (vec2.v[0].get_type() == Variable::VECTOR) {
 			is_mat2 = true;
 		}
 		else {
@@ -4376,12 +4376,12 @@ static void exprfunc_vadd(Program *prg, const std::vector<Token> &v)
 		if (vec.v.size() != vec2.v.size()) {
 			my_throw(Error(std::string(__FUNCTION__) + ": " + "Can't add different sized vectors at " + get_error_info(prg)));
 		}
-		if (IS_NUMBER(vec.v[0]) && IS_NUMBER(vec2.v[0])) {
+		if (vec.v[0].get_type() == Variable::NUMBER && vec2.v[0].get_type() == Variable::NUMBER) {
 			for (size_t j = 0; j < vec.v.size(); j++) {
 				vec.v[j].set_n(vec.v[j].get_n()+vec2.v[j].get_n());
 			}
 		}
-		else if (IS_VECTOR(vec.v[0]) && IS_VECTOR(vec2.v[0])) {
+		else if (vec.v[0].get_type() == Variable::VECTOR && vec2.v[0].get_type() == Variable::VECTOR) {
 			if (vec.v[0].v.size() != vec2.v[0].v.size()) {
 				my_throw(Error(std::string(__FUNCTION__) + ": " + "Can't add different sized matrices at " + get_error_info(prg)));
 			}
@@ -4413,12 +4413,12 @@ static void exprfunc_vsub(Program *prg, const std::vector<Token> &v)
 		if (vec.v.size() != vec2.v.size()) {
 			my_throw(Error(std::string(__FUNCTION__) + ": " + "Can't subtract different sized vectors at " + get_error_info(prg)));
 		}
-		if (IS_NUMBER(vec.v[0]) && IS_NUMBER(vec2.v[0])) {
+		if (vec.v[0].get_type() == Variable::NUMBER && vec2.v[0].get_type() == Variable::NUMBER) {
 			for (size_t j = 0; j < vec.v.size(); j++) {
 				vec.v[j].set_n(vec.v[j].get_n()-vec2.v[j].get_n());
 			}
 		}
-		else if (IS_VECTOR(vec.v[0]) && IS_VECTOR(vec2.v[0])) {
+		else if (vec.v[0].get_type() == Variable::VECTOR && vec2.v[0].get_type() == Variable::VECTOR) {
 			if (vec.v[0].v.size() != vec2.v[0].v.size()) {
 				my_throw(Error(std::string(__FUNCTION__) + ": " + "Can't subtract different sized matrices at " + get_error_info(prg)));
 			}
