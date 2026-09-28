@@ -8,8 +8,8 @@ vector_add groups TRANSITION_SHRINK
 var font
 = font (font_load "c:/windows/fonts/arial.ttf" 12 1 512 TRUE)
 
-var c c_both c_left c_right ll lr l1 l2 l3 l4 l5 l6 r1 r2 r3 r4 r5 r6 bcycle ; widget userdata
-number wc wc_both wc_left wc_right wll wlr wl1 wl2 wl3 wl4 wl5 wl6 wr1 wr2 wr3 wr4 wr5 wr6 wbcycle ; widgets
+var c c_both c_left c_right ll lr l1 l2 l3 l4 l5 l6 l7 r1 r2 r3 r4 r5 r6 r7 bcycle ; widget userdata
+number wc wc_both wc_left wc_right wll wlr wl1 wl2 wl3 wl4 wl5 wl6 wl6 wl7 wr1 wr2 wr3 wr4 wr5 wr6 wr7 wbcycle ; widgets
 
 function start_gui
 {
@@ -31,11 +31,15 @@ function start_gui
 	call_result l3 mkradio g1 TRANSITION_SHRINK "Shrink"
 	call_result l4 mkradio g1 TRANSITION_SLIDE "Slide"
 	call_result l5 mkradio g1 TRANSITION_SLIDE_VERTICAL "V. Slide"
+	call_result l6 mkradio g1 TRANSITION_SLIDE_REVERSE "Slide Rev."
+	call_result l7 mkradio g1 TRANSITION_SLIDE_VERTICAL_REVERSE "V. Slide Rev."
 	call_result r1 mkradio g2 TRANSITION_NONE "None"
 	call_result r2 mkradio g2 TRANSITION_ENLARGE "Enlarge"
 	call_result r3 mkradio g2 TRANSITION_SHRINK "Shrink"
 	call_result r4 mkradio g2 TRANSITION_SLIDE "Slide"
 	call_result r5 mkradio g2 TRANSITION_SLIDE_VERTICAL "V. Slide"
+	call_result r6 mkradio g2 TRANSITION_SLIDE_REVERSE "Slide Rev."
+	call_result r7 mkradio g2 TRANSITION_SLIDE_VERTICAL_REVERSE "V. Slide Rev."
 	call_result bcycle mkbutton "Cycle GUI" cycle_gui
 
 	= wll (widget_create 1 30 ll)
@@ -45,7 +49,9 @@ function start_gui
 	= wl3 (widget_create 200 30 l3)
 	= wl4 (widget_create 200 30 l4)
 	= wl5 (widget_create 200 30 l5)
-	= wc_left (widget_create 200 180 c_left)
+	= wl6 (widget_create 200 30 l6)
+	= wl7 (widget_create 200 30 l7)
+	= wc_left (widget_create 200 240 c_left)
 	widget_set_accepts_focus wc_left FALSE
 	widget_set_parent wll wc_left
 	widget_set_parent wl1 wc_left
@@ -53,6 +59,8 @@ function start_gui
 	widget_set_parent wl3 wc_left
 	widget_set_parent wl4 wc_left
 	widget_set_parent wl5 wc_left
+	widget_set_parent wl6 wc_left
+	widget_set_parent wl7 wc_left
 
 	= wlr (widget_create 1 30 lr)
 	widget_set_accepts_focus wlr FALSE
@@ -61,7 +69,9 @@ function start_gui
 	= wr3 (widget_create 200 30 r3)
 	= wr4 (widget_create 200 30 r4)
 	= wr5 (widget_create 200 30 r5)
-	= wc_right (widget_create 200 180 c_right)
+	= wr6 (widget_create 200 30 r6)
+	= wr7 (widget_create 200 30 r7)
+	= wc_right (widget_create 200 240 c_right)
 	widget_set_accepts_focus wc_right FALSE
 	widget_set_parent wlr wc_right
 	widget_set_parent wr1 wc_right
@@ -69,13 +79,15 @@ function start_gui
 	widget_set_parent wr3 wc_right
 	widget_set_parent wr4 wc_right
 	widget_set_parent wr5 wc_right
+	widget_set_parent wr6 wc_right
+	widget_set_parent wr7 wc_right
 
-	= wc_both (widget_create 400 180 c_both)
+	= wc_both (widget_create 400 240 c_both)
 	widget_set_accepts_focus wc_both FALSE
 	widget_set_parent wc_left wc_both
 	widget_set_parent wc_right wc_both
 
-	= wc (widget_create 400 210 c)
+	= wc (widget_create 400 270 c)
 	widget_set_accepts_focus wc FALSE
 	widget_set_parent wc_both wc
 	= wbcycle (widget_create 400 30 bcycle)
