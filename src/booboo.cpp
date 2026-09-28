@@ -1891,11 +1891,11 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "JOY_RIGHTY", SDL_GAMEPAD_AXIS_RIGHTY, pass);
 	insert_constant(prg, "JOY_TRIGGERLEFT", SDL_GAMEPAD_AXIS_LEFT_TRIGGER, pass);
 	insert_constant(prg, "JOY_TRIGGERRIGHT", SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, pass);
-	insert_constant(prg, "TRANSITION_NONE", TRANSITION_NONE, pass);
-	insert_constant(prg, "TRANSITION_ENLARGE", TRANSITION_ENLARGE, pass);
-	insert_constant(prg, "TRANSITION_SHRINK", TRANSITION_SHRINK, pass);
-	insert_constant(prg, "TRANSITION_SLIDE", TRANSITION_SLIDE, pass);
-	insert_constant(prg, "TRANSITION_SLIDE_VERTICAL", TRANSITION_SLIDE_VERTICAL, pass);
+	insert_constant(prg, "TRANSITION_NONE", gui::GUI::TRANSITION_NONE, pass);
+	insert_constant(prg, "TRANSITION_ENLARGE", gui::GUI::TRANSITION_ENLARGE, pass);
+	insert_constant(prg, "TRANSITION_SHRINK", gui::GUI::TRANSITION_SHRINK, pass);
+	insert_constant(prg, "TRANSITION_SLIDE", gui::GUI::TRANSITION_SLIDE, pass);
+	insert_constant(prg, "TRANSITION_SLIDE_VERTICAL", gui::GUI::TRANSITION_SLIDE_VERTICAL, pass);
 	insert_constant(prg, "LETTERBOX_TOP", gfx::LETTERBOX_TOP, pass);
 	insert_constant(prg, "LETTERBOX_BOTTOM", gfx::LETTERBOX_BOTTOM, pass);
 	insert_constant(prg, "LETTERBOX_LEFT", gfx::LETTERBOX_LEFT, pass);

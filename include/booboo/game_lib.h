@@ -21,14 +21,6 @@
 #endif
 #endif
 
-enum GUI_Transition_Type {
-	TRANSITION_NONE = 0,
-	TRANSITION_ENLARGE,
-	TRANSITION_SHRINK,
-	TRANSITION_SLIDE,
-	TRANSITION_SLIDE_VERTICAL
-};
-
 void BOOBOO_GAME_EXPORT start_lib_game();
 void BOOBOO_GAME_EXPORT end_lib_game();
 void BOOBOO_GAME_EXPORT game_lib_destroy_program(booboo::Program *prg);

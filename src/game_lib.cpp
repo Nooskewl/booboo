@@ -11,8 +11,6 @@ using namespace noo;
 
 using namespace booboo;
 
-static GUI_Transition_Type transition_in_type = TRANSITION_ENLARGE;
-static GUI_Transition_Type transition_out_type = TRANSITION_SHRINK;
 static bool custom_projection_set = false;
 static glm::mat4 custom_mv = glm::mat4(1.0f);
 static glm::mat4 custom_proj = glm::mat4(1.0f);
@@ -4899,33 +4897,10 @@ public:
 	virtual ~BooBoo_GUI();
 
 	virtual void update();
-
-private:
-	bool done_transition_in;
 };
 
-BooBoo_GUI::BooBoo_GUI(BooBoo_Widget *root) :
-	done_transition_in(false)
+BooBoo_GUI::BooBoo_GUI(BooBoo_Widget *root)
 {
-	transition = transition_in_type != TRANSITION_NONE;
-
-	switch (transition_in_type) {
-		case TRANSITION_ENLARGE:
-			transition_is_enlarge = true;
-			break;
-		case TRANSITION_SHRINK:
-			transition_is_shrink = true;
-			break;
-		case TRANSITION_SLIDE:
-			transition_is_slide = true;
-			break;
-		case TRANSITION_SLIDE_VERTICAL:
-			transition_is_slide_vertical = true;
-			break;
-		case TRANSITION_NONE:
-			break;
-	}
-
 	root->set_centre_x(true);
 	root->set_centre_y(true);
 
@@ -4942,43 +4917,6 @@ BooBoo_GUI::~BooBoo_GUI()
 
 void BooBoo_GUI::update()
 {
-	if (transitioning_in == false && done_transition_in == false) {
-		switch (transition_in_type) {
-			case TRANSITION_ENLARGE:
-				transition_is_enlarge = false;
-				break;
-			case TRANSITION_SHRINK:
-				transition_is_shrink = false;
-				break;
-			case TRANSITION_SLIDE:
-				transition_is_slide = false;
-				break;
-			case TRANSITION_SLIDE_VERTICAL:
-				transition_is_slide_vertical = false;
-				break;
-			case TRANSITION_NONE:
-				break;
-		}
-		switch (transition_out_type) {
-			case TRANSITION_ENLARGE:
-				transition_is_enlarge = true;
-				break;
-			case TRANSITION_SHRINK:
-				transition_is_shrink = true;
-				break;
-			case TRANSITION_SLIDE:
-				transition_is_slide = true;
-				break;
-			case TRANSITION_SLIDE_VERTICAL:
-				transition_is_slide_vertical = true;
-				break;
-			case TRANSITION_NONE:
-				break;
-		}
-		transition = transition_out_type != TRANSITION_NONE;
-		done_transition_in = true;
-	}
-
 	gui::GUI::update();
 }
 
@@ -5038,8 +4976,8 @@ static bool widgetfunc_gui_set_transition_types(Program *prg, const std::vector<
 	int in = as_number(prg, v, 0);
 	int out = as_number(prg, v, 1);
 
-	transition_in_type = (GUI_Transition_Type)in;
-	transition_out_type = (GUI_Transition_Type)out;
+	shim::gui_transition_in_type = (gui::GUI::Transition_Type)in;
+	shim::gui_transition_out_type = (gui::GUI::Transition_Type)out;
 
 	return true;
 }
