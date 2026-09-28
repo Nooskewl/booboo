@@ -5363,19 +5363,25 @@ void my_throw(Error e)
 {
 	int result;
 	if (gfx::internal::gfx_context.inited == true) {
-		result = gui::popup("ERROR!", e.error_message, "Abort", "Debug", "Continue");
-		if (result == 0) {
-			throw e;
-		}
-		else if (result == 1) {
-			AllocConsole();
-			FILE* fp;
-			freopen_s(&fp, "CONIN$", "r", stdin);
-			freopen_s(&fp, "CONOUT$", "w", stdout);
-			freopen_s(&fp, "CONOUT$", "w", stderr);
-			booboo::debug("Debugging program. Type 'help' for help...");
+		if (prg && prg->complete_pass == booboo::PASS2) {
+			result = gui::popup("ERROR!", e.error_message, "Abort", "Debug", "Continue");
+			if (result == 0) {
+				throw e;
+			}
+			else if (result == 1) {
+				AllocConsole();
+				FILE* fp;
+				freopen_s(&fp, "CONIN$", "r", stdin);
+				freopen_s(&fp, "CONOUT$", "w", stdout);
+				freopen_s(&fp, "CONOUT$", "w", stderr);
+				booboo::debug("Debugging program. Type 'help' for help...");
+			}
+			else {
+			}
 		}
 		else {
+			result = gui::popup("ERROR!", e.error_message, "Abort");
+			throw e;
 		}
 	}
 	else if (shim::debug) {
