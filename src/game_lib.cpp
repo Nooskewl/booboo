@@ -405,6 +405,33 @@ static bool gfxfunc_add_notification(Program *prg, const std::vector<Token> &v)
 	return true;
 }
 
+static void exprfunc_popup(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(2)
+
+	std::string heading = as_string(prg, v, 0);
+	std::string caption = as_string(prg, v, 1);
+
+	std::string s1 = "OK";
+	std::string s2 = "";
+	std::string s3 = "";
+
+	if (v.size() > 2) {
+		s1 = as_string(prg, v, 2);
+	}
+
+	if (v.size() > 3) {
+		s2 = as_string(prg, v, 3);
+	}
+
+	if (v.size() > 4) {
+		s3 = as_string(prg, v, 4);
+	}
+
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(gui::popup(heading, caption, s1, s2, s3));
+}
+
 static void exprfunc_gfx_is_fullscreen(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(0)
@@ -5212,6 +5239,7 @@ void start_lib_game()
 	add_instruction("screen_shake", gfxfunc_screen_shake);
 	add_instruction("set_cursor_pos", gfxfunc_set_cursor_pos);
 	add_instruction("add_notification", gfxfunc_add_notification);
+	add_expression_handler("popup", exprfunc_popup);
 	add_expression_handler("is_fullscreen", exprfunc_gfx_is_fullscreen);
 	add_instruction("toggle_fullscreen", gfxfunc_toggle_fullscreen);
 	add_expression_handler("get_refresh_rate", exprfunc_gfx_get_refresh_rate);
