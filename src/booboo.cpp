@@ -5386,7 +5386,7 @@ void my_throw(Error e)
 			throw e;
 		}
 	}
-	else if (shim::debug) {
+	else if (shim::debug && prg && prg->complete_pass == booboo::PASS2) {
 		booboo::debug("An error occurred: " + e.error_message + "...");
 	}
 	else {
