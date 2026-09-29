@@ -1892,7 +1892,7 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "JOY_TRIGGERLEFT", SDL_GAMEPAD_AXIS_LEFT_TRIGGER, pass);
 	insert_constant(prg, "JOY_TRIGGERRIGHT", SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, pass);
 	insert_constant(prg, "TRANSITION_NONE", gui::GUI::TRANSITION_NONE, pass);
-	insert_constant(prg, "TRANSITION_ENLARGE", gui::GUI::TRANSITION_ENLARGE, pass);
+	insert_constant(prg, "TRANSITION_GROW", gui::GUI::TRANSITION_GROW, pass);
 	insert_constant(prg, "TRANSITION_SHRINK", gui::GUI::TRANSITION_SHRINK, pass);
 	insert_constant(prg, "TRANSITION_SLIDE", gui::GUI::TRANSITION_SLIDE, pass);
 	insert_constant(prg, "TRANSITION_SLIDE_VERTICAL", gui::GUI::TRANSITION_SLIDE_VERTICAL, pass);
