@@ -2,7 +2,7 @@ var exited
 = exited FALSE
 
 var groups
-vector_add groups TRANSITION_ENLARGE
+vector_add groups TRANSITION_GROW
 vector_add groups TRANSITION_SHRINK
 
 var font
@@ -27,14 +27,14 @@ function start_gui
 	= g1 (@ [groups 0])
 	= g2 (@ [groups 1])
 	call_result l1 mkradio g1 TRANSITION_NONE "None"
-	call_result l2 mkradio g1 TRANSITION_ENLARGE "Enlarge"
+	call_result l2 mkradio g1 TRANSITION_GROW "Grow"
 	call_result l3 mkradio g1 TRANSITION_SHRINK "Shrink"
 	call_result l4 mkradio g1 TRANSITION_SLIDE "Slide"
 	call_result l5 mkradio g1 TRANSITION_SLIDE_VERTICAL "V. Slide"
 	call_result l6 mkradio g1 TRANSITION_SLIDE_REVERSE "Slide Rev."
 	call_result l7 mkradio g1 TRANSITION_SLIDE_VERTICAL_REVERSE "V. Slide Rev."
 	call_result r1 mkradio g2 TRANSITION_NONE "None"
-	call_result r2 mkradio g2 TRANSITION_ENLARGE "Enlarge"
+	call_result r2 mkradio g2 TRANSITION_GROW "Grow"
 	call_result r3 mkradio g2 TRANSITION_SHRINK "Shrink"
 	call_result r4 mkradio g2 TRANSITION_SLIDE "Slide"
 	call_result r5 mkradio g2 TRANSITION_SLIDE_VERTICAL "V. Slide"
