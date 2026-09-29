@@ -4893,16 +4893,20 @@ static bool widgetfunc_set_padding_bottom(Program *prg, const std::vector<Token>
 class BooBoo_GUI : public gui::GUI
 {
 public:
-	BooBoo_GUI(BooBoo_Widget *root);
+	BooBoo_GUI(BooBoo_Widget *root, bool centre_x, bool centre_y);
 	virtual ~BooBoo_GUI();
 
 	virtual void update();
 };
 
-BooBoo_GUI::BooBoo_GUI(BooBoo_Widget *root)
+BooBoo_GUI::BooBoo_GUI(BooBoo_Widget *root, bool centre_x, bool centre_y)
 {
-	root->set_centre_x(true);
-	root->set_centre_y(true);
+	if (centre_x) {
+		root->set_centre_x(true);
+	}
+	if (centre_y) {
+		root->set_centre_y(true);
+	}
 
 	TGUI_Widget *modal_main_widget = new TGUI_Widget(1.0f, 1.0f);
 
@@ -4922,14 +4926,24 @@ void BooBoo_GUI::update()
 
 static bool widgetfunc_gui_start(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	MIN_ARGS(1)
 
 	unsigned int id = as_number(prg, v, 0);
+
+	bool centre_x = true;
+	if (v.size() > 1) {
+		centre_x = as_number(prg, v, 1);
+	}
+
+	bool centre_y = true;
+	if (v.size() > 2) {
+		centre_y = as_number(prg, v, 2);
+	}
 
 	Widget_Info *info = widget_info(prg);
 	INFO_EXISTS(info->widgets, id)
 
-	BooBoo_GUI *g = new BooBoo_GUI(info->widgets[id]->widget);
+	BooBoo_GUI *g = new BooBoo_GUI(info->widgets[id]->widget, centre_x, centre_y);
 
 	shim::guis.push_back(g);
 	
