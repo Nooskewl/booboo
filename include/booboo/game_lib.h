@@ -21,6 +21,14 @@
 #endif
 #endif
 
+enum GUI_Alignment {
+	GUI_LEFT = 0,
+	GUI_TOP = GUI_LEFT,
+	GUI_CENTRE,
+	GUI_RIGHT,
+	GUI_BOTTOM = GUI_RIGHT
+};
+
 void BOOBOO_GAME_EXPORT start_lib_game();
 void BOOBOO_GAME_EXPORT end_lib_game();
 void BOOBOO_GAME_EXPORT game_lib_destroy_program(booboo::Program *prg);

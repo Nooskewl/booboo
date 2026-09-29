@@ -1898,6 +1898,11 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "TRANSITION_SLIDE_VERTICAL", gui::GUI::TRANSITION_SLIDE_VERTICAL, pass);
 	insert_constant(prg, "TRANSITION_SLIDE_REVERSE", gui::GUI::TRANSITION_SLIDE_REVERSE, pass);
 	insert_constant(prg, "TRANSITION_SLIDE_VERTICAL_REVERSE", gui::GUI::TRANSITION_SLIDE_VERTICAL_REVERSE, pass);
+	insert_constant(prg, "GUI_CENTRE", GUI_CENTRE, pass);
+	insert_constant(prg, "GUI_LEFT", GUI_LEFT, pass);
+	insert_constant(prg, "GUI_RIGHT", GUI_RIGHT, pass);
+	insert_constant(prg, "GUI_TOP", GUI_LEFT, pass);
+	insert_constant(prg, "GUI_BOTTOM", GUI_BOTTOM, pass);
 	insert_constant(prg, "LETTERBOX_TOP", gfx::LETTERBOX_TOP, pass);
 	insert_constant(prg, "LETTERBOX_BOTTOM", gfx::LETTERBOX_BOTTOM, pass);
 	insert_constant(prg, "LETTERBOX_LEFT", gfx::LETTERBOX_LEFT, pass);

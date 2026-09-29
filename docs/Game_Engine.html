@@ -1508,8 +1508,8 @@ and h are the calculated position and size of the widget in pixels.
 <h3>gui_start</h3>
 <pre>
 	Start executing a gui
-	GUIs are centred on x/y by default
-	e.g. gui_start root_widget ^ centre_x centre_y
+	GUIs are centred on x/y by default. Use GUI_* constants for alignment
+	e.g. gui_start root_widget ^ align_x align_y
 </pre>
 
 <h3>gui_exit</h3>
@@ -1967,6 +1967,16 @@ GUI constants:
 	<li>TRANSITION_SLIDE_VERTICAL</li>
 	<li>TRANSITION_SLIDE_REVERSE</li>
 	<li>TRANSITION_SLIDE_VERTICAL_REVERSE</li>
+</ul>
+
+<p>GUI Alignment:</p>
+
+<ul>
+	<li>GUI_CENTRE</li>
+	<li>GUI_LEFT</li>
+	<li>GUI_RIGHT</li>
+	<li>GUI_TOP</li>
+	<li>GUI_BOTTOM</li>
 </ul>
 
 <p>For drawing custom letterbox:</p>

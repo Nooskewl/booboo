@@ -4893,19 +4893,26 @@ static bool widgetfunc_set_padding_bottom(Program *prg, const std::vector<Token>
 class BooBoo_GUI : public gui::GUI
 {
 public:
-	BooBoo_GUI(BooBoo_Widget *root, bool centre_x, bool centre_y);
+	BooBoo_GUI(BooBoo_Widget *root, GUI_Alignment x_align, GUI_Alignment y_align);
 	virtual ~BooBoo_GUI();
 
 	virtual void update();
 };
 
-BooBoo_GUI::BooBoo_GUI(BooBoo_Widget *root, bool centre_x, bool centre_y)
+BooBoo_GUI::BooBoo_GUI(BooBoo_Widget *root, GUI_Alignment x_align, GUI_Alignment y_align)
 {
-	if (centre_x) {
+	if (x_align == GUI_CENTRE) {
 		root->set_centre_x(true);
 	}
-	if (centre_y) {
+	else if (x_align == GUI_RIGHT) {
+		root->set_float_right(true);
+	}
+
+	if (y_align == GUI_CENTRE) {
 		root->set_centre_y(true);
+	}
+	else if (y_align == GUI_BOTTOM) {
+		root->set_float_bottom(true);
 	}
 
 	TGUI_Widget *modal_main_widget = new TGUI_Widget(1.0f, 1.0f);
@@ -4930,20 +4937,20 @@ static bool widgetfunc_gui_start(Program *prg, const std::vector<Token> &v)
 
 	unsigned int id = as_number(prg, v, 0);
 
-	bool centre_x = true;
+	GUI_Alignment x_align = GUI_CENTRE;
 	if (v.size() > 1) {
-		centre_x = as_number(prg, v, 1);
+		x_align = (GUI_Alignment)as_number(prg, v, 1);
 	}
 
-	bool centre_y = true;
+	GUI_Alignment y_align = GUI_CENTRE;
 	if (v.size() > 2) {
-		centre_y = as_number(prg, v, 2);
+		y_align = (GUI_Alignment)as_number(prg, v, 2);
 	}
 
 	Widget_Info *info = widget_info(prg);
 	INFO_EXISTS(info->widgets, id)
 
-	BooBoo_GUI *g = new BooBoo_GUI(info->widgets[id]->widget, centre_x, centre_y);
+	BooBoo_GUI *g = new BooBoo_GUI(info->widgets[id]->widget, x_align, y_align);
 
 	shim::guis.push_back(g);
 	
