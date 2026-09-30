@@ -1,3 +1,0 @@
-Never share or distribute BooBoo source code
-
-You cannot use the source code to build a competing game engine
