@@ -2796,50 +2796,12 @@ bool interpret(Program *prg, bool trigger_breakpoints)
 
 	if (shim::debug && trigger_breakpoints) {
 		std::string inf = get_error_info(prg);
-		std::string curr_f = get_file_name(prg);
-		int curr_l = get_line_num(prg);
-		std::string prev_f;
-		int prev_l = -1;
-		int pc = prg->s->pc;
-		bool found = false;
-		while (prg->s->pc > 0) {
-			prg->s->pc--;
-			std::string f = get_file_name(prg);
-			int l = get_line_num(prg);
-			if (f == curr_f) {
-				prev_f = f;
-				prev_l = l;
-				found = true;
-				break;
-			}
-		}
-		prg->s->pc = pc;
-		bool go = false;
-		for (size_t i = 0; i < file_breakpoints.size(); i++) {
-			util::Tokenizer t(file_breakpoints[i], ':');
-			std::string f = t.next();
-			std::string ls = t.next();
-			int l = atoi(ls.c_str());
-			if (
-				(found == false && f == curr_f && l <= curr_l) ||
-				(found == true && f == curr_f && l > prev_l && l <= curr_l)
-			) {
-				inf = file_breakpoints[i];
-				go = true;
-				break;
-			}
-		}
-		if (go) {
-			debug("Breakpoint " + inf + " hit...");
-		}
-		/*
 		for (size_t i = 0; i < file_breakpoints.size(); i++) {
 			if (file_breakpoints[i] == inf) {
 				debug("Breakpoint " + inf + " hit...");
 				break;
 			}
 		}
-		*/
 	}
 
 	if (trigger_breakpoints && break_on_interpret) {
