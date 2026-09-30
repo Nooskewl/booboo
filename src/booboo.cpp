@@ -2737,10 +2737,12 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 
 	prg->s->pc = 0;
 
-	for (size_t i = 0; i < function_breakpoints.size(); i++) {
-		if (function_breakpoints[i] == prg->s->name) {
-			debug("Breakpoint (" + prg->s->name + ") hit...");
-			break;
+	if (shim::debug) {
+		for (size_t i = 0; i < function_breakpoints.size(); i++) {
+			if (function_breakpoints[i] == prg->s->name) {
+				debug("Breakpoint (" + prg->s->name + ") hit...");
+				break;
+			}
 		}
 	}
 
