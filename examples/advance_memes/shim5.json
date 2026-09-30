@@ -1,0 +1,9 @@
+{
+	"shim": {
+		"gfx": {
+			"width": 450,
+			"height": 800,
+			"linear_filtering": true
+		}
+	}
+}
