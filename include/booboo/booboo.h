@@ -218,6 +218,8 @@ struct Program {
 
 	std::vector<int> real_line_numbers;
 	std::vector<std::string> real_file_names;
+
+	std::map<std::string, bool> lines_with_instructions;
 };
 
 enum F12 {

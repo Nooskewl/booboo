@@ -2324,6 +2324,8 @@ func_top:
 					func.s->program[func.s->program.size()-1].data.push_back(t);
 				}
 				else if (library_map.find(tok) != library_map.end()) {
+					std::string b = get_error_info(prg);
+					prg->lines_with_instructions[b] = true;
 					Statement s;
 					s.method = library_map[tok];
 					func.s->program.push_back(s);
@@ -2612,6 +2614,8 @@ func_top:
 			prg->s->program[prg->s->program.size()-1].data.push_back(t);
 		}
 		else if (library_map.find(tok) != library_map.end()) {
+			std::string b = get_error_info(prg);
+			prg->lines_with_instructions[b] = true;
 			Statement s;
 			s.method = library_map[tok];
 			prg->s->program.push_back(s);
@@ -5733,8 +5737,13 @@ void debug(std::string text)
 					}
 				}
 				else {
-					file_breakpoints.push_back(line);
-					printf("Breakpoint added!\n");
+					if (prg->lines_with_instructions.find(line) == prg->lines_with_instructions.end()) {
+						printf("No instruction on %s. No breakpoint set!\n", line.c_str());
+					}
+					else {
+						file_breakpoints.push_back(line);
+						printf("Breakpoint added!\n");
+					}
 				}
 			}
 		}
