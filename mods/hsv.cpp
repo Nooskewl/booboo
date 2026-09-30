@@ -150,9 +150,9 @@ void HSVtoRGB(float& fR, float& fG, float& fB, float& fH, float& fS, float& fV) 
 
 static void exprfunc_rgb_to_hsv(Program *prg, const std::vector<Token> &v)
 {
-	float r = as_number(prg, v[0]);
-	float g = as_number(prg, v[1]);
-	float b = as_number(prg, v[2]);
+	float r = as_number(prg, v, 0);
+	float g = as_number(prg, v, 1);
+	float b = as_number(prg, v, 2);
 
 	r /= 255.0f;
 	g /= 255.0f;
@@ -163,45 +163,47 @@ static void exprfunc_rgb_to_hsv(Program *prg, const std::vector<Token> &v)
 	RGBtoHSV(r, g, b, h, s, val);
 
 	Variable vec;
-	vec.type = Variable::VECTOR;
+	vec.set_type(Variable::VECTOR);
 
 	Variable var;
-	var.type = Variable::NUMBER;
+	var.set_type(Variable::NUMBER);
 
-	var.n = h;
+	var.set_n(h);
 	vec.v.push_back(var);
-	var.n = s;
+	var.set_n(s);
 	vec.v.push_back(var);
-	var.n = val;
+	var.set_n(val);
 	vec.v.push_back(var);
 
-	prg->result = vec;
+	prg->result->set_type(Variable::VECTOR);
+	prg->result->set(vec);
 }
 
 static void exprfunc_hsv_to_rgb(Program *prg, const std::vector<Token> &v)
 {
-	float h = as_number(prg, v[0]);
-	float s = as_number(prg, v[1]);
-	float val = as_number(prg, v[2]);
+	float h = as_number(prg, v, 0);
+	float s = as_number(prg, v, 1);
+	float val = as_number(prg, v, 2);
 
 	float r, g, b;
 
 	HSVtoRGB(r, g, b, h, s, val);
 
 	Variable vec;
-	vec.type = Variable::VECTOR;
+	vec.set_type(Variable::VECTOR);
 
 	Variable var;
-	var.type = Variable::NUMBER;
+	var.set_type(Variable::NUMBER);
 
-	var.n = int(r * 255.0f);
+	var.set_n(int(r * 255.0f));
 	vec.v.push_back(var);
-	var.n = int(g * 255.0f);
+	var.set_n(int(g * 255.0f));
 	vec.v.push_back(var);
-	var.n = int(b * 255.0f);
+	var.set_n(int(b * 255.0f));
 	vec.v.push_back(var);
 
-	prg->result = vec;
+	prg->result->set_type(Variable::VECTOR);
+	prg->result->set(vec);
 }
 
 extern "C" {
