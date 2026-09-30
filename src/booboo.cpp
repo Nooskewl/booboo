@@ -726,7 +726,13 @@ bool process_includes(Program *prg)
 			std::string new_code;
 			std::string fn;
 			fn = name;
-			new_code = booboo::load_text("scripts/" + name);
+
+			if (shim::cpa) {
+				new_code = booboo::load_text("scripts/" + name);
+			}
+			else {
+				new_code = booboo::load_text(name);
+			}
 
 			int nlines = 1;
 			int i = 0;
