@@ -207,10 +207,8 @@ Sections:
 	You can do some basic "reflection" using toptr to get a pointer
 	to the variable with the name in a string.
 	e.g. var foo
-	e.g. = number 10
-	e.g. var bar
-	e.g. = bar "foo"
-	e.g. = `(toptr bar) 1000 ; foo is now 1000
+	e.g. = foo 10
+	e.g. = `(toptr "foo") 1000 ; foo is now 1000
 	You can use this to script BooBoo with function names/etc in a text file.
 	Returns NULL if the variable isn't found
 </pre>
