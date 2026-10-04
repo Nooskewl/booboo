@@ -620,6 +620,8 @@ void end()
 	}
 
 	shim::end_all();
+
+	shim::static_end_all();
 }
 
 static int set_orig_args(bool forced, bool count_only)
@@ -971,8 +973,8 @@ again:
 	fprintf(f, "invert_mouse_wheel=%d\n", invert_mouse_wheel);
 	fclose(f);
 
-	standard_lib_destroy_program(prg);
 	game_lib_destroy_program(prg);
+	standard_lib_destroy_program(prg);
 	destroy_program(prg);
 	prg = nullptr;
 

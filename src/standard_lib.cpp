@@ -2623,6 +2623,7 @@ static void exprfunc_mml_play(Program *prg, const std::vector<Token> &v)
 	for (std::map<int, MML_Instance *>::iterator it = iinfo->instances.begin(); it != iinfo->instances.end();) {
 		std::pair<int, MML_Instance *> p = *it;
 		if (p.second->mml->track_active(p.second->instance) == false) {
+			delete it->second;
 			it = iinfo->instances.erase(it);
 		}
 		else {

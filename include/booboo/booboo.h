@@ -189,6 +189,7 @@ struct Function_Swap {
 };
 
 struct Program {
+	Function_Swap *main_s;
 	Function_Swap *s;
 
 	int compare_flag;

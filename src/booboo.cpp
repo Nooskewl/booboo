@@ -2851,7 +2851,7 @@ void destroy_program(Program *prg)
 	prg->variables.clear();
 	prg->functions.clear();
 
-	delete prg->s;
+	delete prg->main_s;
 	delete prg->result;
 	black_box.clear();
 	delete prg;
@@ -4797,7 +4797,8 @@ Program *create_program(std::string code)
 
 	prg->num_consts = -1;
 
-	prg->s = new Function_Swap;
+	prg->main_s = new Function_Swap;
+	prg->s = prg->main_s;
 
 	prg->real_line_numbers.push_back(1);
 	prg->real_file_names.push_back(main_program_name);

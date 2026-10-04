@@ -5444,6 +5444,7 @@ void game_lib_destroy_program(Program *prg)
 	delete model_i;
 	delete billboard_i;
 	delete widget_i;
+	delete sprite_i;
 
 	booboo::set_black_box("com.nooskewl.booboo.image", nullptr);
 	booboo::set_black_box("com.nooskewl.booboo.font", nullptr);
