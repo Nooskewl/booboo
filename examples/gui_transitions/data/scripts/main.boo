@@ -2,7 +2,7 @@ var exited
 = exited FALSE
 
 var groups
-vector_add groups TRANSITION_GROW
+vector_add groups TRANSITION_SHRINK
 vector_add groups TRANSITION_SHRINK
 
 var font
