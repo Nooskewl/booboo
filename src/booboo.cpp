@@ -1876,6 +1876,11 @@ static void compile(Program *prg, Pass pass)
 	insert_constant(prg, "EVENT_MOUSE_AXIS", TGUI_MOUSE_AXIS, pass);
 	insert_constant(prg, "EVENT_MOUSE_WHEEL", TGUI_MOUSE_WHEEL, pass);
 	insert_constant(prg, "EVENT_TEXT", TGUI_TEXT, pass);
+	insert_constant(prg, "EVENT_FOCUS", TGUI_FOCUS, pass);
+	insert_constant(prg, "FOCUS_LEFT", TGUI_FOCUS_LEFT, pass);
+	insert_constant(prg, "FOCUS_RIGHT", TGUI_FOCUS_RIGHT, pass);
+	insert_constant(prg, "FOCUS_UP", TGUI_FOCUS_UP, pass);
+	insert_constant(prg, "FOCUS_DOWN", TGUI_FOCUS_DOWN, pass);
 	insert_constant(prg, "JOY_A", TGUI_B_A, pass);
 	insert_constant(prg, "JOY_B", TGUI_B_B, pass);
 	insert_constant(prg, "JOY_X", TGUI_B_X, pass);

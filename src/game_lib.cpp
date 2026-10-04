@@ -4465,6 +4465,9 @@ void BooBoo_Widget::handle_event(TGUI_Event *event)
 		tmp[2].n = event->mouse.x;
 		tmp[3].n = event->mouse.y;
 	}
+	else if (event->type == TGUI_FOCUS) {
+		tmp[2].n = (int)event->focus.type;
+	}
 	else {
 		go = false;
 	}

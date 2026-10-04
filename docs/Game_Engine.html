@@ -2047,6 +2047,15 @@ GUI constants:
 	<li>F12_END</li>
 </ul>
 
+<p>For EVENT_FOCUS events:</p>
+
+<ul>
+	<li>FOCUS_LEFT</li>
+	<li>FOCUS_RIGHT</li>
+	<li>FOCUS_UP</li>
+	<li>FOCUS_DOWN</li>
+</ul>
+
 <a id="Events"></a>
 <h2>Events</h2>
 
@@ -2132,6 +2141,12 @@ are:
 <h3>EVENT_TEXT</h3>
 <pre>
 	a - a string containing the text that was typed
+</pre>
+
+<h3>EVENT_FOCUS</h3>
+<p>A directional-pad/arrow key generates these. This is special to gui_event</p>
+<pre>
+	a - the FOCUS_* event type, see constants
 </pre>
 
 </div>
