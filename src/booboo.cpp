@@ -4851,6 +4851,9 @@ Program *create_program(std::string code)
 	prg->s->line = 0;
 	prg->s->start_line = 0;
 	prg->s->program.clear();
+	for (size_t i = 0; i < prg->functions.size(); i++) {
+		delete prg->functions[i].s;
+	}
 	prg->functions.clear();
 	prg->s->line_numbers.clear();
 
