@@ -104,7 +104,7 @@ var ops
 = [ops "+-"] i_neg
 = [ops "="] i_eq
 
-gui_start container
+= VOID (gui_start container)
 
 gui_set_focus _eq
 

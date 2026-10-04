@@ -114,11 +114,18 @@ struct Billboard_Info {
 	std::map<int, Billboard *> billboards;
 };
 
+class BooBoo_GUI;
 class BooBoo_Widget;
 
 struct Widget {
 	BooBoo_Widget *widget;
 	booboo::Variable *data;
+};
+
+struct GUI_Info
+{
+	int gui_id;
+	std::map<int, BooBoo_GUI *> guis;
 };
 
 struct Widget_Info
@@ -136,5 +143,6 @@ Vertex_Buffer_Info BOOBOO_GAME_EXPORT *vertex_buffer_info(booboo::Program *prg);
 Model_Info BOOBOO_GAME_EXPORT *model_info(booboo::Program *prg);
 Billboard_Info BOOBOO_GAME_EXPORT *billboard_info(booboo::Program *prg);
 Widget_Info BOOBOO_GAME_EXPORT *widget_info(booboo::Program *prg);
+GUI_Info BOOBOO_GAME_EXPORT *gui_info(booboo::Program *prg);
 
 #endif // BOOBOO_GAME_LIB_H

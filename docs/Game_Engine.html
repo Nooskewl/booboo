@@ -1505,11 +1505,20 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. widget_set_down_widget widget down_widget
 </pre>
 
-<h3>gui_start</h3>
+<h3>(gui_start)</h3>
 <pre>
 	Start executing a gui
 	GUIs are centred on x/y by default. Use GUI_* constants for alignment
-	e.g. gui_start root_widget ^ align_x align_y
+	Returns a GUI id
+	e.g. = VOID (gui_start root_widget ^ align_x align_y)
+</pre>
+
+<h3>gui_layout</h3>
+<pre>
+	If you change the size or positions of widgets, you may need to call gui_layout.
+	Without any params it lays out the frontmost GUI, otherwise it takes a GUI id
+	as returned by gui_start.
+	e.g. gui_layout ^ id
 </pre>
 
 <h3>gui_exit</h3>

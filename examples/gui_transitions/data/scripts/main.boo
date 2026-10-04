@@ -94,7 +94,7 @@ function start_gui
 	widget_set_break_line wbcycle TRUE
 	widget_set_parent wbcycle wc
 
-	gui_start wc
+	= VOID (gui_start wc)
 }
 
 call start_gui

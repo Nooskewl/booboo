@@ -2,6 +2,7 @@
 #include <shim5/shaders/glsl/default_vertex.h>
 #include <shim5/shaders/glsl/default_textured_fragment.h>
 #include <shim5/internal/gfx.h>
+#include <tgui6/tgui6.h>
 
 using namespace noo;
 
@@ -109,6 +110,17 @@ Billboard_Info *billboard_info(Program *prg)
 		info = new Billboard_Info;
 		info->billboard_id = 0;
 		booboo::set_black_box("com.nooskewl.booboo.billboard", info);
+	}
+	return info;
+}
+
+GUI_Info *gui_info(Program *prg)
+{
+	GUI_Info *info = (GUI_Info *)booboo::get_black_box("com.nooskewl.booboo.gui");
+	if (info == nullptr) {
+		info = new GUI_Info;
+		info->gui_id = 0;
+		booboo::set_black_box("com.nooskewl.booboo.gui", info);
 	}
 	return info;
 }
@@ -4934,7 +4946,7 @@ void BooBoo_GUI::update()
 	gui::GUI::update();
 }
 
-static bool widgetfunc_gui_start(Program *prg, const std::vector<Token> &v)
+static void widgetfunc_gui_start(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
 
@@ -4954,10 +4966,34 @@ static bool widgetfunc_gui_start(Program *prg, const std::vector<Token> &v)
 	INFO_EXISTS(info->widgets, id)
 
 	BooBoo_GUI *g = new BooBoo_GUI(info->widgets[id]->widget, x_align, y_align);
+	
+	GUI_Info *ginfo = gui_info(prg);
+	int gid = ginfo->gui_id;
+	ginfo->guis[ginfo->gui_id++] = g;
+
+	prg->result->set_type(Variable::NUMBER);
+	prg->result->set_n(gid);
 
 	shim::guis.push_back(g);
 	
 	shim::convert_directions_to_focus_events = true;
+}
+
+static bool widgetfunc_gui_layout(Program *prg, const std::vector<Token> &v)
+{
+	if (v.size() == 0) {
+		if (shim::guis.size() > 0) {
+			shim::guis.back()->gui->layout();
+		}
+		return true;
+	}
+
+	unsigned int id = as_number(prg, v, 0);
+
+	GUI_Info *info = gui_info(prg);
+	INFO_EXISTS(info->guis, id)
+
+	info->guis[id]->gui->layout();
 
 	return true;
 }
@@ -5383,7 +5419,7 @@ void start_lib_game()
 	add_expression_handler("widget_get_padding_right", exprfunc_widget_get_padding_right);
 	add_expression_handler("widget_get_padding_top", exprfunc_widget_get_padding_top);
 	add_expression_handler("widget_get_padding_bottom", exprfunc_widget_get_padding_bottom);
-	add_instruction("gui_start", widgetfunc_gui_start);
+	add_expression_handler("gui_start", widgetfunc_gui_start);
 	add_instruction("gui_exit", widgetfunc_gui_exit);
 	add_instruction("gui_set_focus", widgetfunc_gui_set_focus);
 	add_instruction("gui_set_transition_types", widgetfunc_gui_set_transition_types);
@@ -5438,6 +5474,8 @@ void game_lib_destroy_program(Program *prg)
 	for (std::map<int, Widget *>::iterator i = widget_i->widgets.begin(); i != widget_i->widgets.end(); i++) {
 		delete widget_i->widgets[(*i).first];
 	}
+	GUI_Info *gui_i = gui_info(prg);
+	gui_i->guis.clear();
 
 	delete image_i;
 	delete font_i;
