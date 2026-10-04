@@ -868,6 +868,7 @@ int main(int argc, char **argv)
 	add_expression_handler("mouse_get_buttons", exprfunc_mouse_get_buttons);
 	add_expression_handler("key_get", exprfunc_key_get);
 
+	std::vector<HMODULE> free_dlls;
 	std::string dlls = "";
 	try {
 		dlls = util::load_text_from_filesystem("dll.txt");
@@ -881,6 +882,7 @@ int main(int argc, char **argv)
 		dll += ".dll";
 		HMODULE m = LoadLibraryA(dll.c_str());
 		if (m != NULL) {
+			free_dlls.push_back(m);
 			BOOBOO_DLL_START_FUNC func = (BOOBOO_DLL_START_FUNC)GetProcAddress(m, "booboo_start");
 			if (func != NULL) {
 				(*func)();
@@ -1001,6 +1003,11 @@ again:
 	booboo::end();
 
 	::end();
+
+	for (size_t i = 0; i < free_dlls.size(); i++) {
+		FreeLibrary(free_dlls[i]);
+	}
+	free_dlls.clear();
 
 	}
 	catch (util::Error &e) {

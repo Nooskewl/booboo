@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 	shim::organisation_name = "Nooskewl";
 	shim::game_name = "BooBoo";
 
-	if (shim::static_start_all(SDL_INIT_AUDIO) == false) {
+	if (shim::static_start_all(SDL_INIT_AUDIO, false) == false) {
 		return 1;
 	}
 
@@ -75,6 +75,7 @@ int main(int argc, char **argv)
 	booboo::start();
 	start_lib_standard();
 
+	std::vector<HMODULE> free_dlls;
 	std::string dlls = "";
 	try {
 		dlls = util::load_text_from_filesystem("dll.txt");
@@ -88,6 +89,7 @@ int main(int argc, char **argv)
 		dll += ".dll";
 		HMODULE m = LoadLibraryA(dll.c_str());
 		if (m != NULL) {
+			free_dlls.push_back(m);
 			BOOBOO_DLL_START_FUNC func = (BOOBOO_DLL_START_FUNC)GetProcAddress(m, "booboo_start");
 			if (func != NULL) {
 				(*func)();
@@ -173,6 +175,16 @@ again:
 
 	end_lib_standard();
 	booboo::end();
+	booboo::cli_args.clear();
+
+	audio::end();
+	util::end();
+	shim::static_end_all(false);
+
+	for (size_t i = 0; i < free_dlls.size(); i++) {
+		FreeLibrary(free_dlls[i]);
+	}
+	free_dlls.clear();
 
 	}
 	catch (booboo::Error &e) {

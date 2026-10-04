@@ -2663,7 +2663,7 @@ void call_function(Program *prg, int function, const std::vector<Token> &params,
 	if (shim::debug == false || get_file_name(prg) == "UNKNOWN") {
 		bt = false;
 	}
-	if (bt) {
+	if (shim::debug && bt) {
 		backtrace.push_back(get_file_name(prg) + ":" + prg->s->name + ":" + util::itos(get_line_num(prg)));
 	}
 
@@ -4691,6 +4691,9 @@ void start()
 void end()
 {
 	library_map.clear();
+	token_map.clear();
+	expression_map.clear();
+	expression_handlers.clear();
 
 	while (var_args.size() > 0) {
 		var_args.pop();
