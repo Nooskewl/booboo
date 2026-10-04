@@ -25,6 +25,10 @@ using namespace booboo;
 
 template <typename T> T sign(T v) { return (T(0) < v) - (v < T(0)); }
 
+SDL_IOStream *io_in;
+SDL_IOStream *io_out;
+SDL_IOStream *io_err;
+
 File_Info *file_info(Program *prg)
 {
 	File_Info *info = (File_Info *)get_black_box("com.nooskewl.booboo.files");
@@ -3495,6 +3499,7 @@ static bool SDLCALL stdio_close(void *userdata)
             status = false;
         }
     }
+    SDL_free(rwopsdata);
     return status;
 }
 
@@ -3529,12 +3534,12 @@ SDL_IOStream *SDL_RWFromFP(FILE *fp, bool autoclose)
 void start_lib_standard()
 {
 	File_Info *info = file_info(prg);
-	SDL_IOStream *in = SDL_RWFromFP(stdin, false);
-	SDL_IOStream *out = SDL_RWFromFP(stdout, false);
-	SDL_IOStream *err = SDL_RWFromFP(stderr, false);
-	info->files[info->file_id++] = in;
-	info->files[info->file_id++] = out;
-	info->files[info->file_id++] = err;
+	io_in = SDL_RWFromFP(stdin, false);
+	io_out = SDL_RWFromFP(stdout, false);
+	io_err = SDL_RWFromFP(stderr, false);
+	info->files[info->file_id++] = io_in;
+	info->files[info->file_id++] = io_out;
+	info->files[info->file_id++] = io_err;
 
 	add_expression_handler("getenv", exprfunc_getenv);
 	add_expression_handler("getcwd", exprfunc_getcwd);

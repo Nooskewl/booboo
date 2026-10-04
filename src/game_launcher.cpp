@@ -622,6 +622,13 @@ void end()
 	shim::end_all();
 
 	shim::static_end_all();
+	
+	for (int i = 0; i < shim::argc; i++) {
+		delete[] shim::argv[i];
+	}
+	delete[] shim::argv;
+	shim::argc = 0;
+	shim::argv = nullptr;
 }
 
 static int set_orig_args(bool forced, bool count_only)
