@@ -612,7 +612,6 @@ bool go()
 
 void end()
 {
-	// If Alt-F4 is pressed the title gui can remain in shim::guis. Leaving it to shim to destruct won't work, because ~Title_GUI accesses Globals which is destroyed below
 	for (std::vector<gui::GUI *>::iterator it = shim::guis.begin(); it != shim::guis.end();) {
 		gui::GUI *gui = *it;
 		delete gui;
