@@ -1,6 +1,6 @@
 html {
 	font-family: Arial, sans-serif;
-	background-color: #cba;
+	background-color: #bab;
 	color: black;
 	line-height: 1.5;
 }
@@ -11,13 +11,14 @@ body {
 	padding: 0;
 }
 a, a:visited {
-	color: #654;
+	color: #fde;
+	text-decoration: none;
 }
 h1, h2, h3 {
 	padding: 10px;
 	margin-top: 15px;
 	margin-bottom: 15px;
-	background-color: #fed;
+	background-color: #fef;
 	color: black;
 	border: 2px solid black;
 }
@@ -27,7 +28,7 @@ h2 {
 ::selection {
 	color: black;
 	background-color: black;
-	color: #fed;
+	color: #fef;
 }
 #footer {
 	text-align: center;
@@ -48,7 +49,7 @@ pre, code {
 }
 hr {
 	border: 0;
-	border-top: 1px solid #fed;
+	border-top: 1px solid #fef;
 }
 img {
 	max-width: 100%;
