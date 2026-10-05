@@ -2665,10 +2665,10 @@ func_top:
 void call_function(Program *prg, int function, const std::vector<Token> &params, int ignore_params)
 {
 	bool bt = true;
-	if (shim::debug == false || get_file_name(prg) == "UNKNOWN") {
+	if (get_file_name(prg) == "UNKNOWN") {
 		bt = false;
 	}
-	if (shim::debug && bt) {
+	if (bt) {
 		backtrace.push_back(get_file_name(prg) + ":" + prg->s->name + ":" + util::itos(get_line_num(prg)));
 	}
 
