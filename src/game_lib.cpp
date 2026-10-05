@@ -4905,6 +4905,37 @@ static bool widgetfunc_set_padding_bottom(Program *prg, const std::vector<Token>
 	return true;
 }
 
+static void widgetfunc_get_relative_event(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	int id = as_number(prg, v, 0);
+	float mouse_x = as_number(prg, v, 1);
+	float mouse_y = as_number(prg, v, 2);
+
+	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, id)
+
+	TGUI_Widget *widget = info->widgets[id]->widget;
+
+	mouse_x -= widget->get_x();
+	mouse_y -= widget->get_y();
+
+	// -1 if out of bounds on any dimension
+	if (mouse_x < 0 || mouse_y < 0 || mouse_x >= widget->get_width() || mouse_y >= widget->get_height()) {
+		mouse_x = mouse_y = -1;
+	}
+
+	Variable var;
+	var.set_type(Variable::NUMBER);
+
+	prg->result->set_type(Variable::VECTOR);
+	var.set_n(mouse_x);
+	prg->result->v.push_back(var);
+	var.set_n(mouse_y);
+	prg->result->v.push_back(var);
+}
+
 class BooBoo_GUI : public gui::GUI
 {
 public:
@@ -5419,6 +5450,7 @@ void start_lib_game()
 	add_expression_handler("widget_get_padding_right", exprfunc_widget_get_padding_right);
 	add_expression_handler("widget_get_padding_top", exprfunc_widget_get_padding_top);
 	add_expression_handler("widget_get_padding_bottom", exprfunc_widget_get_padding_bottom);
+	add_expression_handler("widget_get_relative_event", widgetfunc_get_relative_event);
 	add_expression_handler("gui_start", widgetfunc_gui_start);
 	add_instruction("gui_exit", widgetfunc_gui_exit);
 	add_instruction("gui_set_focus", widgetfunc_gui_set_focus);

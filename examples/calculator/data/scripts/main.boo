@@ -152,14 +152,14 @@ function draw_button x y w h focussed data
 	font_draw font r g b 255 [data "text"] xx yy
 }
 
-function button_event type a b c d x y w h focussed ~data
+function button_event id type a b c d x y w h focussed ~data
 {
 	var pressed
 	= pressed 0
 
 	if (&& (== type EVENT_MOUSE_DOWN) (== a 1) (== b FALSE)) down
 		var on_button
-		call_result on_button owned x y w h c d
+		call_result on_button owned id c d
 		if (== on_button TRUE) really_down
 			= [data "down"] TRUE
 		:really_down
@@ -167,7 +167,7 @@ function button_event type a b c d x y w h focussed ~data
 
 	if (&& (== [data "down"] TRUE) (== type EVENT_MOUSE_UP)) up
 		var on_button
-		call_result on_button owned x y w h c d
+		call_result on_button owned id c d
 		if (== on_button TRUE) really_up
 			= pressed 1
 		:really_up
@@ -198,21 +198,19 @@ function mkbutton text
 	return m
 }
 
-function owned wx wy ww wh x y
+function owned id x y
 {
-	if (|| (< x wx) (< y wy) (>= x (+ wx ww)) (>= y (+ wy wh))) nope
-		return FALSE
-	:nope
-	return TRUE
+	explode (widget_get_relative_event id x y) x y
+	return (>= x 0)
 }
 
-function null_event type a b c d x y w h focussed ~data
+function null_event id type a b c d x y w h focussed ~data
 {
 }
 
 function gui_event id type a b c d x y w h focussed ~data
 {
-	call [data "event"] type a b c d x y w h focussed data
+	call [data "event"] id type a b c d x y w h focussed data
 }
 
 function gui_draw id x y w h focussed data

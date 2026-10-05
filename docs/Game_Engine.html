@@ -1505,6 +1505,13 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. widget_set_down_widget widget down_widget
 </pre>
 
+<h3>(widget_get_relative_event)</h3>
+<pre>
+	Returns a mouse event such that 0, 0 is the topleft of the widget.
+	If the mouse event is not over the widget, -1, -1 is returned.
+	e.g. explode (widget_get_relative_event w mx my) mx my
+</pre>
+
 <h3>(gui_start)</h3>
 <pre>
 	Start executing a gui
