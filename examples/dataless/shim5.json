@@ -1,0 +1,7 @@
+{
+	"shim" : {
+		"gfx" : {
+			"linear_filtering": true
+		}
+	}
+}
