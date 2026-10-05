@@ -1192,6 +1192,35 @@ static void exprfunc_image_create(Program *prg, const std::vector<Token> &v)
 	}
 }
 
+static void exprfunc_image_create_sub(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(5)
+
+	int id = as_number(prg, v, 0);
+	int x = as_number(prg, v, 1);
+	int y = as_number(prg, v, 2);
+	int w = as_number(prg, v, 3);
+	int h = as_number(prg, v, 4);
+
+	Image_Info *info = image_info(prg);
+
+	prg->result->set_type(Variable::NUMBER);
+
+	prg->result->set_n(info->image_id);
+
+	try {
+		gfx::Image *img = new gfx::Image(info->images[id]->image, util::Point<int>(x, y), util::Size<int>(w, h));
+
+		Image *i = new Image;
+		i->image = img;
+
+		info->images[info->image_id++] = i;
+	}
+	catch (util::Error &e) {
+		prg->result->set_n(-1);
+	}
+}
+
 static void exprfunc_image_load(Program *prg, const std::vector<Token> &v)
 {
 	MIN_ARGS(1)
@@ -5318,6 +5347,7 @@ void start_lib_game()
 	add_instruction("circle", primfunc_circle);
 	add_instruction("filled_circle", primfunc_filled_circle);
 	add_expression_handler("image_create", exprfunc_image_create);
+	add_expression_handler("image_create_sub", exprfunc_image_create_sub);
 	add_expression_handler("image_load", exprfunc_image_load);
 	add_expression_handler("image_save", exprfunc_image_save);
 	add_expression_handler("screenshot", exprfunc_image_screenshot);
