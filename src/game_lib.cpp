@@ -4509,6 +4509,8 @@ void BooBoo_Widget::handle_event(TGUI_Event *event)
 	else if (event->type == TGUI_FOCUS) {
 		tmp[2].n = (int)event->focus.type;
 	}
+	else if (event->type == TGUI_TICK) {
+	}
 	else {
 		go = false;
 	}

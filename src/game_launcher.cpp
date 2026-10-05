@@ -391,6 +391,8 @@ void handle_event(TGUI_Event *event)
 		args[1].type = Token::STRING;
 		args[1].s = event->text.text;
 	}
+	else if (event->type == TGUI_TICK) {
+	}
 	else {
 		go = false;
 	}
