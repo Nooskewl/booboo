@@ -39,12 +39,6 @@ There are 3 optional functions taking/returning no parameters called from the ap
 and the stencil buffer is cleared to 0.</p>
 
 <p>
-There are also GUI callbacks for events and drawing, and a callback for
-generic input events, which are described in the <a href="#GUI">GUI</a> and
-<a href="#Events">events</a> sections.
-</p>
-
-<p>
 There is another global callback you can define, draw_letterbox
 </p>
 <pre>
@@ -56,8 +50,16 @@ draw a custom letterbox when the window size and aspect ratio you requested don'
 match. A default letterbox will be drawn in case you don't draw anything.
 </p>
 
+<p>function resized is called when the window is resized.</p>
+
 <p>And finally f12 callback, which is callback when F12/Guide button is pressed and when
 the F12 popup goes away, with one of the constants in the constants section.</p>
+
+<p>
+There are also GUI callbacks for events and drawing, and a callback for
+generic input events, which are described in the <a href="#GUI">GUI</a> and
+<a href="#Events">events</a> sections.
+</p>
 
 <p>
 At startup, global code is run. Then the above mentioned callbacks get called

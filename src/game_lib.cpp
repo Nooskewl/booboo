@@ -5269,6 +5269,8 @@ static void found_device_callback()
 			set_2d();
 		}
 	}
+	std::vector<Token> tmp;
+	call_function(prg, "resized", tmp);
 }
 
 void register_game_callbacks()

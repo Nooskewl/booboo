@@ -463,6 +463,46 @@ static void call_timer_callbacks(Program *prg)
 	}
 }
 
+static void pump_events()
+{
+	// EVENTS
+	while (true) {
+		SDL_Event sdl_event;
+		TGUI_Event *e = nullptr;
+
+		bool all_done = false;
+
+		if (!SDL_PollEvent(&sdl_event)) {
+			e = shim::pop_pushed_event();
+			if (e == nullptr) {
+				all_done = true;
+			}
+		}
+
+		if (all_done) {
+			break;
+		}
+
+		TGUI_Event *event;
+
+		if (e) {
+			event = e;
+		}
+		else {
+			if (sdl_event.type == SDL_EVENT_QUIT) {
+				static TGUI_Event quit_event;
+				quit_event.type = TGUI_QUIT;
+				event = &quit_event;
+			}
+			else {
+				event = shim::handle_event(&sdl_event);
+			}
+		}
+
+		handle_event(event);
+	}
+}
+
 static void loop()
 {
 	// These keep the logic running at 60Hz and drawing at refresh rate is possible
@@ -471,60 +511,11 @@ static void loop()
 	int logic_frames = 0;
 	int drawing_frames = 0;
 	bool can_draw = true;
-	bool can_logic = true;
 	std::string old_music_name = "";
 	int curr_logic_rate = shim::logic_rate;
 
 	while (quit == false) {
-		// EVENTS
-		while (true) {
-			SDL_Event sdl_event;
-			TGUI_Event *e = nullptr;
-
-			bool all_done = false;
-
-			if (!SDL_PollEvent(&sdl_event)) {
-				e = shim::pop_pushed_event();
-				if (e == nullptr) {
-					all_done = true;
-				}
-			}
-
-			if (all_done) {
-				break;
-			}
-
-			if (e == nullptr) {
-				if (sdl_event.type == SDL_EVENT_QUIT) {
-					if (can_logic == false) {
-						shim::handle_event(&sdl_event);
-						quit = true;
-						break;
-					}
-				}
-			}
-
-			TGUI_Event *event;
-
-			if (e) {
-				event = e;
-			}
-			else {
-				if (sdl_event.type == SDL_EVENT_QUIT) {
-					static TGUI_Event quit_event;
-					quit_event.type = TGUI_QUIT;
-					event = &quit_event;
-				}
-				else {
-					event = shim::handle_event(&sdl_event);
-				}
-			}
-
-			handle_event(event);
-			if (quit) {
-				break;
-			}
-		}
+		pump_events();
 
 		if (quit) {
 			break;
@@ -589,11 +580,9 @@ static void loop()
 		}
 
 		// LOGIC
-		if (can_logic) {
-			for (int logic = 0; logic < logic_reps; logic++) {
-				gfx::update_animations();
-				// logic
-			}
+		for (int logic = 0; logic < logic_reps; logic++) {
+			gfx::update_animations();
+			// logic
 		}
 
 		// DRAWING
@@ -943,6 +932,8 @@ again:
 	}
 
 	prg = create_program(code);
+
+	pump_events();
 
 	register_game_callbacks();
 
