@@ -1,18 +1,45 @@
 var clouds
 var cloud
-vector_add cloud 0
-vector_add cloud 0
+vector_add cloud 0 0 0
 = [cloud 0] 360
 = [cloud 1] 150
+= [cloud 2] 20
 vector_add clouds cloud
 = [cloud 0] 280
 = [cloud 1] 150
+= [cloud 2] 45
 vector_add clouds cloud
 = [cloud 0] 335
 = [cloud 1] 175
+= [cloud 2] 30
 vector_add clouds cloud
 = [cloud 0] 305
 = [cloud 1] 175
+= [cloud 2] 20
+vector_add clouds cloud
+= [cloud 0] 320
+= [cloud 1] 1600
+= [cloud 2] 35
+vector_add clouds cloud
+= [cloud 0] 300
+= [cloud 1] 150
+= [cloud 2] 15
+vector_add clouds cloud
+= [cloud 0] 275
+= [cloud 1] 180
+= [cloud 2] 20
+vector_add clouds cloud
+= [cloud 0] 330
+= [cloud 1] 175
+= [cloud 2] 30
+vector_add clouds cloud
+= [cloud 0] 240
+= [cloud 1] 145
+= [cloud 2] 20
+vector_add clouds cloud
+= [cloud 0] 245
+= [cloud 1] 185
+= [cloud 2] 15
 vector_add clouds cloud
 
 var count1
@@ -20,66 +47,20 @@ var count1
 var count2
 = count2 600
 
-function draw_cloud cx cy
+var next_flicker flicker_len glow_sz
+= next_flicker 5
+= flicker_len next_flicker
+= glow_sz 0
+
+function draw_cloud cx cy csz
 {
-	var x
-	var y
-	= x cx
-	= y cy
-	= x (- x 20)
-	= y (- y 20)
-	filled_circle 224 224 224 255 x y 15 -1
-	= x cx
-	= y cy
-	= x (- x 35)
-	= y (- y 10)
-	filled_circle 224 224 224 255 x y 20 -1
-	= x cx
-	= y cy
-	= x (- x 15)
-	= y (+ y 5)
-	filled_circle 224 224 224 255 x y 15 -1
-	= x cx
-	= y cy
-	= x (+ x 5)
-	= y (+ y 15)
-	filled_circle 224 224 224 255 x y 25 -1
-	= x cx
-	= y cy
-	= x (+ x 15)
-	= y (+ y 10)
-	filled_circle 224 224 224 255 x y 15 -1
+	filled_circle 224 224 224 255 cx cy csz
 }
 
-function draw_cloud_flip cx cy
+function draw_cloud_flip cx cy csz
 {
-	var x
-	var y
-	= x cx
-	= y cy
-	= x (+ x 20)
-	= y (- y 20)
-	filled_circle 224 224 224 255 x y 15 -1
-	= x cx
-	= y cy
-	= x (+ x 35)
-	= y (- y 10)
-	filled_circle 224 224 224 255 x y 20 -1
-	= x cx
-	= y cy
-	= x (+ x 15)
-	= y (+ y 5)
-	filled_circle 224 224 224 255 x y 15 -1
-	= x cx
-	= y cy
-	= x (- x 5)
-	= y (+ y 15)
-	filled_circle 224 224 224 255 x y 25 -1
-	= x cx
-	= y cy
-	= x (- x 15)
-	= y (+ y 10)
-	filled_circle 224 224 224 255 x y 15 -1
+	= cx (- 640 cx)
+	filled_circle 224 224 224 255 cx cy csz
 }
 
 function draw
@@ -124,19 +105,25 @@ function draw
 :next_cloud
 	var cloud
 	= cloud [clouds i]
-	var x
-	var y
-	explode cloud x y
-	? x 320
-	jge flip_cloud
-	call draw_cloud x y
-	goto next_draw_cloud_iteration
-:flip_cloud
-	call draw_cloud_flip x y
+	var x y sz
+	explode cloud x y sz
+	call draw_cloud x y sz
+	call draw_cloud_flip x y sz
 :next_draw_cloud_iteration
 	= i (+ i 1)
 	? i num_clouds
 	jl next_cloud
+
+	var alpha
+	= alpha (/ next_flicker flicker_len)
+	var y
+	= y (- 360 glow_sz)
+	var r g b
+	= r (* 255 alpha)
+	= g (* 216 alpha)
+	= b 0
+	= alpha (* alpha 255)
+	filled_rectangle 0 0 0 0 0 0 0 0 r g b alpha r g b alpha 0 y 640 glow_sz
 }
 
 function run
@@ -156,14 +143,7 @@ function run
 	var x
 	var y
 	explode cloud x y
-	? x 320
-	jge flip_cloud_update
-	=x (- x 0.5)
-	= [cloud 0] x
-	= [clouds i] cloud
-	goto next_update_iteration
-:flip_cloud_update
-	= x (+ x 0.5)
+	= x (- x 0.5)
 	= [cloud 0] x
 	= [clouds i] cloud
 :next_update_iteration
@@ -177,4 +157,13 @@ function run
 	jg not_done
 	reset "enter_score.boo"
 :not_done
+
+	= next_flicker (- next_flicker 1)
+	if (<= next_flicker 0) flick
+		= next_flicker (rand 5 25)
+		= flicker_len next_flicker
+		var f
+		= f (- 1 (/ count2 600))
+		= glow_sz (+ (* (/ (rand 0 1000) 1000) 100 f) (* f 50) 5)
+	:flick
 }
