@@ -1,3 +1,15 @@
+var ph pw sp am amm buf i
+= buf 0
+
+for i 0 (< i 5) 1 wave
+	vector_add ph (/ (rand 0 1000) 1000)
+	vector_add pw (rand 3 15)
+	vector_add sp (+ (* (/ (rand 0 1000) 1000) 0.01) 0.01)
+	vector_add am (+ (* (/ (rand 0 1000) 1000) 25) 5)
+	vector_add amm (rand 150 300)
+	= buf (+ buf 30)
+:wave
+
 function draw
 {
 	clear 0 0 0
@@ -194,13 +206,47 @@ function draw
 
 	? life 0
 	jg dont_draw_flood
-	var p
-	= p (/ (- 180 exit_count) 180)
-	var h
-	= h (* 360 p)
-	var dy
-	= dy (- 360 h)
-	filled_rectangle 0 108 128 128 0 108 128 128 0 108 128 128 0 108 128 128 0 dy 640 360
+
+	var sw sh
+	explode (get_buffer_size) sw sh
+
+	var i
+	for i 0 (< i sw) 1 flood
+		var j
+		var amp
+		= amp 0
+		for j 0 (< j (vector_size ph)) 1 flood2
+			var f
+			= f (sin (+ (* [ph j] PI 2) (* (/ i sw) [pw j])))
+			var t
+			= t (% (get_ticks) (* [amm j] 2))
+			if (>= t [amm j]) greater less
+				= t (- 1 (/ (- t [amm j]) [amm j]))
+			:greater
+				= t (/ t [amm j])
+			:less
+			= f (* f (* [am j] t))
+			= amp (+ amp f)
+		:flood2
+		var h
+		= h (+ sh (* buf 2))
+		var y
+		= y (/ exit_count 180)
+		= y (* y h)
+		= y (+ y amp)
+		= y (- y buf)
+		filled_rectangle 0 108 128 128 0 108 128 128 0 108 128 128 0 108 128 128 i y 1 (- sh y)
+	:flood
 
 :dont_draw_flood
+}
+
+function event type a b c d
+{
+	if (== type EVENT_TICK) go
+		var i
+		for i 0 (< i (vector_size ph)) 1 loop
+			= [ph i] (+ [ph i] [sp i])
+		:loop
+	:go
 }
