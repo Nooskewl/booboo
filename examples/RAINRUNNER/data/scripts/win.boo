@@ -1,43 +1,43 @@
 var clouds
 var cloud
 vector_add cloud 0 0 0
-= [cloud 0] 360
+= [cloud 0] 300
 = [cloud 1] 150
 = [cloud 2] 20
 vector_add clouds cloud
-= [cloud 0] 280
+= [cloud 0] 220
 = [cloud 1] 150
 = [cloud 2] 45
 vector_add clouds cloud
-= [cloud 0] 335
+= [cloud 0] 275
 = [cloud 1] 175
 = [cloud 2] 30
 vector_add clouds cloud
-= [cloud 0] 305
+= [cloud 0] 245
 = [cloud 1] 175
 = [cloud 2] 20
 vector_add clouds cloud
-= [cloud 0] 320
+= [cloud 0] 260
 = [cloud 1] 1600
 = [cloud 2] 35
 vector_add clouds cloud
-= [cloud 0] 300
+= [cloud 0] 240
 = [cloud 1] 150
 = [cloud 2] 15
 vector_add clouds cloud
-= [cloud 0] 275
+= [cloud 0] 215
 = [cloud 1] 180
 = [cloud 2] 20
 vector_add clouds cloud
-= [cloud 0] 330
+= [cloud 0] 270
 = [cloud 1] 175
 = [cloud 2] 30
 vector_add clouds cloud
-= [cloud 0] 240
+= [cloud 0] 180
 = [cloud 1] 145
 = [cloud 2] 20
 vector_add clouds cloud
-= [cloud 0] 245
+= [cloud 0] 185
 = [cloud 1] 185
 = [cloud 2] 15
 vector_add clouds cloud
@@ -123,7 +123,7 @@ function draw
 	= g (* 216 alpha)
 	= b 0
 	= alpha (* alpha 255)
-	filled_rectangle 0 0 0 0 0 0 0 0 r g b alpha r g b alpha 0 y 640 glow_sz
+	filled_rectangle 0 0 0 0 0 0 0 0 r g b alpha r g b alpha 0 y 640 150
 }
 
 function run
@@ -143,7 +143,7 @@ function run
 	var x
 	var y
 	explode cloud x y
-	= x (- x 0.5)
+	= x (- x 0.35)
 	= [cloud 0] x
 	= [clouds i] cloud
 :next_update_iteration
@@ -164,6 +164,6 @@ function run
 		= flicker_len next_flicker
 		var f
 		= f (- 1 (/ count2 600))
-		= glow_sz (+ (* (/ (rand 0 1000) 1000) 100 f) (* f 50) 5)
+		= glow_sz (+ (* (/ (rand 0 1000) 1000) 100 f) (* f 50))
 	:flick
 }
