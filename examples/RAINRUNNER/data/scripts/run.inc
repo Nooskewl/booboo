@@ -162,9 +162,9 @@ function run
 	= vy 0
 :move_vertical
 	= py (+ py vy)
-	? py 25
+	? py 30
 	jge y_ok
-	= py 25
+	= py 30
 :y_ok
 
 	; gravity
@@ -306,12 +306,12 @@ function run
 	= p_y1 (- player_y h)
 	= p_y2 (+ player_y h)
 	? have_umbrella 1
+	jne check_drop_collisions
 	var tmp
 	var half_umbrella_h
 	explode (image_size umbrella_img) tmp half_umbrella_h
 	= half_umbrella_h (/ half_umbrella_h 2)
 	= p_y1 (- p_y1 half_umbrella_h)
-	jne check_drop_collisions
 :check_drop_collisions
 	? drop_x1 p_x2
 	jge after_collisions
