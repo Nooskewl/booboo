@@ -210,6 +210,8 @@ function draw
 	var sw sh
 	explode (get_buffer_size) sw sh
 
+	start_primitives
+
 	var i
 	for i 0 (< i sw) 1 flood
 		var j
@@ -237,6 +239,8 @@ function draw
 		= y (- y buf)
 		filled_rectangle 0 108 128 128 0 108 128 128 0 108 128 128 0 108 128 128 i y 1 (- sh y)
 	:flood
+
+	end_primitives
 
 :dont_draw_flood
 }
