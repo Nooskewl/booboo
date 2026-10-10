@@ -333,6 +333,7 @@ function run
 	? life 0
 	jne solved_collision
 	= VOID (mml_play gameover_sfx 1 0)
+	screen_shake 3 500
 	= exit_count 180
 :solved_collision
 	= num_drops (- num_drops 1)
