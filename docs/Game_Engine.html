@@ -1337,6 +1337,7 @@ Only the armature named "Armature" is used.</p>
 <p>
 Widgets are generic rectangles with a userdata attached to them to supply
 their properties. Padding can be used as margin since you draw your own widgets, it can be split or used for one or the other.
+x/y in the callbacks refers to the topleft of the widget without padding. Use widget_get_padding_* to get the size of padding.
 </p>
 
 <p>
