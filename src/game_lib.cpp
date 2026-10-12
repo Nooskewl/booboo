@@ -1783,7 +1783,7 @@ static bool fontfunc_draw(Program *prg, const std::vector<Token> &v)
 		interpret_codes = as_number(prg, v, 9);
 	}
 	else {
-		interpret_codes = false;
+		interpret_codes = true;
 	}
 
 	if (v.size() > 10) {
@@ -1808,6 +1808,86 @@ static bool fontfunc_draw(Program *prg, const std::vector<Token> &v)
 	font->draw(c, text, util::Point<float>(x, y), interpret_codes, centre, interpret_codes, rtl);
 
 	return true;
+}
+
+static void exprfunc_font_draw_wrapped(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(8)
+
+	int id = as_number(prg, v, 0);
+	double r = as_number(prg, v, 1);
+	double g = as_number(prg, v, 2);
+	double b = as_number(prg, v, 3);
+	double a = as_number(prg, v, 4);
+	std::string text = as_string(prg, v, 5);
+	double x = as_number(prg, v, 6);
+	double y = as_number(prg, v, 7);
+	int w = as_number(prg, v, 8);
+	int line_height = as_number(prg, v, 9);
+	int max_lines = as_number(prg, v, 10);
+	int elapsed = as_number(prg, v, 11);
+	int delay = as_number(prg, v, 12);
+	int first_line_indent;
+	bool centre;
+	bool interpret_codes;
+	bool dry_run;
+
+	if (v.size() > 13) {
+		first_line_indent = as_number(prg, v, 13);
+	}
+	else {
+		first_line_indent = 0;
+	}
+
+	if (v.size() > 14) {
+		centre = as_number(prg, v, 14);
+	}
+	else {
+		centre = false;
+	}
+
+	if (v.size() > 15) {
+		interpret_codes = as_number(prg, v, 15);
+	}
+	else {
+		interpret_codes = true;
+	}
+
+	if (v.size() > 16) {
+		dry_run = as_number(prg, v, 16);
+	}
+	else {
+		dry_run = false;
+	}
+
+	Font_Info *info = font_info(prg);
+
+	INFO_EXISTS(info->fonts, id)
+
+	gfx::TTF *font = info->fonts[id];
+
+	SDL_Color c;
+	c.r = r;
+	c.g = g;
+	c.b = b;
+	c.a = a;
+
+	bool full;
+	int num_lines;
+	int width;
+
+	font->draw_wrapped(c, text, util::Point<float>(x, y), w, line_height, max_lines, elapsed, delay, dry_run, full, num_lines, width, interpret_codes, centre, first_line_indent, interpret_codes);
+
+	prg->result->set_type(Variable::VECTOR);
+	
+	Variable var;
+	var.set_type(Variable::NUMBER);
+	var.set_n(full);
+	prg->result->v.push_back(var);
+	var.set_n(num_lines);
+	prg->result->v.push_back(var);
+	var.set_n(width);
+	prg->result->v.push_back(var);
 }
 
 static void exprfunc_font_width(Program *prg, const std::vector<Token> &v)
@@ -5370,6 +5450,7 @@ void start_lib_game()
 	add_expression_handler("font_load", exprfunc_font_load);
 	add_instruction("font_destroy", fontfunc_destroy);
 	add_instruction("font_draw", fontfunc_draw);
+	add_expression_handler("font_draw_wrapped", exprfunc_font_draw_wrapped);
 	add_expression_handler("font_width", exprfunc_font_width);
 	add_expression_handler("font_height", exprfunc_font_height);
 	add_instruction("font_add_extra_glyph", fontfunc_add_extra_glyph);
