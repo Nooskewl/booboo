@@ -391,18 +391,22 @@ function run
 		= joy_x1 1
 	:set_strafe_right
 
-	if (< (eabs joy_x1) 0.1) clip_x1
+	= joy_x1 (* joy_x1 0.5)
+	= joy_x2 (* joy_x2 0.5)
+	= joy_y1 (* joy_y1 0.5)
+	= joy_y2 (* joy_y2 0.5)
+	if (< (abs joy_x1) 0.1) clampx1
 		= joy_x1 0
-	:clip_x1
-	if (< (eabs joy_x2) 0.1) clip_x2
+	:clampx1
+	if (< (abs joy_x2) 0.1) clampx2
 		= joy_x2 0
-	:clip_x2
-	if (< (eabs joy_y1) 0.1) clip_y1
+	:clampx2
+	if (< (abs joy_y1) 0.1) clampy1
 		= joy_y1 0
-	:clip_y1
-	if (< (eabs joy_y2) 0.1) clip_y2
+	:clampy1
+	if (< (abs joy_y2) 0.1) clampy2
 		= joy_y2 0
-	:clip_y2
+	:clampy2
 
 	= joy_x1 (neg joy_x1)
 	= joy_y1 (neg joy_y1)
