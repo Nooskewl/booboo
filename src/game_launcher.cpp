@@ -959,6 +959,8 @@ again:
 
 	unregister_game_callbacks();
 
+	gfx::end_screen_shake();
+
 	shim::current_shader = shim::default_shader;
 	shim::current_shader->use();
 	gfx::update_projection();
