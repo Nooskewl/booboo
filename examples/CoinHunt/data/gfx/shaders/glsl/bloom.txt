@@ -16,7 +16,7 @@ void main()
 	float yk1 = texcoord.y / oney;
 	float yk2 = (1.0 - texcoord.y) / oney;
 
-	int kernel = int(max(1, min(7, min(xk1, min(yk2, min(yk1, yk2))))));
+	int kernel = int(max(1, min(7, min(xk1, min(xk2, min(yk1, yk2))))));
 
 	vec4 result = texture2D(tex, texcoord);
 	float f = 1.0 / (float(kernel - 1) * 2.0 + 1.0);
