@@ -356,7 +356,7 @@ extern BOOBOO_EXPORT std::map<std::string, void *> black_box;
 #endif
 
 extern "C" {
-	typedef void (*BOOBOO_DLL_START_FUNC)(void);
+	typedef void (*BOOBOO_DLL_FUNC)(void);
 }
 
 #endif // BOOBOO_H

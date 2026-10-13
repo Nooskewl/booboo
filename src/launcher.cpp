@@ -90,7 +90,7 @@ int main(int argc, char **argv)
 		HMODULE m = LoadLibraryA(dll.c_str());
 		if (m != NULL) {
 			free_dlls.push_back(m);
-			BOOBOO_DLL_START_FUNC func = (BOOBOO_DLL_START_FUNC)GetProcAddress(m, "booboo_start");
+			BOOBOO_DLL_FUNC func = (BOOBOO_DLL_FUNC)GetProcAddress(m, "booboo_start");
 			if (func != NULL) {
 				(*func)();
 			}
@@ -182,6 +182,11 @@ again:
 	shim::static_end_all(false);
 
 	for (size_t i = 0; i < free_dlls.size(); i++) {
+		HMODULE m = free_dlls[i];
+		BOOBOO_DLL_FUNC func = (BOOBOO_DLL_FUNC)GetProcAddress(m, "booboo_end");
+		if (func != NULL) {
+			(*func)();
+		}
 		FreeLibrary(free_dlls[i]);
 	}
 	free_dlls.clear();
