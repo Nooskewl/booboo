@@ -1876,12 +1876,14 @@ static void exprfunc_font_draw_wrapped(Program *prg, const std::vector<Token> &v
 	int num_lines;
 	int width;
 
-	font->draw_wrapped(c, text, util::Point<float>(x, y), w, line_height, max_lines, elapsed, delay, dry_run, full, num_lines, width, interpret_codes, centre, first_line_indent, interpret_codes);
+	int chars_drawn = font->draw_wrapped(c, text, util::Point<float>(x, y), w, line_height, max_lines, elapsed, delay, dry_run, full, num_lines, width, interpret_codes, centre, first_line_indent, interpret_codes);
 
 	prg->result->set_type(Variable::VECTOR);
 	
 	Variable var;
 	var.set_type(Variable::NUMBER);
+	var.set_n(chars_drawn);
+	prg->result->v.push_back(var);
 	var.set_n(full);
 	prg->result->v.push_back(var);
 	var.set_n(num_lines);
