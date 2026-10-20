@@ -1,3 +1,15 @@
+const TRAILSZ 5
+
+var trailbufs i
+for i 0 (< i TRAILSZ) 1 tr
+	var trailbuf
+	= trailbuf (image_create 640 360)
+	vector_add trailbufs trailbuf
+:tr
+var tb tbi
+= tb 0
+= tbi 0
+
 var ph pw sp am amm buf i
 = buf 0
 
@@ -12,9 +24,11 @@ for i 0 (< i 5) 1 wave
 
 function draw
 {
-	clear 0 0 0
+	set_target [trailbufs tbi]
+	
+	clear 0 0 0 0
 
-	line 0 255 0 255 0 ground 640 ground 2
+	filled_rectangle 0 0 0 16 0 0 0 16 0 0 0 16 0 0 0 16 0 0 640 360
 
 	var flip_h
 	= flip_h 0
@@ -149,6 +163,24 @@ function draw
 	= i (+ i 1)
 	? i 10
 	jl next_numeral_draw
+
+	set_target_backbuffer
+
+	clear 0 0 0
+
+	var i
+	for i 0 (< i TRAILSZ) 1 tr
+		var j
+		= j (% (+ i tbi 1) TRAILSZ)
+		var a
+		= a (* (/ (+ i 1) TRAILSZ) 255)
+		image_draw [trailbufs j] a a a a 0 0
+	:tr
+
+	= tb (+ tb 0.5)
+	= tbi (% tb TRAILSZ)
+
+	line 0 255 0 255 0 ground 640 ground 2
 
 	; draw life
 
