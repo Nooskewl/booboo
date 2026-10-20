@@ -248,6 +248,7 @@ function draw
 		= y (/ exit_count 180)
 		= y (* y h)
 		= y (+ y amp2)
+		= y (- y 15)
 		= y (- y buf)
 		filled_rectangle 0 68 80 80 0 68 80 80 0 68 80 80 0 68 80 80 i y 1 (- sh y)
 	:flood
