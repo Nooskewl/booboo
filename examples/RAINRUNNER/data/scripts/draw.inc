@@ -28,8 +28,6 @@ function draw
 	
 	clear 0 0 0 0
 
-	filled_rectangle 0 0 0 16 0 0 0 16 0 0 0 16 0 0 0 16 0 0 640 360
-
 	var flip_h
 	= flip_h 0
 	? dir 1
