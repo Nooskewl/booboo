@@ -39,7 +39,7 @@ var fired
 var billboards
 
 var num_billboards
-= num_billboards 100
+= num_billboards 75
 
 var hit
 = hit (mml_create "@PO0 = { 0 1000 }\nA @TYPE1 @PO0 a8 @PO0")
@@ -53,7 +53,7 @@ for i 0 (< i num_billboards) 1 loop
 	= x (* (/ (- (rand 0 1000) 500) 500) 10)
 	var z
 	= z (* (/ (- (rand 0 1000) 500) 500) 10)
-	= b (billboard_create tree x 0.3 z 0.7 0.7)
+	= b (billboard_create tree x 0.7 z 1.5 1.5)
 	vector_add billboards b
 :loop
 
