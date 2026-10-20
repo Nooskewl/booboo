@@ -29,6 +29,9 @@ var tree
 var projectile
 = projectile (image_load "projectile.png")
 
+var heart
+= heart (image_load "heart.png")
+
 var hand_normal
 = hand_normal (image_load "hand_normal.png")
 var hand_fire
@@ -173,8 +176,15 @@ function move_enemy ~e
 
 function spawn_bullet x y z dx dy dz friendly
 {
+	var img
+	if (== friendly TRUE) ring _heart
+		= img projectile
+	:ring
+		= img heart
+	:_heart
+
 	var billboard
-	= billboard (billboard_create projectile x y z 0.35 0.35)
+	= billboard (billboard_create img x y z 0.35 0.35)
 
 	var bullet
 	= [bullet "x"] x
@@ -278,7 +288,7 @@ function draw
 	= sz (vector_size bullets)
 
 	for i 0 (< i sz) 1 next_bullet
-		billboard_draw [[bullets i] "billboard"] 192 192 192 192
+		billboard_draw [[bullets i] "billboard"] 255 255 255 255
 	:next_bullet
 	
 	enable_depth_test FALSE
@@ -534,7 +544,7 @@ function run
 		= c2 (sin (neg anglex))
 		vector_init v c c2 s
 		= v (normalize v)
-		call spawn_bullet (* x -1) 0.2 (* z -1) [v 0] [v 1] [v 2] TRUE
+		call spawn_bullet (+ (* x -1) 0.1) 0.2 (* z -1) [v 0] [v 1] [v 2] TRUE
 		= VOID (mml_play fire_sfx 1 0)
 		= fired 30
 	:fire
