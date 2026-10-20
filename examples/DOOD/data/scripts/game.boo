@@ -2,8 +2,6 @@ var music
 = music (mml_load "battle.mml")
 = VOID (mml_play music 0.5 1)
 
-resize 240 135
-
 var score
 = score 0
 var life
@@ -12,7 +10,7 @@ var exit_count
 = exit_count 180
 
 var font
-= font (font_load "c:/windows/fonts/arial.ttf" 16 1 512 TRUE)
+= font (font_load "c:/windows/fonts/arial.ttf" 32 1 512 TRUE)
 
 var eicon
 = eicon (image_load "stand_s.png")
@@ -288,7 +286,7 @@ function draw
 
 	set_2d
 
-	image_draw hicon 255 255 255 255 20 10 0 0
+	image_stretch_region hicon 255 255 255 255 0 0 16 16 20 10 32 32 0 0
 
 	var r g b
 	if (>= life 50) green (>= life 25) yellow red
@@ -308,7 +306,7 @@ function draw
 	var healths
 	= healths (string_format "%" life)
 	var xx
-	= xx (+ 20 16 10)
+	= xx (+ 20 32 10)
 	font_draw font 0 0 0 255 healths (- xx 1) 10
 	font_draw font 0 0 0 255 healths (+ xx 1) 10
 	font_draw font 0 0 0 255 healths xx 9
@@ -319,7 +317,7 @@ function draw
 	= scores (string_format "%" score)
 
 	var xx
-	= xx (- 240 20)
+	= xx (- 640 20)
 	var w
 	= w (font_width font scores)
 	= xx (- xx w)
@@ -330,16 +328,20 @@ function draw
 	font_draw font 0 0 0 255 scores xx 11
 	font_draw font 255 255 255 255 scores xx 10
 
-	= xx (- xx 10 16)
+	= xx (- xx 10 32)
 
-	image_draw eicon 255 255 255 255 xx 10 0 0
+	image_stretch_region eicon 255 255 255 255 0 0 16 16 xx 10 32 32 0 0
 
 	var hand
 	= hand hand_normal
 	if (> fired 0) draw_hand
 		= hand hand_fire
 	:draw_hand
-	image_draw hand 255 255 255 255 32 0 0 0
+	var hw hh hw2 hh2
+	explode (image_size hand) hw hh
+	= hw2 (* hw 2)
+	= hh2 (* hh 2)
+	image_stretch_region hand 255 255 255 255 0 0 hw hh (- 640 hw2) (- 360 hh2) hw2 hh2 0 0
 }
 
 function eabs x

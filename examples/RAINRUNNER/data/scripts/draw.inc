@@ -6,9 +6,10 @@ for i 0 (< i TRAILSZ) 1 tr
 	= trailbuf (image_create 640 360)
 	vector_add trailbufs trailbuf
 :tr
-var tb tbi
+var tb tbi last_tbi
 = tb 0
 = tbi 0
+= last_tbi -1
 
 var ph pw sp am amm buf i
 = buf 0
@@ -24,7 +25,13 @@ for i 0 (< i 5) 1 wave
 
 function draw
 {
+	if (== last_tbi tbi) skip
+		goto skiptrail
+	:skip
+
 	set_target [trailbufs tbi]
+
+	= last_tbi tbi
 	
 	clear 0 0 0 0
 
@@ -162,6 +169,7 @@ function draw
 	? i 10
 	jl next_numeral_draw
 
+:skiptrail
 	set_target_backbuffer
 
 	clear 0 0 0
