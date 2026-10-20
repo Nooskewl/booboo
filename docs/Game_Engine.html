@@ -1535,6 +1535,15 @@ and h are the calculated position and size of the widget in pixels.
 	e.g. explode (widget_get_relative_event w mx my) mx my
 </pre>
 
+<h3>widget_set_size</h3>
+<pre>
+	Set a new size for a widget
+	Values less than equal to 1.0 are considered a percent of container size
+	Anything about is exact size in pixels
+	You may need to call gui_layout after this
+	e.g. widget_set_size widget w h
+</pre>
+
 <h3>(gui_start)</h3>
 <pre>
 	Start executing a gui
@@ -1560,7 +1569,8 @@ and h are the calculated position and size of the widget in pixels.
 <h3>gui_set_focus</h3>
 <pre>
 	Set focus to a widget
-	e.g. gui_set_focus my_button
+	If gui is -1 it uses the toplevel gui
+	e.g. gui_set_focus gui my_button
 </pre>
 
 <h3>gui_set_transition_types</h3>
@@ -1569,6 +1579,13 @@ and h are the calculated position and size of the widget in pixels.
 	transitions. See constants.
 	e.g. gui_set_transition_types TRANSITION_SHRINK TRANSITION_SHRINK
 	; this is the default
+</pre>
+
+<h3>gui_set_offset</h3>
+<pre>
+	Set an offset from the topleft for the GUI.
+	If gui is -1 it uses the toplevel gui
+	e.g. gui_set_offset gui x y
 </pre>
 
 <a id="Collision"></a>

@@ -5049,6 +5049,36 @@ static void widgetfunc_get_relative_event(Program *prg, const std::vector<Token>
 	prg->result->v.push_back(var);
 }
 
+static bool widgetfunc_set_size(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(3)
+
+	int id = as_number(prg, v, 0);
+	float w = as_number(prg, v, 1);
+	float h = as_number(prg, v, 2);
+
+	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, id)
+
+	TGUI_Widget *widget = info->widgets[id]->widget;
+
+	if (w <= 1.0) {
+		widget->set_width(w);
+	}
+	else {
+		widget->set_width((int)w);
+	}
+
+	if (h <= 1.0) {
+		widget->set_height(h);
+	}
+	else {
+		widget->set_height((int)h);
+	}
+
+	return true;
+}
+
 class BooBoo_GUI : public gui::GUI
 {
 public:
@@ -5158,16 +5188,21 @@ static bool widgetfunc_gui_exit(Program *prg, const std::vector<Token> &v)
 
 static bool widgetfunc_gui_set_focus(Program *prg, const std::vector<Token> &v)
 {
-	COUNT_ARGS(1)
+	COUNT_ARGS(2)
 
 	unsigned int id = as_number(prg, v, 0);
+	unsigned int widget = as_number(prg, v, 1);
 
 	Widget_Info *info = widget_info(prg);
+	INFO_EXISTS(info->widgets, widget)
 
-	INFO_EXISTS(info->widgets, id)
-
-	if (shim::guis.size() > 0) {
-		shim::guis[shim::guis.size()-1]->gui->set_focus(info->widgets[id]->widget);
+	if (id >= 0) {
+		GUI_Info *ginfo = gui_info(prg);
+		INFO_EXISTS(ginfo->guis, id)
+		ginfo->guis[id]->gui->set_focus(info->widgets[widget]->widget);
+	}
+	else {
+		shim::guis[shim::guis.size()-1]->gui->set_focus(info->widgets[widget]->widget);
 	}
 
 	return true;
@@ -5182,6 +5217,26 @@ static bool widgetfunc_gui_set_transition_types(Program *prg, const std::vector<
 
 	shim::gui_transition_in_type = (gui::GUI::Transition_Type)in;
 	shim::gui_transition_out_type = (gui::GUI::Transition_Type)out;
+
+	return true;
+}
+
+static bool widgetfunc_gui_set_offset(Program *prg, const std::vector<Token> &v)
+{
+	COUNT_ARGS(2)
+
+	unsigned int id = as_number(prg, v, 0);
+	unsigned int x = as_number(prg, v, 1);
+	unsigned int y = as_number(prg, v, 2);
+
+	if (id >= 0) {
+		GUI_Info *info = gui_info(prg);
+		INFO_EXISTS(info->guis, id)
+		info->guis[id]->gui->set_offset(x, y);
+	}
+	else {
+		shim::guis[shim::guis.size()-1]->gui->set_offset(x, y);
+	}
 
 	return true;
 }
@@ -5568,10 +5623,12 @@ void start_lib_game()
 	add_expression_handler("widget_get_padding_top", exprfunc_widget_get_padding_top);
 	add_expression_handler("widget_get_padding_bottom", exprfunc_widget_get_padding_bottom);
 	add_expression_handler("widget_get_relative_event", widgetfunc_get_relative_event);
+	add_instruction("widget_set_size", widgetfunc_set_size);
 	add_expression_handler("gui_start", widgetfunc_gui_start);
 	add_instruction("gui_exit", widgetfunc_gui_exit);
 	add_instruction("gui_set_focus", widgetfunc_gui_set_focus);
 	add_instruction("gui_set_transition_types", widgetfunc_gui_set_transition_types);
+	add_instruction("gui_set_offset", widgetfunc_gui_set_offset);
 	add_instruction("start_text_input", miscfunc_start_text_input);
 	add_instruction("end_text_input", miscfunc_end_text_input);
 	add_instruction("timer_callback", miscfunc_timer_callback);
