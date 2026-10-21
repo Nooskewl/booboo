@@ -628,7 +628,7 @@ function run
 :killed_enemies
 
 	for i 0 (< i ne) 1 enemy_attack
-		if (== TRUE [[enemies i] "attacking"]) ok
+		if (&& (== TRUE [[enemies i] "attacking"]) (== FALSE [[enemies i] "dead"])) ok
 			= [[enemies i] "attack_count"] (- [[enemies i] "attack_count"] 1)
 			if (<= [[enemies i] "attack_count"] 0) enemy_fire
 				= [[enemies i] "attack_count"] 60
