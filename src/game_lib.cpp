@@ -5155,14 +5155,14 @@ static void widgetfunc_gui_start(Program *prg, const std::vector<Token> &v)
 
 static bool widgetfunc_gui_layout(Program *prg, const std::vector<Token> &v)
 {
-	if (v.size() == 0) {
+	if (v.size() == 0 || as_number(prg, v, 0) < 0) {
 		if (shim::guis.size() > 0) {
 			shim::guis.back()->gui->layout();
 		}
 		return true;
 	}
 
-	unsigned int id = as_number(prg, v, 0);
+	int id = as_number(prg, v, 0);
 
 	GUI_Info *info = gui_info(prg);
 	INFO_EXISTS(info->guis, id)
@@ -5190,8 +5190,8 @@ static bool widgetfunc_gui_set_focus(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	unsigned int id = as_number(prg, v, 0);
-	unsigned int widget = as_number(prg, v, 1);
+	int id = as_number(prg, v, 0);
+	int widget = as_number(prg, v, 1);
 
 	Widget_Info *info = widget_info(prg);
 	INFO_EXISTS(info->widgets, widget)
@@ -5225,9 +5225,9 @@ static bool widgetfunc_gui_set_offset(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(2)
 
-	unsigned int id = as_number(prg, v, 0);
-	unsigned int x = as_number(prg, v, 1);
-	unsigned int y = as_number(prg, v, 2);
+	int id = as_number(prg, v, 0);
+	int x = as_number(prg, v, 1);
+	int y = as_number(prg, v, 2);
 
 	if (id >= 0) {
 		GUI_Info *info = gui_info(prg);
