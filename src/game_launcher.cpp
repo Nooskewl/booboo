@@ -960,6 +960,9 @@ again:
 	unregister_game_callbacks();
 
 	gfx::end_screen_shake();
+	
+	SDL_SetWindowRelativeMouseMode(gfx::internal::gfx_context.window, false);
+	mouse_relative = false;
 
 	shim::current_shader = shim::default_shader;
 	shim::current_shader->use();
