@@ -23,8 +23,10 @@ var SPEED
 var BULLET_SPEED
 = BULLET_SPEED 0.2
 
-var tree
+var tree tree2 tree3
 = tree (image_load "tree.png")
+= tree2 (image_load "tree2.png")
+= tree3 (image_load "tree3.png")
 
 var projectile
 = projectile (image_load "projectile.png")
@@ -42,7 +44,7 @@ var fired
 var billboards
 
 var num_billboards
-= num_billboards 75
+= num_billboards 100
 
 var hit
 = hit (mml_create "@PO0 = { 0 1000 }\nA @TYPE1 @PO0 a8 @PO0")
@@ -56,7 +58,25 @@ for i 0 (< i num_billboards) 1 loop
 	= x (* (/ (- (rand 0 1000) 500) 500) 10)
 	var z
 	= z (* (/ (- (rand 0 1000) 500) 500) 10)
-	= b (billboard_create tree x 0.7 z 1.5 1.5)
+	var img w h y r
+	= r (rand 0 2)
+	if (== r 0) zero (== r 1) two three
+		= img tree
+		= w 1.5
+		= h 1.5
+		= y 0.65
+	:zero
+		= img tree2
+		= w 1.0
+		= h 1.0
+		= y 0.4
+	:two
+		= img tree3
+		= w 0.5
+		= h 1.0
+		= y 0.45
+	:three
+	= b (billboard_create img x y z w h)
 	vector_add billboards b
 :loop
 
@@ -77,12 +97,12 @@ vector_add positions 1000 -0.01 -1000
 vector_add positions 1000 -0.01 1000
 vector_add positions -1000 -0.01 1000
 var texcoords
-vector_add texcoords -10000 -10000
-vector_add texcoords 10000 -10000
-vector_add texcoords 10000 10000
-vector_add texcoords -10000 -10000
-vector_add texcoords 10000 10000
-vector_add texcoords -10000 10000
+vector_add texcoords -5000 -5000
+vector_add texcoords 5000 -5000
+vector_add texcoords 5000 5000
+vector_add texcoords -5000 -5000
+vector_add texcoords 5000 5000
+vector_add texcoords -5000 5000
 var faces
 vector_add faces 0 1 2
 vector_add faces 0 2 3
