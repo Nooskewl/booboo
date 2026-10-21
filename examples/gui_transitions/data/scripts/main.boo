@@ -99,7 +99,7 @@ function start_gui
 
 call start_gui
 
-gui_set_focus wl1
+gui_set_focus -1 wl1
 
 function draw_nothing x y w h focussed data
 {

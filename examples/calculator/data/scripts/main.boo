@@ -106,7 +106,7 @@ var ops
 
 = VOID (gui_start container)
 
-gui_set_focus _eq
+gui_set_focus -1 _eq
 
 function draw_window x y w h focussed data
 {
