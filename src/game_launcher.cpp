@@ -533,7 +533,6 @@ static void loop()
 		float ms_per_logic_frame = 1000 / shim::logic_rate;
 		Uint32 now = SDL_GetTicks();
 		int diff = now - start;
-		bool skip_drawing = false;
 		int logic_reps = diff / ms_per_logic_frame;
 
 		// Relax giant stutters/pauses
@@ -579,14 +578,11 @@ static void loop()
 			break;
 		}
 
-		// LOGIC
 		for (int logic = 0; logic < logic_reps; logic++) {
 			gfx::update_animations();
-			// logic
 		}
 
-		// DRAWING
-		if (skip_drawing == false && can_draw) {
+		if (can_draw) {
 			draw_all();
 		}
 
