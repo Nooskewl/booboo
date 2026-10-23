@@ -185,5 +185,18 @@ vector_add life_b 0
 vector_add life_b 0
 vector_add life_b 0
 
+const TRAILSZ 5
+
+var trailbufs i
+for i 0 (< i TRAILSZ) 1 tr
+	var trailbuf
+	= trailbuf (image_create 640 360)
+	vector_add trailbufs trailbuf
+:tr
+var tb tbi last_tbi
+= tb 0
+= tbi 0
+= last_tbi -1
+
 include "run.inc"
 include "draw.inc"
