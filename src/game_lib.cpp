@@ -1743,6 +1743,31 @@ static void exprfunc_font_load(Program *prg, const std::vector<Token> &v)
 	}
 }
 
+static void exprfunc_font_load_pixel(Program *prg, const std::vector<Token> &v)
+{
+	MIN_ARGS(1)
+
+	std::string name = as_string(prg, v, 0);
+
+	Font_Info *info = font_info(prg);
+
+	bool load_from_filesystem = shim::cpa == nullptr;
+	if (v.size() > 1) {
+		load_from_filesystem = as_number(prg, v, 1);
+	}
+
+	prg->result->set_type(Variable::NUMBER);
+
+	try {
+		gfx::Pixel_Font *font = new gfx::Pixel_Font(name, load_from_filesystem);
+		prg->result->set_n(info->font_id);
+		info->fonts[info->font_id++] = font;
+	}
+	catch (util::Error &e) {
+		prg->result->set_n(-1);
+	}
+}
+
 static bool fontfunc_destroy(Program *prg, const std::vector<Token> &v)
 {
 	COUNT_ARGS(1)
@@ -1797,7 +1822,7 @@ static bool fontfunc_draw(Program *prg, const std::vector<Token> &v)
 
 	INFO_EXISTS(info->fonts, id)
 
-	gfx::TTF *font = info->fonts[id];
+	gfx::Font *font = info->fonts[id];
 
 	SDL_Color c;
 	c.r = r;
@@ -1864,7 +1889,7 @@ static void exprfunc_font_draw_wrapped(Program *prg, const std::vector<Token> &v
 
 	INFO_EXISTS(info->fonts, id)
 
-	gfx::TTF *font = info->fonts[id];
+	gfx::Font *font = info->fonts[id];
 
 	SDL_Color c;
 	c.r = r;
@@ -1903,7 +1928,7 @@ static void exprfunc_font_width(Program *prg, const std::vector<Token> &v)
 
 	INFO_EXISTS(info->fonts, id)
 
-	gfx::TTF *font = info->fonts[id];
+	gfx::Font *font = info->fonts[id];
 
 	int w = font->get_text_width(text);
 
@@ -1921,7 +1946,7 @@ static void exprfunc_font_height(Program *prg, const std::vector<Token> &v)
 
 	INFO_EXISTS(info->fonts, id)
 
-	gfx::TTF *font = info->fonts[id];
+	gfx::Font *font = info->fonts[id];
 
 	int h = font->get_height();
 
@@ -1939,7 +1964,7 @@ static bool fontfunc_add_extra_glyph(Program *prg, const std::vector<Token> &v)
 	
 	Font_Info *info = font_info(prg);
 	INFO_EXISTS(info->fonts, id)
-	gfx::TTF *font = info->fonts[id];
+	gfx::Font *font = info->fonts[id];
 
 	Image_Info *iinfo = image_info(prg);
 	INFO_EXISTS(iinfo->images, image_id)
@@ -5505,6 +5530,7 @@ void start_lib_game()
 	add_expression_handler("image_to_texture", exprfunc_image_to_texture);
 	add_instruction("image_update", imagefunc_update);
 	add_expression_handler("font_load", exprfunc_font_load);
+	add_expression_handler("font_load_pixel", exprfunc_font_load_pixel);
 	add_instruction("font_destroy", fontfunc_destroy);
 	add_instruction("font_draw", fontfunc_draw);
 	add_expression_handler("font_draw_wrapped", exprfunc_font_draw_wrapped);
@@ -5646,7 +5672,7 @@ void game_lib_destroy_program(Program *prg)
 		delete image_i->images[(*i).first];
 	}
 	Font_Info *font_i = font_info(prg);
-	for (std::map<int, gfx::TTF *>::iterator i = font_i->fonts.begin(); i != font_i->fonts.end(); i++) {
+	for (std::map<int, gfx::Font *>::iterator i = font_i->fonts.begin(); i != font_i->fonts.end(); i++) {
 		delete font_i->fonts[(*i).first];
 	}
 	Tilemap_Info *tilemap_i = tilemap_info(prg);

@@ -17,3 +17,9 @@ as well as +loop.
 
 Some of these tools need SDL3.dll and SDL3_ttf.dll and shim5.dll, located in the
 root of the BooBoo installation.
+
+mkpixelfont can get you started creating a pixel font. Using the 'events' example
+as a template, you'd put a font.ttf in the font directory and run mkpixelfont to
+create font.png. You need a file called glyphs.utf8 which has each character you
+want in the font, and a file called info.ini which has two possible lines, size=
+and wide= (for wide fonts.)

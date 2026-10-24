@@ -1,9 +1,11 @@
+resize 240 135
+
 var cock fire
 = cock (sample_load "gun-cocking-01.wav")
 = fire (sample_load "pistol.ogg")
 
 var font
-= font (font_load "c:/windows/fonts/arial.ttf" 32 1 512 TRUE)
+= font (font_load_pixel "font")
 
 function event type a b c d
 {
@@ -18,5 +20,5 @@ function event type a b c d
 
 function draw
 {
-	font_draw font 50 255 100 255 "Press SPACE" 25 25
+	font_draw font 255 255 255 255 "Press SPACE" 25 25
 }

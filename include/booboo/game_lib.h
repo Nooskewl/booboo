@@ -53,7 +53,7 @@ struct Image_Info {
 
 struct Font_Info {
 	unsigned int font_id;
-	std::map<int, gfx::TTF *> fonts;
+	std::map<int, gfx::Font *> fonts;
 };
 
 struct Tilemap_Info {
