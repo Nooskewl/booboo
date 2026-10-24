@@ -22,4 +22,5 @@ mkpixelfont can get you started creating a pixel font. Using the 'events' exampl
 as a template, you'd put a font.ttf in the font directory and run mkpixelfont to
 create font.png. You need a file called glyphs.utf8 which has each character you
 want in the font, and a file called info.ini which has two possible lines, size=
-and wide= (for wide fonts.)
+and wide= (for wide fonts.) If you specify a size of 10, it'll reserve 10x10 per
+glyph or 20x10 if wide=1.
